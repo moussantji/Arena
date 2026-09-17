@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oculis · 3 palettes ultra-premium — Ophtalmologie, gestion & réception</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SHELL (présentation) — studio sombre
+============================================================ */
+:root{
+  --shell-bg:#0A0B0F; --shell-ink:#E9EBF4; --shell-dim:#9AA1B8; --shell-line:rgba(255,255,255,.09);
+  --shell-card:rgba(255,255,255,.03);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--shell-bg); color:var(--shell-ink);
+  font-family:'Manrope',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+body::before{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(900px 500px at 85% -5%, rgba(123,92,246,.14), transparent 60%),
+    radial-gradient(800px 480px at -10% 25%, rgba(30,86,214,.12), transparent 60%),
+    radial-gradient(700px 420px at 60% 110%, rgba(15,107,82,.12), transparent 60%);
+}
+::selection{background:#7B5CF6;color:#fff}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+
+/* topbar */
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,11,15,.72);border-bottom:1px solid var(--shell-line)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
+.t-brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;font-size:12px}
+.t-brand .mark{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#1E56D6,#7B5CF6);display:grid;place-items:center;color:#fff}
+.t-brand .mark svg{width:15px;height:15px}
+.t-brand em{font-style:normal;color:var(--shell-dim);font-weight:600;letter-spacing:.06em}
+.t-links{display:flex;gap:4px}
+.t-links a{font-size:11.5px;font-weight:700;color:var(--shell-dim);text-decoration:none;padding:7px 12px;border-radius:99px;transition:.25s}
+.t-links a:hover{color:#fff;background:rgba(255,255,255,.07)}
+
+/* hero */
+.hero{padding:84px 0 60px;position:relative}
+.hero .over{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:800;letter-spacing:.22em;color:var(--shell-dim);text-transform:uppercase;margin-bottom:22px}
+.hero .over::before{content:"";width:26px;height:1.5px;background:linear-gradient(90deg,#1E56D6,#7B5CF6)}
+h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(40px,6.4vw,74px);line-height:1.04;letter-spacing:-.01em;max-width:880px}
+h1 b{font-weight:600}
+h1 i{font-style:italic;font-weight:300;background:linear-gradient(92deg,#8FB3FF,#C9B4FF 60%,#FFC39E);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin-top:24px;max-width:640px;font-size:16px;line-height:1.65;color:var(--shell-dim)}
+.hero .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:30px}
+.hero .tags span{font-size:11px;font-weight:700;letter-spacing:.05em;padding:7px 14px;border-radius:99px;border:1px solid var(--shell-line);background:var(--shell-card);color:var(--shell-dim)}
+
+/* ============================================================
+   SECTIONS PALETTE
+============================================================ */
+section.palette{border-top:1px solid var(--shell-line);padding:76px 0 90px;position:relative}
+.p-head{display:grid;grid-template-columns:auto 1fr;gap:36px;align-items:start;margin-bottom:44px}
+.p-num{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:clamp(72px,9vw,128px);line-height:.9;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.22)}
+.p-title h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(30px,4vw,46px);letter-spacing:-.01em}
+.p-title .mood{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.p-title .mood span{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:6px 12px;border-radius:99px;border:1px solid var(--shell-line);color:var(--shell-dim)}
+.p-title p{margin-top:16px;max-width:660px;font-size:14.5px;line-height:1.7;color:var(--shell-dim)}
+.p-title .use{margin-top:14px;display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--shell-ink);background:var(--shell-card);border:1px solid var(--shell-line);padding:8px 14px;border-radius:10px}
+.p-title .use b{color:var(--shell-dim);font-weight:800;letter-spacing:.1em;font-size:10px;text-transform:uppercase}
+
+/* blocs */
+.block{margin-top:34px}
+.block > h3{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--shell-dim);display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.block > h3::after{content:"";flex:1;height:1px;background:var(--shell-line)}
+
+/* tokens */
+.tgroup{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.tgroup .glabel{grid-column:1/-1;font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--shell-dim);opacity:.75;margin:6px 0 0}
+.sw{border-radius:12px;padding:10px;cursor:pointer;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:transform .25s,box-shadow .25s;min-height:64px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
+.sw:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.sw .n{font-size:10px;font-weight:800;letter-spacing:.02em;opacity:.75}
+.sw .h{font-size:11.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.sw.l{color:#10131c}
+.sw.d{color:#F4F6FF}
+.sw .tip{position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:0;transition:.25s}
+.sw:hover .tip{opacity:.6}
+.sw.copied{outline:2px solid #7B5CF6;outline-offset:2px}
+.grad-sw{background:var(--g)!important}
+
+/* mockups */
+.stage{display:flex;flex-wrap:wrap;gap:40px;align-items:center;justify-content:center}
+.stage-col{display:flex;flex-direction:column;gap:14px;align-items:center}
+.stage-col .cap{font-size:10.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--shell-dim);display:flex;align-items:center;gap:8px}
+.stage-col .cap .ic{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;background:var(--shell-card);border:1px solid var(--shell-line)}
+.stage-col .cap .ic svg{width:12px;height:12px}
+
+/* browser frame */
+.browser{width:min(760px,100%);border-radius:14px;overflow:hidden;background:#10131B;border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 90px rgba(0,0,0,.55)}
+.bbar{height:34px;display:flex;align-items:center;gap:7px;padding:0 14px;background:#161A24;border-bottom:1px solid rgba(255,255,255,.06)}
+.bbar i{width:9px;height:9px;border-radius:50%;background:#2A3040}
+.bbar i:nth-child(1){background:#3A4152}.bbar i:nth-child(2){background:#3A4152}.bbar i:nth-child(3){background:#3A4152}
+.bbar .url{margin-left:12px;flex:1;max-width:330px;font-size:9.5px;font-weight:600;color:#6E7690;background:#0D1017;border:1px solid rgba(255,255,255,.05);border-radius:7px;padding:4px 12px;letter-spacing:.03em}
+
+/* phone frame */
+.phone{width:302px;border-radius:42px;padding:10px;background:linear-gradient(160deg,#232733,#14161d);border:1px solid rgba(255,255,255,.14);box-shadow:0 40px 90px rgba(0,0,0,.55)}
+.phone .island{width:86px;height:18px;border-radius:99px;background:#05060A;margin:6px auto 0;position:relative;z-index:5}
+.pbody{border-radius:33px;overflow:hidden;position:relative;height:600px;display:flex;flex-direction:column}
+
+/* ============================================================
+   PALETTE TOKENS (appliqués aux mockups + swatches)
+============================================================ */
+.p1{--bg:#F3F6FB;--surface:#FFFFFF;--surface-2:#E9EFF8;--border:#D7E0EE;
+    --text-1:#0C1A30;--text-2:#43536E;--text-3:#8492AB;
+    --primary:#1E56D6;--primary-hover:#1744AC;--primary-soft:#E2EAFC;
+    --accent:#C08A2D;--accent-soft:#F6ECDA;
+    --success:#1F8A58;--success-soft:#DFF3E8;
+    --warning:#A86400;--warning-soft:#FAEDD7;
+    --danger:#C13B3B;--danger-soft:#FAE4E4;
+    --sidebar:#0C1A30;--sidebar-text:#B9C7E0;--sidebar-active:#1E56D6;
+    --g:linear-gradient(135deg,#1E56D6,#4F86FF);
+    --shadow:0 14px 34px rgba(12,26,48,.10)}
+.p2{--bg:#F5F3EC;--surface:#FFFFFF;--surface-2:#EFECE1;--border:#E0DBCB;
+    --text-1:#13251E;--text-2:#48584F;--text-3:#8A948C;
+    --primary:#0F6B52;--primary-hover:#0B5540;--primary-soft:#DFF0E8;
+    --accent:#B0702A;--accent-soft:#F5E9D6;
+    --success:#2F7D4E;--success-soft:#E3F1E7;
+    --warning:#A26605;--warning-soft:#F6EDD8;
+    --danger:#B23F2C;--danger-soft:#F7E5E0;
+    --sidebar:#10221B;--sidebar-text:#B4C9BC;--sidebar-active:#0F6B52;
+    --g:linear-gradient(135deg,#0F6B52,#37A37F);
+    --shadow:0 14px 34px rgba(19,37,30,.10)}
+.p3{--bg:#0B0D13;--surface:#141824;--surface-2:#1C2130;--border:#272E42;
+    --text-1:#F1F3FA;--text-2:#A7AEC6;--text-3:#6E7592;
+    --primary:#7B5CF6;--primary-hover:#9377FF;--primary-soft:#292349;
+    --accent:#FF9E6D;--accent-soft:#3B2B21;
+    --success:#34D399;--success-soft:#123227;
+    --warning:#F5B62E;--warning-soft:#352B10;
+    --danger:#F0716B;--danger-soft:#3A1E1E;
+    --sidebar:#0E1119;--sidebar-text:#9AA1BC;--sidebar-active:#7B5CF6;
+    --g:linear-gradient(135deg,#7B5CF6,#B18CFF);
+    --shadow:0 18px 44px rgba(0,0,0,.5)}
+
+/* ============================================================
+   APP DESKTOP (réception)
+============================================================ */
+.app{display:flex;height:478px;background:var(--bg);font-family:'Manrope',sans-serif}
+.app .icn{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.side{width:172px;flex:none;background:var(--sidebar);display:flex;flex-direction:column;padding:16px 12px 12px}
+.brand{display:flex;gap:9px;align-items:center;padding:2px 6px 16px}
+.brand .bmark{width:28px;height:28px;border-radius:9px;background:var(--g);display:grid;place-items:center;color:#fff;flex:none;box-shadow:0 6px 14px rgba(0,0,0,.25)}
+.brand .bmark svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.brand b{font-size:12.5px;font-weight:800;color:#fff;letter-spacing:.02em;display:block;line-height:1.1}
+.brand small{font-size:7.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sidebar-text)}
+.snav{display:flex;flex-direction:column;gap:2px}
+.snav a{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:700;color:var(--sidebar-text);padding:7px 9px;border-radius:8px;text-decoration:none;transition:.2s}
+.snav a .icn{width:13.5px;height:13.5px;opacity:.85}
+.snav a.on{background:var(--sidebar-active);color:#fff;box-shadow:0 6px 14px rgba(0,0,0,.28)}
+.snav a.on .icn{opacity:1}
+.snav a .pip{margin-left:auto;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.suser{margin-top:auto;display:flex;align-items:center;gap:8px;padding:10px 6px 0;border-top:1px solid rgba(255,255,255,.08)}
+.suser .av{width:26px;height:26px;border-radius:50%;background:var(--g);color:#fff;font-size:9px;font-weight:800;display:grid;place-items:center;flex:none}
+.suser b{font-size:10px;color:#fff;display:block;line-height:1.2}
+.suser small{font-size:8px;color:var(--sidebar-text);font-weight:600}
+.main{flex:1;display:flex;flex-direction:column;padding:14px 16px;gap:11px;min-width:0}
+.tbar{display:flex;align-items:center;gap:10px}
+.tbar h1{font-size:15px;font-weight:800;color:var(--text-1);letter-spacing:-.01em;line-height:1.15}
+.tbar .date{font-size:9.5px;font-weight:600;color:var(--text-3)}
+.tbar .sp{flex:1}
+.searchbox{width:172px;height:30px;border-radius:99px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;gap:7px;padding:0 11px;color:var(--text-3)}
+.searchbox .icn{width:12.5px;height:12.5px}
+.searchbox span{font-size:9.5px;font-weight:600}
+.bell{width:30px;height:30px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;color:var(--text-2);position:relative}
+.bell .icn{width:13px;height:13px}
+.bell::after{content:"";position:absolute;top:6px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--accent);border:1.5px solid var(--surface)}
+.tav{width:30px;height:30px;border-radius:50%;background:var(--g);color:#fff;font-size:9.5px;font-weight:800;display:grid;place-items:center}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:9px 11px;box-shadow:var(--shadow)}
+.stat .sl{font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3)}
+.stat .sv{font-size:17px;font-weight:800;color:var(--text-1);margin-top:2px;font-variant-numeric:tabular-nums}
+.stat .ss{font-size:8.5px;font-weight:700;margin-top:1px;display:flex;align-items:center;gap:5px;color:var(--text-3)}
+.stat .ss i{width:6px;height:6px;border-radius:50%;flex:none}
+.cols{flex:1;display:grid;grid-template-columns:1.55fr 1fr;gap:11px;min-height:0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:0}
+.chead{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border)}
+.chead b{font-size:10.5px;font-weight:800;color:var(--text-1)}
+.chead .cnt{font-size:8.5px;font-weight:800;color:var(--primary);background:var(--primary-soft);padding:2px 7px;border-radius:99px}
+.chead .sp{flex:1}
+.chead .fltr{font-size:8.5px;font-weight:700;color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);padding:3px 8px;border-radius:99px}
+.qrows{overflow:hidden}
+.qrow{display:grid;grid-template-columns:34px 24px 1fr auto 20px;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border);min-height:40px}
+.qrow:last-child{border-bottom:none}
+.qrow.hot{background:var(--primary-soft)}
+.qrow.hot .qname{box-shadow:inset 2.5px 0 0 var(--primary)}
+.ctime{font-size:9.5px;font-weight:800;color:var(--text-1);font-variant-numeric:tabular-nums}
+.qrow .qav{width:23px;height:23px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);font-size:7.5px;font-weight:800;display:grid;place-items:center}
+.qname{font-size:10px;font-weight:800;color:var(--text-1);display:block;line-height:1.25;min-width:0}
+.qmotif{font-size:8.5px;font-weight:600;color:var(--text-3);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{font-size:8px;font-weight:800;letter-spacing:.04em;padding:3.5px 8px;border-radius:99px;white-space:nowrap}
+.chip.c-pri{background:var(--primary-soft);color:var(--primary)}
+.chip.c-warn{background:var(--warning-soft);color:var(--warning)}
+.chip.c-ok{background:var(--success-soft);color:var(--success)}
+.chip.c-acc{background:var(--accent-soft);color:var(--accent)}
+.qact{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;color:var(--text-3);background:var(--surface-2)}
+.qact .icn{width:10.5px;height:10.5px}
+/* dossier */
+.dossier{padding:12px;gap:10px}
+.d-hero{display:flex;align-items:center;gap:10px}
+.d-hero .dav{width:36px;height:36px;border-radius:12px;background:var(--g);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center;flex:none}
+.d-hero b{font-size:12px;font-weight:800;color:var(--text-1);display:block;line-height:1.25}
+.d-hero small{font-size:8.5px;font-weight:600;color:var(--text-3);display:block}
+.d-hero .dass{margin-left:auto}
+.vitals{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.vit{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:7px 9px}
+.vit .vl{font-size:7.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+.vit .vv{font-size:10.5px;font-weight:800;color:var(--text-1);margin-top:1px;font-variant-numeric:tabular-nums}
+.vit .vv em{font-style:normal;font-size:8px;color:var(--text-3);font-weight:700}
+.dact{display:flex;gap:7px;margin-top:auto}
+.btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:9.5px;font-weight:800;padding:8px 10px;border-radius:9px;text-decoration:none;transition:.2s}
+.btn .icn{width:11px;height:11px}
+.btn.b-pri{background:var(--primary);color:#fff;box-shadow:0 6px 14px rgba(0,0,0,.15)}
+.btn.b-gh{background:var(--surface);border:1px solid var(--border);color:var(--text-2)}
+
+/* ============================================================
+   APP MOBILE (réception)
+============================================================ */
+.pbody{background:var(--bg);color:var(--text-1)}
+.pbody .icn{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sbar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 2px;font-size:9.5px;font-weight:800;color:var(--text-1)}
+.sbar .rico{display:flex;align-items:center;gap:4px}
+.sbar .batt{width:17px;height:8.5px;border-radius:2.5px;border:1px solid currentColor;position:relative;opacity:.85}
+.sbar .batt::after{content:"";position:absolute;inset:1.2px;right:3.4px;border-radius:1.2px;background:currentColor}
+.mtop{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 10px}
+.mtop .mw{display:flex;align-items:center;gap:7px}
+.mtop .mwe{width:22px;height:22px;border-radius:7px;background:var(--g);display:grid;place-items:center;color:#fff}
+.mtop .mwe svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mtop b{font-size:12.5px;font-weight:800;letter-spacing:.01em}
+.mtop .mad{width:27px;height:27px;border-radius:50%;background:var(--g);color:#fff;font-size:9px;font-weight:800;display:grid;place-items:center}
+.mhero{margin:0 14px;border-radius:18px;background:var(--g);padding:15px 15px 14px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.mhero::after{content:"";position:absolute;right:-34px;top:-40px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.14)}
+.mhero .h1{font-size:14px;font-weight:800;letter-spacing:-.01em;position:relative;z-index:1}
+.mhero .h2{font-size:9.5px;font-weight:600;opacity:.88;margin-top:3px;position:relative;z-index:1}
+.mhero .hb{margin-top:11px;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);color:var(--text-1);font-size:9px;font-weight:800;padding:6.5px 11px;border-radius:99px;position:relative;z-index:1}
+.mhero .hb svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.macts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px 4px}
+.ma{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:9px 4px 7px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:var(--shadow)}
+.ma .mab{width:27px;height:27px;border-radius:9px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center}
+.ma .mab .icn{width:13.5px;height:13.5px}
+.ma small{font-size:7.5px;font-weight:800;color:var(--text-2);letter-spacing:.01em;text-align:center}
+.msec{display:flex;align-items:center;gap:7px;padding:12px 16px 8px}
+.msec b{font-size:10.5px;font-weight:800;color:var(--text-1)}
+.msec .mcnt{font-size:8px;font-weight:800;background:var(--primary-soft);color:var(--primary);padding:2px 7px;border-radius:99px}
+.msec .sp{flex:1}
+.msec .ml{font-size:8.5px;font-weight:700;color:var(--text-3)}
+.mrows{padding:0 14px;overflow:hidden}
+.mrow{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:8px 10px;margin-bottom:7px;box-shadow:var(--shadow)}
+.mt{width:34px;flex:none;text-align:center;font-size:9px;font-weight:800;color:var(--primary);background:var(--primary-soft);border-radius:9px;padding:5px 0;font-variant-numeric:tabular-nums}
+.mrow b{font-size:10px;font-weight:800;color:var(--text-1);display:block;line-height:1.3}
+.mrow small{font-size:8.5px;font-weight:600;color:var(--text-3);display:block}
+.mrow .chev{margin-left:auto;color:var(--text-3);flex:none}
+.mrow .chev .icn{width:11px;height:11px}
+.mrow .chip{margin-left:auto;flex:none}
+.mnav{margin-top:auto;position:relative;border-top:1px solid var(--border);background:var(--surface);padding:8px 8px 14px;display:flex}
+.mnav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3.5px;text-decoration:none;color:var(--text-3);font-size:7.5px;font-weight:800}
+.mnav a .icn{width:16px;height:16px}
+.mnav a.on{color:var(--primary)}
+.mnav a.on::after{content:"";width:4px;height:4px;border-radius:50%;background:var(--primary);margin-top:-1px}
+/* variantes onyx mobile */
+.p3 .mnav{background:rgba(20,24,36,.92);backdrop-filter:blur(10px)}
+.p3 .mrow,.p3 .ma{border-color:var(--border)}
+
+/* ============================================================
+   Ajustements PC / Mobile + export
+============================================================ */
+.adj{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.adj .acard{background:var(--shell-card);border:1px solid var(--shell-line);border-radius:14px;padding:18px}
+.adj .acard h4{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--shell-ink);display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.adj .acard h4 .ic{width:24px;height:24px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--shell-line);display:grid;place-items:center}
+.adj .acard h4 .ic svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.adj li{list-style:none;font-size:12.5px;line-height:1.55;color:var(--shell-dim);padding:5px 0 5px 20px;position:relative;border-bottom:1px dashed rgba(255,255,255,.06)}
+.adj li:last-child{border-bottom:none}
+.adj li::before{content:"";position:absolute;left:2px;top:12px;width:7px;height:7px;border-radius:2.5px;background:var(--adgc,var(--shell-dim))}
+.adj li b{color:var(--shell-ink);font-weight:700}
+
+details.export{background:var(--shell-card);border:1px solid var(--shell-line);border-radius:14px;overflow:hidden}
+details.export summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:15px 18px;font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--shell-ink)}
+details.export summary::-webkit-details-marker{display:none}
+details.export summary .dotx{width:9px;height:9px;border-radius:3px;background:var(--exgc,#7B5CF6)}
+details.export summary .cp{margin-left:auto;font-size:10.5px;font-weight:800;color:var(--shell-dim);border:1px solid var(--shell-line);padding:6px 12px;border-radius:8px;transition:.2s}
+details.export summary .cp:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+details.export pre{margin:0;padding:4px 18px 18px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.75;color:#B9C0D8;overflow-x:auto;white-space:pre}
+details.export .k{color:#8FB3FF}
+details.export .v{color:#E8C99B}
+details.export .c{color:#5A6178;font-style:italic}
+
+/* footer */
+footer{border-top:1px solid var(--shell-line);padding:44px 0 60px}
+.fstrip{display:flex;border-radius:14px;overflow:hidden;height:44px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.fstrip div{flex:1}
+footer p{margin-top:20px;font-size:11.5px;color:var(--shell-dim);text-align:center}
+footer p b{color:var(--shell-ink)}
+
+/* toast */
+#toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,80px);background:#1B2030;border:1px solid rgba(255,255,255,.14);color:#fff;font-size:12px;font-weight:700;padding:11px 18px;border-radius:99px;z-index:99;transition:transform .35s cubic-bezier(.2,.9,.3,1.3);box-shadow:0 16px 40px rgba(0,0,0,.5);display:flex;gap:8px;align-items:center}
+#toast.show{transform:translate(-50%,0)}
+#toast i{width:7px;height:7px;border-radius:50%;background:#34D399}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:none}
+
+@media(max-width:860px){
+  .p-head{grid-template-columns:1fr;gap:10px}
+  .p-num{font-size:64px}
+  .adj{grid-template-columns:1fr}
+  .t-links{display:none}
+  .app{height:auto}
+  .side{display:none}
+  .main{min-width:0}
+  .cols{grid-template-columns:1fr}
+  .qrows{max-height:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== SPRITE ICONS ===================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.2 12S5.8 5.8 12 5.8 21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3.1"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/></symbol>
+  <symbol id="i-door" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2.2"/><circle cx="15" cy="12" r="1.1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.4"/><path d="M3.5 10h17M8.5 3v4M15.5 3v4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9.5" cy="8.5" r="3.4"/><path d="M3 19.5c.8-3.6 3.4-5.4 6.5-5.4s5.7 1.8 6.5 5.4M15.8 5.6a3.4 3.4 0 010 5.9M18.5 14.6c1.6.8 2.7 2.3 3.2 4.4"/></symbol>
+  <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l2.4-6 4.2 12 2.4-6H21"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5.8A1.8 1.8 0 015.8 4H8M16 4h2.2A1.8 1.8 0 0120 5.8V8M20 16v2.2a1.8 1.8 0 01-1.8 1.8H16M8 20H5.8A1.8 1.8 0 014 18.2V16"/><circle cx="12" cy="12" r="3.4"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13.5" rx="2.4"/><path d="M3 10.5h18M6.8 15h4.5"/></symbol>
+  <symbol id="i-slid" viewBox="0 0 24 24"><path d="M4 7.5h16M4 12h16M4 16.5h16"/><circle cx="9.5" cy="7.5" r="2" fill="var(--sidebar,#111)" stroke="none"/><circle cx="15" cy="12" r="2" fill="var(--sidebar,#111)" stroke="none"/><circle cx="7.5" cy="16.5" r="2" fill="var(--sidebar,#111)" stroke="none"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6.2 9.2a5.8 5.8 0 0111.6 0c0 4.6 1.9 5.8 1.9 5.8H4.3s1.9-1.2 1.9-5.8M10 18.6a2.1 2.1 0 004 0"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.4"/><path d="M15.8 15.8L21 21"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4"/><path d="M12 7.2v4.8l3.4 2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.6l5 5L19.5 6.5"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5.5 4h3.4l1.6 4.1-2.1 1.6a12.6 12.6 0 005.9 5.9l1.6-2.1L20 15.1v3.4a2 2 0 01-2.2 2A16.9 16.9 0 013.5 6.2 2 2 0 015.5 4Z"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9.5 5.5l6.5 6.5-6.5 6.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M4 6.2A2.2 2.2 0 016.2 4h11.6A2.2 2.2 0 0120 6.2v8.6a2.2 2.2 0 01-2.2 2.2H9.4L4 21.2V6.2Z"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 20v-9M12 20V4.5M19 20v-6.5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.8"/><path d="M4.8 20c1-3.9 3.9-5.8 7.2-5.8s6.2 1.9 7.2 5.8"/></symbol>
+  <symbol id="i-desktop" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12.5" rx="2"/><path d="M9 20.5h6M12 17v3.5"/></symbol>
+  <symbol id="i-mobile" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.6"/><path d="M11 17.8h2"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4L21 19.5H3L12 4ZM12 10v4.2M12 17.2h.01"/></symbol>
+</svg>
+
+<!-- ===================== TOPBAR ===================== -->
+<header class="topbar">
+  <div class="wrap">
+    <div class="t-brand">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.2 12S5.8 5.8 12 5.8 21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3.1"/></svg></span>
+      OCULIS <em>· Système de palettes</em>
+    </div>
+    <nav class="t-links">
+      <a href="#s1">01 · Saphir &amp; Ambre</a>
+      <a href="#s2">02 · Émeraude &amp; Sable</a>
+      <a href="#s3">03 · Onyx &amp; Iris</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<div class="hero wrap">
+  <div class="over">Ophtalmologie — Gestion de clinique &amp; Réception</div>
+  <h1>Trois palettes <i>ultra-premium</i> pour la gestion de votre clinique <b>ophtalmo</b>.</h1>
+  <p>Chaque palette est déclinée en design tokens complets (surfaces, textes, marque, états) et illustrée sur les deux surfaces clés : le <b>tableau de bord PC de la réception</b> et l'<b>application mobile</b> de l'équipe d'accueil. Cliquez sur un nuancier pour copier le hex.</p>
+  <div class="tags">
+    <span>24 tokens / palette</span><span>PC · sidebar 240px</span><span>Mobile · bottom nav</span><span>Contraste AA</span><span>Export CSS 1-clic</span>
+  </div>
+</div>
+
+<!-- ================================================================
+     PALETTE 01 — SAPHIR & AMBRE
+================================================================= -->
+<section class="palette" id="s1">
+  <div class="wrap">
+    <div class="p-head rv">
+      <div class="p-num">01</div>
+      <div class="p-title">
+        <h2>Saphir &amp; Ambre</h2>
+        <div class="mood"><span>Précision</span><span>Confiance</span><span>Luxe sobre</span></div>
+        <p>Le saphir profond évoque la rigueur du soin visuel ; l'ambre doré réchauffe l'accueil. Fond givré blanc-bleu, sidebar encre marine : la palette de référence des cabinets d'ophtalmologie haut de gamme.</p>
+        <div class="use"><b>Recommandé</b> Interface PC de gestion · écran de réception · patient dossier</div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <h3>Nuancier — tokens</h3>
+      <div class="tgroup">
+        <span class="glabel">Surfaces</span>
+        <div class="sw l" style="background:#F3F6FB" data-copy="#F3F6FB"><span class="tip">copier</span><span class="n">Fond</span><span class="h">#F3F6FB</span></div>
+        <div class="sw l" style="background:#FFFFFF" data-copy="#FFFFFF"><span class="tip">copier</span><span class="n">Surface</span><span class="h">#FFFFFF</span></div>
+        <div class="sw l" style="background:#E9EFF8" data-copy="#E9EFF8"><span class="tip">copier</span><span class="n">Surface 2</span><span class="h">#E9EFF8</span></div>
+        <div class="sw l" style="background:#D7E0EE" data-copy="#D7E0EE"><span class="tip">copier</span><span class="n">Bordure</span><span class="h">#D7E0EE</span></div>
+        <span class="glabel">Textes</span>
+        <div class="sw d" style="background:#0C1A30" data-copy="#0C1A30"><span class="tip">copier</span><span class="n">Texte principal</span><span class="h">#0C1A30</span></div>
+        <div class="sw d" style="background:#43536E" data-copy="#43536E"><span class="tip">copier</span><span class="n">Texte secondaire</span><span class="h">#43536E</span></div>
+        <div class="sw d" style="background:#8492AB" data-copy="#8492AB"><span class="tip">copier</span><span class="n">Texte muet</span><span class="h">#8492AB</span></div>
+        <span class="glabel">Marque</span>
+        <div class="sw d" style="background:#1E56D6" data-copy="#1E56D6"><span class="tip">copier</span><span class="n">Primaire</span><span class="h">#1E56D6</span></div>
+        <div class="sw d" style="background:#1744AC" data-copy="#1744AC"><span class="tip">copier</span><span class="n">Primaire · hover</span><span class="h">#1744AC</span></div>
+        <div class="sw l" style="background:#E2EAFC" data-copy="#E2EAFC"><span class="tip">copier</span><span class="n">Primaire · soft</span><span class="h">#E2EAFC</span></div>
+        <div class="sw d" style="background:#C08A2D" data-copy="#C08A2D"><span class="tip">copier</span><span class="n">Accent or</span><span class="h">#C08A2D</span></div>
+        <div class="sw l" style="background:#F6ECDA" data-copy="#F6ECDA"><span class="tip">copier</span><span class="n">Accent · soft</span><span class="h">#F6ECDA</span></div>
+        <span class="glabel">États</span>
+        <div class="sw d" style="background:#1F8A58" data-copy="#1F8A58"><span class="tip">copier</span><span class="n">Succès</span><span class="h">#1F8A58</span></div>
+        <div class="sw l" style="background:#DFF3E8" data-copy="#DFF3E8"><span class="tip">copier</span><span class="n">Succès · soft</span><span class="h">#DFF3E8</span></div>
+        <div class="sw d" style="background:#A86400" data-copy="#A86400"><span class="tip">copier</span><span class="n">Alerte</span><span class="h">#A86400</span></div>
+        <div class="sw l" style="background:#FAEDD7" data-copy="#FAEDD7"><span class="tip">copier</span><span class="n">Alerte · soft</span><span class="h">#FAEDD7</span></div>
+        <div class="sw d" style="background:#C13B3B" data-copy="#C13B3B"><span class="tip">copier</span><span class="n">Erreur</span><span class="h">#C13B3B</span></div>
+        <div class="sw l" style="background:#FAE4E4" data-copy="#FAE4E4"><span class="tip">copier</span><span class="n">Erreur · soft</span><span class="h">#FAE4E4</span></div>
+        <span class="glabel">Structure</span>
+        <div class="sw d" style="background:#0C1A30" data-copy="#0C1A30"><span class="tip">copier</span><span class="n">Sidebar PC</span><span class="h">#0C1A30</span></div>
+        <div class="sw d grad-sw" data-copy="linear-gradient(135deg,#1E56D6,#4F86FF)"><span class="tip">copier</span><span class="n">Dégradé signature</span><span class="h">1E56D6 → 4F86FF</span></div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <h3>Aperçu — écran réception</h3>
+      <div class="stage">
+        <div class="stage-col">
+          <div class="cap"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-desktop"/></svg></span>PC · Tableau de bord réception</div>
+          <div class="browser">
+            <div class="bbar"><i></i><i></i><i></i><span class="url">app.oculis-clinique.fr/reception</span></div>
+            <div class="app p1">
+              <aside class="side">
+                <div class="brand"><span class="bmark"><svg viewBox="0 0 24 24"><path d="M2.2 12S5.8 5.8 12 5.8 21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3.1"/></svg></span><span><b>Oculis</b><small>Clinique Ophtalmo</small></span></div>
+                <nav class="snav">
+                  <a href="#s1"><svg class="icn"><use href="#i-grid"/></svg>Tableau de bord</a>
+                  <a href="#s1" class="on"><svg class="icn"><use href="#i-door"/></svg>Réception<span class="pip"></span></a>
+                  <a href="#s1"><svg class="icn"><use href="#i-cal"/></svg>Rendez-vous</a>
+                  <a href="#s1"><svg class="icn"><use href="#i-users"/></svg>Patients</a>
+                  <a href="#s1"><svg class="icn"><use href="#i-pulse"/></svg>Consultations</a>
+                  <a href="#s1"><svg class="icn"><use href="#i-scan"/></svg>Imagerie OCT</a>
+                  <a href="#s1"><svg class="icn"><use href="#i-card"/></svg>Facturation</a>
+                  <a href="#s1"><svg class="icn"><use href="#i-slid"/></svg>Paramètres</a>
+                </nav>
+                <div class="suser"><span class="av">CL</span><span><b>Claire Laurent</b><small>Accueil &amp; facturation</small></span></div>
+              </aside>
+              <main class="main">
+                <div class="tbar">
+                  <div><h1>Réception</h1><span class="date">Mardi 17 septembre 2026</span></div>
+                  <span class="sp"></span>
+                  <div class="searchbox"><svg class="icn"><use href="#i-search"/></svg><span>Rechercher un patient…</span></div>
+                  <span class="bell"><svg class="icn"><use href="#i-bell"/></svg></span>
+                  <span class="tav">CL</span>
+                </div>
+                <div class="stats">
+                  <div class="stat"><div class="sl">Rendez-vous</div><div class="sv">24</div><div class="ss"><i style="background:var(--success)"></i>+2 vs hier</div></div>
+                  <div class="stat"><div class="sl">En attente</div><div class="sv">6</div><div class="ss"><i style="background:var(--warning)"></i>salle d'attente</div></div>
+                  <div class="stat"><div class="sl">En consultation</div><div class="sv">2</div><div class="ss"><i style="background:var(--primary)"></i>Dr Martin · Dr Petit</div></div>
+                  <div class="stat"><div class="sl">Retards</div><div class="sv">3</div><div class="ss"><i style="background:var(--danger)"></i>&gt; 10 min</div></div>
+                </div>
+                <div class="cols">
+                  <div class="card">
+                    <div class="chead"><b>File d'accueil</b><span class="cnt">5</span><span class="sp"></span><span class="fltr">Tous les patients</span></div>
+                    <div class="qrows">
+                      <div class="qrow hot">
+                        <span class="ctime">09:12</span><span class="qav">AR</span>
+                        <span class="qname">Amélie Rousseau<span class="qmotif">Consultation + OCT · Dr Martin</span></span>
+                        <span class="chip c-pri">En cours</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">09:30</span><span class="qav">JP</span>
+                        <span class="qname">Jean-Marc Petit<span class="qmotif">Tonométrie + fond d'œil · Dr Petit</span></span>
+                        <span class="chip c-warn">En attente</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">09:45</span><span class="qav">SB</span>
+                        <span class="qname">Sofia Benali<span class="qmotif">Suivi cataracte · Dr Martin</span></span>
+                        <span class="chip c-warn">En attente</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">10:00</span><span class="qav">KH</span>
+                        <span class="qname">Karim Haddad<span class="qmotif">Contrôle post-op · Dr Petit</span></span>
+                        <span class="chip c-ok">Terminé</span>
+                        <span class="qact"><svg class="icn"><use href="#i-check"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">10:15</span><span class="qav">CD</span>
+                        <span class="qname">Claire Dubois<span class="qmotif">Bilan complet · Dr Moreau</span></span>
+                        <span class="chip c-warn">En attente</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card dossier">
+                    <div class="chead" style="border:none;padding:0 0 2px"><b>Dossier patient</b><span class="sp"></span><span class="chip c-acc">N° 2026-0841</span></div>
+                    <div class="d-hero">
+                      <span class="dav">AR</span>
+                      <span><b>Amélie Rousseau</b><small>34 ans · Assurée — CPM T</small></span>
+                    </div>
+                    <div class="vitals">
+                      <div class="vit"><div class="vl">Acuité OD</div><div class="vv">10/10</div></div>
+                      <div class="vit"><div class="vl">Acuité OG</div><div class="vv">9/10</div></div>
+                      <div class="vit"><div class="vl">Tension oculaire</div><div class="vv">14 / 15 <em>mmHg</em></div></div>
+                      <div class="vit"><div class="vl">Dernier OCT</div><div class="vv">02/03/26</div></div>
+                    </div>
+                    <div class="dact">
+                      <a class="btn b-pri" href="#s1"><svg class="icn"><use href="#i-check"/></svg>Vérifier</a>
+                      <a class="btn b-gh" href="#s1"><svg class="icn"><use href="#i-card"/></svg>Facturer</a>
+                    </div>
+                  </div>
+                </div>
+              </main>
+            </div>
+          </div>
+        </div>
+        <div class="stage-col">
+          <div class="cap"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mobile"/></svg></span>Mobile · App réception</div>
+          <div class="phone">
+            <div class="island"></div>
+            <div class="pbody p1">
+              <div class="sbar"><span>09:41</span><span class="rico"><span class="batt"></span></span></div>
+              <div class="mtop">
+                <span class="mw"><span class="mwe"><svg viewBox="0 0 24 24"><path d="M2.2 12S5.8 5.8 12 5.8 21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3.1"/></svg></span><b>Oculis</b></span>
+                <span class="mad">CL</span>
+              </div>
+              <div class="mhero">
+                <div class="h1">Bonjour Claire 👋</div>
+                <div class="h2">24 rendez-vous aujourd'hui · 6 patients en attente</div>
+                <span class="hb">Prendre l'attente <svg viewBox="0 0 24 24"><use href="#i-chev"/></svg></span>
+              </div>
+              <div class="macts">
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-door"/></svg></span><small>Check-in</small></span>
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-plus"/></svg></span><small>Nouveau</small></span>
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-msg"/></svg></span><small>Rappel</small></span>
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-card"/></svg></span><small>Facture</small></span>
+              </div>
+              <div class="msec"><b>Salle d'attente</b><span class="mcnt">3</span><span class="sp"></span><span class="ml">Trier par heure</span></div>
+              <div class="mrows">
+                <div class="mrow"><span class="mt">09:30</span><span><b>Jean-Marc Petit</b><small>Tonométrie + fond d'œil</small></span><span class="chev"><svg class="icn"><use href="#i-chev"/></svg></span></div>
+                <div class="mrow"><span class="mt">09:45</span><span><b>Sofia Benali</b><small>Suivi cataracte</small></span><span class="chev"><svg class="icn"><use href="#i-chev"/></svg></span></div>
+                <div class="mrow"><span class="mt">10:15</span><span><b>Claire Dubois</b><small>Bilan complet</small></span><span class="chev"><svg class="icn"><use href="#i-chev"/></svg></span></div>
+              </div>
+              <div class="msec"><b>Aujourd'hui</b><span class="mcnt">2 à venir</span></div>
+              <div class="mrows">
+                <div class="mrow"><span class="mt">10:30</span><span><b>Dr Petit</b><small>Consultation · cab. 2</small></span><span class="chip c-pri">Planifié</span></div>
+                <div class="mrow"><span class="mt">11:15</span><span><b>K. Haddad</b><small>Contrôle post-op</small></span><span class="chip c-ok">Terminé</span></div>
+              </div>
+              <nav class="mnav">
+                <a href="#s1" class="on"><svg class="icn"><use href="#i-door"/></svg>Accueil</a>
+                <a href="#s1"><svg class="icn"><use href="#i-cal"/></svg>RDV</a>
+                <a href="#s1"><svg class="icn"><use href="#i-users"/></svg>Patients</a>
+                <a href="#s1"><svg class="icn"><use href="#i-chart"/></svg>Stats</a>
+                <a href="#s1"><svg class="icn"><use href="#i-user"/></svg>Profil</a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <h3>Ajustements PC / Mobile</h3>
+      <div class="adj">
+        <div class="acard" style="--adgc:#1E56D6">
+          <h4><span class="ic"><svg viewBox="0 0 24 24"><use href="#i-desktop"/></svg></span>PC — Poste de réception</h4>
+          <ul>
+            <li>Sidebar <b>240px encre marine #0C1A30</b>, item actif en pastille saphir + point or</li>
+            <li>Cards <b>radius 12–14px</b>, bordures hairline 1px <b>#D7E0EE</b>, ombre douce <b>14px / 10%</b></li>
+            <li>Base typographique <b>14px</b>, valeurs chiffrées en tabular-nums (heures, TA, acuités)</li>
+            <li>Dégradé saphir réservé aux <b>CTA primaires</b> et avatars — jamais en fond de page</li>
+          </ul>
+        </div>
+        <div class="acard" style="--adgc:#C08A2D">
+          <h4><span class="ic"><svg viewBox="0 0 24 24"><use href="#i-mobile"/></svg></span>Mobile — Tablette / téléphone de l'accueil</h4>
+          <ul>
+            <li>Bottom nav <b>blanc 56px</b>, item actif saphir + point, icônes 16px</li>
+            <li>Hero <b>dégradé saphir</b> radius 18px, bouton blanc 92% avec texte encre</li>
+            <li><b>44px minimum</b> par cible tactile, cartes radius 13px, espacement 14px</li>
+            <li>Chips d'état <b>toujours douces</b> (fond soft + texte saturé) pour lecture à 2m</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <details class="export">
+        <summary><span class="dotx" style="background:#1E56D6"></span>Export CSS — Saphir &amp; Ambre<span class="cp" data-copy-css="css1">Copier</span></summary>
+        <pre id="css1"><span class="c">/* Palette 01 — Saphir & Ambre (PC & Mobile) */</span>
+<span class="k">:root</span> {
+  --bg: <span class="v">#F3F6FB</span>;            --surface: <span class="v">#FFFFFF</span>;
+  --surface-2: <span class="v">#E9EFF8</span>;        --border: <span class="v">#D7E0EE</span>;
+  --text-1: <span class="v">#0C1A30</span>;           --text-2: <span class="v">#43536E</span>;
+  --text-3: <span class="v">#8492AB</span>;
+  --primary: <span class="v">#1E56D6</span>;          --primary-hover: <span class="v">#1744AC</span>;
+  --primary-soft: <span class="v">#E2EAFC</span>;      --accent: <span class="v">#C08A2D</span>;
+  --accent-soft: <span class="v">#F6ECDA</span>;
+  --success: <span class="v">#1F8A58</span>;           --success-soft: <span class="v">#DFF3E8</span>;
+  --warning: <span class="v">#A86400</span>;           --warning-soft: <span class="v">#FAEDD7</span>;
+  --danger: <span class="v">#C13B3B</span>;            --danger-soft: <span class="v">#FAE4E4</span>;
+  --sidebar-pc: <span class="v">#0C1A30</span>;        --gradient-brand: linear-gradient(135deg, <span class="v">#1E56D6</span>, <span class="v">#4F86FF</span>);
+  --radius-pc: 14px;  --radius-mobile: 18px;
+  --nav-mobile-height: 56px;
+}</pre>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     PALETTE 02 — ÉMERAUDE & SABLE
+================================================================= -->
+<section class="palette" id="s2">
+  <div class="wrap">
+    <div class="p-head rv">
+      <div class="p-num">02</div>
+      <div class="p-title">
+        <h2>Émeraude &amp; Sable</h2>
+        <div class="mood"><span>Apaisement</span><span>Nature</span><span>Prestige</span></div>
+        <p>Un vert profond de cire sur fond crème, rehaussé de cuivre. L'ambiance des cliniques de soins visuels « spa » : chaleureuse à la réception, rassurante pour les bilans complets et le suivi long (cataracte, DMLA, post-op).</p>
+        <div class="use"><b>Idéal</b> Espace patient &amp; bilans · cliniques premium · suivi cataracte / post-op</div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <h3>Nuancier — tokens</h3>
+      <div class="tgroup">
+        <span class="glabel">Surfaces</span>
+        <div class="sw l" style="background:#F5F3EC" data-copy="#F5F3EC"><span class="tip">copier</span><span class="n">Fond</span><span class="h">#F5F3EC</span></div>
+        <div class="sw l" style="background:#FFFFFF" data-copy="#FFFFFF"><span class="tip">copier</span><span class="n">Surface</span><span class="h">#FFFFFF</span></div>
+        <div class="sw l" style="background:#EFECE1" data-copy="#EFECE1"><span class="tip">copier</span><span class="n">Surface 2</span><span class="h">#EFECE1</span></div>
+        <div class="sw l" style="background:#E0DBCB" data-copy="#E0DBCB"><span class="tip">copier</span><span class="n">Bordure</span><span class="h">#E0DBCB</span></div>
+        <span class="glabel">Textes</span>
+        <div class="sw d" style="background:#13251E" data-copy="#13251E"><span class="tip">copier</span><span class="n">Texte principal</span><span class="h">#13251E</span></div>
+        <div class="sw d" style="background:#48584F" data-copy="#48584F"><span class="tip">copier</span><span class="n">Texte secondaire</span><span class="h">#48584F</span></div>
+        <div class="sw d" style="background:#8A948C" data-copy="#8A948C"><span class="tip">copier</span><span class="n">Texte muet</span><span class="h">#8A948C</span></div>
+        <span class="glabel">Marque</span>
+        <div class="sw d" style="background:#0F6B52" data-copy="#0F6B52"><span class="tip">copier</span><span class="n">Primaire</span><span class="h">#0F6B52</span></div>
+        <div class="sw d" style="background:#0B5540" data-copy="#0B5540"><span class="tip">copier</span><span class="n">Primaire · hover</span><span class="h">#0B5540</span></div>
+        <div class="sw l" style="background:#DFF0E8" data-copy="#DFF0E8"><span class="tip">copier</span><span class="n">Primaire · soft</span><span class="h">#DFF0E8</span></div>
+        <div class="sw d" style="background:#B0702A" data-copy="#B0702A"><span class="tip">copier</span><span class="n">Accent cuivre</span><span class="h">#B0702A</span></div>
+        <div class="sw l" style="background:#F5E9D6" data-copy="#F5E9D6"><span class="tip">copier</span><span class="n">Accent · soft</span><span class="h">#F5E9D6</span></div>
+        <span class="glabel">États</span>
+        <div class="sw d" style="background:#2F7D4E" data-copy="#2F7D4E"><span class="tip">copier</span><span class="n">Succès</span><span class="h">#2F7D4E</span></div>
+        <div class="sw l" style="background:#E3F1E7" data-copy="#E3F1E7"><span class="tip">copier</span><span class="n">Succès · soft</span><span class="h">#E3F1E7</span></div>
+        <div class="sw d" style="background:#A26605" data-copy="#A26605"><span class="tip">copier</span><span class="n">Alerte</span><span class="h">#A26605</span></div>
+        <div class="sw l" style="background:#F6EDD8" data-copy="#F6EDD8"><span class="tip">copier</span><span class="n">Alerte · soft</span><span class="h">#F6EDD8</span></div>
+        <div class="sw d" style="background:#B23F2C" data-copy="#B23F2C"><span class="tip">copier</span><span class="n">Erreur</span><span class="h">#B23F2C</span></div>
+        <div class="sw l" style="background:#F7E5E0" data-copy="#F7E5E0"><span class="tip">copier</span><span class="n">Erreur · soft</span><span class="h">#F7E5E0</span></div>
+        <span class="glabel">Structure</span>
+        <div class="sw d" style="background:#10221B" data-copy="#10221B"><span class="tip">copier</span><span class="n">Sidebar PC</span><span class="h">#10221B</span></div>
+        <div class="sw d grad-sw" data-copy="linear-gradient(135deg,#0F6B52,#37A37F)"><span class="tip">copier</span><span class="n">Dégradé signature</span><span class="h">0F6B52 → 37A37F</span></div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <h3>Aperçu — écran réception</h3>
+      <div class="stage">
+        <div class="stage-col">
+          <div class="cap"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-desktop"/></svg></span>PC · Tableau de bord réception</div>
+          <div class="browser">
+            <div class="bbar"><i></i><i></i><i></i><span class="url">app.oculis-clinique.fr/reception</span></div>
+            <div class="app p2">
+              <aside class="side">
+                <div class="brand"><span class="bmark"><svg viewBox="0 0 24 24"><path d="M2.2 12S5.8 5.8 12 5.8 21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3.1"/></svg></span><span><b>Oculis</b><small>Clinique Ophtalmo</small></span></div>
+                <nav class="snav">
+                  <a href="#s2"><svg class="icn"><use href="#i-grid"/></svg>Tableau de bord</a>
+                  <a href="#s2" class="on"><svg class="icn"><use href="#i-door"/></svg>Réception<span class="pip"></span></a>
+                  <a href="#s2"><svg class="icn"><use href="#i-cal"/></svg>Rendez-vous</a>
+                  <a href="#s2"><svg class="icn"><use href="#i-users"/></svg>Patients</a>
+                  <a href="#s2"><svg class="icn"><use href="#i-pulse"/></svg>Consultations</a>
+                  <a href="#s2"><svg class="icn"><use href="#i-scan"/></svg>Imagerie OCT</a>
+                  <a href="#s2"><svg class="icn"><use href="#i-card"/></svg>Facturation</a>
+                  <a href="#s2"><svg class="icn"><use href="#i-slid"/></svg>Paramètres</a>
+                </nav>
+                <div class="suser"><span class="av">CL</span><span><b>Claire Laurent</b><small>Accueil &amp; facturation</small></span></div>
+              </aside>
+              <main class="main">
+                <div class="tbar">
+                  <div><h1>Réception</h1><span class="date">Mardi 17 septembre 2026</span></div>
+                  <span class="sp"></span>
+                  <div class="searchbox"><svg class="icn"><use href="#i-search"/></svg><span>Rechercher un patient…</span></div>
+                  <span class="bell"><svg class="icn"><use href="#i-bell"/></svg></span>
+                  <span class="tav">CL</span>
+                </div>
+                <div class="stats">
+                  <div class="stat"><div class="sl">Rendez-vous</div><div class="sv">24</div><div class="ss"><i style="background:var(--success)"></i>+2 vs hier</div></div>
+                  <div class="stat"><div class="sl">En attente</div><div class="sv">6</div><div class="ss"><i style="background:var(--warning)"></i>salle d'attente</div></div>
+                  <div class="stat"><div class="sl">En consultation</div><div class="sv">2</div><div class="ss"><i style="background:var(--primary)"></i>Dr Martin · Dr Petit</div></div>
+                  <div class="stat"><div class="sl">Retards</div><div class="sv">3</div><div class="ss"><i style="background:var(--danger)"></i>&gt; 10 min</div></div>
+                </div>
+                <div class="cols">
+                  <div class="card">
+                    <div class="chead"><b>File d'accueil</b><span class="cnt">5</span><span class="sp"></span><span class="fltr">Tous les patients</span></div>
+                    <div class="qrows">
+                      <div class="qrow hot">
+                        <span class="ctime">09:12</span><span class="qav">AR</span>
+                        <span class="qname">Amélie Rousseau<span class="qmotif">Consultation + OCT · Dr Martin</span></span>
+                        <span class="chip c-pri">En cours</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">09:30</span><span class="qav">JP</span>
+                        <span class="qname">Jean-Marc Petit<span class="qmotif">Tonométrie + fond d'œil · Dr Petit</span></span>
+                        <span class="chip c-warn">En attente</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">09:45</span><span class="qav">SB</span>
+                        <span class="qname">Sofia Benali<span class="qmotif">Suivi cataracte · Dr Martin</span></span>
+                        <span class="chip c-warn">En attente</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">10:00</span><span class="qav">KH</span>
+                        <span class="qname">Karim Haddad<span class="qmotif">Contrôle post-op · Dr Petit</span></span>
+                        <span class="chip c-ok">Terminé</span>
+                        <span class="qact"><svg class="icn"><use href="#i-check"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">10:15</span><span class="qav">CD</span>
+                        <span class="qname">Claire Dubois<span class="qmotif">Bilan complet · Dr Moreau</span></span>
+                        <span class="chip c-warn">En attente</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card dossier">
+                    <div class="chead" style="border:none;padding:0 0 2px"><b>Dossier patient</b><span class="sp"></span><span class="chip c-acc">N° 2026-0841</span></div>
+                    <div class="d-hero">
+                      <span class="dav">AR</span>
+                      <span><b>Amélie Rousseau</b><small>34 ans · Assurée — CPM T</small></span>
+                    </div>
+                    <div class="vitals">
+                      <div class="vit"><div class="vl">Acuité OD</div><div class="vv">10/10</div></div>
+                      <div class="vit"><div class="vl">Acuité OG</div><div class="vv">9/10</div></div>
+                      <div class="vit"><div class="vl">Tension oculaire</div><div class="vv">14 / 15 <em>mmHg</em></div></div>
+                      <div class="vit"><div class="vl">Dernier OCT</div><div class="vv">02/03/26</div></div>
+                    </div>
+                    <div class="dact">
+                      <a class="btn b-pri" href="#s2"><svg class="icn"><use href="#i-check"/></svg>Vérifier</a>
+                      <a class="btn b-gh" href="#s2"><svg class="icn"><use href="#i-card"/></svg>Facturer</a>
+                    </div>
+                  </div>
+                </div>
+              </main>
+            </div>
+          </div>
+        </div>
+        <div class="stage-col">
+          <div class="cap"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mobile"/></svg></span>Mobile · App réception</div>
+          <div class="phone">
+            <div class="island"></div>
+            <div class="pbody p2">
+              <div class="sbar"><span>09:41</span><span class="rico"><span class="batt"></span></span></div>
+              <div class="mtop">
+                <span class="mw"><span class="mwe"><svg viewBox="0 0 24 24"><path d="M2.2 12S5.8 5.8 12 5.8 21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3.1"/></svg></span><b>Oculis</b></span>
+                <span class="mad">CL</span>
+              </div>
+              <div class="mhero">
+                <div class="h1">Bonjour Claire 👋</div>
+                <div class="h2">24 rendez-vous aujourd'hui · 6 patients en attente</div>
+                <span class="hb">Prendre l'attente <svg viewBox="0 0 24 24"><use href="#i-chev"/></svg></span>
+              </div>
+              <div class="macts">
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-door"/></svg></span><small>Check-in</small></span>
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-plus"/></svg></span><small>Nouveau</small></span>
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-msg"/></svg></span><small>Rappel</small></span>
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-card"/></svg></span><small>Facture</small></span>
+              </div>
+              <div class="msec"><b>Salle d'attente</b><span class="mcnt">3</span><span class="sp"></span><span class="ml">Trier par heure</span></div>
+              <div class="mrows">
+                <div class="mrow"><span class="mt">09:30</span><span><b>Jean-Marc Petit</b><small>Tonométrie + fond d'œil</small></span><span class="chev"><svg class="icn"><use href="#i-chev"/></svg></span></div>
+                <div class="mrow"><span class="mt">09:45</span><span><b>Sofia Benali</b><small>Suivi cataracte</small></span><span class="chev"><svg class="icn"><use href="#i-chev"/></svg></span></div>
+                <div class="mrow"><span class="mt">10:15</span><span><b>Claire Dubois</b><small>Bilan complet</small></span><span class="chev"><svg class="icn"><use href="#i-chev"/></svg></span></div>
+              </div>
+              <div class="msec"><b>Aujourd'hui</b><span class="mcnt">2 à venir</span></div>
+              <div class="mrows">
+                <div class="mrow"><span class="mt">10:30</span><span><b>Dr Petit</b><small>Consultation · cab. 2</small></span><span class="chip c-pri">Planifié</span></div>
+                <div class="mrow"><span class="mt">11:15</span><span><b>K. Haddad</b><small>Contrôle post-op</small></span><span class="chip c-ok">Terminé</span></div>
+              </div>
+              <nav class="mnav">
+                <a href="#s2" class="on"><svg class="icn"><use href="#i-door"/></svg>Accueil</a>
+                <a href="#s2"><svg class="icn"><use href="#i-cal"/></svg>RDV</a>
+                <a href="#s2"><svg class="icn"><use href="#i-users"/></svg>Patients</a>
+                <a href="#s2"><svg class="icn"><use href="#i-chart"/></svg>Stats</a>
+                <a href="#s2"><svg class="icn"><use href="#i-user"/></svg>Profil</a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <h3>Ajustements PC / Mobile</h3>
+      <div class="adj">
+        <div class="acard" style="--adgc:#0F6B52">
+          <h4><span class="ic"><svg viewBox="0 0 24 24"><use href="#i-desktop"/></svg></span>PC — Poste de réception</h4>
+          <ul>
+            <li>Sidebar <b>240px pin forêt #10221B</b>, item actif émeraude + point cuivre</li>
+            <li>Cards <b>radius 14px</b>, bordures <b>#E0DBCB</b> légèrement sableuses, ombre chaude</li>
+            <li>Fond de page <b>crème #F5F3EC</b> : les surfaces blanches « flottent » sans agressivité</li>
+            <li>Le cuivre est un accent <b>≤ 5%</b> : points actifs, badges de dossier, surbrillance facturation</li>
+          </ul>
+        </div>
+        <div class="acard" style="--adgc:#B0702A">
+          <h4><span class="ic"><svg viewBox="0 0 24 24"><use href="#i-mobile"/></svg></span>Mobile — Tablette / téléphone de l'accueil</h4>
+          <ul>
+            <li>Bottom nav <b>crème #F5F3EC</b> + hairline sable, item actif émeraude</li>
+            <li>Hero <b>dégradé émeraude</b> radius 18px, halo blanc 14% en haut à droite</li>
+            <li>Actions rapides : pastilles <b>soft émeraude</b> radius 9px, label 7.5px gras</li>
+            <li>Modes d'usage : <b>tablette paysage</b> pour la file d'attente, portrait pour le check-in</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <details class="export">
+        <summary><span class="dotx" style="background:#0F6B52"></span>Export CSS — Émeraude &amp; Sable<span class="cp" data-copy-css="css2">Copier</span></summary>
+        <pre id="css2"><span class="c">/* Palette 02 — Émeraude & Sable (PC & Mobile) */</span>
+<span class="k">:root</span> {
+  --bg: <span class="v">#F5F3EC</span>;            --surface: <span class="v">#FFFFFF</span>;
+  --surface-2: <span class="v">#EFECE1</span>;        --border: <span class="v">#E0DBCB</span>;
+  --text-1: <span class="v">#13251E</span>;           --text-2: <span class="v">#48584F</span>;
+  --text-3: <span class="v">#8A948C</span>;
+  --primary: <span class="v">#0F6B52</span>;          --primary-hover: <span class="v">#0B5540</span>;
+  --primary-soft: <span class="v">#DFF0E8</span>;      --accent: <span class="v">#B0702A</span>;
+  --accent-soft: <span class="v">#F5E9D6</span>;
+  --success: <span class="v">#2F7D4E</span>;           --success-soft: <span class="v">#E3F1E7</span>;
+  --warning: <span class="v">#A26605</span>;           --warning-soft: <span class="v">#F6EDD8</span>;
+  --danger: <span class="v">#B23F2C</span>;            --danger-soft: <span class="v">#F7E5E0</span>;
+  --sidebar-pc: <span class="v">#10221B</span>;        --gradient-brand: linear-gradient(135deg, <span class="v">#0F6B52</span>, <span class="v">#37A37F</span>);
+  --radius-pc: 14px;  --radius-mobile: 18px;
+  --nav-mobile-height: 56px;
+}</pre>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     PALETTE 03 — ONYX & IRIS
+================================================================= -->
+<section class="palette" id="s3">
+  <div class="wrap">
+    <div class="p-head rv">
+      <div class="p-num">03</div>
+      <div class="p-title">
+        <h2>Onyx &amp; Iris</h2>
+        <div class="mood"><span>Technologie</span><span>Nuit</span><span>Signature</span></div>
+        <p>Un onyx profond traversé d'une lavande irisée et d'une lueur abricot. La palette digitale : mode « Nuit » de la réception (gardes, salle d'imagerie), lecture des rendus OCT et fond d'œil sans éblouir les yeux des patients.</p>
+        <div class="use"><b>Signature</b> Mode sombre · salle d'imagerie OCT / fond d'œil · app patient premium</div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <h3>Nuancier — tokens</h3>
+      <div class="tgroup">
+        <span class="glabel">Surfaces</span>
+        <div class="sw d" style="background:#0B0D13" data-copy="#0B0D13"><span class="tip">copier</span><span class="n">Fond</span><span class="h">#0B0D13</span></div>
+        <div class="sw d" style="background:#141824" data-copy="#141824"><span class="tip">copier</span><span class="n">Surface</span><span class="h">#141824</span></div>
+        <div class="sw d" style="background:#1C2130" data-copy="#1C2130"><span class="tip">copier</span><span class="n">Surface 2</span><span class="h">#1C2130</span></div>
+        <div class="sw d" style="background:#272E42" data-copy="#272E42"><span class="tip">copier</span><span class="n">Bordure</span><span class="h">#272E42</span></div>
+        <span class="glabel">Textes</span>
+        <div class="sw l" style="background:#F1F3FA" data-copy="#F1F3FA"><span class="tip">copier</span><span class="n">Texte principal</span><span class="h">#F1F3FA</span></div>
+        <div class="sw l" style="background:#A7AEC6" data-copy="#A7AEC6"><span class="tip">copier</span><span class="n">Texte secondaire</span><span class="h">#A7AEC6</span></div>
+        <div class="sw d" style="background:#6E7592" data-copy="#6E7592"><span class="tip">copier</span><span class="n">Texte muet</span><span class="h">#6E7592</span></div>
+        <span class="glabel">Marque</span>
+        <div class="sw d" style="background:#7B5CF6" data-copy="#7B5CF6"><span class="tip">copier</span><span class="n">Primaire iris</span><span class="h">#7B5CF6</span></div>
+        <div class="sw d" style="background:#9377FF" data-copy="#9377FF"><span class="tip">copier</span><span class="n">Primaire · hover</span><span class="h">#9377FF</span></div>
+        <div class="sw d" style="background:#292349" data-copy="#292349"><span class="tip">copier</span><span class="n">Primaire · soft</span><span class="h">#292349</span></div>
+        <div class="sw l" style="background:#FF9E6D" data-copy="#FF9E6D"><span class="tip">copier</span><span class="n">Accent abricot</span><span class="h">#FF9E6D</span></div>
+        <div class="sw d" style="background:#3B2B21" data-copy="#3B2B21"><span class="tip">copier</span><span class="n">Accent · soft</span><span class="h">#3B2B21</span></div>
+        <span class="glabel">États</span>
+        <div class="sw l" style="background:#34D399" data-copy="#34D399"><span class="tip">copier</span><span class="n">Succès</span><span class="h">#34D399</span></div>
+        <div class="sw d" style="background:#123227" data-copy="#123227"><span class="tip">copier</span><span class="n">Succès · soft</span><span class="h">#123227</span></div>
+        <div class="sw l" style="background:#F5B62E" data-copy="#F5B62E"><span class="tip">copier</span><span class="n">Alerte</span><span class="h">#F5B62E</span></div>
+        <div class="sw d" style="background:#352B10" data-copy="#352B10"><span class="tip">copier</span><span class="n">Alerte · soft</span><span class="h">#352B10</span></div>
+        <div class="sw l" style="background:#F0716B" data-copy="#F0716B"><span class="tip">copier</span><span class="n">Erreur</span><span class="h">#F0716B</span></div>
+        <div class="sw d" style="background:#3A1E1E" data-copy="#3A1E1E"><span class="tip">copier</span><span class="n">Erreur · soft</span><span class="h">#3A1E1E</span></div>
+        <span class="glabel">Structure</span>
+        <div class="sw d" style="background:#0E1119" data-copy="#0E1119"><span class="tip">copier</span><span class="n">Sidebar PC</span><span class="h">#0E1119</span></div>
+        <div class="sw d grad-sw" data-copy="linear-gradient(135deg,#7B5CF6,#B18CFF)"><span class="tip">copier</span><span class="n">Dégradé signature</span><span class="h">7B5CF6 → B18CFF</span></div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <h3>Aperçu — écran réception</h3>
+      <div class="stage">
+        <div class="stage-col">
+          <div class="cap"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-desktop"/></svg></span>PC · Tableau de bord réception</div>
+          <div class="browser">
+            <div class="bbar"><i></i><i></i><i></i><span class="url">app.oculis-clinique.fr/reception</span></div>
+            <div class="app p3">
+              <aside class="side">
+                <div class="brand"><span class="bmark"><svg viewBox="0 0 24 24"><path d="M2.2 12S5.8 5.8 12 5.8 21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3.1"/></svg></span><span><b>Oculis</b><small>Clinique Ophtalmo</small></span></div>
+                <nav class="snav">
+                  <a href="#s3"><svg class="icn"><use href="#i-grid"/></svg>Tableau de bord</a>
+                  <a href="#s3" class="on"><svg class="icn"><use href="#i-door"/></svg>Réception<span class="pip"></span></a>
+                  <a href="#s3"><svg class="icn"><use href="#i-cal"/></svg>Rendez-vous</a>
+                  <a href="#s3"><svg class="icn"><use href="#i-users"/></svg>Patients</a>
+                  <a href="#s3"><svg class="icn"><use href="#i-pulse"/></svg>Consultations</a>
+                  <a href="#s3"><svg class="icn"><use href="#i-scan"/></svg>Imagerie OCT</a>
+                  <a href="#s3"><svg class="icn"><use href="#i-card"/></svg>Facturation</a>
+                  <a href="#s3"><svg class="icn"><use href="#i-slid"/></svg>Paramètres</a>
+                </nav>
+                <div class="suser"><span class="av">CL</span><span><b>Claire Laurent</b><small>Accueil &amp; facturation</small></span></div>
+              </aside>
+              <main class="main">
+                <div class="tbar">
+                  <div><h1>Réception</h1><span class="date">Mardi 17 septembre 2026</span></div>
+                  <span class="sp"></span>
+                  <div class="searchbox"><svg class="icn"><use href="#i-search"/></svg><span>Rechercher un patient…</span></div>
+                  <span class="bell"><svg class="icn"><use href="#i-bell"/></svg></span>
+                  <span class="tav">CL</span>
+                </div>
+                <div class="stats">
+                  <div class="stat"><div class="sl">Rendez-vous</div><div class="sv">24</div><div class="ss"><i style="background:var(--success)"></i>+2 vs hier</div></div>
+                  <div class="stat"><div class="sl">En attente</div><div class="sv">6</div><div class="ss"><i style="background:var(--warning)"></i>salle d'attente</div></div>
+                  <div class="stat"><div class="sl">En consultation</div><div class="sv">2</div><div class="ss"><i style="background:var(--primary)"></i>Dr Martin · Dr Petit</div></div>
+                  <div class="stat"><div class="sl">Retards</div><div class="sv">3</div><div class="ss"><i style="background:var(--danger)"></i>&gt; 10 min</div></div>
+                </div>
+                <div class="cols">
+                  <div class="card">
+                    <div class="chead"><b>File d'accueil</b><span class="cnt">5</span><span class="sp"></span><span class="fltr">Tous les patients</span></div>
+                    <div class="qrows">
+                      <div class="qrow hot">
+                        <span class="ctime">09:12</span><span class="qav">AR</span>
+                        <span class="qname">Amélie Rousseau<span class="qmotif">Consultation + OCT · Dr Martin</span></span>
+                        <span class="chip c-pri">En cours</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">09:30</span><span class="qav">JP</span>
+                        <span class="qname">Jean-Marc Petit<span class="qmotif">Tonométrie + fond d'œil · Dr Petit</span></span>
+                        <span class="chip c-warn">En attente</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">09:45</span><span class="qav">SB</span>
+                        <span class="qname">Sofia Benali<span class="qmotif">Suivi cataracte · Dr Martin</span></span>
+                        <span class="chip c-warn">En attente</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">10:00</span><span class="qav">KH</span>
+                        <span class="qname">Karim Haddad<span class="qmotif">Contrôle post-op · Dr Petit</span></span>
+                        <span class="chip c-ok">Terminé</span>
+                        <span class="qact"><svg class="icn"><use href="#i-check"/></svg></span>
+                      </div>
+                      <div class="qrow">
+                        <span class="ctime">10:15</span><span class="qav">CD</span>
+                        <span class="qname">Claire Dubois<span class="qmotif">Bilan complet · Dr Moreau</span></span>
+                        <span class="chip c-warn">En attente</span>
+                        <span class="qact"><svg class="icn"><use href="#i-phone"/></svg></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card dossier">
+                    <div class="chead" style="border:none;padding:0 0 2px"><b>Dossier patient</b><span class="sp"></span><span class="chip c-acc">N° 2026-0841</span></div>
+                    <div class="d-hero">
+                      <span class="dav">AR</span>
+                      <span><b>Amélie Rousseau</b><small>34 ans · Assurée — CPM T</small></span>
+                    </div>
+                    <div class="vitals">
+                      <div class="vit"><div class="vl">Acuité OD</div><div class="vv">10/10</div></div>
+                      <div class="vit"><div class="vl">Acuité OG</div><div class="vv">9/10</div></div>
+                      <div class="vit"><div class="vl">Tension oculaire</div><div class="vv">14 / 15 <em>mmHg</em></div></div>
+                      <div class="vit"><div class="vl">Dernier OCT</div><div class="vv">02/03/26</div></div>
+                    </div>
+                    <div class="dact">
+                      <a class="btn b-pri" href="#s3"><svg class="icn"><use href="#i-check"/></svg>Vérifier</a>
+                      <a class="btn b-gh" href="#s3"><svg class="icn"><use href="#i-card"/></svg>Facturer</a>
+                    </div>
+                  </div>
+                </div>
+              </main>
+            </div>
+          </div>
+        </div>
+        <div class="stage-col">
+          <div class="cap"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mobile"/></svg></span>Mobile · App réception</div>
+          <div class="phone">
+            <div class="island"></div>
+            <div class="pbody p3">
+              <div class="sbar"><span>09:41</span><span class="rico"><span class="batt"></span></span></div>
+              <div class="mtop">
+                <span class="mw"><span class="mwe"><svg viewBox="0 0 24 24"><path d="M2.2 12S5.8 5.8 12 5.8 21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3.1"/></svg></span><b>Oculis</b></span>
+                <span class="mad">CL</span>
+              </div>
+              <div class="mhero">
+                <div class="h1">Bonjour Claire 👋</div>
+                <div class="h2">24 rendez-vous aujourd'hui · 6 patients en attente</div>
+                <span class="hb">Prendre l'attente <svg viewBox="0 0 24 24"><use href="#i-chev"/></svg></span>
+              </div>
+              <div class="macts">
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-door"/></svg></span><small>Check-in</small></span>
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-plus"/></svg></span><small>Nouveau</small></span>
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-msg"/></svg></span><small>Rappel</small></span>
+                <span class="ma"><span class="mab"><svg class="icn"><use href="#i-card"/></svg></span><small>Facture</small></span>
+              </div>
+              <div class="msec"><b>Salle d'attente</b><span class="mcnt">3</span><span class="sp"></span><span class="ml">Trier par heure</span></div>
+              <div class="mrows">
+                <div class="mrow"><span class="mt">09:30</span><span><b>Jean-Marc Petit</b><small>Tonométrie + fond d'œil</small></span><span class="chev"><svg class="icn"><use href="#i-chev"/></svg></span></div>
+                <div class="mrow"><span class="mt">09:45</span><span><b>Sofia Benali</b><small>Suivi cataracte</small></span><span class="chev"><svg class="icn"><use href="#i-chev"/></svg></span></div>
+                <div class="mrow"><span class="mt">10:15</span><span><b>Claire Dubois</b><small>Bilan complet</small></span><span class="chev"><svg class="icn"><use href="#i-chev"/></svg></span></div>
+              </div>
+              <div class="msec"><b>Aujourd'hui</b><span class="mcnt">2 à venir</span></div>
+              <div class="mrows">
+                <div class="mrow"><span class="mt">10:30</span><span><b>Dr Petit</b><small>Consultation · cab. 2</small></span><span class="chip c-pri">Planifié</span></div>
+                <div class="mrow"><span class="mt">11:15</span><span><b>K. Haddad</b><small>Contrôle post-op</small></span><span class="chip c-ok">Terminé</span></div>
+              </div>
+              <nav class="mnav">
+                <a href="#s3" class="on"><svg class="icn"><use href="#i-door"/></svg>Accueil</a>
+                <a href="#s3"><svg class="icn"><use href="#i-cal"/></svg>RDV</a>
+                <a href="#s3"><svg class="icn"><use href="#i-users"/></svg>Patients</a>
+                <a href="#s3"><svg class="icn"><use href="#i-chart"/></svg>Stats</a>
+                <a href="#s3"><svg class="icn"><use href="#i-user"/></svg>Profil</a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <h3>Ajustements PC / Mobile</h3>
+      <div class="adj">
+        <div class="acard" style="--adgc:#7B5CF6">
+          <h4><span class="ic"><svg viewBox="0 0 24 24"><use href="#i-desktop"/></svg></span>PC — Poste de réception (nuit / imagerie)</h4>
+          <ul>
+            <li>3 niveaux de surface <b>#0B0D13 → #141824 → #1C2130</b>, bordures <b>#272E42</b> (jamais de noir pur)</li>
+            <li>Item actif : pastille iris <b>avec lueur douce</b> (shadow 25%), point abricot</li>
+            <li>Cards <b>radius 12px</b>, ombre portée 40% — la profondeur remplace les bordures</li>
+            <li>Texte blanc <b>90% max</b> (#F1F3FA) pour éviter l'éblouissement en salle de soins</li>
+          </ul>
+        </div>
+        <div class="acard" style="--adgc:#FF9E6D">
+          <h4><span class="ic"><svg viewBox="0 0 24 24"><use href="#i-mobile"/></svg></span>Mobile — App de garde / tablette</h4>
+          <ul>
+            <li>Bottom nav <b>pillule glass</b> (blur 10px, surface 92%) collée au bord bas</li>
+            <li>Hero <b>dégradé iris</b> radius 18px + halo blanc 14%, CTA blanc 92%</li>
+            <li>États <b>neon-doux</b> : pastilles sombres + texte vif (lisible, sans halos)</li>
+            <li>Usage <b>main courante</b> : check-in rapide, le pouce atteint tout en bas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="block rv">
+      <details class="export">
+        <summary><span class="dotx" style="background:#7B5CF6"></span>Export CSS — Onyx &amp; Iris<span class="cp" data-copy-css="css3">Copier</span></summary>
+        <pre id="css3"><span class="c">/* Palette 03 — Onyx & Iris (mode sombre PC & Mobile) */</span>
+<span class="k">:root</span> {
+  --bg: <span class="v">#0B0D13</span>;            --surface: <span class="v">#141824</span>;
+  --surface-2: <span class="v">#1C2130</span>;        --border: <span class="v">#272E42</span>;
+  --text-1: <span class="v">#F1F3FA</span>;           --text-2: <span class="v">#A7AEC6</span>;
+  --text-3: <span class="v">#6E7592</span>;
+  --primary: <span class="v">#7B5CF6</span>;          --primary-hover: <span class="v">#9377FF</span>;
+  --primary-soft: <span class="v">#292349</span>;      --accent: <span class="v">#FF9E6D</span>;
+  --accent-soft: <span class="v">#3B2B21</span>;
+  --success: <span class="v">#34D399</span>;           --success-soft: <span class="v">#123227</span>;
+  --warning: <span class="v">#F5B62E</span>;           --warning-soft: <span class="v">#352B10</span>;
+  --danger: <span class="v">#F0716B</span>;            --danger-soft: <span class="v">#3A1E1E</span>;
+  --sidebar-pc: <span class="v">#0E1119</span>;        --gradient-brand: linear-gradient(135deg, <span class="v">#7B5CF6</span>, <span class="v">#B18CFF</span>);
+  --radius-pc: 12px;  --radius-mobile: 20px;
+  --nav-mobile-glass: blur(10px) <span class="v">#141824</span>E7;
+}</pre>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="wrap">
+    <div class="fstrip">
+      <div style="background:linear-gradient(135deg,#1E56D6,#4F86FF)"></div>
+      <div style="background:linear-gradient(135deg,#0F6B52,#37A37F)"></div>
+      <div style="background:linear-gradient(135deg,#7B5CF6,#B18CFF)"></div>
+    </div>
+    <p><b>Oculis</b> — 3 systèmes de palettes premium pour la gestion d'une clinique d'ophtalmologie &amp; sa réception. Cliquez sur n'importe quel nuancier pour copier la couleur · « Copier » exporte le bloc CSS.</p>
+  </div>
+</footer>
+
+<div id="toast"><i></i><span id="toastMsg">Copié</span></div>
+
+<script>
+/* copy hex / gradient */
+const toast=document.getElementById('toast'),toastMsg=document.getElementById('toastMsg');
+let tt;
+function showToast(msg){
+  toastMsg.textContent=msg;
+  toast.classList.add('show');
+  clearTimeout(tt);
+  tt=setTimeout(()=>toast.classList.remove('show'),1600);
+}
+function copyText(v,msg){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(v).then(()=>showToast(msg)).catch(()=>fallback(v,msg));
+  }else fallback(v,msg);
+}
+function fallback(v,msg){
+  const ta=document.createElement('textarea');ta.value=v;document.body.appendChild(ta);
+  ta.select();try{document.execCommand('copy');showToast(msg);}catch(e){showToast('Sélection manuelle : '+v);}
+  document.body.removeChild(ta);
+}
+document.addEventListener('click',e=>{
+  const sw=e.target.closest('.sw[data-copy]');
+  if(sw){
+    const v=sw.dataset.copy;
+    copyText(v,v.startsWith('linear')?'Dégradé copié':v+' copié');
+    sw.classList.add('copied');setTimeout(()=>sw.classList.remove('copied'),700);
+    return;
+  }
+  const cp=e.target.closest('[data-copy-css]');
+  if(cp){
+    const pre=document.getElementById(cp.dataset.copyCss);
+    copyText(pre?pre.textContent:'','Bloc CSS copié');
+    const old=cp.textContent;cp.textContent='Copié ✓';setTimeout(()=>cp.textContent=old,1400);
+  }
+});
+/* reveal on scroll */
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}}),{threshold:.08});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
