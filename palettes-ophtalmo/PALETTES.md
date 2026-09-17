@@ -1,7 +1,9 @@
 # Oculis · 3 palettes ultra-premium — Gestion clinique ophtalmo & Réception
 
 > Aperçu live : `index.html` (tokens cliquables + mockups PC & mobile de l'écran Réception)
-> PNG haut de gamme : dossier `png/` (1 par palette × PC Electron / Mobile React Native + comparatif)
+> **PNG unifiée v2** : `png/00-3-palettes-en-1-clinique.png` — les 3 palettes en une image, écrans de pilotage clinique (KPI, agenda, file d'attente, facturation) + photos de la clinique en fond
+> PNG par palette : dossier `png/` (1 par palette × PC Electron / Mobile React Native + comparatifs)
+> Images de fond (générées) : dossier `img/` (réception, salle d'attente, iris, texture imagerie)
 
 ## Fichiers de thème prêts à l'emploi
 
