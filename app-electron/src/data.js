@@ -1,7 +1,7 @@
-// Données métier complètes de la clinique Oculis (Ophtalmologie)
+// Données métier complètes de la clinique Le Renouveau (Ophtalmologie)
 
 window.clinicData = {
-  name: "Clinique Oculis",
+  name: "Clinique Le Renouveau",
   tagline: "CLINIQUE OPHTALMO",
   dateString: "Vendredi 18 septembre 2026",
   user: {
@@ -18,7 +18,7 @@ window.clinicData = {
     noShow: { count: 1, subtext: "sur 24 patients", status: "warn" }
   },
   banner: {
-    title: "Clinique Oculis",
+    title: "Clinique Le Renouveau",
     subtitle: "Réception & pilotage — 24 RDV · CA 1 850 000 FCFA",
     status: "Salle d’attente : 6 patients · 2 consultations en cours"
   },
@@ -181,7 +181,7 @@ window.clinicData = {
 
 
 
-// Grille officielle des Types de Consultation de la Clinique Oculis (FCFA)
+// Grille officielle des Types de Consultation de la Clinique Le Renouveau (FCFA)
 window.consultationTypes = [
   { id: "ophtalmologie", label: "Consultation ophtalmologie", tarif: 15000, formattedTarif: "15 000 FCFA", code: "CS-OPH" },
   { id: "optometrie", label: "Consultation optométrie", tarif: 5000, formattedTarif: "5 000 FCFA", code: "CS-OPT" },
@@ -265,7 +265,7 @@ window.clinicConsultations = [
 ];
 
 
-// Registre complet des Rendez-vous de la Clinique Oculis
+// Registre complet des Rendez-vous de la Clinique Le Renouveau
 window.clinicAppointments = [
   {
     id: "RDV-2026-0081",
@@ -428,7 +428,7 @@ window.clinicOctExams = [
 ];
 
 
-// Registre officiel des Factures et Encaissements de la Clinique Oculis (en FCFA)
+// Registre officiel des Factures et Encaissements de la Clinique Le Renouveau (en FCFA)
 window.clinicInvoices = [
   {
     numFacture: "FAC-2026-0210",
@@ -505,7 +505,7 @@ window.clinicInvoices = [
 ];
 
 
-// Registre des Consommables & Matériel Médical Ophtalmologique de la Clinique Oculis
+// Registre des Consommables & Matériel Médical Ophtalmologique de la Clinique Le Renouveau
 window.clinicInventory = [
   {
     id: "MAT-001",

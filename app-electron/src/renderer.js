@@ -843,7 +843,7 @@ document.getElementById('btn-export-excel')?.addEventListener('click', () => {
   const now = new Date();
   const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
   link.setAttribute("href", url);
-  link.setAttribute("download", `oculis_patients_${dateStr}.csv`);
+  link.setAttribute("download", `le_renouveau_patients_${dateStr}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -1063,7 +1063,7 @@ document.getElementById('btn-export-consultations')?.addEventListener('click', (
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", "consultations_oculis.csv");
+  link.setAttribute("download", "consultations_le_renouveau.csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -1273,7 +1273,7 @@ document.getElementById('btn-export-rdv')?.addEventListener('click', () => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", "planning_rendezvous_oculis.csv");
+  link.setAttribute("download", "planning_rendezvous_le_renouveau.csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -1574,7 +1574,7 @@ document.getElementById('btn-export-oct')?.addEventListener('click', () => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", "examens_imagerie_oct_oculis.csv");
+  link.setAttribute("download", "examens_imagerie_oct_le_renouveau.csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -1806,7 +1806,7 @@ document.getElementById('btn-export-fac')?.addEventListener('click', () => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", "journal_facturation_encaissements_oculis.csv");
+  link.setAttribute("download", "journal_facturation_encaissements_le_renouveau.csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -2004,7 +2004,7 @@ document.getElementById('btn-export-stock')?.addEventListener('click', () => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", "inventaire_stock_materiel_oculis.csv");
+  link.setAttribute("download", "inventaire_stock_materiel_le_renouveau.csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -2045,7 +2045,7 @@ document.getElementById('btn-save-settings')?.addEventListener('click', () => {
 document.getElementById('btn-export-full-backup')?.addEventListener('click', () => {
   const backupData = {
     exportDate: new Date().toISOString(),
-    clinique: "Clinique Ophtalmologique Oculis - Bamako",
+    clinique: "Clinique Ophtalmologique Le Renouveau - Bamako",
     devise: "FCFA",
     patients: patientsList,
     appointments: appointmentsList,
@@ -2060,7 +2060,7 @@ document.getElementById('btn-export-full-backup')?.addEventListener('click', () 
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", "sauvegarde_complete_oculis_clinic.json");
+  link.setAttribute("download", "sauvegarde_complete_clinique_le_renouveau.json");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
