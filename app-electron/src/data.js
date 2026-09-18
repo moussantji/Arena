@@ -263,3 +263,98 @@ window.clinicConsultations = [
     modePaiement: "NSIA Assurances"
   }
 ];
+
+
+// Registre complet des Rendez-vous de la Clinique Oculis
+window.clinicAppointments = [
+  {
+    id: "RDV-2026-0081",
+    date: "18/09/2026",
+    heure: "09:00",
+    patientId: "P001",
+    patientNom: "TRAORÉ Mamadou",
+    patientRef: "CLI-ML-2026-0841",
+    patientTel: "+223 76 45 89 12",
+    motif: "Consultation ophtalmologie + Bilan OCT",
+    praticien: "Dr Martin (Ophtalmologue)",
+    bureau: "Bureau 1 (Ophtalmo)",
+    statut: "Confirmé",
+    type: "Présentiel",
+    notes: "Patient sous couvert CANAM AMO - Suivi tensionnel"
+  },
+  {
+    id: "RDV-2026-0082",
+    date: "18/09/2026",
+    heure: "09:30",
+    patientId: "P002",
+    patientNom: "COULIBALY Fatoumata",
+    patientRef: "CLI-ML-2026-0842",
+    patientTel: "+223 66 12 34 56",
+    motif: "Consultation optométrie · Tonométrie",
+    praticien: "Dr Petit (Optométriste)",
+    bureau: "Bureau 2 (Réfraction)",
+    statut: "En attente",
+    type: "Présentiel",
+    notes: "Assurée SUNU - Réfraction et acuité visuelle"
+  },
+  {
+    id: "RDV-2026-0083",
+    date: "18/09/2026",
+    heure: "10:00",
+    patientId: "P003",
+    patientNom: "DIARRA Oumar",
+    patientRef: "CLI-ML-2026-0843",
+    patientTel: "+223 79 88 11 22",
+    motif: "Suivi post-opératoire cataracte",
+    praticien: "Dr Martin (Ophtalmologue)",
+    bureau: "Bureau 1 (Ophtalmo)",
+    statut: "Retardé",
+    type: "Présentiel",
+    notes: "Retard signalé de 10 min - Contrôle œil gauche"
+  },
+  {
+    id: "RDV-2026-0084",
+    date: "18/09/2026",
+    heure: "10:30",
+    patientId: "P004",
+    patientNom: "KÉÏTA Aminata",
+    patientRef: "CLI-ML-2026-0844",
+    patientTel: "+223 70 55 44 33",
+    motif: "Consultation orthopsie & Bilan strabisme",
+    praticien: "Dr Petit (Orthoptiste)",
+    bureau: "Bureau 3 (Orthopsie)",
+    statut: "Confirmé",
+    type: "Présentiel",
+    notes: "Séance bilan visuel binoculaire"
+  },
+  {
+    id: "RDV-2026-0085",
+    date: "18/09/2026",
+    heure: "11:15",
+    patientId: "P001",
+    patientNom: "SANOGO Bakary",
+    patientRef: "CLI-ML-2026-0845",
+    patientTel: "+223 74 22 99 00",
+    motif: "Fond d'œil diabétique & Angiographie",
+    praticien: "Dr Martin (Ophtalmologue)",
+    bureau: "Bureau 1 (Ophtalmo)",
+    statut: "Confirmé",
+    type: "Présentiel",
+    notes: "Dilatation pupillaire requise à l'accueil"
+  },
+  {
+    id: "RDV-2026-0086",
+    date: "18/09/2026",
+    heure: "14:00",
+    patientId: "P002",
+    patientNom: "BAGAYOKO Adama",
+    patientRef: "CLI-ML-2026-0846",
+    patientTel: "+223 65 33 22 11",
+    motif: "Consultation pré-anesthésie chirurgie",
+    praticien: "Dr Traoré (Anesthésiste)",
+    bureau: "Bureau 4 (Généraliste)",
+    statut: "Confirmé",
+    type: "Présentiel",
+    notes: "Bilan sanguin pré-opératoire complet"
+  }
+];

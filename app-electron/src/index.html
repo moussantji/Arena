@@ -298,6 +298,60 @@
         </div>
 
         <!-- VUE GESTION DES CONSULTATIONS -->
+        
+        <!-- VUE GESTION DES RENDEZ-VOUS -->
+        <div id="view-rendezvous" class="patients-view-container" style="display: none;">
+          <div class="patients-toolbar">
+            <div class="patients-filters">
+              <div class="patients-search-box">
+                <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="rdv-view-search" placeholder="Rechercher un RDV par patient, réf, motif, médecin...">
+              </div>
+              <select class="filter-select" id="filter-rdv-praticien">
+                <option value="">Tous les praticiens</option>
+                <option value="Dr Martin (Ophtalmologue)">Dr Martin (Ophtalmologue)</option>
+                <option value="Dr Petit (Optométriste)">Dr Petit (Optométriste)</option>
+                <option value="Dr Petit (Orthoptiste)">Dr Petit (Orthoptiste)</option>
+                <option value="Dr Traoré (Anesthésiste)">Dr Traoré (Anesthésiste)</option>
+              </select>
+              <select class="filter-select" id="filter-rdv-status">
+                <option value="">Tous les statuts</option>
+                <option value="Confirmé">Confirmé</option>
+                <option value="En attente">En attente</option>
+                <option value="Retardé">Retardé</option>
+                <option value="Annulé">Annulé</option>
+              </select>
+            </div>
+            <div class="patients-actions-right">
+              <button class="btn-export-excel" id="btn-export-rdv" title="Exporter les rendez-vous en fichier Excel">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Exporter en Excel</span>
+              </button>
+              <button class="btn-add-patient" id="btn-open-create-rdv">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Nouveau RDV</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="patients-table-card">
+            <div class="rdv-table-header">
+              <span>DATE & HEURE</span>
+              <span>N° RDV</span>
+              <span>PATIENT</span>
+              <span>TÉLÉPHONE</span>
+              <span>MOTIF DE CONSULTATION</span>
+              <span>PRATICIEN</span>
+              <span>BUREAU</span>
+              <span>STATUT</span>
+              <span>ACTIONS</span>
+            </div>
+            <div class="rdv-table-body" id="rdv-table-body">
+              <!-- Rendu dynamique via renderer.js -->
+            </div>
+          </div>
+        </div>
+
         <div id="view-consultations" class="patients-view-container" style="display: none;">
           <div class="patients-toolbar">
             <div class="patients-filters">
@@ -595,6 +649,91 @@
   
 
   <!-- Modal Nouvelle Consultation -->
+  
+  <!-- Modal Nouveau Rendez-vous -->
+  <div class="modal-overlay" id="create-rdv-modal">
+    <div class="modal-card patient-modal-card" style="width: 580px !important;">
+      <div class="patient-modal-header">
+        <div class="patient-modal-avatar">📅</div>
+        <div class="patient-modal-title">
+          <h3 id="modal-rdv-form-title" style="font-size: 16px; font-weight: 800; color: var(--oc-text-1);">Nouveau Rendez-vous</h3>
+          <p style="font-size: 11px; font-weight: 600; color: var(--oc-text-3);">Planification et affectation praticien / bureau</p>
+        </div>
+        <button class="modal-close-icon-btn" id="btn-close-rdv-modal">✕</button>
+      </div>
+
+      <form id="create-rdv-form">
+        <div class="patient-modal-body" style="max-height: calc(85vh - 130px); overflow-y: auto; padding: 16px 24px;">
+          <div class="modal-info-section">
+            <div class="modal-section-title">PATIENT CONCERNÉ</div>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">SÉLECTIONNER LE PATIENT *</label>
+                <select class="form-select" id="rdv-patient-select" required>
+                  <!-- Options chargées dynamiquement -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-info-section">
+            <div class="modal-section-title">DATE, CRÉNEAU & LOCALISATION</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">DATE DU RENDEZ-VOUS *</label>
+                <input class="form-input" id="rdv-date" type="text" value="18/09/2026" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">HEURE DU CRÉNEAU *</label>
+                <input class="form-input" id="rdv-heure" type="text" value="11:45" required placeholder="HH:MM">
+              </div>
+              <div class="form-group">
+                <label class="form-label">PRATICIEN / MÉDECIN *</label>
+                <select class="form-select" id="rdv-praticien-select" required>
+                  <option value="Dr Martin (Ophtalmologue)">Dr Martin (Ophtalmologue)</option>
+                  <option value="Dr Petit (Optométriste)">Dr Petit (Optométriste)</option>
+                  <option value="Dr Petit (Orthoptiste)">Dr Petit (Orthoptiste)</option>
+                  <option value="Dr Coulibaly (Médecin généraliste)">Dr Coulibaly (Médecin généraliste)</option>
+                  <option value="Dr Traoré (Anesthésiste)">Dr Traoré (Anesthésiste)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">BUREAU / SALLE *</label>
+                <select class="form-select" id="rdv-bureau-select" required>
+                  <option value="Bureau 1 (Ophtalmo)">Bureau 1 (Ophtalmo)</option>
+                  <option value="Bureau 2 (Réfraction)">Bureau 2 (Réfraction)</option>
+                  <option value="Bureau 3 (Orthopsie)">Bureau 3 (Orthopsie)</option>
+                  <option value="Bureau 4 (Généraliste)">Bureau 4 (Généraliste)</option>
+                  <option value="Salle d'Imagerie OCT">Salle d'Imagerie OCT</option>
+                  <option value="Bureau Urgences">Bureau Urgences</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-info-section">
+            <div class="modal-section-title">MOTIF & CONSIGNES</div>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">MOTIF DE LA CONSULTATION *</label>
+                <input class="form-input" id="rdv-motif" required placeholder="Ex: Première consultation ophtalmo, Suivi cataracte, Bilan de réfraction...">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">REMARQUES OU NOTES CLINIQUES</label>
+                <input class="form-input" id="rdv-notes" placeholder="Ex: Patient sous couvert CANAM AMO - Dilatation pupillaire requise">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-cancel" id="btn-cancel-rdv">Annuler</button>
+          <button type="submit" class="btn-modal-confirm" id="btn-submit-rdv">Planifier le Rendez-vous</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="create-consultation-modal">
     <div class="modal-card patient-modal-card" style="width: 580px !important;">
       <div class="patient-modal-header">
@@ -699,7 +838,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=23"></script>
-  <script src="renderer.js?v=23"></script>
+  <script src="data.js?v=24"></script>
+  <script src="renderer.js?v=24"></script>
 </body>
 </html>

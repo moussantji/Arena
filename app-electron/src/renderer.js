@@ -7,6 +7,7 @@ let currentView = "Réception"; // "Réception" ou "Patients"
 let agendaItems = [...clinicData.agenda];
 let patientsList = [...clinicData.patients];
 let consultationsList = window.clinicConsultations ? [...window.clinicConsultations] : [];
+let appointmentsList = window.clinicAppointments ? [...window.clinicAppointments] : [];
 
 // Eléments DOM
 const agendaContainer = document.getElementById('agenda-container');
@@ -22,6 +23,7 @@ const createModal = document.getElementById('create-patient-modal');
 const viewReception = document.getElementById('view-reception');
 const viewPatients = document.getElementById('view-patients');
 const viewConsultations = document.getElementById('view-consultations');
+const viewRendezvous = document.getElementById('view-rendezvous');
 const viewTitle = document.getElementById('view-title');
 const viewDate = document.getElementById('view-date');
 
@@ -69,25 +71,31 @@ window.switchView = function switchView(tabName) {
     }
   });
 
+  // Masquer toutes les vues d'abord
+  if (viewReception) viewReception.style.display = 'none';
+  if (viewPatients) viewPatients.style.display = 'none';
+  if (viewConsultations) viewConsultations.style.display = 'none';
+  if (viewRendezvous) viewRendezvous.style.display = 'none';
+
   if (tabName === 'Patients') {
-    if (viewReception) viewReception.style.display = 'none';
-    if (viewConsultations) viewConsultations.style.display = 'none';
     if (viewPatients) viewPatients.style.display = 'flex';
     if (viewTitle) viewTitle.textContent = "Gestion des Patients";
     if (viewDate) viewDate.textContent = `Répertoire clinique — ${patientsList.length} patients enregistrés`;
     renderPatientsTable();
     showToast("Répertoire des patients ouvert ✓");
+  } else if (tabName === 'Rendez-vous') {
+    if (viewRendezvous) viewRendezvous.style.display = 'flex';
+    if (viewTitle) viewTitle.textContent = "Gestion des Rendez-vous";
+    if (viewDate) viewDate.textContent = `Planning clinique — ${appointmentsList.length} RDV programmés`;
+    renderRdvTable();
+    showToast("Planning des Rendez-vous ouvert ✓");
   } else if (tabName === 'Consultations') {
-    if (viewReception) viewReception.style.display = 'none';
-    if (viewPatients) viewPatients.style.display = 'none';
     if (viewConsultations) viewConsultations.style.display = 'flex';
     if (viewTitle) viewTitle.textContent = "Gestion des Consultations";
     if (viewDate) viewDate.textContent = `Registre médical — ${consultationsList.length} actes enregistrés aujourd'hui`;
     renderConsultationsTable();
     showToast("Module Consultations ouvert ✓");
   } else if (tabName === 'Réception') {
-    if (viewPatients) viewPatients.style.display = 'none';
-    if (viewConsultations) viewConsultations.style.display = 'none';
     if (viewReception) viewReception.style.display = 'block';
     if (viewTitle) viewTitle.textContent = "Pilotage";
     if (viewDate) viewDate.textContent = "Réception · Vendredi 18 septembre 2026";
@@ -917,4 +925,213 @@ document.getElementById('btn-export-consultations')?.addEventListener('click', (
   URL.revokeObjectURL(url);
 
   showToast(`Export réussi : ${consultationsList.length} consultations exportées ✓`);
+});
+
+
+// ============================================================
+// 17. MODULE GESTION DES RENDEZ-VOUS (PLANNING & AFFECTATION)
+// ============================================================
+
+const rdvTableBody = document.getElementById('rdv-table-body');
+const createRdvModal = document.getElementById('create-rdv-modal');
+
+function renderRdvTable(filterText = "", filterPraticien = "", filterStatus = "") {
+  if (!rdvTableBody) return;
+  rdvTableBody.innerHTML = '';
+
+  const filtered = appointmentsList.filter(r => {
+    const q = filterText.toLowerCase();
+    const matchText = !q ||
+      r.id.toLowerCase().includes(q) ||
+      r.patientNom.toLowerCase().includes(q) ||
+      r.motif.toLowerCase().includes(q) ||
+      r.patientTel.toLowerCase().includes(q) ||
+      r.praticien.toLowerCase().includes(q);
+
+    const matchPrat = !filterPraticien || r.praticien === filterPraticien;
+    const matchStat = !filterStatus || r.statut === filterStatus;
+
+    return matchText && matchPrat && matchStat;
+  });
+
+  if (filtered.length === 0) {
+    rdvTableBody.innerHTML = `
+      <div style="padding: 30px; text-align: center; color: var(--oc-text-3); font-size: 12px; font-weight: 700;">
+        Aucun rendez-vous ne correspond à votre recherche.
+      </div>
+    `;
+    return;
+  }
+
+  filtered.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'rdv-row';
+
+    let statClass = 'attente';
+    if (r.statut === 'Confirmé') statClass = 'confirme';
+    else if (r.statut === 'Retardé') statClass = 'retarde';
+    else if (r.statut === 'Annulé') statClass = 'annule';
+
+    row.innerHTML = `
+      <div class="rdv-time-box">
+        <span class="rdv-time-val">${r.heure}</span>
+        <span class="rdv-date-val">${r.date}</span>
+      </div>
+      <span class="cs-col-num">${r.id}</span>
+      <div>
+        <strong style="color: var(--oc-text-1); font-size: 11px;">${r.patientNom}</strong>
+        <div style="font-size: 8.5px; color: var(--oc-text-3); font-family: var(--oc-font-mono);">${r.patientRef}</div>
+      </div>
+      <span style="font-family: var(--oc-font-mono); font-size: 10px; color: var(--oc-text-2);">${r.patientTel}</span>
+      <span style="font-weight: 700; color: var(--oc-text-1); font-size: 10.5px;" title="${r.notes}">${r.motif}</span>
+      <span style="font-weight: 600; color: var(--oc-text-2); font-size: 10px;">${r.praticien}</span>
+      <span class="bureau-badge">${r.bureau}</span>
+      <span class="rdv-badge-statut ${statClass}">${r.statut}</span>
+      <div>
+        <button class="btn-modal-cancel" style="padding: 4px 8px; font-size: 9px; border-radius: var(--oc-radius-pill);" onclick="openPatientDossierModal('${r.patientId}')">Fiche</button>
+      </div>
+    `;
+    rdvTableBody.appendChild(row);
+  });
+}
+
+// Filtres RDV
+document.getElementById('rdv-view-search')?.addEventListener('input', (e) => {
+  const fText = e.target.value;
+  const fPrat = document.getElementById('filter-rdv-praticien')?.value || "";
+  const fStat = document.getElementById('filter-rdv-status')?.value || "";
+  renderRdvTable(fText, fPrat, fStat);
+});
+
+document.getElementById('filter-rdv-praticien')?.addEventListener('change', (e) => {
+  const fText = document.getElementById('rdv-view-search')?.value || "";
+  const fPrat = e.target.value;
+  const fStat = document.getElementById('filter-rdv-status')?.value || "";
+  renderRdvTable(fText, fPrat, fStat);
+});
+
+document.getElementById('filter-rdv-status')?.addEventListener('change', (e) => {
+  const fText = document.getElementById('rdv-view-search')?.value || "";
+  const fPrat = document.getElementById('filter-rdv-praticien')?.value || "";
+  const fStat = e.target.value;
+  renderRdvTable(fText, fPrat, fStat);
+});
+
+// Modale Nouveau RDV
+function openCreateRdvModal() {
+  const selectPat = document.getElementById('rdv-patient-select');
+  if (selectPat) {
+    selectPat.innerHTML = patientsList.map(p => 
+      `<option value="${p.id}">${p.personalInfo.nom} ${p.personalInfo.prenom} (${p.personalInfo.telephone}) — ${p.insuranceInfo.assurance}</option>`
+    ).join('');
+  }
+
+  if (createRdvModal) createRdvModal.classList.add('open');
+}
+
+document.getElementById('btn-open-create-rdv')?.addEventListener('click', openCreateRdvModal);
+document.getElementById('btn-close-rdv-modal')?.addEventListener('click', () => {
+  if (createRdvModal) createRdvModal.classList.remove('open');
+});
+document.getElementById('btn-cancel-rdv')?.addEventListener('click', () => {
+  if (createRdvModal) createRdvModal.classList.remove('open');
+});
+
+// Enregistrement d'un nouveau RDV
+document.getElementById('create-rdv-form')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const patientId = document.getElementById('rdv-patient-select').value;
+  const p = patientsList.find(x => x.id === patientId) || patientsList[0];
+  const date = document.getElementById('rdv-date').value.trim();
+  const heure = document.getElementById('rdv-heure').value.trim();
+  const praticien = document.getElementById('rdv-praticien-select').value;
+  const bureau = document.getElementById('rdv-bureau-select').value;
+  const motif = document.getElementById('rdv-motif').value.trim();
+  const notes = document.getElementById('rdv-notes').value.trim() || "Aucune consigne particulière";
+
+  const nextId = 'RDV-2026-' + String(80 + appointmentsList.length + 1).padStart(4, '0');
+
+  const newRdv = {
+    id: nextId,
+    date: date,
+    heure: heure,
+    patientId: p.id,
+    patientNom: `${p.personalInfo.nom} ${p.personalInfo.prenom}`,
+    patientRef: p.ref,
+    patientTel: p.personalInfo.telephone,
+    motif: motif,
+    praticien: praticien,
+    bureau: bureau,
+    statut: "Confirmé",
+    type: "Présentiel",
+    notes: notes
+  };
+
+  appointmentsList.unshift(newRdv);
+
+  // Synchroniser aussi avec l'agenda de l'accueil
+  agendaItems.unshift({
+    id: `A${agendaItems.length + 1}`,
+    time: heure,
+    patient: `${p.personalInfo.prenom} ${p.personalInfo.nom}`,
+    desc: `${motif} · ${bureau}`,
+    status: "pri"
+  });
+
+  if (createRdvModal) createRdvModal.classList.remove('open');
+  e.target.reset();
+
+  renderRdvTable();
+  renderAgenda();
+  showToast(`Rendez-vous pour ${p.personalInfo.prenom} ${p.personalInfo.nom} planifié à ${heure} ! ✓`);
+});
+
+// Export Excel des Rendez-vous
+document.getElementById('btn-export-rdv')?.addEventListener('click', () => {
+  if (!appointmentsList || appointmentsList.length === 0) {
+    showToast("Aucun rendez-vous à exporter !");
+    return;
+  }
+
+  const headers = [
+    "N° RDV",
+    "Date",
+    "Heure",
+    "Réf Patient",
+    "Nom Patient",
+    "Téléphone",
+    "Motif",
+    "Praticien",
+    "Bureau",
+    "Statut",
+    "Notes Cliniques"
+  ];
+
+  const rows = appointmentsList.map(r => [
+    `"${r.id}"`,
+    `"${r.date}"`,
+    `"${r.heure}"`,
+    `"${r.patientRef}"`,
+    `"${r.patientNom}"`,
+    `"${r.patientTel}"`,
+    `"${r.motif}"`,
+    `"${r.praticien}"`,
+    `"${r.bureau}"`,
+    `"${r.statut}"`,
+    `"${r.notes}"`
+  ]);
+
+  const csvContent = "\uFEFF" + [headers.join(";"), ...rows.map(r => r.join(";"))].join("\r\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "planning_rendezvous_oculis.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  showToast(`Export réussi : ${appointmentsList.length} rendez-vous exportés ✓`);
 });
