@@ -83,7 +83,90 @@
           </a>
         </nav>
 
-        <div class="sidebar-footer">
+        
+  <!-- ÉCRAN DE CONNEXION SÉCURISÉ OCULIS -->
+  <div id="login-screen" style="position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0f172a 100%);">
+    <div style="width: 100%; max-width: 440px; background: #ffffff; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4); overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1);">
+      
+      <!-- En-tête Connexion -->
+      <div style="background: linear-gradient(135deg, #1E56D6 0%, #0f2e82 100%); padding: 28px 24px; text-align: center; color: #ffffff; position: relative;">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: rgba(255, 255, 255, 0.15); border-radius: 12px; margin-bottom: 12px; backdrop-filter: blur(8px);">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#ffffff" stroke-width="2.2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          </svg>
+        </div>
+        <h1 style="font-size: 20px; font-weight: 800; letter-spacing: -0.3px; margin: 0 0 4px 0;">CLINIQUE OCULIS</h1>
+        <p style="font-size: 11px; margin: 0; color: rgba(255, 255, 255, 0.85); font-weight: 500;">Portail Médical & Gestion Hospitalière — Bamako</p>
+      </div>
+
+      <!-- Formulaire de Connexion -->
+      <div style="padding: 24px;">
+        <!-- Profils Démo Rapides -->
+        <div style="margin-bottom: 18px;">
+          <label style="display: block; font-size: 10px; font-weight: 800; color: #64748b; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px;">
+            CONNEXION RAPIDE (SÉLECTION DU POSTE) :
+          </label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button type="button" class="btn-demo-user" data-user="claire" style="padding: 8px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; text-align: left; cursor: pointer; transition: all 0.2s;">
+              <strong style="display: block; font-size: 11px; color: #0f172a;">Claire Laurent</strong>
+              <span style="font-size: 9.5px; color: #1E56D6; font-weight: 600;">Accueil & Caisse</span>
+            </button>
+            <button type="button" class="btn-demo-user" data-user="martin" style="padding: 8px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; text-align: left; cursor: pointer; transition: all 0.2s;">
+              <strong style="display: block; font-size: 11px; color: #0f172a;">Dr. Eric Martin</strong>
+              <span style="font-size: 9.5px; color: #059669; font-weight: 600;">Ophtalmologiste</span>
+            </button>
+            <button type="button" class="btn-demo-user" data-user="petit" style="padding: 8px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; text-align: left; cursor: pointer; transition: all 0.2s;">
+              <strong style="display: block; font-size: 11px; color: #0f172a;">Dr. Sophie Petit</strong>
+              <span style="font-size: 9.5px; color: #d97706; font-weight: 600;">Optométriste</span>
+            </button>
+            <button type="button" class="btn-demo-user" data-user="traore" style="padding: 8px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; text-align: left; cursor: pointer; transition: all 0.2s;">
+              <strong style="display: block; font-size: 11px; color: #0f172a;">Dr. A. Traoré</strong>
+              <span style="font-size: 9.5px; color: #7c3aed; font-weight: 600;">Généraliste / Urgences</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; margin: 16px 0; gap: 10px;">
+          <div style="flex: 1; height: 1px; background: #e2e8f0;"></div>
+          <span style="font-size: 10px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Ou identifiants manuels</span>
+          <div style="flex: 1; height: 1px; background: #e2e8f0;"></div>
+        </div>
+
+        <form id="login-form">
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 10.5px; font-weight: 700; color: #334155; margin-bottom: 5px;">IDENTIFIANT / EMAIL</label>
+            <div style="position: relative;">
+              <input type="text" id="login-username" required value="claurent" style="width: 100%; padding: 9px 12px 9px 34px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 12px; color: #0f172a; outline: none; box-sizing: border-box;">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#64748b" stroke-width="2" style="position: absolute; left: 11px; top: 11px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+              <label style="font-size: 10.5px; font-weight: 700; color: #334155;">MOT DE PASSE</label>
+              <a href="#" id="link-forgot-pass" style="font-size: 10px; color: #1E56D6; text-decoration: none; font-weight: 600;">Oublié ?</a>
+            </div>
+            <div style="position: relative;">
+              <input type="password" id="login-password" required value="oculis2024" style="width: 100%; padding: 9px 12px 9px 34px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 12px; color: #0f172a; outline: none; box-sizing: border-box;">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#64748b" stroke-width="2" style="position: absolute; left: 11px; top: 11px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+          </div>
+
+          <button type="submit" style="width: 100%; padding: 11px; background: #1E56D6; color: #ffffff; border: none; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; box-shadow: 0 4px 12px rgba(30, 86, 214, 0.3);">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span>Se connecter à la session</span>
+          </button>
+        </form>
+
+        <div style="margin-top: 16px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+          <span style="font-size: 9.5px; color: #64748b;">Système Hospitalier Sécurisé · Chiffrement AES-256 · Bamako</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="sidebar-footer">
           <div class="user-profile">
             <div class="user-avatar">CL</div>
             <div class="user-info">
@@ -91,6 +174,10 @@
               <span class="user-role">Accueil &amp; gestion</span>
             </div>
           </div>
+          <button id="btn-logout" title="Se déconnecter" style="margin-top: 8px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px; background: rgba(225, 29, 72, 0.1); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.2); border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Déconnexion</span>
+          </button>
         </div>
       </aside>
 
@@ -1636,7 +1723,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=32"></script>
-  <script src="renderer.js?v=32"></script>
+  <script src="data.js?v=33"></script>
+  <script src="renderer.js?v=33"></script>
 </body>
 </html>

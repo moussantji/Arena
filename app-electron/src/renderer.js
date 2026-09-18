@@ -2073,3 +2073,121 @@ document.getElementById('btn-export-full-backup')?.addEventListener('click', () 
 document.getElementById('btn-reset-demo')?.addEventListener('click', () => {
   showToast("Données cliniques actualisées et synchronisées ✓");
 });
+
+
+// ============================================================
+// 23. MODULE AUTHENTIFICATION & SESSIONS UTILISATEURS
+// ============================================================
+
+const USERS_DB = {
+  claire: {
+    username: "claurent",
+    name: "Claire Laurent",
+    role: "Accueil & gestion",
+    initials: "CL",
+    bureau: "Caisse & Accueil"
+  },
+  martin: {
+    username: "emartin",
+    name: "Dr. Eric Martin",
+    role: "Ophtalmologiste",
+    initials: "EM",
+    bureau: "Bureau 1 (Ophtalmo)"
+  },
+  petit: {
+    username: "spetit",
+    name: "Dr. Sophie Petit",
+    role: "Optométriste",
+    initials: "SP",
+    bureau: "Bureau 2 (Réfraction)"
+  },
+  traore: {
+    username: "atraore",
+    name: "Dr. A. Traoré",
+    role: "Généraliste / Urgences",
+    initials: "AT",
+    bureau: "Bureau 4 (Généraliste)"
+  }
+};
+
+let currentLoggedUser = USERS_DB.claire;
+
+const loginScreen = document.getElementById('login-screen');
+const loginForm = document.getElementById('login-form');
+const btnLogout = document.getElementById('btn-logout');
+
+// Remplissage automatique lors du clic sur un profil démo
+document.querySelectorAll('.btn-demo-user').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const uKey = btn.getAttribute('data-user');
+    const u = USERS_DB[uKey];
+    if (!u) return;
+
+    document.getElementById('login-username').value = u.username;
+    document.getElementById('login-password').value = "oculis2024";
+
+    // Animation de sélection
+    document.querySelectorAll('.btn-demo-user').forEach(b => b.style.borderColor = '#e2e8f0');
+    btn.style.borderColor = '#1E56D6';
+  });
+});
+
+// Connexion
+loginForm?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const uname = document.getElementById('login-username').value.trim().toLowerCase();
+  
+  // Trouver l'utilisateur correspondant ou garder par défaut
+  let matchedUser = Object.values(USERS_DB).find(u => u.username.toLowerCase() === uname);
+  if (!matchedUser) {
+    matchedUser = {
+      username: uname,
+      name: uname.charAt(0).toUpperCase() + uname.slice(1),
+      role: "Praticien Clinique",
+      initials: uname.slice(0, 2).toUpperCase(),
+      bureau: "Cabinet Médical"
+    };
+  }
+
+  currentLoggedUser = matchedUser;
+
+  // Mettre à jour l'interface utilisateur
+  const elUserName = document.querySelector('.user-name');
+  const elUserRole = document.querySelector('.user-role');
+  const elUserAvatar = document.querySelector('.user-avatar');
+  const elTopAvatar = document.getElementById('btn-user-profile');
+
+  if (elUserName) elUserName.textContent = matchedUser.name;
+  if (elUserRole) elUserRole.textContent = matchedUser.role;
+  if (elUserAvatar) elUserAvatar.textContent = matchedUser.initials;
+  if (elTopAvatar) {
+    elTopAvatar.textContent = matchedUser.initials;
+    elTopAvatar.title = `Connecté : ${matchedUser.name} (${matchedUser.role})`;
+  }
+
+  // Masquer l'écran de connexion avec une transition douce
+  if (loginScreen) {
+    loginScreen.style.opacity = '0';
+    loginScreen.style.transition = 'opacity 0.25s ease';
+    setTimeout(() => {
+      loginScreen.style.display = 'none';
+      loginScreen.style.opacity = '1';
+    }, 250);
+  }
+
+  showToast(`Bienvenue ${matchedUser.name} ! Session active ✓`);
+});
+
+// Déconnexion
+btnLogout?.addEventListener('click', () => {
+  if (loginScreen) {
+    loginScreen.style.display = 'flex';
+  }
+  showToast("Vous avez été déconnecté avec succès.");
+});
+
+// Lien mot de passe oublié
+document.getElementById('link-forgot-pass')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  showToast("Mot de passe par défaut pour tous les comptes : oculis2024");
+});
