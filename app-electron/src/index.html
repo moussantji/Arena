@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/theme.css">
   <link rel="stylesheet" href="styles/app.css?v=4">
-  <link rel="stylesheet" href="styles/patients.css?v=5">
+  <link rel="stylesheet" href="styles/patients.css?v=7">
 </head>
 <body>
   <div id="scaler-wrapper">
@@ -417,7 +417,8 @@
       </div>
 
       <div class="modal-actions">
-        <button class="btn-modal-cancel" id="btn-close-dossier-bottom">Fermer le dossier</button>
+        <button class="btn-modal-cancel" id="btn-close-dossier-bottom">Fermer</button>
+        <button class="btn-modal-cancel" id="btn-edit-from-dossier" style="border-color: var(--oc-primary); color: var(--oc-primary);">Modifier ce dossier</button>
         <button class="btn-modal-confirm" id="btn-imprimer-fiche">Imprimer la fiche patient</button>
       </div>
     </div>
@@ -430,13 +431,14 @@
       <div class="patient-modal-header">
         <div class="patient-modal-avatar">+</div>
         <div class="patient-modal-title">
-          <h3 style="font-size: 16px; font-weight: 800; color: var(--oc-text-1);">Nouveau Dossier Patient</h3>
+          <h3 id="modal-form-title" style="font-size: 16px; font-weight: 800; color: var(--oc-text-1);">Nouveau Dossier Patient</h3>
           <p style="font-size: 11px; font-weight: 600; color: var(--oc-text-3);">Enregistrement et prise en charge clinique</p>
         </div>
         <button class="modal-close-icon-btn" id="btn-close-create-modal">✕</button>
       </div>
 
       <form id="create-patient-form">
+        <input type="hidden" id="f-edit-id" value="">
         <div class="patient-modal-body" style="max-height: 60vh; overflow-y: auto; padding-right: 6px;">
           <div class="modal-info-section">
             <div class="modal-section-title">INFORMATIONS PERSONNELLES</div>
@@ -508,9 +510,34 @@
 
         <div class="modal-actions">
           <button type="button" class="btn-modal-cancel" id="btn-cancel-create">Annuler</button>
-          <button type="submit" class="btn-modal-confirm">Enregistrer le Patient</button>
+          <button type="submit" class="btn-modal-confirm" id="btn-submit-patient-form">Enregistrer le Patient</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  
+  <!-- Modal Confirmation Suppression Patient -->
+  <div class="modal-overlay" id="delete-patient-modal">
+    <div class="modal-card" style="width: 420px;">
+      <div class="modal-header">
+        <div class="modal-icon-badge" style="background-color: var(--oc-danger-soft); color: var(--oc-danger);">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </div>
+        <div class="modal-title">
+          <h3 style="color: var(--oc-danger);">Supprimer le dossier</h3>
+          <p id="delete-patient-name-sub">Mamadou TRAORÉ · N° 0841</p>
+        </div>
+      </div>
+      <div class="modal-details">
+        <p style="font-size: 11px; color: var(--oc-text-2); line-height: 1.5;">
+          Êtes-vous sûr de vouloir supprimer définitivement ce patient de la clinique ? Cette action effacera ses données d'assurance, ses examens et son historique d'encaissement.
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" id="btn-cancel-delete">Annuler</button>
+        <button class="btn-modal-danger" id="btn-confirm-delete">Supprimer définitivement</button>
+      </div>
     </div>
   </div>
 
@@ -520,7 +547,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=6"></script>
-  <script src="renderer.js?v=6"></script>
+  <script src="data.js?v=7"></script>
+  <script src="renderer.js?v=7"></script>
 </body>
 </html>

@@ -4,6 +4,7 @@ const clinicData = window.clinicData;
 // État local de l'application
 let currentActivePatientId = "P001";
 let currentView = "Réception"; // "Réception" ou "Patients"
+let patientToDeleteId = null;
 let agendaItems = [...clinicData.agenda];
 let patientsList = [...clinicData.patients];
 
@@ -16,6 +17,7 @@ const toastMsg = document.getElementById('toast-msg');
 const billingModal = document.getElementById('billing-modal');
 const dossierModal = document.getElementById('patient-dossier-modal');
 const createModal = document.getElementById('create-patient-modal');
+const deleteModal = document.getElementById('delete-patient-modal');
 
 // Vues
 const viewReception = document.getElementById('view-reception');
@@ -140,7 +142,7 @@ function renderQueue() {
   });
 }
 
-// 5. Rendu du Tableau Gestion des Patients
+// 5. Rendu du Tableau Gestion des Patients avec boutons Modifier & Supprimer
 function renderPatientsTable(filterText = "", filterAss = "", filterSex = "") {
   if (!patientsTableBody) return;
   patientsTableBody.innerHTML = '';
@@ -193,12 +195,29 @@ function renderPatientsTable(filterText = "", filterAss = "", filterSex = "") {
       </div>
       <span class="p-col-nat">🇲🇱 ${p.personalInfo.nationalite}</span>
       <div class="p-col-actions">
-        <button class="p-btn-action" data-action="view" data-id="${p.id}">Dossier</button>
+        <button class="p-btn-action edit" data-action="edit" data-id="${p.id}" title="Modifier">Modifier</button>
+        <button class="p-btn-action delete" data-action="delete" data-id="${p.id}" title="Supprimer">✕</button>
       </div>
     `;
 
+    // Clic sur la ligne pour ouvrir le dossier
     row.addEventListener('click', (e) => {
+      if (e.target.closest('.p-btn-action')) return; // Ne pas ouvrir si on clique sur Modifier ou Supprimer
       openPatientDossierModal(p.id);
+    });
+
+    // Bouton Modifier
+    const btnEdit = row.querySelector('.p-btn-action.edit');
+    btnEdit?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openEditPatientModal(p.id);
+    });
+
+    // Bouton Supprimer
+    const btnDelete = row.querySelector('.p-btn-action.delete');
+    btnDelete?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openDeletePatientModal(p.id);
     });
 
     patientsTableBody.appendChild(row);
@@ -285,6 +304,15 @@ function openPatientDossierModal(patientId = null) {
   document.getElementById('modal-field-numass').textContent = p.insuranceInfo.numAss;
   document.getElementById('modal-field-valiass').textContent = `${p.insuranceInfo.dateValiAss} (En cours de validité)`;
 
+  // Bouton Modifier depuis la fiche
+  const btnEditFromDossier = document.getElementById('btn-edit-from-dossier');
+  if (btnEditFromDossier) {
+    btnEditFromDossier.onclick = () => {
+      closePatientDossierModal();
+      openEditPatientModal(p.id);
+    };
+  }
+
   if (dossierModal) dossierModal.classList.add('open');
 }
 
@@ -301,10 +329,45 @@ document.getElementById('btn-imprimer-fiche')?.addEventListener('click', () => {
   closePatientDossierModal();
 });
 
-// 8. Modal Nouveau Patient
+// 8. Modal Nouveau Patient & Modification
 document.getElementById('btn-open-create-patient')?.addEventListener('click', () => {
-  if (createModal) createModal.classList.add('open');
+  openCreatePatientModal();
 });
+
+function openCreatePatientModal() {
+  document.getElementById('f-edit-id').value = '';
+  document.getElementById('modal-form-title').textContent = "Nouveau Dossier Patient";
+  document.getElementById('btn-submit-patient-form').textContent = "Enregistrer le Patient";
+  document.getElementById('create-patient-form').reset();
+  document.getElementById('f-nationalite').value = "Malienne";
+  if (createModal) createModal.classList.add('open');
+}
+
+function openEditPatientModal(patientId) {
+  const p = patientsList.find(x => x.id === patientId);
+  if (!p) return;
+
+  document.getElementById('f-edit-id').value = p.id;
+  document.getElementById('modal-form-title').textContent = `Modifier : ${p.personalInfo.prenom} ${p.personalInfo.nom}`;
+  document.getElementById('btn-submit-patient-form').textContent = "Mettre à jour le dossier";
+
+  document.getElementById('f-nom').value = p.personalInfo.nom;
+  document.getElementById('f-prenom').value = p.personalInfo.prenom;
+  document.getElementById('f-sexe').value = p.personalInfo.sexe;
+  document.getElementById('f-age').value = p.personalInfo.age;
+  document.getElementById('f-tel').value = p.personalInfo.telephone;
+  document.getElementById('f-email').value = p.personalInfo.email;
+  document.getElementById('f-nationalite').value = p.personalInfo.nationalite;
+  document.getElementById('f-profession').value = p.personalInfo.profession;
+  document.getElementById('f-adresse').value = p.personalInfo.adresse;
+
+  document.getElementById('f-assurance').value = p.insuranceInfo.assurance;
+  document.getElementById('f-societe').value = p.insuranceInfo.societe;
+  document.getElementById('f-numass').value = p.insuranceInfo.numAss;
+  document.getElementById('f-valiass').value = p.insuranceInfo.dateValiAss;
+
+  if (createModal) createModal.classList.add('open');
+}
 
 document.getElementById('btn-close-create-modal')?.addEventListener('click', () => {
   if (createModal) createModal.classList.remove('open');
@@ -314,61 +377,129 @@ document.getElementById('btn-cancel-create')?.addEventListener('click', () => {
   if (createModal) createModal.classList.remove('open');
 });
 
+// Soumission du Formulaire (Création OU Modification)
 document.getElementById('create-patient-form')?.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  const count = patientsList.length + 1;
-  const newRef = `CLI-ML-2026-${String(840 + count).padStart(4, '0')}`;
-  const newTicket = `N° ${String(840 + count).padStart(4, '0')}`;
+  const editId = document.getElementById('f-edit-id').value;
 
-  const newPatient = {
-    id: `P${String(count).padStart(3, '0')}`,
-    ref: newRef,
-    ticket: newTicket,
-    personalInfo: {
-      nom: document.getElementById('f-nom').value.trim().toUpperCase(),
-      prenom: document.getElementById('f-prenom').value.trim(),
-      sexe: document.getElementById('f-sexe').value,
-      age: parseInt(document.getElementById('f-age').value) || 30,
-      telephone: document.getElementById('f-tel').value.trim(),
-      email: document.getElementById('f-email').value.trim() || "Non renseigné",
-      nationalite: document.getElementById('f-nationalite').value.trim() || "Malienne",
-      profession: document.getElementById('f-profession').value.trim() || "Particulier",
-      adresse: document.getElementById('f-adresse').value.trim()
-    },
-    insuranceInfo: {
-      assurance: document.getElementById('f-assurance').value.trim() || "Direct comptant",
-      societe: document.getElementById('f-societe').value.trim() || "N/A",
-      dateValiAss: document.getElementById('f-valiass').value.trim() || "31/12/2026",
-      numAss: document.getElementById('f-numass').value.trim() || "N/A"
-    },
-    medicalInfo: {
-      time: "10:30",
-      desc: "Première consultation",
-      status: "waiting",
-      statusLabel: "En attente",
-      vitals: { od: "10/10", og: "10/10", tension: "14/14 mmHg", oct: "À planifier" }
-    },
-    billing: {
-      total: 35000,
-      formattedTotal: "35 000 FCFA",
-      coverage: "Direct patient",
-      patientShare: "35 000 FCFA",
-      insuranceShare: "0 FCFA"
+  if (editId) {
+    // Mode MODIFICATION
+    const p = patientsList.find(x => x.id === editId);
+    if (p) {
+      p.personalInfo.nom = document.getElementById('f-nom').value.trim().toUpperCase();
+      p.personalInfo.prenom = document.getElementById('f-prenom').value.trim();
+      p.personalInfo.sexe = document.getElementById('f-sexe').value;
+      p.personalInfo.age = parseInt(document.getElementById('f-age').value) || p.personalInfo.age;
+      p.personalInfo.telephone = document.getElementById('f-tel').value.trim();
+      p.personalInfo.email = document.getElementById('f-email').value.trim() || "Non renseigné";
+      p.personalInfo.nationalite = document.getElementById('f-nationalite').value.trim() || "Malienne";
+      p.personalInfo.profession = document.getElementById('f-profession').value.trim() || "Particulier";
+      p.personalInfo.adresse = document.getElementById('f-adresse').value.trim();
+
+      p.insuranceInfo.assurance = document.getElementById('f-assurance').value.trim() || "Direct comptant";
+      p.insuranceInfo.societe = document.getElementById('f-societe').value.trim() || "N/A";
+      p.insuranceInfo.dateValiAss = document.getElementById('f-valiass').value.trim() || "31/12/2026";
+      p.insuranceInfo.numAss = document.getElementById('f-numass').value.trim() || "N/A";
+
+      if (createModal) createModal.classList.remove('open');
+      renderPatientsTable();
+      renderQueue();
+      if (currentActivePatientId === p.id) selectPatient(p.id);
+      showToast(`Dossier de ${p.personalInfo.prenom} ${p.personalInfo.nom} mis à jour avec succès ! ✓`);
     }
-  };
+  } else {
+    // Mode CRÉATION
+    const count = patientsList.length + 1;
+    const newRef = `CLI-ML-2026-${String(840 + count).padStart(4, '0')}`;
+    const newTicket = `N° ${String(840 + count).padStart(4, '0')}`;
 
-  patientsList.unshift(newPatient);
-  if (createModal) createModal.classList.remove('open');
-  e.target.reset();
+    const newPatient = {
+      id: `P${String(count).padStart(3, '0')}`,
+      ref: newRef,
+      ticket: newTicket,
+      personalInfo: {
+        nom: document.getElementById('f-nom').value.trim().toUpperCase(),
+        prenom: document.getElementById('f-prenom').value.trim(),
+        sexe: document.getElementById('f-sexe').value,
+        age: parseInt(document.getElementById('f-age').value) || 30,
+        telephone: document.getElementById('f-tel').value.trim(),
+        email: document.getElementById('f-email').value.trim() || "Non renseigné",
+        nationalite: document.getElementById('f-nationalite').value.trim() || "Malienne",
+        profession: document.getElementById('f-profession').value.trim() || "Particulier",
+        adresse: document.getElementById('f-adresse').value.trim()
+      },
+      insuranceInfo: {
+        assurance: document.getElementById('f-assurance').value.trim() || "Direct comptant",
+        societe: document.getElementById('f-societe').value.trim() || "N/A",
+        dateValiAss: document.getElementById('f-valiass').value.trim() || "31/12/2026",
+        numAss: document.getElementById('f-numass').value.trim() || "N/A"
+      },
+      medicalInfo: {
+        time: "10:30",
+        desc: "Première consultation",
+        status: "waiting",
+        statusLabel: "En attente",
+        vitals: { od: "10/10", og: "10/10", tension: "14/14 mmHg", oct: "À planifier" }
+      },
+      billing: {
+        total: 35000,
+        formattedTotal: "35 000 FCFA",
+        coverage: "Direct patient",
+        patientShare: "35 000 FCFA",
+        insuranceShare: "0 FCFA"
+      }
+    };
 
-  renderPatientsTable();
-  renderQueue();
-  selectPatient(newPatient.id);
-  showToast(`Patient ${newPatient.personalInfo.prenom} ${newPatient.personalInfo.nom} créé avec succès ! ✓`);
+    patientsList.unshift(newPatient);
+    if (createModal) createModal.classList.remove('open');
+    e.target.reset();
+
+    renderPatientsTable();
+    renderQueue();
+    selectPatient(newPatient.id);
+    showToast(`Patient ${newPatient.personalInfo.prenom} ${newPatient.personalInfo.nom} créé avec succès ! ✓`);
+  }
 });
 
-// 9. Filtres vue Patients
+// 9. Modal Suppression Patient
+function openDeletePatientModal(patientId) {
+  const p = patientsList.find(x => x.id === patientId);
+  if (!p) return;
+
+  patientToDeleteId = patientId;
+  const elSub = document.getElementById('delete-patient-name-sub');
+  if (elSub) elSub.textContent = `${p.personalInfo.prenom} ${p.personalInfo.nom} · ${p.ticket} (${p.ref})`;
+
+  if (deleteModal) deleteModal.classList.add('open');
+}
+
+document.getElementById('btn-cancel-delete')?.addEventListener('click', () => {
+  if (deleteModal) deleteModal.classList.remove('open');
+  patientToDeleteId = null;
+});
+
+document.getElementById('btn-confirm-delete')?.addEventListener('click', () => {
+  if (!patientToDeleteId) return;
+
+  const idx = patientsList.findIndex(x => x.id === patientToDeleteId);
+  if (idx !== -1) {
+    const deleted = patientsList.splice(idx, 1)[0];
+    if (deleteModal) deleteModal.classList.remove('open');
+
+    // Si on a supprimé le patient actif en cours, passer au premier disponible
+    if (currentActivePatientId === patientToDeleteId && patientsList.length > 0) {
+      selectPatient(patientsList[0].id);
+    }
+
+    renderPatientsTable();
+    renderQueue();
+    showToast(`Patient ${deleted.personalInfo.prenom} ${deleted.personalInfo.nom} supprimé du répertoire ✓`);
+  }
+  patientToDeleteId = null;
+});
+
+// 10. Filtres vue Patients
 document.getElementById('patients-view-search')?.addEventListener('input', (e) => {
   const fText = e.target.value;
   const fAss = document.getElementById('filter-assurance')?.value || "";
@@ -390,7 +521,7 @@ document.getElementById('filter-sexe')?.addEventListener('change', (e) => {
   renderPatientsTable(fText, fAss, fSex);
 });
 
-// 10. Actions d'encaissement (FCFA)
+// 11. Actions d'encaissement (FCFA)
 const btnEncaissement = document.getElementById('btn-encaissement');
 btnEncaissement?.addEventListener('click', () => {
   const p = patientsList.find(x => x.id === currentActivePatientId);
@@ -414,7 +545,7 @@ document.getElementById('btn-modal-confirm')?.addEventListener('click', () => {
   showToast(`Encaissement validé : ${p.billing.formattedTotal} reçu pour ${p.personalInfo.nom} ✓`);
 });
 
-// 11. Prendre l'attente / Appeler le prochain
+// 12. Prendre l'attente / Appeler le prochain
 function callNextPatient() {
   const nextWaiting = patientsList.find(x => x.medicalInfo.status === 'waiting');
   if (nextWaiting) {
@@ -428,7 +559,7 @@ function callNextPatient() {
 document.getElementById('btn-call-next')?.addEventListener('click', callNextPatient);
 document.getElementById('btn-banner-attente')?.addEventListener('click', callNextPatient);
 
-// 12. Écouteurs de clics directs et délégués sur la sidebar
+// 13. Écouteurs de clics directs et délégués sur la sidebar
 document.querySelectorAll('.nav-item').forEach(item => {
   item.onclick = function(e) {
     e.preventDefault();
@@ -446,7 +577,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// 13. Recherche de patient en Topbar
+// 14. Recherche de patient en Topbar
 const searchInput = document.getElementById('patient-search');
 searchInput?.addEventListener('input', (e) => {
   const val = e.target.value.toLowerCase().trim();
@@ -469,7 +600,7 @@ searchInput?.addEventListener('input', (e) => {
 renderAgenda();
 renderQueue();
 
-// 14. Auto-scaling bidirectionnel exact pour le Preview Arena
+// 15. Auto-scaling bidirectionnel exact pour le Preview Arena
 function fitToWindow() {
   const wrapper = document.getElementById('scaler-wrapper');
   if (!wrapper) return;
@@ -477,13 +608,11 @@ function fitToWindow() {
   const targetWidth = 1360;
   const targetHeight = 880;
 
-  // Récupération fiable des dimensions du viewport
   const availableWidth = document.documentElement.clientWidth || window.innerWidth;
   const availableHeight = document.documentElement.clientHeight || window.innerHeight;
 
   if (!availableWidth || !availableHeight) return;
 
-  // Calcul du facteur d'échelle pour faire rentrer exactement toute l'app
   const scaleX = availableWidth / targetWidth;
   const scaleY = availableHeight / targetHeight;
   const scale = Math.min(scaleX, scaleY);
@@ -494,7 +623,6 @@ function fitToWindow() {
   const scaledWidth = targetWidth * scale;
   const scaledHeight = targetHeight * scale;
 
-  // Centrage parfait horizontal et vertical
   const offsetX = Math.max(0, (availableWidth - scaledWidth) / 2);
   const offsetY = Math.max(0, (availableHeight - scaledHeight) / 2);
 
@@ -502,7 +630,6 @@ function fitToWindow() {
   wrapper.style.left = `${offsetX}px`;
   wrapper.style.top = `${offsetY}px`;
 
-  // Empêcher tout scroll parasite
   document.body.style.width = `${availableWidth}px`;
   document.body.style.height = `${availableHeight}px`;
   document.body.style.overflow = 'hidden';
