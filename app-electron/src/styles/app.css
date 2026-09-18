@@ -395,7 +395,7 @@ html, body {
 /* Clinic Banner (Photo Réception Bleue) */
 .clinic-banner {
   position: relative;
-  height: 110px;
+  height: 125px;
   border-radius: var(--oc-radius);
   overflow: hidden;
   box-shadow: var(--oc-shadow-card);
@@ -424,7 +424,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(12, 26, 48, 0.72);
+  background-color: rgba(12, 26, 48, 0.58);
   z-index: 2;
 }
 
@@ -434,7 +434,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, rgba(30, 86, 214, 0.45) 0%, rgba(192, 138, 45, 0.3) 100%);
+  background: linear-gradient(90deg, rgba(30, 86, 214, 0.35) 0%, rgba(192, 138, 45, 0.2) 100%);
   z-index: 3;
 }
 
