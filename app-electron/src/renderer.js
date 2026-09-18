@@ -4,7 +4,6 @@ const clinicData = window.clinicData;
 // État local de l'application
 let currentActivePatientId = "P001";
 let currentView = "Réception"; // "Réception" ou "Patients"
-let patientToDeleteId = null;
 let agendaItems = [...clinicData.agenda];
 let patientsList = [...clinicData.patients];
 
@@ -17,7 +16,6 @@ const toastMsg = document.getElementById('toast-msg');
 const billingModal = document.getElementById('billing-modal');
 const dossierModal = document.getElementById('patient-dossier-modal');
 const createModal = document.getElementById('create-patient-modal');
-const deleteModal = document.getElementById('delete-patient-modal');
 
 // Vues
 const viewReception = document.getElementById('view-reception');
@@ -142,7 +140,7 @@ function renderQueue() {
   });
 }
 
-// 5. Rendu du Tableau Gestion des Patients avec boutons Modifier & Supprimer
+// 5. Rendu du Tableau Gestion des Patients (clic direct sur la ligne pour ouvrir la fiche)
 function renderPatientsTable(filterText = "", filterAss = "", filterSex = "") {
   if (!patientsTableBody) return;
   patientsTableBody.innerHTML = '';
@@ -194,30 +192,11 @@ function renderPatientsTable(filterText = "", filterAss = "", filterSex = "") {
         <span class="p-ass-num">${p.insuranceInfo.numAss}</span>
       </div>
       <span class="p-col-nat">🇲🇱 ${p.personalInfo.nationalite}</span>
-      <div class="p-col-actions">
-        <button class="p-btn-action edit" data-action="edit" data-id="${p.id}" title="Modifier">Modifier</button>
-        <button class="p-btn-action delete" data-action="delete" data-id="${p.id}" title="Supprimer">✕</button>
-      </div>
     `;
 
-    // Clic sur la ligne pour ouvrir le dossier
-    row.addEventListener('click', (e) => {
-      if (e.target.closest('.p-btn-action')) return; // Ne pas ouvrir si on clique sur Modifier ou Supprimer
+    // Clic n'importe où sur le patient pour ouvrir sa fiche détaillée
+    row.addEventListener('click', () => {
       openPatientDossierModal(p.id);
-    });
-
-    // Bouton Modifier
-    const btnEdit = row.querySelector('.p-btn-action.edit');
-    btnEdit?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openEditPatientModal(p.id);
-    });
-
-    // Bouton Supprimer
-    const btnDelete = row.querySelector('.p-btn-action.delete');
-    btnDelete?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openDeletePatientModal(p.id);
     });
 
     patientsTableBody.appendChild(row);
@@ -275,7 +254,7 @@ function selectPatient(patientId) {
   showToast(`Dossier actif : ${fullName} (${p.ref})`);
 }
 
-// 7. Modal Fiche Patient Complète
+// 7. Modal Fiche Patient Complète (Sortie via la croix ✕ uniquement)
 function openPatientDossierModal(patientId = null) {
   const p = patientsList.find(x => x.id === (patientId || currentActivePatientId));
   if (!p) return;
@@ -304,7 +283,7 @@ function openPatientDossierModal(patientId = null) {
   document.getElementById('modal-field-numass').textContent = p.insuranceInfo.numAss;
   document.getElementById('modal-field-valiass').textContent = `${p.insuranceInfo.dateValiAss} (En cours de validité)`;
 
-  // Bouton Modifier depuis la fiche
+  // Bouton Modifier ce dossier
   const btnEditFromDossier = document.getElementById('btn-edit-from-dossier');
   if (btnEditFromDossier) {
     btnEditFromDossier.onclick = () => {
@@ -320,12 +299,16 @@ function closePatientDossierModal() {
   if (dossierModal) dossierModal.classList.remove('open');
 }
 
+// Clics pour ouvrir la fiche
 document.getElementById('btn-check-dossier')?.addEventListener('click', () => openPatientDossierModal());
 document.getElementById('patient-avatar-box')?.addEventListener('click', () => openPatientDossierModal());
+
+// Sortie via la croix ✕
 document.getElementById('btn-close-dossier-modal')?.addEventListener('click', closePatientDossierModal);
-document.getElementById('btn-close-dossier-bottom')?.addEventListener('click', closePatientDossierModal);
+
+// Bouton Imprimer
 document.getElementById('btn-imprimer-fiche')?.addEventListener('click', () => {
-  showToast("Impression fiche patient envoyée à l'imprimante ✓");
+  showToast("Impression de la fiche patient envoyée à l'imprimante ✓");
   closePatientDossierModal();
 });
 
@@ -462,44 +445,7 @@ document.getElementById('create-patient-form')?.addEventListener('submit', (e) =
   }
 });
 
-// 9. Modal Suppression Patient
-function openDeletePatientModal(patientId) {
-  const p = patientsList.find(x => x.id === patientId);
-  if (!p) return;
-
-  patientToDeleteId = patientId;
-  const elSub = document.getElementById('delete-patient-name-sub');
-  if (elSub) elSub.textContent = `${p.personalInfo.prenom} ${p.personalInfo.nom} · ${p.ticket} (${p.ref})`;
-
-  if (deleteModal) deleteModal.classList.add('open');
-}
-
-document.getElementById('btn-cancel-delete')?.addEventListener('click', () => {
-  if (deleteModal) deleteModal.classList.remove('open');
-  patientToDeleteId = null;
-});
-
-document.getElementById('btn-confirm-delete')?.addEventListener('click', () => {
-  if (!patientToDeleteId) return;
-
-  const idx = patientsList.findIndex(x => x.id === patientToDeleteId);
-  if (idx !== -1) {
-    const deleted = patientsList.splice(idx, 1)[0];
-    if (deleteModal) deleteModal.classList.remove('open');
-
-    // Si on a supprimé le patient actif en cours, passer au premier disponible
-    if (currentActivePatientId === patientToDeleteId && patientsList.length > 0) {
-      selectPatient(patientsList[0].id);
-    }
-
-    renderPatientsTable();
-    renderQueue();
-    showToast(`Patient ${deleted.personalInfo.prenom} ${deleted.personalInfo.nom} supprimé du répertoire ✓`);
-  }
-  patientToDeleteId = null;
-});
-
-// 10. Filtres vue Patients
+// 9. Filtres vue Patients
 document.getElementById('patients-view-search')?.addEventListener('input', (e) => {
   const fText = e.target.value;
   const fAss = document.getElementById('filter-assurance')?.value || "";
@@ -521,7 +467,7 @@ document.getElementById('filter-sexe')?.addEventListener('change', (e) => {
   renderPatientsTable(fText, fAss, fSex);
 });
 
-// 11. Actions d'encaissement (FCFA)
+// 10. Actions d'encaissement (FCFA)
 const btnEncaissement = document.getElementById('btn-encaissement');
 btnEncaissement?.addEventListener('click', () => {
   const p = patientsList.find(x => x.id === currentActivePatientId);
@@ -545,7 +491,7 @@ document.getElementById('btn-modal-confirm')?.addEventListener('click', () => {
   showToast(`Encaissement validé : ${p.billing.formattedTotal} reçu pour ${p.personalInfo.nom} ✓`);
 });
 
-// 12. Prendre l'attente / Appeler le prochain
+// 11. Prendre l'attente / Appeler le prochain
 function callNextPatient() {
   const nextWaiting = patientsList.find(x => x.medicalInfo.status === 'waiting');
   if (nextWaiting) {
@@ -559,7 +505,7 @@ function callNextPatient() {
 document.getElementById('btn-call-next')?.addEventListener('click', callNextPatient);
 document.getElementById('btn-banner-attente')?.addEventListener('click', callNextPatient);
 
-// 13. Écouteurs de clics directs et délégués sur la sidebar
+// 12. Écouteurs de clics directs et délégués sur la sidebar
 document.querySelectorAll('.nav-item').forEach(item => {
   item.onclick = function(e) {
     e.preventDefault();
@@ -577,7 +523,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// 14. Recherche de patient en Topbar
+// 13. Recherche de patient en Topbar
 const searchInput = document.getElementById('patient-search');
 searchInput?.addEventListener('input', (e) => {
   const val = e.target.value.toLowerCase().trim();
@@ -600,7 +546,7 @@ searchInput?.addEventListener('input', (e) => {
 renderAgenda();
 renderQueue();
 
-// 15. Auto-scaling bidirectionnel exact pour le Preview Arena
+// 14. Auto-scaling bidirectionnel exact pour le Preview Arena
 function fitToWindow() {
   const wrapper = document.getElementById('scaler-wrapper');
   if (!wrapper) return;
