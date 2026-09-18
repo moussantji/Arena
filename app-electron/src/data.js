@@ -3,7 +3,7 @@
 export const clinicData = {
   name: "Clinique Oculis",
   tagline: "CLINIQUE OPHTALMO",
-  dateString: "Mardi 17 septembre 2026",
+  dateString: "Vendredi 18 septembre 2026",
   user: {
     id: "CL01",
     name: "Claire Laurent",
@@ -22,88 +22,158 @@ export const clinicData = {
     subtitle: "Réception & pilotage — 24 RDV · CA 1 850 000 FCFA",
     status: "Salle d’attente : 6 patients · 2 consultations en cours"
   },
-  agenda: [
-    { id: "A1", time: "09:00", patient: "Amélie Rousseau", desc: "Consultation + OCT · cab. 1", status: "pri" },
-    { id: "A2", time: "09:30", patient: "Jean-Marc Petit", desc: "Tonométrie · cab. 2", status: "pri" },
-    { id: "A3", time: "10:00", patient: "Sofia Benali", desc: "Suivi cataracte · cab. 1", alert: "retard 10 min", status: "warn" },
-    { id: "A4", time: "10:30", patient: "Karim Haddad", desc: "Contrôle post-op · cab. 2", status: "pri" },
-    { id: "A5", time: "11:15", patient: "Claire Dubois", desc: "Bilan complet · cab. 1", status: "ok" },
-    { id: "A6", time: "14:00", patient: "Ibrahim Traoré", desc: "Fond d'œil diabétique · cab. 1", status: "pri" },
-    { id: "A7", time: "14:45", patient: "Aminata Koné", desc: "Réfraction pédiatrique · cab. 2", status: "pri" },
-    { id: "A8", time: "15:30", patient: "Moussa Coulibaly", desc: "Laser YAG · cab. 3", status: "pri" }
-  ],
-  queue: [
+  patients: [
     {
-      id: "Q1",
+      // Patient malien complet
+      id: "P001",
+      ref: "CLI-ML-2026-0841",
       ticket: "N° 0841",
-      time: "09:12",
-      patient: "Amélie Rousseau",
-      desc: "OCT Macula",
-      status: "in-progress",
-      statusLabel: "En cours",
-      age: 34,
-      insurance: "Assurance AMO / Privée",
-      vitals: { od: "10/10", og: "9/10", tension: "14/15 mmHg", oct: "02/03" },
+      personalInfo: {
+        nom: "TRAORÉ",
+        prenom: "Mamadou",
+        adresse: "Badalabougou Rue 105, Porte 24, Bamako",
+        sexe: "Masculin",
+        age: 48,
+        telephone: "+223 76 45 89 12",
+        email: "mamadou.traore@orangemali.com",
+        nationalite: "Malienne",
+        profession: "Ingénieur Télécoms"
+      },
+      insuranceInfo: {
+        assurance: "CANAM (AMO)",
+        societe: "Orange Mali SA",
+        dateValiAss: "31/12/2026",
+        numAss: "AMO-ML-78459201-B"
+      },
+      medicalInfo: {
+        time: "09:12",
+        desc: "OCT Macula + Réfraction",
+        status: "in-progress",
+        statusLabel: "En cours",
+        vitals: { od: "10/10", og: "8/10", tension: "14/15 mmHg", oct: "02/03" }
+      },
       billing: {
         total: 120000,
         formattedTotal: "120 000 FCFA",
-        coverage: "Prise en charge 80%",
-        patientShare: "25 000 FCFA"
+        coverage: "AMO 80%",
+        patientShare: "25 000 FCFA",
+        insuranceShare: "95 000 FCFA"
       }
     },
     {
-      id: "Q2",
+      id: "P002",
+      ref: "CLI-ML-2026-0842",
       ticket: "N° 0842",
-      time: "09:30",
-      patient: "Jean-Marc Petit",
-      desc: "Tonométrie à aplanation",
-      status: "waiting",
-      statusLabel: "En attente",
-      age: 58,
-      insurance: "Assurance NSIA 100%",
-      vitals: { od: "8/10", og: "7/10", tension: "18/19 mmHg", oct: "En attente" },
-      billing: {
-        total: 35000,
-        formattedTotal: "35 000 FCFA",
-        coverage: "Prise en charge 100%",
-        patientShare: "0 FCFA"
-      }
-    },
-    {
-      id: "Q3",
-      ticket: "N° 0843",
-      time: "09:45",
-      patient: "Sofia Benali",
-      desc: "Suivi post-op cataracte",
-      status: "waiting",
-      statusLabel: "En attente",
-      age: 67,
-      insurance: "Assurance Gras Savoye",
-      vitals: { od: "9/10", og: "10/10", tension: "13/14 mmHg", oct: "Normal" },
-      billing: {
-        total: 50000,
-        formattedTotal: "50 000 FCFA",
-        coverage: "Prise en charge 70%",
-        patientShare: "15 000 FCFA"
-      }
-    },
-    {
-      id: "Q4",
-      ticket: "N° 0844",
-      time: "10:15",
-      patient: "Claire Dubois",
-      desc: "Bilan complet de la vue",
-      status: "waiting",
-      statusLabel: "En attente",
-      age: 42,
-      insurance: "Direct comptant",
-      vitals: { od: "6/10", og: "5/10", tension: "15/15 mmHg", oct: "Non requis" },
+      personalInfo: {
+        nom: "COULIBALY",
+        prenom: "Fatoumata",
+        adresse: "ACI 2000, Près du Monument Bougie, Bamako",
+        sexe: "Féminin",
+        age: 36,
+        telephone: "+223 66 12 34 56",
+        email: "f.coulibaly@bceao.int",
+        nationalite: "Malienne",
+        profession: "Analyste financière"
+      },
+      insuranceInfo: {
+        assurance: "SUNU Assurances",
+        societe: "BCEAO Siège Bamako",
+        dateValiAss: "30/06/2027",
+        numAss: "SUNU-ML-2024-998"
+      },
+      medicalInfo: {
+        time: "09:30",
+        desc: "Tonométrie + Fond d’œil",
+        status: "waiting",
+        statusLabel: "En attente",
+        vitals: { od: "9/10", og: "9/10", tension: "16/16 mmHg", oct: "Normal" }
+      },
       billing: {
         total: 45000,
         formattedTotal: "45 000 FCFA",
-        coverage: "Comptant patient",
-        patientShare: "45 000 FCFA"
+        coverage: "Prise en charge 100%",
+        patientShare: "0 FCFA",
+        insuranceShare: "45 000 FCFA"
+      }
+    },
+    {
+      id: "P003",
+      ref: "CLI-ML-2026-0843",
+      ticket: "N° 0843",
+      personalInfo: {
+        nom: "DIARRA",
+        prenom: "Oumar",
+        adresse: "Hippodrome II, Bamako",
+        sexe: "Masculin",
+        age: 62,
+        telephone: "+223 78 90 23 45",
+        email: "oumar.diarra@malitel.ml",
+        nationalite: "Malienne",
+        profession: "Enseignant retraité"
+      },
+      insuranceInfo: {
+        assurance: "INPS / AMO",
+        societe: "Ministère de l'Éducation Nationale",
+        dateValiAss: "31/12/2026",
+        numAss: "AMO-ML-55231904-C"
+      },
+      medicalInfo: {
+        time: "09:45",
+        desc: "Suivi chirurgie cataracte",
+        status: "waiting",
+        statusLabel: "En attente",
+        vitals: { od: "8/10", og: "10/10", tension: "13/14 mmHg", oct: "Post-op OK" }
+      },
+      billing: {
+        total: 60000,
+        formattedTotal: "60 000 FCFA",
+        coverage: "AMO 80%",
+        patientShare: "12 000 FCFA",
+        insuranceShare: "48 000 FCFA"
+      }
+    },
+    {
+      id: "P004",
+      ref: "CLI-ML-2026-0844",
+      ticket: "N° 0844",
+      personalInfo: {
+        nom: "KÉÏTA",
+        prenom: "Aminata",
+        adresse: "Hamdallaye ACI, Bamako",
+        sexe: "Féminin",
+        age: 29,
+        telephone: "+223 70 33 22 11",
+        email: "aminata.keita@avocat.ml",
+        nationalite: "Malienne",
+        profession: "Juriste d'affaires"
+      },
+      insuranceInfo: {
+        assurance: "NSIA Assurances",
+        societe: "Cabinet Keita & Associés",
+        dateValiAss: "15/05/2027",
+        numAss: "NSIA-ML-881203"
+      },
+      medicalInfo: {
+        time: "10:15",
+        desc: "Bilan complet réfraction",
+        status: "waiting",
+        statusLabel: "En attente",
+        vitals: { od: "7/10", og: "6/10", tension: "15/15 mmHg", oct: "Non requis" }
+      },
+      billing: {
+        total: 50000,
+        formattedTotal: "50 000 FCFA",
+        coverage: "NSIA 85%",
+        patientShare: "7 500 FCFA",
+        insuranceShare: "42 500 FCFA"
       }
     }
+  ],
+  agenda: [
+    { id: "A1", time: "09:00", patient: "Mamadou Traoré", desc: "Consultation + OCT · cab. 1", status: "pri" },
+    { id: "A2", time: "09:30", patient: "Fatoumata Coulibaly", desc: "Tonométrie · cab. 2", status: "pri" },
+    { id: "A3", time: "10:00", patient: "Oumar Diarra", desc: "Suivi cataracte · cab. 1", alert: "retard 10 min", status: "warn" },
+    { id: "A4", time: "10:30", patient: "Aminata Kéïta", desc: "Bilan réfraction · cab. 2", status: "pri" },
+    { id: "A5", time: "11:15", patient: "Bakary Sanogo", desc: "Fond d'œil diabétique · cab. 1", status: "ok" }
   ]
 };

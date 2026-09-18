@@ -201,10 +201,10 @@
               <span class="col-badge acc" id="patient-ticket">N° 0841</span>
             </div>
             <div class="patient-profile-header">
-              <div class="patient-avatar" id="patient-avatar-box">AR</div>
+              <div class="patient-avatar" id="patient-avatar-box">MT</div>
               <div class="patient-title">
-                <h3 id="patient-name">Amélie Rousseau</h3>
-                <p id="patient-meta">34 ans · Assurance AMO / Privée</p>
+                <h3 id="patient-name">Mamadou Traoré</h3>
+                <p id="patient-meta">48 ans · Malienne · CANAM (AMO)</p>
               </div>
             </div>
             <div class="vitals-grid">
@@ -276,6 +276,99 @@
       <div class="modal-actions">
         <button class="btn-modal-cancel" id="btn-modal-cancel">Annuler</button>
         <button class="btn-modal-confirm" id="btn-modal-confirm">Valider l'encaissement</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- Modal Dossier Patient Complet (Infos perso + Assurance) -->
+  <div class="modal-overlay" id="patient-dossier-modal">
+    <div class="modal-card patient-modal-card">
+      <div class="patient-modal-header">
+        <div class="patient-modal-avatar" id="modal-full-avatar">MT</div>
+        <div class="patient-modal-title">
+          <div class="patient-modal-title-row">
+            <h3 id="modal-full-name">Mamadou TRAORÉ</h3>
+            <span class="col-badge acc" id="modal-full-ref">CLI-ML-2026-0841</span>
+          </div>
+          <p id="modal-full-sub">Patient Malien · Dossier Ophtalmologique Actif</p>
+        </div>
+        <button class="modal-close-icon-btn" id="btn-close-dossier-modal">✕</button>
+      </div>
+
+      <div class="patient-modal-body">
+        <!-- Section 1: Informations Personnelles -->
+        <div class="modal-info-section">
+          <div class="modal-section-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>INFORMATIONS PERSONNELLES</span>
+          </div>
+          <div class="modal-info-grid">
+            <div class="info-cell">
+              <span class="info-label">RÉFÉRENCE</span>
+              <span class="info-val highlight" id="modal-field-ref">CLI-ML-2026-0841</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">NOM & PRÉNOM</span>
+              <span class="info-val" id="modal-field-fullname">TRAORÉ Mamadou</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">SEXE & ÂGE</span>
+              <span class="info-val" id="modal-field-sexe-age">Masculin · 48 ans</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">NATIONALITÉ</span>
+              <span class="info-val" id="modal-field-nationalite">🇲🇱 Malienne</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">PROFESSION</span>
+              <span class="info-val" id="modal-field-profession">Ingénieur Télécoms</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">TÉLÉPHONE</span>
+              <span class="info-val" id="modal-field-tel">+223 76 45 89 12</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">EMAIL</span>
+              <span class="info-val" id="modal-field-email">mamadou.traore@orangemali.com</span>
+            </div>
+            <div class="info-cell full-width">
+              <span class="info-label">ADRESSE DE RÉSIDENCE</span>
+              <span class="info-val" id="modal-field-adresse">Badalabougou Rue 105, Porte 24, Bamako</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Assurance & Prise en Charge -->
+        <div class="modal-info-section">
+          <div class="modal-section-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <span>ASSURANCE & COUVERTURE MÉDICALE</span>
+          </div>
+          <div class="modal-info-grid">
+            <div class="info-cell">
+              <span class="info-label">ORGANISME / ASSURANCE</span>
+              <span class="info-val badge-assurance" id="modal-field-assurance">CANAM (AMO)</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">SOCIÉTÉ / EMPLOYEUR</span>
+              <span class="info-val" id="modal-field-societe">Orange Mali SA</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">N° ASSURÉ / MATRICULE</span>
+              <span class="info-val highlight" id="modal-field-numass">AMO-ML-78459201-B</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">DATE VALIDITÉ ASSURANCE</span>
+              <span class="info-val valid" id="modal-field-valiass">31/12/2026 (Valide)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" id="btn-close-dossier-bottom">Fermer le dossier</button>
+        <button class="btn-modal-confirm" id="btn-imprimer-fiche">Imprimer la fiche patient</button>
       </div>
     </div>
   </div>

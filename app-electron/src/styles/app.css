@@ -1171,3 +1171,150 @@ html, body {
   height: 7px;
   background-color: var(--oc-accent);
 }
+
+/* Styles Modal Dossier Patient Complet */
+.patient-modal-card {
+  width: 580px !important;
+  max-width: 90vw;
+  padding: 24px;
+}
+
+.patient-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--oc-border);
+  margin-bottom: 16px;
+}
+
+.patient-modal-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--oc-gradient);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(30, 86, 214, 0.35);
+  flex-shrink: 0;
+}
+
+.patient-modal-title {
+  flex: 1;
+}
+
+.patient-modal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.patient-modal-title-row h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--oc-text-1);
+}
+
+.patient-modal-title p {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--oc-text-3);
+  margin-top: 2px;
+}
+
+.modal-close-icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--oc-border);
+  background: var(--oc-surface);
+  color: var(--oc-text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+
+.modal-close-icon-btn:hover {
+  background: var(--oc-danger-soft);
+  color: var(--oc-danger);
+  border-color: var(--oc-danger);
+}
+
+.patient-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-info-section {
+  background: var(--oc-bg);
+  border: 1px solid var(--oc-border);
+  border-radius: var(--oc-radius-sm);
+  padding: 14px;
+}
+
+.modal-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--oc-primary);
+  letter-spacing: 0.6px;
+  margin-bottom: 12px;
+}
+
+.modal-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+}
+
+.info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-cell.full-width {
+  grid-column: span 2;
+}
+
+.info-label {
+  font-size: 8px;
+  font-weight: 800;
+  color: var(--oc-text-3);
+  letter-spacing: 0.5px;
+}
+
+.info-val {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--oc-text-1);
+}
+
+.info-val.highlight {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--oc-primary);
+  font-weight: 800;
+}
+
+.info-val.badge-assurance {
+  display: inline-block;
+  color: var(--oc-primary);
+  font-weight: 800;
+}
+
+.info-val.valid {
+  color: var(--oc-success);
+  font-weight: 800;
+}
