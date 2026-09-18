@@ -303,13 +303,16 @@
 
 /* Modal Dossier Patient */
 .patient-modal-card {
-  width: 600px !important;
+  width: 580px !important;
   max-width: 90vw;
+  max-height: 85vh;
   padding: 0 !important;
   overflow: hidden;
   background-color: var(--oc-surface);
   border-radius: var(--oc-radius-lg);
-  box-shadow: var(--oc-shadow-modal);
+  box-shadow: 0 24px 60px rgba(12, 26, 48, 0.3);
+  display: flex;
+  flex-direction: column;
 }
 
 .patient-modal-header {
@@ -381,8 +384,8 @@
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  max-height: 480px;
+  gap: 16px;
+  max-height: calc(85vh - 140px);
   overflow-y: auto;
 }
 

@@ -988,9 +988,13 @@ html, body {
   background-color: var(--oc-surface);
   border-radius: var(--oc-radius-lg);
   border: 1px solid var(--oc-border);
-  box-shadow: 0 20px 50px rgba(12, 26, 48, 0.25);
-  width: 400px;
-  padding: 22px;
+  box-shadow: 0 24px 60px rgba(12, 26, 48, 0.28);
+  width: 440px;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
   transform: translateY(10px);
   transition: transform 0.2s ease;
 }
@@ -1065,39 +1069,53 @@ html, body {
 
 .modal-actions {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--oc-border);
+  background-color: var(--oc-surface);
+  border-radius: 0 0 var(--oc-radius-lg) var(--oc-radius-lg);
+  flex-shrink: 0;
 }
 
 .btn-modal-cancel {
-  flex: 1;
-  padding: 9px;
-  border-radius: var(--oc-radius-sm);
+  padding: 10px 20px;
+  border-radius: var(--oc-radius-pill);
   border: 1px solid var(--oc-border);
-  background: transparent;
+  background: #FFFFFF;
   color: var(--oc-text-2);
   font-weight: 700;
-  font-size: 11px;
+  font-size: 11.5px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
+  line-height: 1.2;
 }
 
 .btn-modal-cancel:hover {
   background-color: var(--oc-surface-2);
   color: var(--oc-text-1);
+  border-color: var(--oc-primary-light);
 }
 
 .btn-modal-confirm {
-  flex: 1;
-  padding: 9px;
-  border-radius: var(--oc-radius-sm);
+  padding: 10px 22px;
+  border-radius: var(--oc-radius-pill);
   border: none;
-  background: var(--oc-primary);
-  color: #FFF;
+  background: linear-gradient(135deg, var(--oc-primary) 0%, #1545b3 100%);
+  color: #FFFFFF;
   font-weight: 800;
-  font-size: 11px;
+  font-size: 11.5px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(30, 86, 214, 0.3);
-  transition: all 0.15s;
+  box-shadow: 0 4px 14px rgba(30, 86, 214, 0.3);
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.btn-modal-confirm:hover {
+  background: linear-gradient(135deg, var(--oc-primary-hover) 0%, #1a4fc2 100%);
+  box-shadow: 0 6px 18px rgba(30, 86, 214, 0.4);
+  transform: translateY(-1px);
 }
 
 .btn-modal-confirm:hover {
