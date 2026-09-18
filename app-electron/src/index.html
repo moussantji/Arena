@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oculis · Clinique Ophtalmo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/theme.css">
+  <link rel="stylesheet" href="styles/app.css">
+</head>
+<body>
+  <div class="app-window">
+    <!-- Chrome Frameless Titlebar -->
+    <header class="window-titlebar">
+      <div class="window-controls">
+        <button class="window-control" id="btn-close" title="Fermer"></button>
+        <button class="window-control" id="btn-min" title="Réduire"></button>
+        <button class="window-control" id="btn-max" title="Agrandir"></button>
+      </div>
+      <div class="window-url-pill">
+        <span class="window-url-text">app.oculis-clinique.fr/pilotage</span>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="app-sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2.2 12S5.8 5.8 12 5.8 21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12Z"/>
+              <circle cx="12" cy="12" r="3.1"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>Oculis</h1>
+            <span>CLINIQUE OPHTALMO</span>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+            <span>Tableau de bord</span>
+          </a>
+          <a class="nav-item active">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="M22 6l-10 7L2 6"/></svg>
+            <span>Réception</span>
+            <div class="nav-accent-dot"></div>
+          </a>
+          <a class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>Rendez-vous</span>
+          </a>
+          <a class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Patients</span>
+          </a>
+          <a class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span>Consultations</span>
+          </a>
+          <a class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            <span>Imagerie OCT</span>
+          </a>
+          <a class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <span>Facturation</span>
+          </a>
+          <a class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            <span>Stock matériel</span>
+          </a>
+          <a class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Statistiques</span>
+          </a>
+          <a class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Paramètres</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-profile">
+            <div class="user-avatar">CL</div>
+            <div class="user-info">
+              <span class="user-name">Claire Laurent</span>
+              <span class="user-role">Accueil &amp; gestion</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Content Area -->
+      <main class="app-content">
+        <!-- Topbar -->
+        <div class="content-topbar">
+          <div class="topbar-header">
+            <h2>Pilotage</h2>
+            <p>Réception · Mardi 17 septembre 2026</p>
+          </div>
+          <div class="topbar-actions">
+            <div class="search-box">
+              <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" class="search-input" placeholder="Rechercher un patient…">
+            </div>
+            <button class="icon-btn" title="Notifications">
+              <svg class="btn-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <div class="btn-badge-dot"></div>
+            </button>
+            <div class="topbar-avatar" title="Mon profil">CL</div>
+          </div>
+        </div>
+
+        <!-- Banner Hero with Reception Photo -->
+        <div class="clinic-banner">
+          <img class="banner-bg-img" src="assets/bg-clinique-bleue.jpg" alt="Clinique Oculis">
+          <div class="banner-overlay-dark"></div>
+          <div class="banner-overlay-gradient"></div>
+          <div class="banner-content">
+            <h3 class="banner-title">Clinique Oculis</h3>
+            <p class="banner-subtitle">Réception &amp; pilotage — 24 RDV · CA 2 840 €</p>
+            <p class="banner-status">Salle d’attente : 6 patients · 2 consultations en cours</p>
+          </div>
+          <button class="banner-action-btn">Prendre l’attente</button>
+        </div>
+
+        <!-- 4 KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">REND.-VOUS</div>
+            <div class="kpi-value">24</div>
+            <div class="kpi-footer">
+              <span class="kpi-dot ok"></span>
+              <span class="kpi-subtext">+2 vs hier</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">EN CONSULT.</div>
+            <div class="kpi-value">2</div>
+            <div class="kpi-footer">
+              <span class="kpi-dot pri"></span>
+              <span class="kpi-subtext">Dr Martin · Dr Petit</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">CA DU JOUR</div>
+            <div class="kpi-value">2 840 €</div>
+            <div class="kpi-footer">
+              <span class="kpi-dot ok"></span>
+              <span class="kpi-subtext">reçu ce matin</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">NO-SHOW</div>
+            <div class="kpi-value">1</div>
+            <div class="kpi-footer">
+              <span class="kpi-dot warn"></span>
+              <span class="kpi-subtext">sur 24 patients</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Columns Section -->
+        <div class="dashboard-columns">
+          <!-- Col 1: Agenda -->
+          <div class="column-card">
+            <div class="col-header">
+              <span class="col-title">Agenda du jour</span>
+              <span class="col-badge pri">24</span>
+            </div>
+            <div class="agenda-list">
+              <div class="agenda-item">
+                <div class="agenda-marker pri"></div>
+                <div class="agenda-content">
+                  <div class="agenda-top">
+                    <span class="agenda-time">09:00</span>
+                  </div>
+                  <span class="agenda-patient">Amélie Rousseau</span>
+                  <span class="agenda-desc">Consultation + OCT · cab. 1</span>
+                </div>
+              </div>
+              <div class="agenda-item">
+                <div class="agenda-marker pri"></div>
+                <div class="agenda-content">
+                  <div class="agenda-top">
+                    <span class="agenda-time">09:30</span>
+                  </div>
+                  <span class="agenda-patient">Jean-Marc Petit</span>
+                  <span class="agenda-desc">Tonométrie · cab. 2</span>
+                </div>
+              </div>
+              <div class="agenda-item">
+                <div class="agenda-marker warn"></div>
+                <div class="agenda-content">
+                  <div class="agenda-top">
+                    <span class="agenda-time">10:00</span>
+                    <span class="agenda-alert">retard 10 min</span>
+                  </div>
+                  <span class="agenda-patient">Sofia Benali</span>
+                  <span class="agenda-desc">Suivi cataracte · cab. 1</span>
+                </div>
+              </div>
+              <div class="agenda-item">
+                <div class="agenda-marker pri"></div>
+                <div class="agenda-content">
+                  <div class="agenda-top">
+                    <span class="agenda-time">10:30</span>
+                  </div>
+                  <span class="agenda-patient">Karim Haddad</span>
+                  <span class="agenda-desc">Contrôle post-op · cab. 2</span>
+                </div>
+              </div>
+              <div class="agenda-item">
+                <div class="agenda-marker ok"></div>
+                <div class="agenda-content">
+                  <div class="agenda-top">
+                    <span class="agenda-time">11:15</span>
+                  </div>
+                  <span class="agenda-patient">Claire Dubois</span>
+                  <span class="agenda-desc">Bilan complet · cab. 1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Col 2: File d'attente -->
+          <div class="column-card">
+            <div class="col-header">
+              <span class="col-title">File d’attente</span>
+              <span class="col-badge warn">4</span>
+            </div>
+            <div class="queue-list">
+              <div class="queue-item active">
+                <div class="queue-left">
+                  <span class="queue-time-badge">09:12</span>
+                  <div class="queue-info">
+                    <span class="queue-patient">Amélie Rousseau</span>
+                    <span class="queue-desc">OCT</span>
+                  </div>
+                </div>
+                <span class="queue-status-chip active">En cours</span>
+              </div>
+              <div class="queue-item">
+                <div class="queue-left">
+                  <span class="queue-time-badge">09:30</span>
+                  <div class="queue-info">
+                    <span class="queue-patient">Jean-Marc Petit</span>
+                    <span class="queue-desc">Tonométrie</span>
+                  </div>
+                </div>
+                <span class="queue-status-chip waiting">En attente</span>
+              </div>
+              <div class="queue-item">
+                <div class="queue-left">
+                  <span class="queue-time-badge">09:45</span>
+                  <div class="queue-info">
+                    <span class="queue-patient">Sofia Benali</span>
+                    <span class="queue-desc">Suivi cataracte</span>
+                  </div>
+                </div>
+                <span class="queue-status-chip waiting">En attente</span>
+              </div>
+              <div class="queue-item">
+                <div class="queue-left">
+                  <span class="queue-time-badge">10:15</span>
+                  <div class="queue-info">
+                    <span class="queue-patient">Claire Dubois</span>
+                    <span class="queue-desc">Bilan complet</span>
+                  </div>
+                </div>
+                <span class="queue-status-chip waiting">En attente</span>
+              </div>
+            </div>
+            <button class="queue-action-btn">
+              <svg class="queue-btn-icon" viewBox="0 0 24 24"><path d="M18 20V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16"/><path d="M14 12v.01"/></svg>
+              <span>Prendre l’attente</span>
+            </button>
+          </div>
+
+          <!-- Col 3: Dossier Actif -->
+          <div class="column-card">
+            <div class="col-header">
+              <span class="col-title">Dossier actif</span>
+              <span class="col-badge acc">N° 0841</span>
+            </div>
+            <div class="patient-profile-header">
+              <div class="patient-avatar">AR</div>
+              <div class="patient-title">
+                <h3>Amélie Rousseau</h3>
+                <p>34 ans · Assurée CPAM</p>
+              </div>
+            </div>
+            <div class="vitals-grid">
+              <div class="vital-tile">
+                <div class="vital-label">ACUITÉ OD</div>
+                <div class="vital-value">10/10</div>
+              </div>
+              <div class="vital-tile">
+                <div class="vital-label">ACUITÉ OG</div>
+                <div class="vital-value">9/10</div>
+              </div>
+              <div class="vital-tile">
+                <div class="vital-label">TA OCULAIRE</div>
+                <div class="vital-value">14/15</div>
+              </div>
+              <div class="vital-tile">
+                <div class="vital-label">OCT</div>
+                <div class="vital-value">02/03</div>
+              </div>
+            </div>
+            <div class="billing-card">
+              <div class="billing-label">FACTURE DU JOUR</div>
+              <div class="billing-amount">185,00 € <span class="billing-cpam">· CPAM T</span></div>
+              <div class="billing-rest">Reste à charge patient : 40,00 €</div>
+            </div>
+            <div class="dossier-actions">
+              <button class="btn-dossier-primary">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <span>Encaisser 185 €</span>
+              </button>
+              <button class="btn-dossier-secondary">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Vérifier le dossier</span>
+              </button>
+            </div>
+            <p class="dossier-footer-note">Prochain : 11:15 — M. Dubois · Bilan</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

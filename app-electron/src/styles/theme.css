@@ -1,0 +1,52 @@
+/* ============================================================
+   OCULIS — Thème Saphir & Ambre (Electron)
+   Ophtalmologie · Gestion de clinique & Réception
+   ============================================================ */
+
+:root {
+  --oc-bg: #F3F6FB;
+  --oc-surface: #FFFFFF;
+  --oc-surface-2: #E9EFF8;
+  --oc-border: #D7E0EE;
+  --oc-border-light: rgba(215, 224, 238, 0.6);
+  --oc-text-1: #0C1A30;
+  --oc-text-2: #43536E;
+  --oc-text-3: #8492AB;
+  
+  --oc-primary: #1E56D6;
+  --oc-primary-hover: #1744AC;
+  --oc-primary-soft: #E2EAFC;
+  
+  --oc-accent: #C08A2D;
+  --oc-accent-soft: #F6ECDA;
+  
+  --oc-success: #1F8A58;
+  --oc-success-soft: #DFF3E8;
+  
+  --oc-warning: #A86400;
+  --oc-warning-soft: #FAEDD7;
+  
+  --oc-danger: #C13B3B;
+  --oc-danger-soft: #FAE4E4;
+  
+  --oc-sidebar: #0C1A30;
+  --oc-sidebar-surface: #13223B;
+  --oc-sidebar-text: #B9C7E0;
+  --oc-sidebar-muted: #5D7295;
+  --oc-sidebar-active: #1E56D6;
+  
+  --oc-chrome-bg: #10131B;
+  --oc-chrome-pill: #0D1017;
+  
+  --oc-gradient: linear-gradient(135deg, #1E56D6, #4F86FF);
+  --oc-gradient-overlay: linear-gradient(to right, rgba(30, 86, 214, 0.92) 0%, rgba(30, 86, 214, 0.55) 55%, rgba(30, 86, 214, 0.12) 100%);
+  
+  --oc-radius: 12px;
+  --oc-radius-sm: 8px;
+  --oc-radius-lg: 16px;
+  --oc-radius-pill: 9999px;
+  
+  --oc-shadow-sm: 0 2px 8px rgba(12, 26, 48, 0.04);
+  --oc-shadow: 0 8px 24px rgba(12, 26, 48, 0.08);
+  --oc-shadow-card: 0 1px 3px rgba(12, 26, 48, 0.05), 0 8px 20px rgba(12, 26, 48, 0.03);
+}

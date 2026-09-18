@@ -1,0 +1,16 @@
+{
+  "name": "oculis-electron",
+  "version": "1.0.0",
+  "description": "Oculis — Gestion de clinique ophtalmologique (Electron)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron ."
+  },
+  "keywords": ["oculis", "ophtalmo", "electron", "clinic"],
+  "author": "Oculis",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^33.2.1"
+  }
+}
