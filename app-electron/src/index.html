@@ -511,6 +511,217 @@
             </div>
           </div>
         </div>
+
+        <!-- VUE GESTION STOCK MATÉRIEL -->
+        <div id="view-stock" class="patients-view-container" style="display: none;">
+          <div class="patients-toolbar">
+            <div class="patients-filters">
+              <div class="patients-search-box">
+                <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="stock-view-search" placeholder="Rechercher par matériel, référence, fournisseur...">
+              </div>
+              <select class="filter-select" id="filter-stock-cat">
+                <option value="">Toutes les catégories</option>
+                <option value="Consommables & Collyres">Consommables & Collyres</option>
+                <option value="Diagnostic & Réfraction">Diagnostic & Réfraction</option>
+                <option value="Chirurgie & Blocs">Chirurgie & Blocs</option>
+                <option value="Imagerie & Informatique">Imagerie & Informatique</option>
+                <option value="Consommables & Stérilisation">Stérilisation</option>
+              </select>
+              <select class="filter-select" id="filter-stock-statut">
+                <option value="">Tous les états de stock</option>
+                <option value="Optimal">Optimal</option>
+                <option value="Alerte réassort">Alerte réassort</option>
+                <option value="Rupture imminente">Rupture imminente</option>
+              </select>
+            </div>
+            <div class="patients-actions-right">
+              <button class="btn-export-excel" id="btn-export-stock" title="Exporter l'inventaire en fichier Excel">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Exporter en Excel</span>
+              </button>
+              <button class="btn-add-patient" id="btn-open-create-stock">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Nouveau Matériel</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="patients-table-card">
+            <div class="stock-table-header">
+              <span>RÉFÉRENCE</span>
+              <span>DÉSIGNATION DU MATÉRIEL</span>
+              <span>CATÉGORIE</span>
+              <span>EN STOCK</span>
+              <span>SEUIL MIN</span>
+              <span>P.U (FCFA)</span>
+              <span>VALEUR TOTALE</span>
+              <span>ÉTAT</span>
+              <span>ACTIONS</span>
+            </div>
+            <div class="stock-table-body" id="stock-table-body">
+              <!-- Rendu dynamique via renderer.js -->
+            </div>
+          </div>
+        </div>
+
+
+        <!-- VUE STATISTIQUES & RAPPORTS CLINIQUES -->
+        <div id="view-statistiques" class="patients-view-container" style="display: none;">
+          <!-- 4 KPI Avancés Statistiques -->
+          <div class="kpi-grid" style="margin-bottom: 0;">
+            <div class="kpi-card">
+              <div class="kpi-header">TOTAL PATIENTS SUIVIS</div>
+              <div class="kpi-value" id="stats-total-patients" style="color: var(--oc-primary);">4</div>
+              <div class="kpi-footer">
+                <span class="kpi-dot ok"></span>
+                <span class="kpi-subtext">100% Maliens enregistrés</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-header">CHIFFRE D'AFFAIRES MENSUEL</div>
+              <div class="kpi-value" id="stats-ca-mensuel" style="color: var(--oc-accent);">24 500 000 FCFA</div>
+              <div class="kpi-footer">
+                <span class="kpi-dot ok"></span>
+                <span class="kpi-subtext">+18% vs mois précédent</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-header">TAUX DE COUVERTURE AMO</div>
+              <div class="kpi-value" id="stats-taux-amo" style="color: var(--oc-success);">75%</div>
+              <div class="kpi-footer">
+                <span class="kpi-dot pri"></span>
+                <span class="kpi-subtext">CANAM / INPS actifs</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-header">VALEUR STOCK PHARMACIE</div>
+              <div class="kpi-value" id="stats-valeur-stock">2 047 000 FCFA</div>
+              <div class="kpi-footer">
+                <span class="kpi-dot warn"></span>
+                <span class="kpi-subtext">6 références en stock</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panneaux graphiques et ventilations -->
+          <div class="dashboard-columns" style="min-height: 440px;">
+            <!-- Panneau 1: Ventilation des Consultations -->
+            <div class="column-card">
+              <div class="col-header">
+                <span class="col-title">Répartition des Consultations</span>
+                <span class="col-badge pri">Ophtalmologie</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; margin-bottom: 5px;">
+                    <span>Consultation Ophtalmologie (15 000 FCFA)</span>
+                    <span style="color: var(--oc-primary);">45%</span>
+                  </div>
+                  <div style="background: var(--oc-bg); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: var(--oc-primary); width: 45%; height: 100%; border-radius: 4px;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; margin-bottom: 5px;">
+                    <span>Imagerie OCT & Tomographie</span>
+                    <span style="color: var(--oc-accent);">25%</span>
+                  </div>
+                  <div style="background: var(--oc-bg); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: var(--oc-accent); width: 25%; height: 100%; border-radius: 4px;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; margin-bottom: 5px;">
+                    <span>Optométrie & Réfraction (5 000 FCFA)</span>
+                    <span style="color: var(--oc-success);">18%</span>
+                  </div>
+                  <div style="background: var(--oc-bg); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: var(--oc-success); width: 18%; height: 100%; border-radius: 4px;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; margin-bottom: 5px;">
+                    <span>Urgences Ophtalmo (25 000 FCFA)</span>
+                    <span style="color: #e11d48;">12%</span>
+                  </div>
+                  <div style="background: var(--oc-bg); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: #e11d48; width: 12%; height: 100%; border-radius: 4px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panneau 2: Répartition des Assurances Maliennes -->
+            <div class="column-card">
+              <div class="col-header">
+                <span class="col-title">Organismes Payeurs & AMO</span>
+                <span class="col-badge acc">Mali</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div>
+                    <strong style="font-size: 11.5px; color: var(--oc-text-1);">CANAM (AMO)</strong>
+                    <div style="font-size: 9px; color: var(--oc-text-3);">Assurance Maladie Obligatoire</div>
+                  </div>
+                  <span style="font-family: var(--oc-font-mono); font-weight: 800; color: var(--oc-primary); font-size: 13px;">52%</span>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div>
+                    <strong style="font-size: 11.5px; color: var(--oc-text-1);">SUNU Assurances</strong>
+                    <div style="font-size: 9px; color: var(--oc-text-3);">Compagnies privées d'assurance</div>
+                  </div>
+                  <span style="font-family: var(--oc-font-mono); font-weight: 800; color: var(--oc-accent); font-size: 13px;">24%</span>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div>
+                    <strong style="font-size: 11.5px; color: var(--oc-text-1);">INPS / AMO</strong>
+                    <div style="font-size: 9px; color: var(--oc-text-3);">Salariés du secteur privé</div>
+                  </div>
+                  <span style="font-family: var(--oc-font-mono); font-weight: 800; color: var(--oc-success); font-size: 13px;">16%</span>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div>
+                    <strong style="font-size: 11.5px; color: var(--oc-text-1);">Direct Comptant</strong>
+                    <div style="font-size: 9px; color: var(--oc-text-3);">Patients sans couverture</div>
+                  </div>
+                  <span style="font-family: var(--oc-font-mono); font-weight: 800; color: var(--oc-text-3); font-size: 13px;">8%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panneau 3: Performance Praticiens & Bureaux -->
+            <div class="column-card">
+              <div class="col-header">
+                <span class="col-title">Activité par Praticien</span>
+                <span class="col-badge warn">Bureaux</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                <div style="padding: 10px 12px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="font-size: 11px; color: var(--oc-text-1);">Dr Martin</strong>
+                    <span class="bureau-badge">Bureau 1</span>
+                  </div>
+                  <div style="font-size: 9.5px; color: var(--oc-text-3); margin-top: 2px;">Ophtalmologue · 14 consultations · 4 OCT</div>
+                </div>
+                <div style="padding: 10px 12px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="font-size: 11px; color: var(--oc-text-1);">Dr Petit</strong>
+                    <span class="bureau-badge">Bureau 2</span>
+                  </div>
+                  <div style="font-size: 9.5px; color: var(--oc-text-3); margin-top: 2px;">Optométriste / Orthoptiste · 10 réfractions</div>
+                </div>
+                <div style="padding: 10px 12px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="font-size: 11px; color: var(--oc-text-1);">Dr Traoré</strong>
+                    <span class="bureau-badge">Bureau 4</span>
+                  </div>
+                  <div style="font-size: 9.5px; color: var(--oc-text-3); margin-top: 2px;">Médecin Anesthésiste · Bilans pré-opératoires</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -769,6 +980,80 @@
         <div class="modal-actions">
           <button type="button" class="btn-modal-cancel" id="btn-cancel-fac">Annuler</button>
           <button type="submit" class="btn-modal-confirm" id="btn-submit-fac">Valider & Encaisser</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Modal Nouveau Matériel Stock -->
+  <div class="modal-overlay" id="create-stock-modal">
+    <div class="modal-card patient-modal-card" style="width: 580px !important;">
+      <div class="patient-modal-header">
+        <div class="patient-modal-avatar">📦</div>
+        <div class="patient-modal-title">
+          <h3 style="font-size: 16px; font-weight: 800; color: var(--oc-text-1);">Nouveau Matériel ou Consommable</h3>
+          <p style="font-size: 11px; font-weight: 600; color: var(--oc-text-3);">Ajout d'une référence d'inventaire médical</p>
+        </div>
+        <button class="modal-close-icon-btn" id="btn-close-stock-modal">✕</button>
+      </div>
+
+      <form id="create-stock-form">
+        <div class="patient-modal-body" style="max-height: calc(85vh - 130px); overflow-y: auto; padding: 16px 24px;">
+          <div class="modal-info-section">
+            <div class="modal-section-title">IDENTIFICATION DU MATÉRIEL</div>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">DÉSIGNATION DE L'ARTICLE *</label>
+                <input class="form-input" id="stock-nom" required placeholder="Ex: Gants stériles chirurgie ophtalmo, Collyre...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">RÉFÉRENCE CODE</label>
+                <input class="form-input" id="stock-ref" readonly style="font-family: var(--oc-font-mono); font-weight: 800; color: var(--oc-primary);">
+              </div>
+              <div class="form-group">
+                <label class="form-label">CATÉGORIE MÉDICALE *</label>
+                <select class="form-select" id="stock-cat-select" required>
+                  <option value="Consommables & Collyres">Consommables & Collyres</option>
+                  <option value="Diagnostic & Réfraction">Diagnostic & Réfraction</option>
+                  <option value="Chirurgie & Blocs">Chirurgie & Blocs</option>
+                  <option value="Imagerie & Informatique">Imagerie & Informatique</option>
+                  <option value="Consommables & Stérilisation">Stérilisation</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-info-section">
+            <div class="modal-section-title">QUANTITÉS, TARIF & FOURNISSEUR</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">QUANTITÉ EN STOCK *</label>
+                <input class="form-input" id="stock-qte" type="number" required value="20">
+              </div>
+              <div class="form-group">
+                <label class="form-label">SEUIL D'ALERTE MINIMAL *</label>
+                <input class="form-input" id="stock-min" type="number" required value="10">
+              </div>
+              <div class="form-group">
+                <label class="form-label">UNITÉ DE CONDITIONNEMENT *</label>
+                <input class="form-input" id="stock-unite" required placeholder="Ex: Flacons, Boîtes 100u, Rouleaux" value="Boîtes">
+              </div>
+              <div class="form-group">
+                <label class="form-label">PRIX UNITAIRE D'ACHAT (FCFA) *</label>
+                <input class="form-input" id="stock-prix" type="number" required value="5000">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">FOURNISSEUR DU MATÉRIEL *</label>
+                <input class="form-input" id="stock-fournisseur" required value="Pharmacie Centrale de Bamako">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-cancel" id="btn-cancel-stock">Annuler</button>
+          <button type="submit" class="btn-modal-confirm" id="btn-submit-stock">Enregistrer le Matériel</button>
         </div>
       </form>
     </div>
@@ -1197,7 +1482,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=30"></script>
-  <script src="renderer.js?v=30"></script>
+  <script src="data.js?v=31"></script>
+  <script src="renderer.js?v=31"></script>
 </body>
 </html>

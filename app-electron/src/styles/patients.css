@@ -1073,3 +1073,73 @@
   flex-shrink: 0;
   margin: 0;
 }
+
+/* Styles pour le Module Stock Matériel */
+.stock-table-header {
+  display: grid;
+  grid-template-columns: 85px 190px 145px 85px 85px 95px 110px 110px 65px;
+  padding: 12px 16px;
+  column-gap: 8px;
+  background-color: var(--oc-bg);
+  border-bottom: 1px solid var(--oc-border);
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--oc-text-3);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.stock-table-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.stock-row {
+  display: grid;
+  grid-template-columns: 85px 190px 145px 85px 85px 95px 110px 110px 65px;
+  padding: 12px 16px;
+  column-gap: 8px;
+  border-bottom: 1px solid var(--oc-border);
+  align-items: center;
+  transition: all 0.15s ease;
+  font-size: 11px;
+}
+
+.stock-row:hover {
+  background-color: rgba(30, 86, 214, 0.04);
+}
+
+.stock-row:last-child {
+  border-bottom: none;
+}
+
+/* Fix Modale Stock */
+#create-stock-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+#create-stock-form .patient-modal-body {
+  flex: 1;
+  min-height: 0;
+  max-height: calc(85vh - 130px);
+  overflow-y: auto;
+  padding: 16px 24px;
+}
+
+#create-stock-form .modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 14px 24px;
+  background-color: var(--oc-bg);
+  border-top: 1px solid var(--oc-border);
+  flex-shrink: 0;
+  margin: 0;
+}

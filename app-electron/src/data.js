@@ -503,3 +503,92 @@ window.clinicInvoices = [
     statut: "Payée"
   }
 ];
+
+
+// Registre des Consommables & Matériel Médical Ophtalmologique de la Clinique Oculis
+window.clinicInventory = [
+  {
+    id: "MAT-001",
+    nom: "Collyre Mydriatique (Tropicamide 0.5%)",
+    categorie: "Consommables & Collyres",
+    stockActuel: 48,
+    stockMin: 15,
+    unite: "Flacons 5ml",
+    prixUnitaire: 3500,
+    formattedPrix: "3 500 FCFA",
+    valeurTotale: 168000,
+    formattedValeur: "168 000 FCFA",
+    fournisseur: "Pharmacie Centrale de Bamako",
+    statut: "Optimal"
+  },
+  {
+    id: "MAT-002",
+    nom: "Bandelettes Fluorescéine stérile",
+    categorie: "Diagnostic & Réfraction",
+    stockActuel: 120,
+    stockMin: 40,
+    unite: "Boîtes 100u",
+    prixUnitaire: 8500,
+    formattedPrix: "8 500 FCFA",
+    valeurTotale: 1020000,
+    formattedValeur: "1 020 000 FCFA",
+    fournisseur: "Labo Ophta Sahel",
+    statut: "Optimal"
+  },
+  {
+    id: "MAT-003",
+    nom: "Embouts de Tonomètre à aplanation",
+    categorie: "Consommables & Stérilisation",
+    stockActuel: 14,
+    stockMin: 20,
+    unite: "Pochettes stériles",
+    prixUnitaire: 6000,
+    formattedPrix: "6 000 FCFA",
+    valeurTotale: 84000,
+    formattedValeur: "84 000 FCFA",
+    fournisseur: "Médical Équipement Mali",
+    statut: "Alerte réassort"
+  },
+  {
+    id: "MAT-004",
+    nom: "Papier d'impression Thermique OCT B-Scan",
+    categorie: "Imagerie & Informatique",
+    stockActuel: 8,
+    stockMin: 10,
+    unite: "Rouleaux HD",
+    prixUnitaire: 12500,
+    formattedPrix: "12 500 FCFA",
+    valeurTotale: 100000,
+    formattedValeur: "100 000 FCFA",
+    fournisseur: "Bureau Pro Bamako",
+    statut: "Alerte réassort"
+  },
+  {
+    id: "MAT-005",
+    nom: "Couteaux biseautés micro-chirurgie cataracte 2.2mm",
+    categorie: "Chirurgie & Blocs",
+    stockActuel: 35,
+    stockMin: 10,
+    unite: "Lames stériles",
+    prixUnitaire: 18000,
+    formattedPrix: "18 000 FCFA",
+    valeurTotale: 630000,
+    formattedValeur: "630 000 FCFA",
+    fournisseur: "SurgiCare Afrique",
+    statut: "Optimal"
+  },
+  {
+    id: "MAT-006",
+    nom: "Larmes artificielles unidose (Hyaluronate 0.2%)",
+    categorie: "Consommables & Collyres",
+    stockActuel: 6,
+    stockMin: 25,
+    unite: "Boîtes de 30",
+    prixUnitaire: 7500,
+    formattedPrix: "7 500 FCFA",
+    valeurTotale: 45000,
+    formattedValeur: "45 000 FCFA",
+    fournisseur: "Labo Ophta Sahel",
+    statut: "Rupture imminente"
+  }
+];

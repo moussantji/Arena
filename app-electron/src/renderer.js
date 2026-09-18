@@ -10,6 +10,7 @@ let consultationsList = window.clinicConsultations ? [...window.clinicConsultati
 let appointmentsList = window.clinicAppointments ? [...window.clinicAppointments] : [];
 let octList = window.clinicOctExams ? [...window.clinicOctExams] : [];
 let invoicesList = window.clinicInvoices ? [...window.clinicInvoices] : [];
+let inventoryList = window.clinicInventory ? [...window.clinicInventory] : [];
 
 // Eléments DOM
 const agendaContainer = document.getElementById('agenda-container');
@@ -28,6 +29,8 @@ const viewConsultations = document.getElementById('view-consultations');
 const viewRendezvous = document.getElementById('view-rendezvous');
 const viewImagerieOct = document.getElementById('view-imagerie-oct');
 const viewFacturation = document.getElementById('view-facturation');
+const viewStock = document.getElementById('view-stock');
+const viewStatistiques = document.getElementById('view-statistiques');
 const viewTitle = document.getElementById('view-title');
 const viewDate = document.getElementById('view-date');
 
@@ -83,6 +86,8 @@ window.switchView = function switchView(tabName) {
 
   if (viewImagerieOct) viewImagerieOct.style.display = 'none';
   if (viewFacturation) viewFacturation.style.display = 'none';
+  if (viewStock) viewStock.style.display = 'none';
+  if (viewStatistiques) viewStatistiques.style.display = 'none';
 
   if (tabName === 'Patients') {
     if (viewPatients) viewPatients.style.display = 'flex';
@@ -115,6 +120,19 @@ window.switchView = function switchView(tabName) {
     if (viewDate) viewDate.textContent = `Journal de caisse — ${invoicesList.length} factures · ${totalEnc.toLocaleString('fr-FR')} FCFA encaissés`;
     renderFacturationTable();
     showToast("Module Facturation ouvert ✓");
+  } else if (tabName === 'Stock matériel') {
+    if (viewStock) viewStock.style.display = 'flex';
+    if (viewTitle) viewTitle.textContent = "Gestion du Stock & Matériel";
+    const totalVal = inventoryList.reduce((acc, m) => acc + (m.valeurTotale || 0), 0);
+    if (viewDate) viewDate.textContent = `Inventaire clinique — ${inventoryList.length} références · Valeur stock : ${totalVal.toLocaleString('fr-FR')} FCFA`;
+    renderStockTable();
+    showToast("Module Stock matériel ouvert ✓");
+  } else if (tabName === 'Statistiques') {
+    if (viewStatistiques) viewStatistiques.style.display = 'flex';
+    if (viewTitle) viewTitle.textContent = "Statistiques & Pilotage Médical";
+    if (viewDate) viewDate.textContent = "Indicateurs d'activité, AMO et performances cliniques";
+    updateStatsView();
+    showToast("Module Statistiques ouvert ✓");
   } else if (tabName === 'Tableau de bord' || tabName === 'Réception') {
     if (viewReception) viewReception.style.display = 'block';
     if (viewTitle) viewTitle.textContent = "Tableau de bord";
@@ -1789,3 +1807,215 @@ document.getElementById('btn-export-fac')?.addEventListener('click', () => {
 
   showToast(`Export réussi : ${invoicesList.length} factures exportées ✓`);
 });
+
+
+// ============================================================
+// 20. MODULE GESTION DU STOCK MATÉRIEL ET CONSOMMABLES (FCFA)
+// ============================================================
+
+const stockTableBody = document.getElementById('stock-table-body');
+const createStockModal = document.getElementById('create-stock-modal');
+
+function renderStockTable(filterText = "", filterCat = "", filterStatus = "") {
+  if (!stockTableBody) return;
+  stockTableBody.innerHTML = '';
+
+  const filtered = inventoryList.filter(m => {
+    const q = filterText.toLowerCase();
+    const matchText = !q ||
+      m.id.toLowerCase().includes(q) ||
+      m.nom.toLowerCase().includes(q) ||
+      m.fournisseur.toLowerCase().includes(q);
+
+    const matchCat = !filterCat || m.categorie === filterCat;
+    const matchStat = !filterStatus || m.statut === filterStatus;
+
+    return matchText && matchCat && matchStat;
+  });
+
+  if (filtered.length === 0) {
+    stockTableBody.innerHTML = '<div style="padding: 30px; text-align: center; color: var(--oc-text-3); font-size: 12px; font-weight: 700;">Aucun matériel ne correspond à votre recherche.</div>';
+    return;
+  }
+
+  filtered.forEach(m => {
+    const row = document.createElement('div');
+    row.className = 'stock-row';
+
+    let chipClass = 'termine';
+    if (m.statut === 'Alerte réassort') chipClass = 'attente';
+    else if (m.statut === 'Rupture imminente') chipClass = 'retarde';
+
+    row.innerHTML = `
+      <span class="cs-col-num">${m.id}</span>
+      <div>
+        <strong style="color: var(--oc-text-1); font-size: 11px;">${m.nom}</strong>
+        <div style="font-size: 8.5px; color: var(--oc-text-3); font-family: var(--oc-font-mono);">${m.unite}</div>
+      </div>
+      <span style="font-size: 10px; color: var(--oc-text-2); font-weight: 600;">${m.categorie}</span>
+      <span style="font-family: var(--oc-font-mono); font-weight: 800; font-size: 11.5px; color: ${m.stockActuel <= m.stockMin ? '#e11d48' : 'var(--oc-text-1)'};">${m.stockActuel}</span>
+      <span style="font-family: var(--oc-font-mono); font-size: 10px; color: var(--oc-text-3);">${m.stockMin}</span>
+      <span class="cs-col-tarif" style="font-size: 10.5px;">${m.formattedPrix}</span>
+      <span style="font-family: var(--oc-font-mono); font-weight: 800; color: var(--oc-primary); font-size: 11px;">${m.formattedValeur}</span>
+      <span class="cs-status-chip ${chipClass}">${m.statut}</span>
+      <div>
+        <button class="btn-modal-cancel" style="padding: 4px 8px; font-size: 9px; border-radius: var(--oc-radius-pill);" onclick="ajusterStock('${m.id}')">+ Réassort</button>
+      </div>
+    `;
+    stockTableBody.appendChild(row);
+  });
+}
+
+// Filtres Stock
+document.getElementById('stock-view-search')?.addEventListener('input', (e) => {
+  const fText = e.target.value;
+  const fCat = document.getElementById('filter-stock-cat')?.value || "";
+  const fStat = document.getElementById('filter-stock-statut')?.value || "";
+  renderStockTable(fText, fCat, fStat);
+});
+
+document.getElementById('filter-stock-cat')?.addEventListener('change', (e) => {
+  const fText = document.getElementById('stock-view-search')?.value || "";
+  const fCat = e.target.value;
+  const fStat = document.getElementById('filter-stock-statut')?.value || "";
+  renderStockTable(fText, fCat, fStat);
+});
+
+document.getElementById('filter-stock-statut')?.addEventListener('change', (e) => {
+  const fText = document.getElementById('stock-view-search')?.value || "";
+  const fCat = document.getElementById('filter-stock-cat')?.value || "";
+  const fStat = e.target.value;
+  renderStockTable(fText, fCat, fStat);
+});
+
+// Modale Nouveau Matériel
+function openCreateStockModal() {
+  const nextNum = 'MAT-' + String(inventoryList.length + 1).padStart(3, '0');
+  const stockRef = document.getElementById('stock-ref');
+  if (stockRef) stockRef.value = nextNum;
+  if (createStockModal) createStockModal.classList.add('open');
+}
+
+document.getElementById('btn-open-create-stock')?.addEventListener('click', openCreateStockModal);
+document.getElementById('btn-close-stock-modal')?.addEventListener('click', () => {
+  if (createStockModal) createStockModal.classList.remove('open');
+});
+document.getElementById('btn-cancel-stock')?.addEventListener('click', () => {
+  if (createStockModal) createStockModal.classList.remove('open');
+});
+
+// Enregistrement d'un nouvel article de stock
+document.getElementById('create-stock-form')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const ref = document.getElementById('stock-ref').value;
+  const nom = document.getElementById('stock-nom').value.trim();
+  const cat = document.getElementById('stock-cat-select').value;
+  const qte = parseInt(document.getElementById('stock-qte').value) || 0;
+  const min = parseInt(document.getElementById('stock-min').value) || 0;
+  const unite = document.getElementById('stock-unite').value.trim() || "Unités";
+  const prix = parseInt(document.getElementById('stock-prix').value) || 0;
+  const fournisseur = document.getElementById('stock-fournisseur').value.trim();
+  const valTotale = qte * prix;
+
+  let statut = "Optimal";
+  if (qte <= 0) statut = "Rupture imminente";
+  else if (qte <= min) statut = "Alerte réassort";
+
+  const newArticle = {
+    id: ref,
+    nom: nom,
+    categorie: cat,
+    stockActuel: qte,
+    stockMin: min,
+    unite: unite,
+    prixUnitaire: prix,
+    formattedPrix: prix.toLocaleString('fr-FR') + " FCFA",
+    valeurTotale: valTotale,
+    formattedValeur: valTotale.toLocaleString('fr-FR') + " FCFA",
+    fournisseur: fournisseur,
+    statut: statut
+  };
+
+  inventoryList.unshift(newArticle);
+  if (createStockModal) createStockModal.classList.remove('open');
+  e.target.reset();
+
+  renderStockTable();
+  updateStatsView();
+  showToast(`Article ${nom} ajouté au stock avec succès ! ✓`);
+});
+
+// Ajustement de stock rapide (+10 unités)
+window.ajusterStock = function ajusterStock(matId) {
+  const m = inventoryList.find(x => x.id === matId);
+  if (!m) return;
+  m.stockActuel += 10;
+  m.valeurTotale = m.stockActuel * m.prixUnitaire;
+  m.formattedValeur = m.valeurTotale.toLocaleString('fr-FR') + " FCFA";
+  if (m.stockActuel > m.stockMin) m.statut = "Optimal";
+  renderStockTable();
+  updateStatsView();
+  showToast(`Réassort effectué : +10 unités pour ${m.nom} ✓`);
+};
+
+// Export Excel Stock
+document.getElementById('btn-export-stock')?.addEventListener('click', () => {
+  if (!inventoryList || inventoryList.length === 0) {
+    showToast("Aucun matériel à exporter !");
+    return;
+  }
+
+  const headers = [
+    "Référence",
+    "Désignation",
+    "Catégorie",
+    "Quantité en Stock",
+    "Seuil Minimal",
+    "Unité",
+    "Prix Unitaire (FCFA)",
+    "Valeur Totale (FCFA)",
+    "Fournisseur",
+    "État Stock"
+  ];
+
+  const rows = inventoryList.map(m => [
+    `"${m.id}"`,
+    `"${m.nom}"`,
+    `"${m.categorie}"`,
+    `"${m.stockActuel}"`,
+    `"${m.stockMin}"`,
+    `"${m.unite}"`,
+    `"${m.prixUnitaire}"`,
+    `"${m.valeurTotale}"`,
+    `"${m.fournisseur}"`,
+    `"${m.statut}"`
+  ]);
+
+  const csvContent = "\uFEFF" + [headers.join(";"), ...rows.map(r => r.join(";"))].join("\r\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "inventaire_stock_materiel_oculis.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  showToast(`Export réussi : ${inventoryList.length} articles de stock exportés ✓`);
+});
+
+// ============================================================
+// 21. MODULE STATISTIQUES & RAPPORTS CLINIQUES
+// ============================================================
+
+function updateStatsView() {
+  const elTotalPat = document.getElementById('stats-total-patients');
+  const elValStock = document.getElementById('stats-valeur-stock');
+
+  if (elTotalPat) elTotalPat.textContent = patientsList.length;
+
+  const totalValStock = inventoryList.reduce((acc, m) => acc + (m.valeurTotale || 0), 0);
+  if (elValStock) elValStock.textContent = totalValStock.toLocaleString('fr-FR') + " FCFA";
+}
