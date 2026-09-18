@@ -552,35 +552,30 @@ function fitToWindow() {
   if (!wrapper) return;
 
   const targetWidth = 1360;
-  const targetHeight = 880;
-
   const availableWidth = window.innerWidth || document.documentElement.clientWidth;
-  const availableHeight = window.innerHeight || document.documentElement.clientHeight;
 
-  if (!availableWidth || !availableHeight) return;
+  if (!availableWidth) return;
 
-  // Si l'écran est plus grand que 1360x880, ne pas grossir excessivement (max 1.05)
-  // Si l'écran est plus petit (ex: iframe preview ~800-1100px), réduire proportionnellement pour que TOUT tienne sans coupure
-  const scaleX = availableWidth / targetWidth;
-  const scaleY = availableHeight / targetHeight;
-  const scale = Math.min(scaleX, scaleY);
+  // Calcul basé sur la largeur disponible, avec un zoom minimum de 0.85 pour rester toujours très net, lisible et grand
+  // L'utilisateur peut scroller verticalement si la hauteur de son écran est réduite
+  let scale = availableWidth / targetWidth;
+  if (scale < 0.85) scale = 0.85; // Empêche le dézoom excessif
+  if (scale > 1.1) scale = 1.0;
 
-  wrapper.style.transformOrigin = 'top center';
+  wrapper.style.transformOrigin = 'top left';
   wrapper.style.transform = `scale(${scale})`;
 
   const scaledWidth = targetWidth * scale;
-  const scaledHeight = targetHeight * scale;
-
   const offsetX = Math.max(0, (availableWidth - scaledWidth) / 2);
-  const offsetY = Math.max(0, (availableHeight - scaledHeight) / 2);
 
-  wrapper.style.position = 'absolute';
+  wrapper.style.position = 'relative';
   wrapper.style.left = `${offsetX}px`;
-  wrapper.style.top = `${offsetY}px`;
+  wrapper.style.top = '0px';
 
   document.body.style.margin = '0';
   document.body.style.padding = '0';
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflowX = 'hidden';
+  document.body.style.overflowY = 'auto';
   document.body.style.backgroundColor = '#0A0E17';
 }
 
