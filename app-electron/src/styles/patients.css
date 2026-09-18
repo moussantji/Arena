@@ -325,3 +325,32 @@
 .btn-modal-danger:hover {
   background: #A82E2E;
 }
+
+/* Bouton Exporter Excel */
+.patients-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-export-excel {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background-color: var(--oc-surface);
+  color: var(--oc-success);
+  border: 1px solid rgba(31, 138, 88, 0.3);
+  padding: 8px 14px;
+  border-radius: var(--oc-radius-pill);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--oc-shadow-sm);
+  transition: all 0.15s;
+}
+
+.btn-export-excel:hover {
+  background-color: var(--oc-success-soft);
+  border-color: var(--oc-success);
+  transform: translateY(-1px);
+}

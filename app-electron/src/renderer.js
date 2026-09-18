@@ -586,3 +586,79 @@ window.addEventListener('DOMContentLoaded', fitToWindow);
 window.addEventListener('load', fitToWindow);
 fitToWindow();
 setInterval(fitToWindow, 1000);
+
+// 15. Exportation en Excel (Format CSV UTF-8 avec BOM compatible Excel / Calc)
+document.getElementById('btn-export-excel')?.addEventListener('click', () => {
+  if (!patientsList || patientsList.length === 0) {
+    showToast("Aucun patient à exporter !");
+    return;
+  }
+
+  // En-têtes du tableau Excel
+  const headers = [
+    "Référence",
+    "Nom",
+    "Prénom",
+    "Sexe",
+    "Âge",
+    "Téléphone",
+    "Email",
+    "Nationalité",
+    "Profession",
+    "Adresse",
+    "Assurance",
+    "Société",
+    "N° Assuré",
+    "Validité Assurance",
+    "Constantes OD",
+    "Constantes OG",
+    "Tension Oculaire",
+    "OCT",
+    "Total Actes (FCFA)",
+    "Part Assurance (FCFA)",
+    "Reste à charge Patient (FCFA)"
+  ];
+
+  // Construction des lignes
+  const rows = patientsList.map(p => [
+    `"${p.ref}"`,
+    `"${p.personalInfo.nom}"`,
+    `"${p.personalInfo.prenom}"`,
+    `"${p.personalInfo.sexe}"`,
+    `"${p.personalInfo.age}"`,
+    `"${p.personalInfo.telephone}"`,
+    `"${p.personalInfo.email}"`,
+    `"${p.personalInfo.nationalite}"`,
+    `"${p.personalInfo.profession}"`,
+    `"${p.personalInfo.adresse}"`,
+    `"${p.insuranceInfo.assurance}"`,
+    `"${p.insuranceInfo.societe}"`,
+    `"${p.insuranceInfo.numAss}"`,
+    `"${p.insuranceInfo.dateValiAss}"`,
+    `"${p.medicalInfo.vitals.od}"`,
+    `"${p.medicalInfo.vitals.og}"`,
+    `"${p.medicalInfo.vitals.tension}"`,
+    `"${p.medicalInfo.vitals.oct}"`,
+    `"${p.billing.total}"`,
+    `"${p.billing.insuranceShare}"`,
+    `"${p.billing.patientShare}"`
+  ]);
+
+  // Assemblage avec point-virgule (séparateur standard Excel francophone) et BOM UTF-8
+  const csvContent = "\uFEFF" + [headers.join(";"), ...rows.map(r => r.join(";"))].join("\r\n");
+
+  // Déclenchement du téléchargement
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+  link.setAttribute("href", url);
+  link.setAttribute("download", `oculis_patients_${dateStr}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  showToast(`Export Excel réussi : ${patientsList.length} patients exportés ✓`);
+});
