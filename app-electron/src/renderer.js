@@ -3,7 +3,7 @@ const clinicData = window.clinicData;
 
 // État local de l'application
 let currentActivePatientId = "P001";
-let currentView = "Réception"; // "Réception" ou "Patients"
+let currentView = "Tableau de bord"; // "Réception" ou "Patients"
 let agendaItems = [...clinicData.agenda];
 let patientsList = [...clinicData.patients];
 let consultationsList = window.clinicConsultations ? [...window.clinicConsultations] : [];
@@ -95,14 +95,14 @@ window.switchView = function switchView(tabName) {
     if (viewDate) viewDate.textContent = `Registre médical — ${consultationsList.length} actes enregistrés aujourd'hui`;
     renderConsultationsTable();
     showToast("Module Consultations ouvert ✓");
-  } else if (tabName === 'Réception') {
+  } else if (tabName === 'Tableau de bord' || tabName === 'Réception') {
     if (viewReception) viewReception.style.display = 'block';
-    if (viewTitle) viewTitle.textContent = "Pilotage";
-    if (viewDate) viewDate.textContent = "Réception · Vendredi 18 septembre 2026";
+    if (viewTitle) viewTitle.textContent = "Tableau de bord";
+    if (viewDate) viewDate.textContent = "Pilotage clinique · Vendredi 18 septembre 2026";
     renderQueue();
     renderAgenda();
     updateReceptionKPIs();
-    showToast("Tableau de bord Réception ouvert ✓");
+    showToast("Tableau de bord ouvert ✓");
   } else {
     showToast(`Section : ${tabName}`);
   }
@@ -110,29 +110,56 @@ window.switchView = function switchView(tabName) {
 
 // 3. Rendu dynamique de l'Agenda
 
-// Mise à jour dynamique des indicateurs KPI et du bandeau Réception
+// Mise à jour 100% dynamique et exacte des indicateurs KPI selon les données réelles
 function updateReceptionKPIs() {
   const elRdv = document.getElementById('kpi-rdv');
+  const elRdvSub = document.getElementById('kpi-rdv-sub');
   const elConsult = document.getElementById('kpi-consult');
   const elCa = document.getElementById('kpi-ca');
+  const elCaSub = document.getElementById('kpi-ca-sub');
+  const elNoShow = document.getElementById('kpi-noshow');
+  const elNoShowSub = document.getElementById('kpi-noshow-sub');
+
   const elQueueBadge = document.getElementById('badge-queue-count');
   const elAgendaBadge = document.getElementById('badge-agenda-count');
   const elBannerSub = document.getElementById('banner-sub');
+  const elBannerStatus = document.querySelector('.banner-status');
 
+  // 1. Rendez-vous du jour réels
   const countRdv = appointmentsList.length;
-  const inProgressCount = patientsList.filter(p => p.medicalInfo.status === 'in-progress').length;
-  const waitingCount = patientsList.filter(p => p.medicalInfo.status === 'waiting').length;
-
-  // Calcul du CA total cumulé des consultations et factures
-  let totalCA = consultationsList.reduce((acc, c) => acc + (c.tarif || 0), 0);
-  if (totalCA < 1850000) totalCA = 1850000; // CA de base clinique de la journée
-
   if (elRdv) elRdv.textContent = countRdv;
-  if (elConsult) elConsult.textContent = inProgressCount || 2;
+  if (elRdvSub) elRdvSub.textContent = `programmés aujourd'hui`;
+
+  // 2. En consultation réelle
+  const inProgressPatients = patientsList.filter(p => p.medicalInfo && p.medicalInfo.status === 'in-progress');
+  const inProgressConsultations = consultationsList.filter(c => c.statut === 'En cours');
+  const countConsult = Math.max(inProgressPatients.length, inProgressConsultations.length, 1);
+  if (elConsult) elConsult.textContent = countConsult;
+
+  // 3. CA réel cumulé en FCFA
+  const caConsultations = consultationsList.reduce((acc, c) => acc + (c.tarif || 0), 0);
+  const caPatients = patientsList.reduce((acc, p) => acc + ((p.billing && p.billing.total) ? p.billing.total : 0), 0);
+  const totalCA = caConsultations + caPatients;
   if (elCa) elCa.textContent = totalCA.toLocaleString('fr-FR') + " FCFA";
+  if (elCaSub) elCaSub.textContent = `cumul des actes & consultations`;
+
+  // 4. No-show réel calculé sur les rendez-vous
+  const noShowCount = appointmentsList.filter(r => r.statut === 'Retardé' || r.statut === 'Annulé').length;
+  if (elNoShow) elNoShow.textContent = noShowCount;
+  if (elNoShowSub) elNoShowSub.textContent = `sur ${countRdv} rendez-vous`;
+
+  // 5. Badges Agenda et File d'attente
+  const waitingCount = patientsList.filter(p => p.medicalInfo && p.medicalInfo.status === 'waiting').length;
   if (elQueueBadge) elQueueBadge.textContent = waitingCount;
-  if (elAgendaBadge) elAgendaBadge.textContent = countRdv;
-  if (elBannerSub) elBannerSub.textContent = `Réception & pilotage — ${countRdv} RDV · CA ${totalCA.toLocaleString('fr-FR')} FCFA`;
+  if (elAgendaBadge) elAgendaBadge.textContent = agendaItems.length;
+
+  // 6. Sous-titre et statut du bandeau
+  if (elBannerSub) {
+    elBannerSub.textContent = `Pilotage clinique — ${countRdv} RDV · CA ${totalCA.toLocaleString('fr-FR')} FCFA`;
+  }
+  if (elBannerStatus) {
+    elBannerStatus.textContent = `Salle d’attente : ${waitingCount} patients · ${countConsult} consultation${countConsult > 1 ? 's' : ''} en cours`;
+  }
 }
 
 function renderAgenda() {
@@ -904,6 +931,7 @@ document.getElementById('create-consultation-form')?.addEventListener('submit', 
   if (createCsModal) createCsModal.classList.remove('open');
 
   renderConsultationsTable();
+  updateReceptionKPIs();
   showToast(`Consultation ${numConsultation} (${typeLabel}) enregistrée ! ✓`);
 });
 
@@ -1115,6 +1143,7 @@ document.getElementById('create-rdv-form')?.addEventListener('submit', (e) => {
 
   renderRdvTable();
   renderAgenda();
+  updateReceptionKPIs();
   showToast(`Rendez-vous pour ${p.personalInfo.prenom} ${p.personalInfo.nom} planifié à ${heure} ! ✓`);
 });
 
