@@ -340,9 +340,11 @@
 
           <div class="patients-table-card">
             <div class="consultations-table-header">
-              <span>N° CONSULTATION</span>
+              <span>N° CS</span>
               <span>PATIENT</span>
-              <span>TYPE DE CONSULTATION</span>
+              <span>BUREAU</span>
+              <span>TYPE CONSULTATION</span>
+              <span>SOUS COUVERT</span>
               <span>TARIF (FCFA)</span>
               <span>PRATICIEN</span>
               <span>STATUT</span>
@@ -616,6 +618,27 @@
                 <label class="form-label">DATE & HEURE *</label>
                 <input class="form-input" id="cs-date-heure" required value="18/09/2026 10:45">
               </div>
+              <div class="form-group">
+                <label class="form-label">BUREAU DE CONSULTATION *</label>
+                <select class="form-select" id="cs-bureau-select" required>
+                  <option value="Bureau 1 (Ophtalmo)">Bureau 1 (Ophtalmo)</option>
+                  <option value="Bureau 2 (Réfraction)">Bureau 2 (Réfraction)</option>
+                  <option value="Bureau 3 (Orthopsie)">Bureau 3 (Orthopsie)</option>
+                  <option value="Bureau 4 (Généraliste)">Bureau 4 (Généraliste)</option>
+                  <option value="Bureau Urgences">Bureau Urgences</option>
+                  <option value="Salle d'Imagerie OCT">Salle d'Imagerie OCT</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">COUVERTURE / PRISE EN CHARGE</label>
+                <div class="checkbox-container">
+                  <input type="checkbox" id="cs-sous-couvert" class="custom-checkbox" checked>
+                  <label for="cs-sous-couvert" class="checkbox-label">
+                    <span>Patient sous couvert</span>
+                    <small style="display: block; font-size: 8.5px; color: var(--oc-text-3);">Prise en charge AMO / Assurances actives</small>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -669,7 +692,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=20"></script>
-  <script src="renderer.js?v=20"></script>
+  <script src="data.js?v=21"></script>
+  <script src="renderer.js?v=21"></script>
 </body>
 </html>

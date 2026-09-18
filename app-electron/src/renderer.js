@@ -727,18 +727,21 @@ function renderConsultationsTable(filterText = "", filterType = "", filterStatus
     if (c.statut === 'Terminée') chipClass = 'termine';
     else if (c.statut === 'En cours') chipClass = 'cours';
 
+    const isCouvert = c.sousCouvert === true || c.sousCouvert === "true";
     row.innerHTML = `
       <span class="cs-col-num">${c.numConsultation}</span>
       <div>
-        <strong style="color: var(--oc-text-1);">${c.patientNom}</strong>
-        <div style="font-size: 9px; color: var(--oc-text-3); font-family: var(--oc-font-mono);">${c.patientRef}</div>
+        <strong style="color: var(--oc-text-1); font-size: 11px;">${c.patientNom}</strong>
+        <div style="font-size: 8.5px; color: var(--oc-text-3); font-family: var(--oc-font-mono);">${c.patientRef}</div>
       </div>
-      <span class="cs-col-type">${c.typeConsultation}</span>
+      <span class="bureau-badge">${c.bureau || 'Bureau 1'}</span>
+      <span class="cs-col-type" style="font-size: 11px;">${c.typeConsultation}</span>
+      <span class="sc-badge ${isCouvert ? 'oui' : 'non'}">${isCouvert ? '✓ OUI' : '✕ NON'}</span>
       <span class="cs-col-tarif ${c.tarif === 0 ? 'free' : ''}">${c.formattedTarif}</span>
-      <span style="color: var(--oc-text-2); font-weight: 600;">${c.praticien}</span>
+      <span style="color: var(--oc-text-2); font-weight: 600; font-size: 10px;">${c.praticien}</span>
       <span class="cs-status-chip ${chipClass}">${c.statut}</span>
       <div>
-        <button class="btn-modal-cancel" style="padding: 4px 10px; font-size: 9.5px; border-radius: var(--oc-radius-pill);" onclick="openPatientDossierModal('${c.patientId}')">Dossier</button>
+        <button class="btn-modal-cancel" style="padding: 4px 8px; font-size: 9px; border-radius: var(--oc-radius-pill);" onclick="openPatientDossierModal('${c.patientId}')">Dossier</button>
       </div>
     `;
     consultationsTableBody.appendChild(row);
@@ -821,10 +824,15 @@ document.getElementById('create-consultation-form')?.addEventListener('submit', 
   const numConsultation = document.getElementById('cs-num').value;
   const praticien = document.getElementById('cs-praticien-select').value;
 
+  const bureau = document.getElementById('cs-bureau-select')?.value || "Bureau 1 (Ophtalmo)";
+  const sousCouvert = document.getElementById('cs-sous-couvert')?.checked ?? true;
+
   const newCs = {
     numConsultation: numConsultation,
     date: "18/09/2026",
     heure: "10:45",
+    bureau: bureau,
+    sousCouvert: sousCouvert,
     patientId: p.id,
     patientNom: `${p.personalInfo.nom} ${p.personalInfo.prenom}`,
     patientRef: p.ref,
@@ -854,9 +862,11 @@ document.getElementById('btn-export-consultations')?.addEventListener('click', (
     "N° Consultation",
     "Date",
     "Heure",
+    "Bureau",
     "Réf Patient",
     "Nom Patient",
     "Type de Consultation",
+    "Sous Couvert (OUI/NON)",
     "Tarif (FCFA)",
     "Praticien",
     "Statut",
@@ -867,9 +877,11 @@ document.getElementById('btn-export-consultations')?.addEventListener('click', (
     `"${c.numConsultation}"`,
     `"${c.date}"`,
     `"${c.heure}"`,
+    `"${c.bureau || 'Bureau 1'}"`,
     `"${c.patientRef}"`,
     `"${c.patientNom}"`,
     `"${c.typeConsultation}"`,
+    `"${c.sousCouvert ? 'OUI' : 'NON'}"`,
     `"${c.tarif}"`,
     `"${c.praticien}"`,
     `"${c.statut}"`,

@@ -604,7 +604,7 @@
 /* Styles dédiés au Tableau des Consultations */
 .consultations-table-header {
   display: grid;
-  grid-template-columns: 130px 190px 220px 120px 180px 100px 90px;
+  grid-template-columns: 110px 160px 130px 170px 100px 100px 140px 85px 75px;
   padding: 12px 18px;
   background-color: var(--oc-bg);
   border-bottom: 1px solid var(--oc-border);
@@ -622,7 +622,7 @@
 
 .consultation-row {
   display: grid;
-  grid-template-columns: 130px 190px 220px 120px 180px 100px 90px;
+  grid-template-columns: 110px 160px 130px 170px 100px 100px 140px 85px 75px;
   padding: 12px 18px;
   border-bottom: 1px solid var(--oc-border);
   align-items: center;
@@ -718,4 +718,77 @@
   border-top: 1px solid var(--oc-border);
   flex-shrink: 0;
   margin: 0;
+}
+
+/* Styles pour case à cocher Sous Couvert et Bureau */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--oc-bg);
+  border: 1px solid var(--oc-border);
+  padding: 8px 12px;
+  border-radius: var(--oc-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 100%;
+}
+
+.checkbox-container:hover {
+  border-color: var(--oc-primary);
+  background-color: rgba(30, 86, 214, 0.04);
+}
+
+.custom-checkbox {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--oc-primary);
+  cursor: pointer;
+}
+
+.checkbox-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--oc-text-1);
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+/* Badge Sous Couvert dans le tableau */
+.sc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: var(--oc-radius-pill);
+  font-size: 8.5px;
+  font-weight: 800;
+  width: fit-content;
+}
+
+.sc-badge.oui {
+  background-color: var(--oc-success-soft);
+  color: var(--oc-success);
+  border: 1px solid rgba(31, 138, 88, 0.2);
+}
+
+.sc-badge.non {
+  background-color: var(--oc-surface-2);
+  color: var(--oc-text-3);
+  border: 1px solid var(--oc-border);
+}
+
+/* Badge Bureau dans le tableau */
+.bureau-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--oc-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--oc-text-2);
+  background-color: var(--oc-surface-2);
+  padding: 2px 6px;
+  border-radius: var(--oc-radius-xs);
+  border: 1px solid var(--oc-border);
 }
