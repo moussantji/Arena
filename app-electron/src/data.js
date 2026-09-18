@@ -1,6 +1,6 @@
 // Données métier complètes de la clinique Oculis (Ophtalmologie)
 
-export const clinicData = {
+window.clinicData = {
   name: "Clinique Oculis",
   tagline: "CLINIQUE OPHTALMO",
   dateString: "Vendredi 18 septembre 2026",
@@ -24,7 +24,6 @@ export const clinicData = {
   },
   patients: [
     {
-      // Patient malien complet
       id: "P001",
       ref: "CLI-ML-2026-0841",
       ticket: "N° 0841",
@@ -177,3 +176,6 @@ export const clinicData = {
     { id: "A5", time: "11:15", patient: "Bakary Sanogo", desc: "Fond d'œil diabétique · cab. 1", status: "ok" }
   ]
 };
+
+// Export ESM pour compatibilité si nécessaire
+export const clinicData = window.clinicData;

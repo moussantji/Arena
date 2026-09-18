@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/theme.css">
   <link rel="stylesheet" href="styles/app.css?v=4">
-  <link rel="stylesheet" href="styles/patients.css?v=2">
+  <link rel="stylesheet" href="styles/patients.css?v=5">
 </head>
 <body>
   <div id="scaler-wrapper">
@@ -44,44 +44,44 @@
         </div>
 
         <nav class="sidebar-nav">
-          <a class="nav-item" data-tab="Tableau de bord">
+          <a class="nav-item" data-tab="Tableau de bord" onclick="switchView('Tableau de bord')">
             <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
             <span>Tableau de bord</span>
           </a>
-          <a class="nav-item active" data-tab="Réception">
+          <a class="nav-item active" data-tab="Réception" onclick="switchView('Réception')">
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="M22 6l-10 7L2 6"/></svg>
             <span>Réception</span>
             <div class="nav-accent-dot"></div>
           </a>
-          <a class="nav-item" data-tab="Rendez-vous">
+          <a class="nav-item" data-tab="Rendez-vous" onclick="switchView('Rendez-vous')">
             <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             <span>Rendez-vous</span>
           </a>
-          <a class="nav-item" data-tab="Patients">
+          <a class="nav-item" data-tab="Patients" onclick="switchView('Patients')">
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span>Patients</span>
           </a>
-          <a class="nav-item" data-tab="Consultations">
+          <a class="nav-item" data-tab="Consultations" onclick="switchView('Consultations')">
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
             <span>Consultations</span>
           </a>
-          <a class="nav-item" data-tab="Imagerie OCT">
+          <a class="nav-item" data-tab="Imagerie OCT" onclick="switchView('Imagerie OCT')">
             <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
             <span>Imagerie OCT</span>
           </a>
-          <a class="nav-item" data-tab="Facturation">
+          <a class="nav-item" data-tab="Facturation" onclick="switchView('Facturation')">
             <svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             <span>Facturation</span>
           </a>
-          <a class="nav-item" data-tab="Stock matériel">
+          <a class="nav-item" data-tab="Stock matériel" onclick="switchView('Stock matériel')">
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
             <span>Stock matériel</span>
           </a>
-          <a class="nav-item" data-tab="Statistiques">
+          <a class="nav-item" data-tab="Statistiques" onclick="switchView('Statistiques')">
             <svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             <span>Statistiques</span>
           </a>
-          <a class="nav-item" data-tab="Paramètres">
+          <a class="nav-item" data-tab="Paramètres" onclick="switchView('Paramètres')">
             <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             <span>Paramètres</span>
           </a>
@@ -520,6 +520,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script type="module" src="renderer.js?v=4"></script>
+  <script src="data.js?v=5"></script>
+  <script src="renderer.js?v=5"></script>
 </body>
 </html>

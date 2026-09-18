@@ -1,4 +1,5 @@
-import { clinicData } from './data.js';
+// Récupérer les données depuis window.clinicData
+const clinicData = window.clinicData;
 
 // État local de l'application
 let currentActivePatientId = "P001";
@@ -24,6 +25,7 @@ const viewDate = document.getElementById('view-date');
 
 // Afficher un Toast UI
 function showToast(message) {
+  if (!toastNotice || !toastMsg) return;
   toastMsg.textContent = message;
   toastNotice.classList.add('show');
   setTimeout(() => {
@@ -51,13 +53,13 @@ document.getElementById('btn-max')?.addEventListener('click', () => {
 window.switchView = function switchView(tabName) {
   currentView = tabName;
 
-  // Mise à jour de la sidebar
+  // Mise à jour visuelle des onglets de la sidebar
   document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.remove('active');
     const dot = item.querySelector('.nav-accent-dot');
     if (dot) dot.remove();
 
-    if (item.dataset.tab === tabName) {
+    if (item.getAttribute('data-tab') === tabName) {
       item.classList.add('active');
       const d = document.createElement('div');
       d.className = 'nav-accent-dot';
@@ -66,24 +68,24 @@ window.switchView = function switchView(tabName) {
   });
 
   if (tabName === 'Patients') {
-    viewReception.style.display = 'none';
-    viewPatients.style.display = 'flex';
-    viewTitle.textContent = "Gestion des Patients";
-    viewDate.textContent = `Répertoire clinique — ${patientsList.length} patients enregistrés`;
+    if (viewReception) viewReception.style.display = 'none';
+    if (viewPatients) viewPatients.style.display = 'flex';
+    if (viewTitle) viewTitle.textContent = "Gestion des Patients";
+    if (viewDate) viewDate.textContent = `Répertoire clinique — ${patientsList.length} patients enregistrés`;
     renderPatientsTable();
-    showToast("Répertoire des patients ouvert");
+    showToast("Répertoire des patients ouvert ✓");
   } else if (tabName === 'Réception') {
-    viewPatients.style.display = 'none';
-    viewReception.style.display = 'block';
-    viewTitle.textContent = "Pilotage";
-    viewDate.textContent = "Réception · Vendredi 18 septembre 2026";
+    if (viewPatients) viewPatients.style.display = 'none';
+    if (viewReception) viewReception.style.display = 'block';
+    if (viewTitle) viewTitle.textContent = "Pilotage";
+    if (viewDate) viewDate.textContent = "Réception · Vendredi 18 septembre 2026";
     renderQueue();
     renderAgenda();
-    showToast("Tableau de bord Réception ouvert");
+    showToast("Tableau de bord Réception ouvert ✓");
   } else {
     showToast(`Section : ${tabName}`);
   }
-}
+};
 
 // 3. Rendu dynamique de l'Agenda
 function renderAgenda() {
@@ -222,19 +224,33 @@ function selectPatient(patientId) {
   const fullName = `${p.personalInfo.prenom} ${p.personalInfo.nom}`;
   const initials = `${p.personalInfo.prenom[0]}${p.personalInfo.nom[0]}`;
 
-  document.getElementById('patient-ticket').textContent = p.ticket;
-  document.getElementById('patient-avatar-box').textContent = initials;
-  document.getElementById('patient-name').textContent = fullName;
-  document.getElementById('patient-meta').textContent = `${p.personalInfo.age} ans · ${p.personalInfo.nationalite} · ${p.insuranceInfo.assurance}`;
+  const elTicket = document.getElementById('patient-ticket');
+  const elAvatar = document.getElementById('patient-avatar-box');
+  const elName = document.getElementById('patient-name');
+  const elMeta = document.getElementById('patient-meta');
+
+  if (elTicket) elTicket.textContent = p.ticket;
+  if (elAvatar) elAvatar.textContent = initials;
+  if (elName) elName.textContent = fullName;
+  if (elMeta) elMeta.textContent = `${p.personalInfo.age} ans · ${p.personalInfo.nationalite} · ${p.insuranceInfo.assurance}`;
   
-  document.getElementById('vital-od').textContent = p.medicalInfo.vitals.od;
-  document.getElementById('vital-og').textContent = p.medicalInfo.vitals.og;
-  document.getElementById('vital-ta').textContent = p.medicalInfo.vitals.tension;
-  document.getElementById('vital-oct').textContent = p.medicalInfo.vitals.oct;
+  const elOd = document.getElementById('vital-od');
+  const elOg = document.getElementById('vital-og');
+  const elTa = document.getElementById('vital-ta');
+  const elOct = document.getElementById('vital-oct');
+
+  if (elOd) elOd.textContent = p.medicalInfo.vitals.od;
+  if (elOg) elOg.textContent = p.medicalInfo.vitals.og;
+  if (elTa) elTa.textContent = p.medicalInfo.vitals.tension;
+  if (elOct) elOct.textContent = p.medicalInfo.vitals.oct;
   
-  document.getElementById('billing-total').innerHTML = `${p.billing.formattedTotal} <span class="billing-cpam" id="billing-coverage">· ${p.billing.coverage}</span>`;
-  document.getElementById('billing-patient-share').textContent = `Reste à charge patient : ${p.billing.patientShare}`;
-  document.getElementById('btn-encaissement-text').textContent = `Encaisser ${p.billing.formattedTotal}`;
+  const elTotal = document.getElementById('billing-total');
+  const elShare = document.getElementById('billing-patient-share');
+  const elBtnText = document.getElementById('btn-encaissement-text');
+
+  if (elTotal) elTotal.innerHTML = `${p.billing.formattedTotal} <span class="billing-cpam" id="billing-coverage">· ${p.billing.coverage}</span>`;
+  if (elShare) elShare.textContent = `Reste à charge patient : ${p.billing.patientShare}`;
+  if (elBtnText) elBtnText.textContent = `Encaisser ${p.billing.formattedTotal}`;
 
   renderQueue();
   showToast(`Dossier actif : ${fullName} (${p.ref})`);
@@ -269,11 +285,11 @@ function openPatientDossierModal(patientId = null) {
   document.getElementById('modal-field-numass').textContent = p.insuranceInfo.numAss;
   document.getElementById('modal-field-valiass').textContent = `${p.insuranceInfo.dateValiAss} (En cours de validité)`;
 
-  dossierModal.classList.add('open');
+  if (dossierModal) dossierModal.classList.add('open');
 }
 
 function closePatientDossierModal() {
-  dossierModal.classList.remove('open');
+  if (dossierModal) dossierModal.classList.remove('open');
 }
 
 document.getElementById('btn-check-dossier')?.addEventListener('click', () => openPatientDossierModal());
@@ -287,15 +303,15 @@ document.getElementById('btn-imprimer-fiche')?.addEventListener('click', () => {
 
 // 8. Modal Nouveau Patient
 document.getElementById('btn-open-create-patient')?.addEventListener('click', () => {
-  createModal.classList.add('open');
+  if (createModal) createModal.classList.add('open');
 });
 
 document.getElementById('btn-close-create-modal')?.addEventListener('click', () => {
-  createModal.classList.remove('open');
+  if (createModal) createModal.classList.remove('open');
 });
 
 document.getElementById('btn-cancel-create')?.addEventListener('click', () => {
-  createModal.classList.remove('open');
+  if (createModal) createModal.classList.remove('open');
 });
 
 document.getElementById('create-patient-form')?.addEventListener('submit', (e) => {
@@ -343,7 +359,7 @@ document.getElementById('create-patient-form')?.addEventListener('submit', (e) =
   };
 
   patientsList.unshift(newPatient);
-  createModal.classList.remove('open');
+  if (createModal) createModal.classList.remove('open');
   e.target.reset();
 
   renderPatientsTable();
@@ -355,21 +371,21 @@ document.getElementById('create-patient-form')?.addEventListener('submit', (e) =
 // 9. Filtres vue Patients
 document.getElementById('patients-view-search')?.addEventListener('input', (e) => {
   const fText = e.target.value;
-  const fAss = document.getElementById('filter-assurance').value;
-  const fSex = document.getElementById('filter-sexe').value;
+  const fAss = document.getElementById('filter-assurance')?.value || "";
+  const fSex = document.getElementById('filter-sexe')?.value || "";
   renderPatientsTable(fText, fAss, fSex);
 });
 
 document.getElementById('filter-assurance')?.addEventListener('change', (e) => {
-  const fText = document.getElementById('patients-view-search').value;
+  const fText = document.getElementById('patients-view-search')?.value || "";
   const fAss = e.target.value;
-  const fSex = document.getElementById('filter-sexe').value;
+  const fSex = document.getElementById('filter-sexe')?.value || "";
   renderPatientsTable(fText, fAss, fSex);
 });
 
 document.getElementById('filter-sexe')?.addEventListener('change', (e) => {
-  const fText = document.getElementById('patients-view-search').value;
-  const fAss = document.getElementById('filter-assurance').value;
+  const fText = document.getElementById('patients-view-search')?.value || "";
+  const fAss = document.getElementById('filter-assurance')?.value || "";
   const fSex = e.target.value;
   renderPatientsTable(fText, fAss, fSex);
 });
@@ -385,15 +401,15 @@ btnEncaissement?.addEventListener('click', () => {
   document.getElementById('modal-amount-gross').textContent = p.billing.formattedTotal;
   document.getElementById('modal-amount-ins').textContent = `- ${p.billing.insuranceShare}`;
   document.getElementById('modal-amount-net').textContent = p.billing.patientShare;
-  billingModal.classList.add('open');
+  if (billingModal) billingModal.classList.add('open');
 });
 
 document.getElementById('btn-modal-cancel')?.addEventListener('click', () => {
-  billingModal.classList.remove('open');
+  if (billingModal) billingModal.classList.remove('open');
 });
 
 document.getElementById('btn-modal-confirm')?.addEventListener('click', () => {
-  billingModal.classList.remove('open');
+  if (billingModal) billingModal.classList.remove('open');
   const p = patientsList.find(x => x.id === currentActivePatientId);
   showToast(`Encaissement validé : ${p.billing.formattedTotal} reçu pour ${p.personalInfo.nom} ✓`);
 });
@@ -412,13 +428,21 @@ function callNextPatient() {
 document.getElementById('btn-call-next')?.addEventListener('click', callNextPatient);
 document.getElementById('btn-banner-attente')?.addEventListener('click', callNextPatient);
 
-// 12. Navigation de la Sidebar (Changement d'onglets)
+// 12. Écouteurs de clics directs et délégués sur la sidebar
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.onclick = function(e) {
+    e.preventDefault();
+    const tab = this.getAttribute('data-tab');
+    if (tab) window.switchView(tab);
+  };
+});
+
 document.addEventListener('click', (e) => {
   const item = e.target.closest('.nav-item');
-  if (item && item.dataset.tab) {
+  if (item) {
     e.preventDefault();
-    e.stopPropagation();
-    switchView(item.dataset.tab);
+    const tab = item.getAttribute('data-tab');
+    if (tab) window.switchView(tab);
   }
 });
 
@@ -445,7 +469,7 @@ searchInput?.addEventListener('input', (e) => {
 renderAgenda();
 renderQueue();
 
-// Auto-scaling dynamique pour adapter exactement l'affichage PC à la taille du Preview
+// 14. Auto-scaling bidirectionnel exact pour le Preview Arena
 function fitToWindow() {
   const wrapper = document.getElementById('scaler-wrapper');
   if (!wrapper) return;
@@ -456,31 +480,27 @@ function fitToWindow() {
   const availableWidth = window.innerWidth;
   const availableHeight = window.innerHeight;
 
-  // Calcul du ratio d'échelle pour remplir la largeur ou hauteur
+  // Calcul du facteur d'échelle pour faire rentrer exactement toute l'app
   const scaleX = availableWidth / targetWidth;
   const scaleY = availableHeight / targetHeight;
-  // Préférer scaleX sur mobile pour éviter les marges latérales
-  let scale = scaleX;
-  if (scale * targetHeight > availableHeight && availableHeight > 500) {
-    scale = Math.min(scaleX, scaleY);
-  }
-
-  // Ne pas zoomer au-delà de 1.05 sur grand écran
-  if (scale > 1.05) scale = 1.0;
+  const scale = Math.min(scaleX, scaleY);
 
   wrapper.style.transform = `scale(${scale})`;
 
   const scaledWidth = targetWidth * scale;
+  const scaledHeight = targetHeight * scale;
+
+  // Centrage parfait horizontal et vertical
   const offsetX = Math.max(0, (availableWidth - scaledWidth) / 2);
+  const offsetY = Math.max(0, (availableHeight - scaledHeight) / 2);
 
+  wrapper.style.position = 'absolute';
   wrapper.style.left = `${offsetX}px`;
-  wrapper.style.top = '0px';
-
-  // Ajuster la hauteur du body si besoin de scroll vertical
-  const neededHeight = targetHeight * scale;
-  document.body.style.minHeight = `${neededHeight}px`;
+  wrapper.style.top = `${offsetY}px`;
 }
 
 window.addEventListener('resize', fitToWindow);
-window.addEventListener('DOMContentLoaded', fitToWindow);
+window.addEventListener('load', fitToWindow);
+fitToWindow();
 setTimeout(fitToWindow, 100);
+setTimeout(fitToWindow, 500);
