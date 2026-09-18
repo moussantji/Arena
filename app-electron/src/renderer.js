@@ -6,6 +6,7 @@ let currentActivePatientId = "P001";
 let currentView = "Réception"; // "Réception" ou "Patients"
 let agendaItems = [...clinicData.agenda];
 let patientsList = [...clinicData.patients];
+let consultationsList = window.clinicConsultations ? [...window.clinicConsultations] : [];
 
 // Eléments DOM
 const agendaContainer = document.getElementById('agenda-container');
@@ -20,6 +21,7 @@ const createModal = document.getElementById('create-patient-modal');
 // Vues
 const viewReception = document.getElementById('view-reception');
 const viewPatients = document.getElementById('view-patients');
+const viewConsultations = document.getElementById('view-consultations');
 const viewTitle = document.getElementById('view-title');
 const viewDate = document.getElementById('view-date');
 
@@ -69,13 +71,23 @@ window.switchView = function switchView(tabName) {
 
   if (tabName === 'Patients') {
     if (viewReception) viewReception.style.display = 'none';
+    if (viewConsultations) viewConsultations.style.display = 'none';
     if (viewPatients) viewPatients.style.display = 'flex';
     if (viewTitle) viewTitle.textContent = "Gestion des Patients";
     if (viewDate) viewDate.textContent = `Répertoire clinique — ${patientsList.length} patients enregistrés`;
     renderPatientsTable();
     showToast("Répertoire des patients ouvert ✓");
+  } else if (tabName === 'Consultations') {
+    if (viewReception) viewReception.style.display = 'none';
+    if (viewPatients) viewPatients.style.display = 'none';
+    if (viewConsultations) viewConsultations.style.display = 'flex';
+    if (viewTitle) viewTitle.textContent = "Gestion des Consultations";
+    if (viewDate) viewDate.textContent = `Registre médical — ${consultationsList.length} actes enregistrés aujourd'hui`;
+    renderConsultationsTable();
+    showToast("Module Consultations ouvert ✓");
   } else if (tabName === 'Réception') {
     if (viewPatients) viewPatients.style.display = 'none';
+    if (viewConsultations) viewConsultations.style.display = 'none';
     if (viewReception) viewReception.style.display = 'block';
     if (viewTitle) viewTitle.textContent = "Pilotage";
     if (viewDate) viewDate.textContent = "Réception · Vendredi 18 septembre 2026";
@@ -669,4 +681,211 @@ document.getElementById('btn-export-excel')?.addEventListener('click', () => {
   URL.revokeObjectURL(url);
 
   showToast(`Export Excel réussi : ${patientsList.length} patients exportés ✓`);
+});
+
+
+// ============================================================
+// 16. MODULE GESTION DES CONSULTATIONS ET TARIFICATION FCFA
+// ============================================================
+
+const consultationsTableBody = document.getElementById('consultations-table-body');
+const createCsModal = document.getElementById('create-consultation-modal');
+
+// Rendu du tableau des consultations
+function renderConsultationsTable(filterText = "", filterType = "", filterStatus = "") {
+  if (!consultationsTableBody) return;
+  consultationsTableBody.innerHTML = '';
+
+  const filtered = consultationsList.filter(c => {
+    const q = filterText.toLowerCase();
+    const matchText = !q ||
+      c.numConsultation.toLowerCase().includes(q) ||
+      c.patientNom.toLowerCase().includes(q) ||
+      c.praticien.toLowerCase().includes(q) ||
+      c.typeConsultation.toLowerCase().includes(q);
+
+    const matchType = !filterType || c.typeConsultation === filterType;
+    const matchStatus = !filterStatus || c.statut === filterStatus;
+
+    return matchText && matchType && matchStatus;
+  });
+
+  if (filtered.length === 0) {
+    consultationsTableBody.innerHTML = `
+      <div style="padding: 30px; text-align: center; color: var(--oc-text-3); font-size: 12px; font-weight: 700;">
+        Aucune consultation trouvée.
+      </div>
+    `;
+    return;
+  }
+
+  filtered.forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'consultation-row';
+
+    let chipClass = 'attente';
+    if (c.statut === 'Terminée') chipClass = 'termine';
+    else if (c.statut === 'En cours') chipClass = 'cours';
+
+    row.innerHTML = `
+      <span class="cs-col-num">${c.numConsultation}</span>
+      <div>
+        <strong style="color: var(--oc-text-1);">${c.patientNom}</strong>
+        <div style="font-size: 9px; color: var(--oc-text-3); font-family: var(--oc-font-mono);">${c.patientRef}</div>
+      </div>
+      <span class="cs-col-type">${c.typeConsultation}</span>
+      <span class="cs-col-tarif ${c.tarif === 0 ? 'free' : ''}">${c.formattedTarif}</span>
+      <span style="color: var(--oc-text-2); font-weight: 600;">${c.praticien}</span>
+      <span class="cs-status-chip ${chipClass}">${c.statut}</span>
+      <div>
+        <button class="btn-modal-cancel" style="padding: 4px 10px; font-size: 9.5px; border-radius: var(--oc-radius-pill);" onclick="openPatientDossierModal('${c.patientId}')">Dossier</button>
+      </div>
+    `;
+    consultationsTableBody.appendChild(row);
+  });
+}
+
+// Filtres Consultations
+document.getElementById('consultations-view-search')?.addEventListener('input', (e) => {
+  const fText = e.target.value;
+  const fType = document.getElementById('filter-consultation-type')?.value || "";
+  const fStatus = document.getElementById('filter-consultation-status')?.value || "";
+  renderConsultationsTable(fText, fType, fStatus);
+});
+
+document.getElementById('filter-consultation-type')?.addEventListener('change', (e) => {
+  const fText = document.getElementById('consultations-view-search')?.value || "";
+  const fType = e.target.value;
+  const fStatus = document.getElementById('filter-consultation-status')?.value || "";
+  renderConsultationsTable(fText, fType, fStatus);
+});
+
+document.getElementById('filter-consultation-status')?.addEventListener('change', (e) => {
+  const fText = document.getElementById('consultations-view-search')?.value || "";
+  const fType = document.getElementById('filter-consultation-type')?.value || "";
+  const fStatus = e.target.value;
+  renderConsultationsTable(fText, fType, fStatus);
+});
+
+// Modale Nouvelle Consultation
+function openCreateConsultationModal() {
+  const csSelect = document.getElementById('cs-patient-select');
+  if (csSelect) {
+    csSelect.innerHTML = patientsList.map(p => 
+      `<option value="${p.id}">${p.personalInfo.nom} ${p.personalInfo.prenom} (${p.ref}) — ${p.insuranceInfo.assurance}</option>`
+    ).join('');
+  }
+
+  const nextNum = 'CS-2026-' + String(420 + consultationsList.length + 1).padStart(4, '0');
+  const csNumInput = document.getElementById('cs-num');
+  if (csNumInput) csNumInput.value = nextNum;
+
+  // Calcul du tarif par défaut
+  updateConsultationTarifDisplay();
+
+  if (createCsModal) createCsModal.classList.add('open');
+}
+
+function updateConsultationTarifDisplay() {
+  const select = document.getElementById('cs-type-select');
+  const display = document.getElementById('cs-tarif-display');
+  if (!select || !display) return;
+
+  const opt = select.options[select.selectedIndex];
+  const tarif = parseInt(opt.getAttribute('data-tarif')) || 0;
+  display.value = tarif === 0 ? "0 FCFA (Gratuit)" : tarif.toLocaleString('fr-FR') + " FCFA";
+}
+
+document.getElementById('cs-type-select')?.addEventListener('change', updateConsultationTarifDisplay);
+
+document.getElementById('btn-open-create-consultation')?.addEventListener('click', openCreateConsultationModal);
+
+document.getElementById('btn-close-cs-modal')?.addEventListener('click', () => {
+  if (createCsModal) createCsModal.classList.remove('open');
+});
+
+document.getElementById('btn-cancel-cs')?.addEventListener('click', () => {
+  if (createCsModal) createCsModal.classList.remove('open');
+});
+
+// Enregistrement de la nouvelle consultation
+document.getElementById('create-consultation-form')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const patientId = document.getElementById('cs-patient-select').value;
+  const p = patientsList.find(x => x.id === patientId) || patientsList[0];
+  const typeSelect = document.getElementById('cs-type-select');
+  const typeLabel = typeSelect.options[typeSelect.selectedIndex].text.split(' — ')[0];
+  const tarif = parseInt(typeSelect.options[typeSelect.selectedIndex].getAttribute('data-tarif')) || 0;
+  const formattedTarif = tarif === 0 ? "0 FCFA" : tarif.toLocaleString('fr-FR') + " FCFA";
+  const numConsultation = document.getElementById('cs-num').value;
+  const praticien = document.getElementById('cs-praticien-select').value;
+
+  const newCs = {
+    numConsultation: numConsultation,
+    date: "18/09/2026",
+    heure: "10:45",
+    patientId: p.id,
+    patientNom: `${p.personalInfo.nom} ${p.personalInfo.prenom}`,
+    patientRef: p.ref,
+    typeConsultation: typeLabel,
+    tarif: tarif,
+    formattedTarif: formattedTarif,
+    praticien: praticien,
+    statut: "En attente",
+    modePaiement: p.insuranceInfo.assurance
+  };
+
+  consultationsList.unshift(newCs);
+  if (createCsModal) createCsModal.classList.remove('open');
+
+  renderConsultationsTable();
+  showToast(`Consultation ${numConsultation} (${typeLabel}) enregistrée ! ✓`);
+});
+
+// Export Excel des consultations
+document.getElementById('btn-export-consultations')?.addEventListener('click', () => {
+  if (!consultationsList || consultationsList.length === 0) {
+    showToast("Aucune consultation à exporter !");
+    return;
+  }
+
+  const headers = [
+    "N° Consultation",
+    "Date",
+    "Heure",
+    "Réf Patient",
+    "Nom Patient",
+    "Type de Consultation",
+    "Tarif (FCFA)",
+    "Praticien",
+    "Statut",
+    "Prise en charge / Assurance"
+  ];
+
+  const rows = consultationsList.map(c => [
+    `"${c.numConsultation}"`,
+    `"${c.date}"`,
+    `"${c.heure}"`,
+    `"${c.patientRef}"`,
+    `"${c.patientNom}"`,
+    `"${c.typeConsultation}"`,
+    `"${c.tarif}"`,
+    `"${c.praticien}"`,
+    `"${c.statut}"`,
+    `"${c.modePaiement}"`
+  ]);
+
+  const csvContent = "\uFEFF" + [headers.join(";"), ...rows.map(r => r.join(";"))].join("\r\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "consultations_oculis.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  showToast(`Export réussi : ${consultationsList.length} consultations exportées ✓`);
 });

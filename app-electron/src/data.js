@@ -179,3 +179,79 @@ window.clinicData = {
 
 // Export ESM pour compatibilité si nécessaire
 
+
+
+// Grille officielle des Types de Consultation de la Clinique Oculis (FCFA)
+window.consultationTypes = [
+  { id: "ophtalmologie", label: "Consultation ophtalmologie", tarif: 15000, formattedTarif: "15 000 FCFA", code: "CS-OPH" },
+  { id: "optometrie", label: "Consultation optométrie", tarif: 5000, formattedTarif: "5 000 FCFA", code: "CS-OPT" },
+  { id: "orthopsie", label: "Consultation orthopsie", tarif: 7500, formattedTarif: "7 500 FCFA", code: "CS-ORT" },
+  { id: "urgence", label: "Consultation en urgence", tarif: 25000, formattedTarif: "25 000 FCFA", code: "CS-URG" },
+  { id: "auto_spe", label: "Consultation auto spécialiste", tarif: 15000, formattedTarif: "15 000 FCFA", code: "CS-SPE" },
+  { id: "amo", label: "Consultation AMO", tarif: 5000, formattedTarif: "5 000 FCFA", code: "CS-AMO" },
+  { id: "pre_anesthesie", label: "Consultation pré-anesthésie", tarif: 10000, formattedTarif: "10 000 FCFA", code: "CS-ANE" },
+  { id: "medecin_generaliste", label: "Consultation médecin généraliste", tarif: 10000, formattedTarif: "10 000 FCFA", code: "CS-GEN" },
+  { id: "rapport_medical", label: "Rapport médical", tarif: 20000, formattedTarif: "20 000 FCFA", code: "DOC-RAP" },
+  { id: "ex_externe", label: "EX Externe", tarif: 0, formattedTarif: "0 FCFA", code: "EX-EXT" },
+  { id: "ex_interne", label: "EX Interne", tarif: 0, formattedTarif: "0 FCFA", code: "EX-INT" }
+];
+
+// Registre initial des Consultations du jour
+window.clinicConsultations = [
+  {
+    numConsultation: "CS-2026-0418",
+    date: "18/09/2026",
+    heure: "08:30",
+    patientId: "P001",
+    patientNom: "TRAORÉ Mamadou",
+    patientRef: "CLI-ML-2026-0841",
+    typeConsultation: "Consultation ophtalmologie",
+    tarif: 15000,
+    formattedTarif: "15 000 FCFA",
+    praticien: "Dr Martin (Ophtalmologue)",
+    statut: "Terminée",
+    modePaiement: "CANAM (AMO)"
+  },
+  {
+    numConsultation: "CS-2026-0419",
+    date: "18/09/2026",
+    heure: "09:15",
+    patientId: "P002",
+    patientNom: "COULIBALY Fatoumata",
+    patientRef: "CLI-ML-2026-0842",
+    typeConsultation: "Consultation optométrie",
+    tarif: 5000,
+    formattedTarif: "5 000 FCFA",
+    praticien: "Dr Petit (Optométriste)",
+    statut: "En cours",
+    modePaiement: "SUNU Assurances"
+  },
+  {
+    numConsultation: "CS-2026-0420",
+    date: "18/09/2026",
+    heure: "09:45",
+    patientId: "P003",
+    patientNom: "DIARRA Oumar",
+    patientRef: "CLI-ML-2026-0843",
+    typeConsultation: "Consultation en urgence",
+    tarif: 25000,
+    formattedTarif: "25 000 FCFA",
+    praticien: "Dr Martin (Ophtalmologue)",
+    statut: "En attente",
+    modePaiement: "INPS / AMO"
+  },
+  {
+    numConsultation: "CS-2026-0421",
+    date: "18/09/2026",
+    heure: "10:15",
+    patientId: "P004",
+    patientNom: "KÉÏTA Aminata",
+    patientRef: "CLI-ML-2026-0844",
+    typeConsultation: "Consultation orthopsie",
+    tarif: 7500,
+    formattedTarif: "7 500 FCFA",
+    praticien: "Dr Petit (Orthoptiste)",
+    statut: "En attente",
+    modePaiement: "NSIA Assurances"
+  }
+];
