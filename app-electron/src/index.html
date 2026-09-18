@@ -493,8 +493,14 @@
             <div class="modal-section-title">ASSURANCE & COUVERTURE</div>
             <div class="form-grid">
               <div class="form-group">
-                <label class="form-label">ORGANISME D'ASSURANCE</label>
-                <input class="form-input" id="f-assurance" placeholder="Ex: CANAM (AMO), SUNU, Direct...">
+                <label class="form-label">ORGANISME D'ASSURANCE *</label>
+                <select class="form-select" id="f-assurance">
+                  <option value="CANAM (AMO)">CANAM (AMO)</option>
+                  <option value="SUNU Assurances">SUNU Assurances</option>
+                  <option value="INPS / AMO">INPS / AMO</option>
+                  <option value="NSIA Assurances">NSIA Assurances</option>
+                  <option value="Direct comptant">Direct comptant (Sans assurance)</option>
+                </select>
               </div>
               <div class="form-group">
                 <label class="form-label">SOCIÉTÉ / EMPLOYEUR</label>
@@ -527,7 +533,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=18"></script>
-  <script src="renderer.js?v=18"></script>
+  <script src="data.js?v=19"></script>
+  <script src="renderer.js?v=19"></script>
 </body>
 </html>
