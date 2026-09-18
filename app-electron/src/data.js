@@ -426,3 +426,80 @@ window.clinicOctExams = [
     clichesCount: 4
   }
 ];
+
+
+// Registre officiel des Factures et Encaissements de la Clinique Oculis (en FCFA)
+window.clinicInvoices = [
+  {
+    numFacture: "FAC-2026-0210",
+    date: "18/09/2026",
+    patientId: "P001",
+    patientNom: "TRAORÉ Mamadou",
+    patientRef: "CLI-ML-2026-0841",
+    actes: "Consultation ophtalmo (15 000) + OCT Maculaire (25 000)",
+    montantBrut: 40000,
+    formattedBrut: "40 000 FCFA",
+    organismeAssurance: "CANAM (AMO)",
+    tauxPriseEnCharge: "80%",
+    partAssurance: 32000,
+    formattedPartAssurance: "32 000 FCFA",
+    restePatient: 8000,
+    formattedRestePatient: "8 000 FCFA",
+    modePaiement: "Orange Money Mali",
+    statut: "Payée"
+  },
+  {
+    numFacture: "FAC-2026-0211",
+    date: "18/09/2026",
+    patientId: "P002",
+    patientNom: "COULIBALY Fatoumata",
+    patientRef: "CLI-ML-2026-0842",
+    actes: "Consultation optométrie (5 000) + Bilan OCT Duo (45 000)",
+    montantBrut: 50000,
+    formattedBrut: "50 000 FCFA",
+    organismeAssurance: "SUNU Assurances",
+    tauxPriseEnCharge: "80%",
+    partAssurance: 40000,
+    formattedPartAssurance: "40 000 FCFA",
+    restePatient: 10000,
+    formattedRestePatient: "10 000 FCFA",
+    modePaiement: "Espèces (Comptant)",
+    statut: "Payée"
+  },
+  {
+    numFacture: "FAC-2026-0212",
+    date: "18/09/2026",
+    patientId: "P003",
+    patientNom: "DIARRA Oumar",
+    patientRef: "CLI-ML-2026-0843",
+    actes: "Consultation en urgence (25 000) + OCT Papille (25 000)",
+    montantBrut: 50000,
+    formattedBrut: "50 000 FCFA",
+    organismeAssurance: "INPS / AMO",
+    tauxPriseEnCharge: "70%",
+    partAssurance: 35000,
+    formattedPartAssurance: "35 000 FCFA",
+    restePatient: 15000,
+    formattedRestePatient: "15 000 FCFA",
+    modePaiement: "Moov Money",
+    statut: "En attente"
+  },
+  {
+    numFacture: "FAC-2026-0213",
+    date: "18/09/2026",
+    patientId: "P004",
+    patientNom: "KÉÏTA Aminata",
+    patientRef: "CLI-ML-2026-0844",
+    actes: "Consultation orthopsie (7 500) + Bilan strabisme",
+    montantBrut: 7500,
+    formattedBrut: "7 500 FCFA",
+    organismeAssurance: "NSIA Assurances",
+    tauxPriseEnCharge: "80%",
+    partAssurance: 6000,
+    formattedPartAssurance: "6 000 FCFA",
+    restePatient: 1500,
+    formattedRestePatient: "1 500 FCFA",
+    modePaiement: "Chèque BDM-SA",
+    statut: "Payée"
+  }
+];

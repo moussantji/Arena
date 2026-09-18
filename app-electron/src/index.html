@@ -458,6 +458,59 @@
             </div>
           </div>
         </div>
+
+        <!-- VUE GESTION DE LA FACTURATION & ENCAISSEMENTS -->
+        <div id="view-facturation" class="patients-view-container" style="display: none;">
+          <div class="patients-toolbar">
+            <div class="patients-filters">
+              <div class="patients-search-box">
+                <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="fac-view-search" placeholder="Rechercher par patient, n° facture, assurance...">
+              </div>
+              <select class="filter-select" id="filter-fac-assurance">
+                <option value="">Toutes les assurances</option>
+                <option value="CANAM (AMO)">CANAM (AMO)</option>
+                <option value="SUNU Assurances">SUNU Assurances</option>
+                <option value="INPS / AMO">INPS / AMO</option>
+                <option value="NSIA Assurances">NSIA Assurances</option>
+                <option value="Direct comptant">Direct comptant</option>
+              </select>
+              <select class="filter-select" id="filter-fac-statut">
+                <option value="">Tous les statuts</option>
+                <option value="Payée">Payée</option>
+                <option value="En attente">En attente</option>
+                <option value="Rejetée">Rejetée</option>
+              </select>
+            </div>
+            <div class="patients-actions-right">
+              <button class="btn-export-excel" id="btn-export-fac" title="Exporter le journal des factures en Excel">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Exporter en Excel</span>
+              </button>
+              <button class="btn-add-patient" id="btn-open-create-fac">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Nouvelle Facture</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="patients-table-card">
+            <div class="fac-table-header">
+              <span>N° FACTURE</span>
+              <span>PATIENT</span>
+              <span>ACTES FACTURÉS</span>
+              <span>TOTAL (FCFA)</span>
+              <span>PART ASSURANCE</span>
+              <span>RESTE PATIENT</span>
+              <span>PAIEMENT</span>
+              <span>STATUT</span>
+              <span>ACTIONS</span>
+            </div>
+            <div class="fac-table-body" id="fac-table-body">
+              <!-- Rendu dynamique via renderer.js -->
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -632,6 +685,92 @@
         <button class="btn-modal-cancel" id="btn-close-oct-view-bottom">Fermer</button>
         <button class="btn-modal-confirm" id="btn-imprimer-oct">Imprimer le Rapport OCT</button>
       </div>
+    </div>
+  </div>
+
+
+  <!-- Modal Nouvelle Facture -->
+  <div class="modal-overlay" id="create-fac-modal">
+    <div class="modal-card patient-modal-card" style="width: 580px !important;">
+      <div class="patient-modal-header">
+        <div class="patient-modal-avatar">💳</div>
+        <div class="patient-modal-title">
+          <h3 id="modal-fac-form-title" style="font-size: 16px; font-weight: 800; color: var(--oc-text-1);">Nouvelle Facture Clinique</h3>
+          <p style="font-size: 11px; font-weight: 600; color: var(--oc-text-3);">Émission de facture, calcul de prise en charge & règlement</p>
+        </div>
+        <button class="modal-close-icon-btn" id="btn-close-fac-modal">✕</button>
+      </div>
+
+      <form id="create-fac-form">
+        <div class="patient-modal-body" style="max-height: calc(85vh - 130px); overflow-y: auto; padding: 16px 24px;">
+          <div class="modal-info-section">
+            <div class="modal-section-title">PATIENT & COUVERTURE MÉDICALE</div>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">SÉLECTION DU PATIENT *</label>
+                <select class="form-select" id="fac-patient-select" required>
+                  <!-- Options dynamiques -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">N° DE FACTURE</label>
+                <input class="form-input" id="fac-num" readonly style="font-family: var(--oc-font-mono); font-weight: 800; color: var(--oc-primary);">
+              </div>
+              <div class="form-group">
+                <label class="form-label">ORGANISME ASSURANCE</label>
+                <input class="form-input" id="fac-assurance-display" readonly style="font-weight: 700; color: var(--oc-accent);">
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-info-section">
+            <div class="modal-section-title">ACTES MÉDICAUX & CALCUL DES PARTS (FCFA)</div>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">INTITULÉ DES ACTES ET SOINS DISPENSÉS *</label>
+                <input class="form-input" id="fac-actes-desc" required value="Consultation ophtalmo + Bilan OCT">
+              </div>
+              <div class="form-group">
+                <label class="form-label">MONTANT TOTAL BRUT (FCFA) *</label>
+                <input class="form-input" id="fac-montant-brut" type="number" required value="40000" style="font-weight: 800; font-size: 12.5px;">
+              </div>
+              <div class="form-group">
+                <label class="form-label">TAUX PRISE EN CHARGE (%) *</label>
+                <select class="form-select" id="fac-taux-select" required>
+                  <option value="80">80% (AMO / Assurances classiques)</option>
+                  <option value="70">70% (INPS standard)</option>
+                  <option value="100">100% (Prise en charge totale)</option>
+                  <option value="0">0% (Direct comptant / Sans couverture)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">PART ASSURANCE (FCFA)</label>
+                <input class="form-input" id="fac-part-ass-display" readonly value="32 000 FCFA" style="font-weight: 800; color: var(--oc-success);">
+              </div>
+              <div class="form-group">
+                <label class="form-label">RESTE À CHARGE PATIENT (FCFA)</label>
+                <input class="form-input" id="fac-reste-pat-display" readonly value="8 000 FCFA" style="font-weight: 900; color: var(--oc-primary); font-size: 13px;">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">MODE DE RÈGLEMENT *</label>
+                <select class="form-select" id="fac-mode-paiement" required>
+                  <option value="Orange Money Mali">Orange Money Mali (Paiement mobile)</option>
+                  <option value="Moov Money">Moov Money (Paiement mobile)</option>
+                  <option value="Espèces (Comptant)">Espèces (Comptant à la caisse)</option>
+                  <option value="Carte bancaire / GIM-UEMOA">Carte bancaire / GIM-UEMOA</option>
+                  <option value="Chèque bancaire BDM / BOA">Chèque bancaire</option>
+                  <option value="Virement bancaire">Virement bancaire</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-cancel" id="btn-cancel-fac">Annuler</button>
+          <button type="submit" class="btn-modal-confirm" id="btn-submit-fac">Valider & Encaisser</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1058,7 +1197,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=29"></script>
-  <script src="renderer.js?v=29"></script>
+  <script src="data.js?v=30"></script>
+  <script src="renderer.js?v=30"></script>
 </body>
 </html>

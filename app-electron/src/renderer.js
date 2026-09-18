@@ -9,6 +9,7 @@ let patientsList = [...clinicData.patients];
 let consultationsList = window.clinicConsultations ? [...window.clinicConsultations] : [];
 let appointmentsList = window.clinicAppointments ? [...window.clinicAppointments] : [];
 let octList = window.clinicOctExams ? [...window.clinicOctExams] : [];
+let invoicesList = window.clinicInvoices ? [...window.clinicInvoices] : [];
 
 // Eléments DOM
 const agendaContainer = document.getElementById('agenda-container');
@@ -26,6 +27,7 @@ const viewPatients = document.getElementById('view-patients');
 const viewConsultations = document.getElementById('view-consultations');
 const viewRendezvous = document.getElementById('view-rendezvous');
 const viewImagerieOct = document.getElementById('view-imagerie-oct');
+const viewFacturation = document.getElementById('view-facturation');
 const viewTitle = document.getElementById('view-title');
 const viewDate = document.getElementById('view-date');
 
@@ -80,6 +82,7 @@ window.switchView = function switchView(tabName) {
   if (viewRendezvous) viewRendezvous.style.display = 'none';
 
   if (viewImagerieOct) viewImagerieOct.style.display = 'none';
+  if (viewFacturation) viewFacturation.style.display = 'none';
 
   if (tabName === 'Patients') {
     if (viewPatients) viewPatients.style.display = 'flex';
@@ -105,6 +108,13 @@ window.switchView = function switchView(tabName) {
     if (viewDate) viewDate.textContent = `Centre d'imagerie rétinienne — ${octList.length} examens enregistrés`;
     renderOctTable();
     showToast("Module Imagerie OCT ouvert ✓");
+  } else if (tabName === 'Facturation') {
+    if (viewFacturation) viewFacturation.style.display = 'flex';
+    if (viewTitle) viewTitle.textContent = "Facturation & Encaissements";
+    const totalEnc = invoicesList.filter(i => i.statut === 'Payée').reduce((acc, i) => acc + (i.montantBrut || 0), 0);
+    if (viewDate) viewDate.textContent = `Journal de caisse — ${invoicesList.length} factures · ${totalEnc.toLocaleString('fr-FR')} FCFA encaissés`;
+    renderFacturationTable();
+    showToast("Module Facturation ouvert ✓");
   } else if (tabName === 'Tableau de bord' || tabName === 'Réception') {
     if (viewReception) viewReception.style.display = 'block';
     if (viewTitle) viewTitle.textContent = "Tableau de bord";
@@ -1546,4 +1556,236 @@ document.getElementById('btn-export-oct')?.addEventListener('click', () => {
   URL.revokeObjectURL(url);
 
   showToast(`Export réussi : ${octList.length} examens OCT exportés ✓`);
+});
+
+
+// ============================================================
+// 19. MODULE FACTURATION & ENCAISSEMENTS EN FCFA
+// ============================================================
+
+const facTableBody = document.getElementById('fac-table-body');
+const createFacModal = document.getElementById('create-fac-modal');
+
+function renderFacturationTable(filterText = "", filterAss = "", filterStatus = "") {
+  if (!facTableBody) return;
+  facTableBody.innerHTML = '';
+
+  const filtered = invoicesList.filter(f => {
+    const q = filterText.toLowerCase();
+    const matchText = !q ||
+      f.numFacture.toLowerCase().includes(q) ||
+      f.patientNom.toLowerCase().includes(q) ||
+      f.actes.toLowerCase().includes(q) ||
+      f.modePaiement.toLowerCase().includes(q);
+
+    const matchAss = !filterAss || f.organismeAssurance === filterAss;
+    const matchStat = !filterStatus || f.statut === filterStatus;
+
+    return matchText && matchAss && matchStat;
+  });
+
+  if (filtered.length === 0) {
+    facTableBody.innerHTML = '<div style="padding: 30px; text-align: center; color: var(--oc-text-3); font-size: 12px; font-weight: 700;">Aucune facture trouvée.</div>';
+    return;
+  }
+
+  filtered.forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'fac-row';
+
+    let chipClass = 'attente';
+    if (f.statut === 'Payée') chipClass = 'termine';
+    else if (f.statut === 'Rejetée') chipClass = 'retarde';
+
+    row.innerHTML = `
+      <span class="cs-col-num">${f.numFacture}</span>
+      <div>
+        <strong style="color: var(--oc-text-1); font-size: 11px;">${f.patientNom}</strong>
+        <div style="font-size: 8.5px; color: var(--oc-accent); font-weight: 700;">${f.organismeAssurance}</div>
+      </div>
+      <span style="font-size: 10px; color: var(--oc-text-2); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${f.actes}">${f.actes}</span>
+      <span class="cs-col-tarif" style="font-size: 11px;">${f.formattedBrut}</span>
+      <span style="color: var(--oc-success); font-weight: 800; font-family: var(--oc-font-mono); font-size: 10px;">${f.formattedPartAssurance} <small style="font-size: 8px; color: var(--oc-text-3);">(${f.tauxPriseEnCharge})</small></span>
+      <span style="color: var(--oc-primary); font-weight: 900; font-family: var(--oc-font-mono); font-size: 11px;">${f.formattedRestePatient}</span>
+      <span style="font-size: 9.5px; color: var(--oc-text-2); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${f.modePaiement}</span>
+      <span class="cs-status-chip ${chipClass}">${f.statut}</span>
+      <div>
+        <button class="btn-modal-cancel" style="padding: 4px 8px; font-size: 9px; border-radius: var(--oc-radius-pill);" onclick="imprimerRecuFacture('${f.numFacture}')">Reçu</button>
+      </div>
+    `;
+    facTableBody.appendChild(row);
+  });
+}
+
+// Filtres Facturation
+document.getElementById('fac-view-search')?.addEventListener('input', (e) => {
+  const fText = e.target.value;
+  const fAss = document.getElementById('filter-fac-assurance')?.value || "";
+  const fStat = document.getElementById('filter-fac-statut')?.value || "";
+  renderFacturationTable(fText, fAss, fStat);
+});
+
+document.getElementById('filter-fac-assurance')?.addEventListener('change', (e) => {
+  const fText = document.getElementById('fac-view-search')?.value || "";
+  const fAss = e.target.value;
+  const fStat = document.getElementById('filter-fac-statut')?.value || "";
+  renderFacturationTable(fText, fAss, fStat);
+});
+
+document.getElementById('filter-fac-statut')?.addEventListener('change', (e) => {
+  const fText = document.getElementById('fac-view-search')?.value || "";
+  const fAss = document.getElementById('filter-fac-assurance')?.value || "";
+  const fStat = e.target.value;
+  renderFacturationTable(fText, fAss, fStat);
+});
+
+// Modale Nouvelle Facture
+function openCreateFacModal() {
+  const selectPat = document.getElementById('fac-patient-select');
+  if (selectPat) {
+    selectPat.innerHTML = patientsList.map(p => 
+      `<option value="${p.id}">${p.personalInfo.nom} ${p.personalInfo.prenom} (${p.ref}) — ${p.insuranceInfo.assurance}</option>`
+    ).join('');
+  }
+
+  const nextNum = 'FAC-2026-' + String(210 + invoicesList.length + 1).padStart(4, '0');
+  const facNumInput = document.getElementById('fac-num');
+  if (facNumInput) facNumInput.value = nextNum;
+
+  updateFacCalcul();
+  if (createFacModal) createFacModal.classList.add('open');
+}
+
+function updateFacCalcul() {
+  const selectPat = document.getElementById('fac-patient-select');
+  const displayAss = document.getElementById('fac-assurance-display');
+  if (selectPat && displayAss) {
+    const p = patientsList.find(x => x.id === selectPat.value) || patientsList[0];
+    displayAss.value = p.insuranceInfo.assurance;
+  }
+
+  const montantBrut = parseInt(document.getElementById('fac-montant-brut')?.value) || 0;
+  const taux = parseInt(document.getElementById('fac-taux-select')?.value) || 0;
+
+  const partAss = Math.round((montantBrut * taux) / 100);
+  const restePat = montantBrut - partAss;
+
+  const displayPartAss = document.getElementById('fac-part-ass-display');
+  const displayRestePat = document.getElementById('fac-reste-pat-display');
+
+  if (displayPartAss) displayPartAss.value = partAss.toLocaleString('fr-FR') + " FCFA";
+  if (displayRestePat) displayRestePat.value = restePat.toLocaleString('fr-FR') + " FCFA";
+}
+
+document.getElementById('fac-patient-select')?.addEventListener('change', updateFacCalcul);
+document.getElementById('fac-montant-brut')?.addEventListener('input', updateFacCalcul);
+document.getElementById('fac-taux-select')?.addEventListener('change', updateFacCalcul);
+
+document.getElementById('btn-open-create-fac')?.addEventListener('click', openCreateFacModal);
+document.getElementById('btn-close-fac-modal')?.addEventListener('click', () => {
+  if (createFacModal) createFacModal.classList.remove('open');
+});
+document.getElementById('btn-cancel-fac')?.addEventListener('click', () => {
+  if (createFacModal) createFacModal.classList.remove('open');
+});
+
+// Enregistrement de la nouvelle facture
+document.getElementById('create-fac-form')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const patientId = document.getElementById('fac-patient-select').value;
+  const p = patientsList.find(x => x.id === patientId) || patientsList[0];
+  const numFac = document.getElementById('fac-num').value;
+  const actes = document.getElementById('fac-actes-desc').value.trim();
+  const montantBrut = parseInt(document.getElementById('fac-montant-brut').value) || 0;
+  const taux = parseInt(document.getElementById('fac-taux-select').value) || 0;
+  const partAss = Math.round((montantBrut * taux) / 100);
+  const restePat = montantBrut - partAss;
+  const modePaiement = document.getElementById('fac-mode-paiement').value;
+
+  const newFac = {
+    numFacture: numFac,
+    date: "18/09/2026",
+    patientId: p.id,
+    patientNom: `${p.personalInfo.nom} ${p.personalInfo.prenom}`,
+    patientRef: p.ref,
+    actes: actes,
+    montantBrut: montantBrut,
+    formattedBrut: montantBrut.toLocaleString('fr-FR') + " FCFA",
+    organismeAssurance: p.insuranceInfo.assurance,
+    tauxPriseEnCharge: `${taux}%`,
+    partAssurance: partAss,
+    formattedPartAssurance: partAss.toLocaleString('fr-FR') + " FCFA",
+    restePatient: restePat,
+    formattedRestePatient: restePat.toLocaleString('fr-FR') + " FCFA",
+    modePaiement: modePaiement,
+    statut: "Payée"
+  };
+
+  invoicesList.unshift(newFac);
+
+  if (createFacModal) createFacModal.classList.remove('open');
+  e.target.reset();
+
+  renderFacturationTable();
+  updateReceptionKPIs();
+  showToast(`Facture ${numFac} émise et encaissée via ${modePaiement} ! ✓`);
+});
+
+// Reçu d'encaissement
+window.imprimerRecuFacture = function imprimerRecuFacture(numFacture) {
+  const fac = invoicesList.find(f => f.numFacture === numFacture);
+  if (!fac) return;
+  showToast(`Reçu de caisse ${fac.numFacture} (${fac.formattedBrut}) généré et imprimé ✓`);
+};
+
+// Export Excel Facturation
+document.getElementById('btn-export-fac')?.addEventListener('click', () => {
+  if (!invoicesList || invoicesList.length === 0) {
+    showToast("Aucune facture à exporter !");
+    return;
+  }
+
+  const headers = [
+    "N° Facture",
+    "Date",
+    "Réf Patient",
+    "Nom Patient",
+    "Actes Facturés",
+    "Total Brut (FCFA)",
+    "Organisme Assurance",
+    "Taux Prise en Charge",
+    "Part Assurance (FCFA)",
+    "Reste à Charge Patient (FCFA)",
+    "Mode de Paiement",
+    "Statut Règlement"
+  ];
+
+  const rows = invoicesList.map(f => [
+    `"${f.numFacture}"`,
+    `"${f.date}"`,
+    `"${f.patientRef}"`,
+    `"${f.patientNom}"`,
+    `"${f.actes}"`,
+    `"${f.montantBrut}"`,
+    `"${f.organismeAssurance}"`,
+    `"${f.tauxPriseEnCharge}"`,
+    `"${f.partAssurance}"`,
+    `"${f.restePatient}"`,
+    `"${f.modePaiement}"`,
+    `"${f.statut}"`
+  ]);
+
+  const csvContent = "\uFEFF" + [headers.join(";"), ...rows.map(r => r.join(";"))].join("\r\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "journal_facturation_encaissements_oculis.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  showToast(`Export réussi : ${invoicesList.length} factures exportées ✓`);
 });
