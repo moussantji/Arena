@@ -1298,8 +1298,9 @@ function renderOctTable(filterText = "", filterType = "", filterStatus = "") {
         <strong style="color: var(--oc-text-1); font-size: 11px;">${o.patientNom}</strong>
         <div style="font-size: 8.5px; color: var(--oc-text-3); font-family: var(--oc-font-mono);">${o.patientRef}</div>
       </div>
-      <span class="oeil-badge">${o.oeil}</span>
+      <span class="oeil-badge">${o.oeil.split(' ')[0]}</span>
       <span style="font-weight: 700; color: var(--oc-text-1); font-size: 10.5px;">${o.typeExamen}</span>
+      <span style="font-family: var(--oc-font-mono); font-weight: 800; color: #38bdf8; font-size: 10px;">${o.epaisseurMaculaire.split(' ')[0]} µm</span>
       <span style="color: var(--oc-text-2); font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.appareil.split(' ')[0]}</span>
       <span class="cs-col-tarif">${o.formattedTarif}</span>
       <span class="cs-status-chip ${chipClass}">${o.statut}</span>
@@ -1333,8 +1334,30 @@ document.getElementById('filter-oct-status')?.addEventListener('change', (e) => 
   renderOctTable(fText, fType, fStat);
 });
 
+let currentOctImageData = null;
+
+// Écouteur pour le chargement d'image cliché
+document.getElementById('oct-file-input')?.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      currentOctImageData = evt.target.result;
+      const elFileName = document.getElementById('oct-file-name');
+      if (elFileName) elFileName.textContent = file.name;
+      showToast(`Image chargée : ${file.name} ✓`);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
 // Modal Nouvel Examen OCT
 function openCreateOctModal() {
+  currentOctImageData = null;
+  const elFileName = document.getElementById('oct-file-name');
+  if (elFileName) elFileName.textContent = "B-scan par défaut";
+  const fileInput = document.getElementById('oct-file-input');
+  if (fileInput) fileInput.value = "";
   const selectPat = document.getElementById('oct-patient-select');
   if (selectPat) {
     selectPat.innerHTML = patientsList.map(p => 
@@ -1382,6 +1405,11 @@ document.getElementById('create-oct-form')?.addEventListener('submit', (e) => {
   const conclusion = document.getElementById('oct-conclusion').value.trim() || "Profil fovéolaire régulier, examen satisfaisant.";
   const numOct = document.getElementById('oct-num').value;
 
+  const epaisseurVal = parseInt(document.getElementById('oct-epaisseur-input')?.value) || 260;
+  let epaisseurLabel = `${epaisseurVal} µm (Normal)`;
+  if (epaisseurVal > 300) epaisseurLabel = `${epaisseurVal} µm (Épaissi / Œdème)`;
+  else if (epaisseurVal < 220) epaisseurLabel = `${epaisseurVal} µm (Aminci / Atrophie)`;
+
   const newOct = {
     id: numOct,
     date: "18/09/2026",
@@ -1393,12 +1421,13 @@ document.getElementById('create-oct-form')?.addEventListener('submit', (e) => {
     typeExamen: typeLabel,
     appareil: appareil,
     statut: "Validé",
-    epaisseurMaculaire: "260 µm (Normal)",
+    epaisseurMaculaire: epaisseurLabel,
     conclusion: conclusion,
     praticien: "Dr Martin (Ophtalmologue)",
     tarif: tarif,
     formattedTarif: tarif.toLocaleString('fr-FR') + " FCFA",
-    clichesCount: 3
+    imageData: currentOctImageData || null,
+    clichesCount: currentOctImageData ? 4 : 3
   };
 
   octList.unshift(newOct);
@@ -1429,6 +1458,20 @@ window.openDetailOctModal = function openDetailOctModal(octId) {
   document.getElementById('oct-view-appareil').textContent = o.appareil;
   document.getElementById('oct-view-praticien').textContent = o.praticien;
   document.getElementById('oct-view-conclusion').textContent = o.conclusion;
+
+  // Affichage Cliché Personnalisé ou B-scan vectoriel
+  const imgContainer = document.getElementById('oct-image-preview-container');
+  const customImg = document.getElementById('oct-custom-img');
+  const defaultSvg = document.getElementById('oct-default-svg');
+
+  if (o.imageData && imgContainer && customImg && defaultSvg) {
+    customImg.src = o.imageData;
+    imgContainer.style.display = 'block';
+    defaultSvg.style.display = 'none';
+  } else if (imgContainer && defaultSvg) {
+    imgContainer.style.display = 'none';
+    defaultSvg.style.display = 'block';
+  }
 
   const elStatut = document.getElementById('oct-view-statut');
   if (elStatut) {
