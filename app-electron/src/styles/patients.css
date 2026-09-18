@@ -181,7 +181,7 @@
 .patients-table-header {
   display: grid;
   grid-template-columns: 140px 220px 95px 145px 200px 160px 120px;
-  padding: 12px 18px;
+  padding: 12px 16px; column-gap: 8px;
   background-color: var(--oc-bg);
   border-bottom: 1px solid var(--oc-border);
   font-size: 9px;
@@ -200,7 +200,7 @@
 .patient-row {
   display: grid;
   grid-template-columns: 140px 220px 95px 145px 200px 160px 120px;
-  padding: 12px 18px;
+  padding: 12px 16px; column-gap: 8px;
   border-bottom: 1px solid var(--oc-border);
   align-items: center;
   transition: all 0.15s ease;
@@ -604,8 +604,8 @@
 /* Styles dédiés au Tableau des Consultations */
 .consultations-table-header {
   display: grid;
-  grid-template-columns: 110px 160px 130px 170px 100px 100px 140px 85px 75px;
-  padding: 12px 18px;
+  grid-template-columns: 105px 145px 140px 180px 85px 95px 140px 80px 65px;
+  padding: 12px 16px; column-gap: 8px;
   background-color: var(--oc-bg);
   border-bottom: 1px solid var(--oc-border);
   font-size: 9px;
@@ -622,8 +622,8 @@
 
 .consultation-row {
   display: grid;
-  grid-template-columns: 110px 160px 130px 170px 100px 100px 140px 85px 75px;
-  padding: 12px 18px;
+  grid-template-columns: 105px 145px 140px 180px 85px 95px 140px 80px 65px;
+  padding: 12px 16px; column-gap: 8px;
   border-bottom: 1px solid var(--oc-border);
   align-items: center;
   transition: all 0.15s ease;
@@ -784,11 +784,23 @@
   align-items: center;
   gap: 4px;
   font-family: var(--oc-font-mono);
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
-  color: var(--oc-text-2);
-  background-color: var(--oc-surface-2);
-  padding: 2px 6px;
+  color: var(--oc-primary);
+  background-color: var(--oc-primary-soft);
+  padding: 3px 7px;
   border-radius: var(--oc-radius-xs);
-  border: 1px solid var(--oc-border);
+  border: 1px solid rgba(30, 86, 214, 0.15);
+  white-space: nowrap;
+  width: fit-content;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-col-type {
+  font-weight: 700;
+  color: var(--oc-text-1);
+  padding-right: 6px;
+  line-height: 1.25;
 }
