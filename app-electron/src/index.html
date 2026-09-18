@@ -722,6 +722,160 @@
             </div>
           </div>
         </div>
+
+        <!-- VUE PARAMÈTRES CLINIQUE -->
+        <div id="view-parametres" class="patients-view-container" style="display: none; overflow-y: auto;">
+          <div class="patients-toolbar" style="margin-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="cs-col-num" style="font-size: 11px; padding: 4px 10px;">CONFIGURATION OCULIS</span>
+              <span style="font-size: 12px; font-weight: 800; color: var(--oc-text-1);">Paramètres Généraux de la Clinique & du Système</span>
+            </div>
+            <button class="btn-add-patient" id="btn-save-settings">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Sauvegarder les Paramètres</span>
+            </button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <!-- Carte 1: Identité Clinique & Coordonnées -->
+            <div class="column-card" style="min-height: auto;">
+              <div class="col-header">
+                <span class="col-title">Identité & Coordonnées de la Clinique</span>
+                <span class="col-badge pri">Établissement</span>
+              </div>
+              <div class="form-grid" style="margin-top: 5px;">
+                <div class="form-group full-width">
+                  <label class="form-label">NOM DE LA CLINIQUE</label>
+                  <input class="form-input" id="set-clinic-name" value="Clinique Ophtalmologique Oculis">
+                </div>
+                <div class="form-group full-width">
+                  <label class="form-label">ADRESSE PRINCIPALE (BAMAKO)</label>
+                  <input class="form-input" id="set-clinic-address" value="Hamdallaye ACI 2000, Rue 380, Bamako, Mali">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">TÉLÉPHONE STANDARD</label>
+                  <input class="form-input" id="set-clinic-tel" value="+223 20 29 45 00">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">EMAIL CONTACT / ACCUEIL</label>
+                  <input class="form-input" id="set-clinic-email" value="contact@clinique-oculis.ml">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">N° D'AGRÉMENT MINISTÈRE SANTÉ</label>
+                  <input class="form-input" id="set-clinic-agrement" value="MS-ML-OPHTA-2024-089">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">NIF / FISCALITÉ MALI</label>
+                  <input class="form-input" id="set-clinic-nif" value="084129532M">
+                </div>
+              </div>
+            </div>
+
+            <!-- Carte 2: Monnaie, Facturation & AMO -->
+            <div class="column-card" style="min-height: auto;">
+              <div class="col-header">
+                <span class="col-title">Paramètres Financiers & Couverture AMO</span>
+                <span class="col-badge acc">Devise & Tiers Payant</span>
+              </div>
+              <div class="form-grid" style="margin-top: 5px;">
+                <div class="form-group">
+                  <label class="form-label">DEVISE ACTIVE DU SYSTÈME</label>
+                  <input class="form-input" readonly value="Franc CFA (FCFA) - XOF" style="font-weight: 800; color: var(--oc-primary);">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">TAUX AMO CANAM PAR DÉFAUT</label>
+                  <select class="form-select" id="set-taux-amo">
+                    <option value="80" selected>80% (Taux légal AMO Mali)</option>
+                    <option value="70">70% (Taux réduit)</option>
+                    <option value="100">100% (Prise en charge totale)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">RÉCEPTIONNAIRE / CAISSE ACTIVE</label>
+                  <input class="form-input" id="set-caisse-user" value="Dr. C. Laurent (Chef de Réception)">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">PAIEMENT MOBILE PAR DÉFAUT</label>
+                  <select class="form-select" id="set-mobile-money">
+                    <option value="Orange Money" selected>Orange Money Mali (#144#)</option>
+                    <option value="Moov Money">Moov Money Mali (*166#)</option>
+                    <option value="Wave Mali">Wave Mali</option>
+                  </select>
+                </div>
+                <div class="form-group full-width">
+                  <label class="form-label">MENTION LÉGALE BAS DE FACTURE</label>
+                  <input class="form-input" id="set-facture-mention" value="Facture certifiée conforme aux conventions CANAM / INPS Mali.">
+                </div>
+              </div>
+            </div>
+
+            <!-- Carte 3: Bureaux & Cabinets Médicaux -->
+            <div class="column-card" style="min-height: auto;">
+              <div class="col-header">
+                <span class="col-title">Cabinets Médicaux & Équipements</span>
+                <span class="col-badge warn">Affectations</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div>
+                    <strong style="font-size: 11px; color: var(--oc-text-1);">Bureau 1 (Ophtalmo)</strong>
+                    <div style="font-size: 9px; color: var(--oc-text-3);">Dr Martin · Lampe à fente Haag-Streit, Tonomètre</div>
+                  </div>
+                  <span class="cs-status-chip termine">Actif</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div>
+                    <strong style="font-size: 11px; color: var(--oc-text-1);">Bureau 2 (Réfraction)</strong>
+                    <div style="font-size: 9px; color: var(--oc-text-3);">Dr Petit · Réfractomètre automatique, Frontofocomètre</div>
+                  </div>
+                  <span class="cs-status-chip termine">Actif</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div>
+                    <strong style="font-size: 11px; color: var(--oc-text-1);">Salle d'Imagerie OCT</strong>
+                    <div style="font-size: 9px; color: var(--oc-text-3);">Spectralis Heidelberg & Cirrus HD Zeiss</div>
+                  </div>
+                  <span class="cs-status-chip termine">Actif</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div>
+                    <strong style="font-size: 11px; color: var(--oc-text-1);">Bureau 4 (Généraliste & Anesthésie)</strong>
+                    <div style="font-size: 9px; color: var(--oc-text-3);">Dr Traoré · Électrocardiographe, Moniteur constantes</div>
+                  </div>
+                  <span class="cs-status-chip termine">Actif</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Carte 4: Thème Graphique & Sauvegarde Système -->
+            <div class="column-card" style="min-height: auto;">
+              <div class="col-header">
+                <span class="col-title">Thème & Sauvegarde des Données</span>
+                <span class="col-badge pri">Système</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                <div style="padding: 10px 12px; background: var(--oc-bg); border-radius: var(--oc-radius-sm); border: 1px solid var(--oc-border);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <strong style="font-size: 11px; color: var(--oc-text-1);">Thème Visuel Médical</strong>
+                    <span style="font-size: 9px; font-weight: 800; color: var(--oc-accent);">SAPHIR & AMBRE</span>
+                  </div>
+                  <div style="font-size: 9px; color: var(--oc-text-3);">Couleurs conformes à la charte Oculis (#1E56D6 & #C08A2D)</div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 4px;">
+                  <button class="btn-modal-cancel" id="btn-export-full-backup" style="flex: 1; border-color: var(--oc-primary); color: var(--oc-primary); font-weight: 800;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: middle;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Sauvegarder JSON
+                  </button>
+                  <button class="btn-modal-cancel" id="btn-reset-demo" style="flex: 1; border-color: var(--oc-accent); color: var(--oc-accent); font-weight: 800;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: middle;"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    Réinitialiser Démo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -1482,7 +1636,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=31"></script>
-  <script src="renderer.js?v=31"></script>
+  <script src="data.js?v=32"></script>
+  <script src="renderer.js?v=32"></script>
 </body>
 </html>

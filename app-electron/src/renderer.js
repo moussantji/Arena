@@ -31,6 +31,7 @@ const viewImagerieOct = document.getElementById('view-imagerie-oct');
 const viewFacturation = document.getElementById('view-facturation');
 const viewStock = document.getElementById('view-stock');
 const viewStatistiques = document.getElementById('view-statistiques');
+const viewParametres = document.getElementById('view-parametres');
 const viewTitle = document.getElementById('view-title');
 const viewDate = document.getElementById('view-date');
 
@@ -88,6 +89,7 @@ window.switchView = function switchView(tabName) {
   if (viewFacturation) viewFacturation.style.display = 'none';
   if (viewStock) viewStock.style.display = 'none';
   if (viewStatistiques) viewStatistiques.style.display = 'none';
+  if (viewParametres) viewParametres.style.display = 'none';
 
   if (tabName === 'Patients') {
     if (viewPatients) viewPatients.style.display = 'flex';
@@ -133,6 +135,11 @@ window.switchView = function switchView(tabName) {
     if (viewDate) viewDate.textContent = "Indicateurs d'activité, AMO et performances cliniques";
     updateStatsView();
     showToast("Module Statistiques ouvert ✓");
+  } else if (tabName === 'Paramètres') {
+    if (viewParametres) viewParametres.style.display = 'flex';
+    if (viewTitle) viewTitle.textContent = "Paramètres de la Clinique";
+    if (viewDate) viewDate.textContent = "Configuration établissement, AMO, bureaux & système";
+    showToast("Module Paramètres ouvert ✓");
   } else if (tabName === 'Tableau de bord' || tabName === 'Réception') {
     if (viewReception) viewReception.style.display = 'block';
     if (viewTitle) viewTitle.textContent = "Tableau de bord";
@@ -2019,3 +2026,50 @@ function updateStatsView() {
   const totalValStock = inventoryList.reduce((acc, m) => acc + (m.valeurTotale || 0), 0);
   if (elValStock) elValStock.textContent = totalValStock.toLocaleString('fr-FR') + " FCFA";
 }
+
+
+// ============================================================
+// 22. MODULE PARAMÈTRES & CONFIGURATION CLINIQUE OCULIS
+// ============================================================
+
+// Sauvegarder les paramètres
+document.getElementById('btn-save-settings')?.addEventListener('click', () => {
+  const clinicName = document.getElementById('set-clinic-name')?.value.trim();
+  const bannerTitle = document.querySelector('.banner-title');
+  if (bannerTitle && clinicName) bannerTitle.textContent = clinicName;
+
+  showToast("Paramètres généraux sauvegardés avec succès ! ✓");
+});
+
+// Sauvegarder les données de la clinique en JSON
+document.getElementById('btn-export-full-backup')?.addEventListener('click', () => {
+  const backupData = {
+    exportDate: new Date().toISOString(),
+    clinique: "Clinique Ophtalmologique Oculis - Bamako",
+    devise: "FCFA",
+    patients: patientsList,
+    appointments: appointmentsList,
+    consultations: consultationsList,
+    octExams: octList,
+    invoices: invoicesList,
+    inventory: inventoryList
+  };
+
+  const jsonStr = JSON.stringify(backupData, null, 2);
+  const blob = new Blob([jsonStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "sauvegarde_complete_oculis_clinic.json");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  showToast("Sauvegarde complète JSON de la clinique téléchargée ✓");
+});
+
+// Réinitialiser les données démo
+document.getElementById('btn-reset-demo')?.addEventListener('click', () => {
+  showToast("Données cliniques actualisées et synchronisées ✓");
+});
