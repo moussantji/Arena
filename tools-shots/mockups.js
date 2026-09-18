@@ -57,7 +57,7 @@ function deskMock(p, k) {
   ];
   const kpis = [
     ['REND.-VOUS', '24', '+2 vs hier', 'ok'], ['EN CONSULT.', '2', 'Dr Martin · Dr Petit', 'pri'],
-    ['CA DU JOUR', '2 840 €', 'reçu ce matin', 'ok'], ['NO-SHOW', '1', 'sur 24 patients', 'warn'],
+    ['CA DU JOUR', '1 850 000 FCFA', 'reçu ce matin', 'ok'], ['NO-SHOW', '1', 'sur 24 patients', 'warn'],
   ];
   const agenda = [
     ['09:00', 'Amélie Rousseau', 'Consultation + OCT · cab. 1', 'pri'],
@@ -110,7 +110,7 @@ function deskMock(p, k) {
   s += `<rect x="224" y="120" width="616" height="104" rx="14" fill="rgba(5,7,12,0.22)"/>`;
   s += `<rect x="224" y="120" width="616" height="104" rx="14" fill="url(#ov${k})"/>`;
   s += `<text x="242" y="158" font-family="Manrope" font-weight="800" font-size="14" fill="#FFFFFF">Clinique Oculis</text>`;
-  s += `<text x="242" y="177" font-family="Manrope" font-weight="600" font-size="10.5" fill="#FFFFFF" opacity="0.92">Réception &amp; pilotage — 24 RDV · CA 2 840 €</text>`;
+  s += `<text x="242" y="177" font-family="Manrope" font-weight="600" font-size="10.5" fill="#FFFFFF" opacity="0.92">Réception &amp; pilotage — 24 RDV · CA 1 850 000 FCFA</text>`;
   s += `<text x="242" y="207" font-family="Manrope" font-weight="600" font-size="9.5" fill="#FFFFFF" opacity="0.8">Salle d’attente : 6 patients · 2 consultations en cours</text>`;
   s += `<rect x="688" y="138" width="136" height="26" rx="13" fill="#FFFFFF" opacity="0.94"/><text x="756" y="155" font-family="Manrope" font-weight="800" font-size="9.5" fill="${p.t1}" text-anchor="middle">Prendre l’attente</text>`;
   /* KPI */
@@ -118,7 +118,7 @@ function deskMock(p, k) {
     const x = 224 + i * 155;
     s += `<rect x="${x}" y="238" width="145" height="76" rx="12" fill="${p.surface}" stroke="${p.border}"/>`;
     s += `<text x="${x + 13}" y="261" font-family="Manrope" font-weight="800" font-size="8" fill="${p.t3}" letter-spacing="1">${esc(st[0])}</text>`;
-    s += `<text x="${x + 13}" y="290" font-family="Manrope" font-weight="800" font-size="22" fill="${p.t1}">${st[1]}</text>`;
+    const isLong = st[1].length > 10; s += `<text x="${x + 13}" y="${isLong ? 288 : 290}" font-family="Manrope" font-weight="800" font-size="${isLong ? 15.5 : 22}" fill="${p.t1}">${st[1]}</text>`;
     const dotc = { ok: p.ok, warn: p.warn, pri: p.pri, err: p.err }[st[3]];
     s += `<circle cx="${x + 17}" cy="302" r="3.2" fill="${dotc}"/>`;
     s += `<text x="${x + 26}" y="306" font-family="Manrope" font-weight="700" font-size="9" fill="${p.t3}">${esc(st[2])}</text>`;
@@ -169,10 +169,10 @@ function deskMock(p, k) {
   });
   s += `<rect x="662" y="508" width="164" height="58" rx="9" fill="${p.bg}" stroke="${p.border}"/>`;
   s += `<text x="672" y="526" font-family="Manrope" font-weight="800" font-size="6.5" fill="${p.t3}" letter-spacing="0.8">FACTURE DU JOUR</text>`;
-  s += `<text x="672" y="545" font-family="Manrope" font-weight="800" font-size="12" fill="${p.t1}">185,00 € <tspan font-size="8.5" font-weight="700" fill="${p.t3}">· CPAM T</tspan></text>`;
-  s += `<text x="672" y="559" font-family="Manrope" font-weight="600" font-size="8" fill="${p.t3}">Reste à charge patient : 40,00 €</text>`;
+  s += `<text x="672" y="543" font-family="Manrope" font-weight="800" font-size="10.5" fill="${p.t1}">120 000 FCFA <tspan font-size="8" font-weight="700" fill="${p.t3}">· AMO</tspan></text>`;
+  s += `<text x="672" y="559" font-family="Manrope" font-weight="600" font-size="8" fill="${p.t3}">Reste à charge patient : 25 000 FCFA</text>`;
   s += `<rect x="662" y="576" width="164" height="28" rx="8" fill="${p.pri}"/>${I('card', 674, 583, 12, '#FFF', 2)}`;
-  s += `<text x="692" y="594" font-family="Manrope" font-weight="800" font-size="9.5" fill="#FFF">Encaisser 185 €</text>`;
+  s += `<text x="692" y="593" font-family="Manrope" font-weight="800" font-size="8.5" fill="#FFF">Encaisser 120 000 FCFA</text>`;
   s += `<rect x="662" y="612" width="164" height="28" rx="8" fill="${p.surface}" stroke="${p.border}"/>${I('check', 674, 619, 12, p.t2, 2.2)}`;
   s += `<text x="692" y="630" font-family="Manrope" font-weight="800" font-size="9.5" fill="${p.t2}">Vérifier le dossier</text>`;
   s += `<text x="662" y="668" font-family="Manrope" font-weight="600" font-size="8" fill="${p.t3}">Prochain : 11:15 — M. Dubois · Bilan</text>`;
