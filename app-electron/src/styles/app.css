@@ -46,6 +46,7 @@ html, body {
 
 .window-controls {
   display: flex;
+  align-items: center;
   gap: 8px;
   -webkit-app-region: no-drag;
 }
@@ -138,32 +139,39 @@ html, body {
   font-size: 7px;
   font-weight: 800;
   color: var(--oc-sidebar-muted);
-  letter-spacing: 1.4px;
-  display: block;
+  letter-spacing: 0.8px;
 }
 
-.sidebar-nav {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 4px;
-  margin-top: 4px;
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   flex: 1;
+  margin-top: 6px;
+}
+
+.nav-section-title {
+  font-size: 8px;
+  font-weight: 800;
+  color: var(--oc-sidebar-muted);
+  letter-spacing: 0.9px;
+  padding: 12px 10px 6px;
+  text-transform: uppercase;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
+  gap: 11px;
+  padding: 9px 12px;
   border-radius: var(--oc-radius-sm);
   color: var(--oc-sidebar-text);
   text-decoration: none;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
-  cursor: pointer !important;
   transition: all 0.15s ease;
   position: relative;
-  user-select: none;
+  cursor: pointer;
 }
 
 .nav-item:hover {
@@ -290,19 +298,19 @@ html, body {
 .search-box {
   display: flex;
   align-items: center;
-  gap: 8px;
   background-color: var(--oc-surface);
   border: 1px solid var(--oc-border);
-  padding: 6px 14px;
   border-radius: var(--oc-radius-pill);
-  width: 230px;
+  padding: 7px 14px;
+  gap: 9px;
+  width: 250px;
   box-shadow: var(--oc-shadow-sm);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: all 0.2s;
 }
 
 .search-box:focus-within {
   border-color: var(--oc-primary);
-  box-shadow: 0 0 0 3px var(--oc-primary-soft);
+  box-shadow: 0 0 0 3px rgba(30, 86, 214, 0.15);
 }
 
 .search-icon {
@@ -311,7 +319,6 @@ html, body {
   stroke: var(--oc-text-3);
   stroke-width: 2;
   fill: none;
-  flex-shrink: 0;
 }
 
 .search-input {
@@ -329,24 +336,23 @@ html, body {
   color: var(--oc-text-3);
 }
 
-.icon-btn {
+.btn-icon-action {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: var(--oc-surface);
   border: 1px solid var(--oc-border);
+  background-color: var(--oc-surface);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   position: relative;
-  box-shadow: var(--oc-shadow-sm);
-  transition: background-color 0.15s, transform 0.15s;
+  transition: all 0.15s;
 }
 
-.icon-btn:hover {
+.btn-icon-action:hover {
   background-color: var(--oc-surface-2);
-  transform: translateY(-1px);
+  border-color: var(--oc-primary-light);
 }
 
 .btn-icon {
@@ -359,8 +365,8 @@ html, body {
 
 .btn-badge-dot {
   position: absolute;
-  top: 7px;
-  right: 7px;
+  top: 6px;
+  right: 6px;
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -372,34 +378,29 @@ html, body {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--oc-gradient);
+  background-color: var(--oc-surface-2);
+  border: 1px solid var(--oc-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
-  color: #FFF;
+  color: var(--oc-primary);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(30, 86, 214, 0.25);
-  transition: transform 0.15s;
 }
 
-.topbar-avatar:hover {
-  transform: scale(1.05);
-}
-
-/* Banner Hero */
+/* Clinic Banner (Photo Réception Bleue) */
 .clinic-banner {
   position: relative;
-  height: 106px;
+  height: 110px;
   border-radius: var(--oc-radius);
   overflow: hidden;
+  box-shadow: var(--oc-shadow-card);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  box-shadow: var(--oc-shadow);
-  background-color: var(--oc-sidebar);
+  flex-shrink: 0;
   margin-bottom: 14px;
 }
 
@@ -410,6 +411,7 @@ html, body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   z-index: 1;
 }
 
@@ -419,7 +421,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(5, 7, 12, 0.24);
+  background-color: rgba(12, 26, 48, 0.72);
   z-index: 2;
 }
 
@@ -429,53 +431,57 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: var(--oc-gradient-overlay);
+  background: linear-gradient(90deg, rgba(30, 86, 214, 0.45) 0%, rgba(192, 138, 45, 0.3) 100%);
   z-index: 3;
 }
 
 .banner-content {
   position: relative;
   z-index: 4;
-  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .banner-title {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: -0.2px;
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.3px;
 }
 
 .banner-subtitle {
   font-size: 11px;
-  font-weight: 600;
-  opacity: 0.95;
-  margin-top: 3px;
+  font-weight: 700;
+  color: #F8FAFD;
+  letter-spacing: 0.2px;
 }
 
 .banner-status {
   font-size: 9.5px;
   font-weight: 600;
-  opacity: 0.82;
-  margin-top: 7px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 1px;
 }
 
 .banner-action-btn {
   position: relative;
   z-index: 4;
-  background-color: #FFFFFF;
-  color: var(--oc-text-1);
+  background-color: var(--oc-accent);
+  color: #FFFFFF;
   border: none;
-  padding: 8px 18px;
+  padding: 9px 18px;
   border-radius: var(--oc-radius-pill);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-  transition: transform 0.15s, opacity 0.15s;
+  box-shadow: 0 4px 14px rgba(192, 138, 45, 0.4);
+  transition: all 0.2s;
 }
 
 .banner-action-btn:hover {
-  opacity: 0.95;
+  background-color: var(--oc-accent-hover);
   transform: translateY(-1px);
 }
 
@@ -527,16 +533,12 @@ html, body {
 
 .kpi-dot.ok { background-color: var(--oc-success); }
 .kpi-dot.pri { background-color: var(--oc-primary); }
-.kpi-dot.warn { background-color: var(--oc-warning); }
-.kpi-dot.err { background-color: var(--oc-danger); }
+.kpi-dot.warn { background-color: var(--oc-accent); }
 
 .kpi-subtext {
-  font-size: 9px;
-  font-weight: 700;
+  font-size: 9.5px;
+  font-weight: 600;
   color: var(--oc-text-3);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* Columns Section */
@@ -576,8 +578,9 @@ html, body {
 .col-badge {
   padding: 2px 8px;
   border-radius: var(--oc-radius-pill);
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .col-badge.pri {
@@ -586,8 +589,8 @@ html, body {
 }
 
 .col-badge.warn {
-  background-color: var(--oc-warning-soft);
-  color: var(--oc-warning);
+  background-color: var(--oc-accent-soft);
+  color: var(--oc-accent);
 }
 
 .col-badge.acc {
@@ -595,63 +598,46 @@ html, body {
   color: var(--oc-accent);
 }
 
-/* Column 1: Agenda Timeline */
+/* Col 1: Agenda */
 .agenda-list {
   display: flex;
   flex-direction: column;
-  position: relative;
-  gap: 14px;
+  gap: 8px;
   overflow-y: auto;
-  padding-right: 4px;
   flex: 1;
-}
-
-.agenda-list::-webkit-scrollbar {
-  width: 4px;
-}
-.agenda-list::-webkit-scrollbar-thumb {
-  background: var(--oc-border);
-  border-radius: 2px;
-}
-
-.agenda-list::before {
-  content: '';
-  position: absolute;
-  top: 6px;
-  bottom: 6px;
-  left: 5px;
-  width: 1px;
-  background-color: var(--oc-border);
 }
 
 .agenda-item {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  position: relative;
-  padding: 1px 0;
+  gap: 10px;
+  padding: 9px 11px;
+  background-color: var(--oc-bg);
+  border: 1px solid var(--oc-border);
+  border-radius: var(--oc-radius-sm);
+  transition: all 0.15s;
+}
+
+.agenda-item:hover {
+  border-color: var(--oc-primary-light);
+  background-color: #FFFFFF;
 }
 
 .agenda-marker {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background-color: var(--oc-primary);
-  border: 2px solid var(--oc-surface);
-  z-index: 2;
-  margin-top: 1px;
+  width: 3px;
+  border-radius: 2px;
+  background-color: var(--oc-border);
   flex-shrink: 0;
 }
 
-.agenda-marker.pri { background-color: var(--oc-primary); }
-.agenda-marker.warn { background-color: var(--oc-warning); }
-.agenda-marker.ok { background-color: var(--oc-success); }
+.agenda-marker.completed { background-color: var(--oc-success); }
+.agenda-marker.in-progress { background-color: var(--oc-primary); }
+.agenda-marker.waiting { background-color: var(--oc-accent); }
 
 .agenda-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-width: 0;
+  gap: 1px;
 }
 
 .agenda-top {
@@ -661,132 +647,104 @@ html, body {
 }
 
 .agenda-time {
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--oc-text-1);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--oc-text-3);
 }
 
 .agenda-alert {
   font-size: 8px;
   font-weight: 800;
-  color: var(--oc-warning);
+  color: var(--oc-accent);
+  background-color: var(--oc-accent-soft);
+  padding: 1px 5px;
+  border-radius: 4px;
 }
 
 .agenda-patient {
   font-size: 11px;
   font-weight: 800;
   color: var(--oc-text-1);
-  margin-top: 1px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .agenda-desc {
-  font-size: 8.5px;
+  font-size: 9px;
   font-weight: 600;
   color: var(--oc-text-3);
-  margin-top: 1px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-/* Column 2: Waiting Queue */
+/* Col 2: File d'attente */
 .queue-list {
   display: flex;
   flex-direction: column;
   gap: 7px;
-  flex: 1;
   overflow-y: auto;
-  padding-right: 4px;
-}
-
-.queue-list::-webkit-scrollbar {
-  width: 4px;
-}
-.queue-list::-webkit-scrollbar-thumb {
-  background: var(--oc-border);
-  border-radius: 2px;
+  flex: 1;
 }
 
 .queue-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 10px;
+  padding: 8px 10px;
+  background-color: var(--oc-bg);
+  border: 1px solid var(--oc-border);
   border-radius: var(--oc-radius-sm);
   cursor: pointer;
   transition: all 0.15s;
-  border: 1px solid transparent;
 }
 
 .queue-item:hover {
-  background-color: var(--oc-surface-2);
+  background-color: #FFFFFF;
+  border-color: var(--oc-primary-light);
 }
 
 .queue-item.active {
   background-color: var(--oc-primary-soft);
-  border-color: rgba(30, 86, 214, 0.2);
+  border-color: var(--oc-primary);
 }
 
 .queue-left {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-width: 0;
+  gap: 9px;
 }
 
 .queue-time-badge {
-  background-color: var(--oc-primary-soft);
-  color: var(--oc-primary);
-  padding: 2px 6px;
-  border-radius: 5px;
-  font-size: 8.5px;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.queue-item.active .queue-time-badge {
-  background-color: #FFFFFF;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--oc-text-3);
 }
 
 .queue-info {
   display: flex;
   flex-direction: column;
-  min-width: 0;
 }
 
 .queue-patient {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--oc-text-1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .queue-desc {
-  font-size: 8px;
+  font-size: 8.5px;
   font-weight: 600;
   color: var(--oc-text-3);
-  margin-top: 1px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .queue-status-chip {
-  padding: 2px 7px;
+  padding: 3px 8px;
   border-radius: var(--oc-radius-pill);
-  font-size: 7.5px;
+  font-size: 8px;
   font-weight: 800;
-  flex-shrink: 0;
 }
 
 .queue-status-chip.active {
-  background-color: var(--oc-primary-soft);
-  color: var(--oc-primary);
+  background-color: var(--oc-primary);
+  color: #FFFFFF;
 }
 
 .queue-status-chip.waiting {
@@ -800,33 +758,33 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: var(--oc-primary);
-  color: #FFFFFF;
-  border: none;
-  padding: 8px;
+  background-color: var(--oc-surface-2);
+  border: 1px dashed var(--oc-border);
   border-radius: var(--oc-radius-sm);
+  padding: 8px;
   font-size: 10px;
   font-weight: 800;
+  color: var(--oc-text-2);
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(30, 86, 214, 0.25);
   transition: all 0.15s;
   flex-shrink: 0;
 }
 
 .queue-action-btn:hover {
-  background-color: var(--oc-primary-hover);
-  transform: translateY(-1px);
+  border-color: var(--oc-primary);
+  color: var(--oc-primary);
+  background-color: var(--oc-primary-soft);
 }
 
 .queue-btn-icon {
   width: 13px;
   height: 13px;
   stroke: currentColor;
-  stroke-width: 2.2;
+  stroke-width: 2;
   fill: none;
 }
 
-/* Column 3: Active Patient Dossier */
+/* Col 3: Dossier Actif */
 .patient-profile-header {
   display: flex;
   align-items: center;
@@ -975,32 +933,32 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  background-color: var(--oc-surface);
+  background-color: transparent;
   color: var(--oc-text-2);
   border: 1px solid var(--oc-border);
-  padding: 8px;
+  padding: 7px;
   border-radius: var(--oc-radius-sm);
   font-size: 9.5px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .btn-dossier-secondary:hover {
-  background-color: var(--oc-bg);
+  background-color: var(--oc-surface-2);
+  color: var(--oc-text-1);
+  border-color: var(--oc-primary-light);
 }
 
 .dossier-footer-note {
   font-size: 8px;
   font-weight: 600;
   color: var(--oc-text-3);
-  margin-top: auto;
-  padding-top: 6px;
   text-align: center;
-  flex-shrink: 0;
+  margin-top: 8px;
 }
 
-/* Modal de confirmation d'encaissement */
+/* Modal Styling */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1082,22 +1040,24 @@ html, body {
 .modal-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 11px;
-}
-
-.modal-row .label {
-  color: var(--oc-text-3);
   font-weight: 600;
+  color: var(--oc-text-2);
 }
 
-.modal-row .value {
-  color: var(--oc-text-1);
+.modal-row.total {
+  border-top: 1px dashed var(--oc-border);
+  padding-top: 8px;
   font-weight: 800;
+  color: var(--oc-text-1);
+  font-size: 12px;
 }
 
-.modal-row.total .value {
+.modal-row .highlight {
   color: var(--oc-primary);
-  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
 }
 
 .modal-actions {
@@ -1110,11 +1070,17 @@ html, body {
   padding: 9px;
   border-radius: var(--oc-radius-sm);
   border: 1px solid var(--oc-border);
-  background: var(--oc-surface);
+  background: transparent;
   color: var(--oc-text-2);
-  font-weight: 800;
+  font-weight: 700;
   font-size: 11px;
   cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-modal-cancel:hover {
+  background-color: var(--oc-surface-2);
+  color: var(--oc-text-1);
 }
 
 .btn-modal-confirm {
@@ -1128,16 +1094,21 @@ html, body {
   font-size: 11px;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(30, 86, 214, 0.3);
+  transition: all 0.15s;
 }
 
-/* Toast de notification */
+.btn-modal-confirm:hover {
+  background: var(--oc-primary-hover);
+}
+
+/* Toast Notifications */
 .toast-notice {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  background-color: #0C1A30;
+  background-color: var(--oc-chrome-bg);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: #FFFFFF;
-  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 10px 18px;
   border-radius: var(--oc-radius-pill);
   font-size: 11px;
@@ -1161,5 +1132,6 @@ html, body {
 .toast-dot {
   width: 7px;
   height: 7px;
+  border-radius: 50%;
   background-color: var(--oc-accent);
 }
