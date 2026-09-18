@@ -165,22 +165,51 @@ function updateReceptionKPIs() {
 function renderAgenda() {
   if (!agendaContainer) return;
   agendaContainer.innerHTML = '';
-  agendaItems.forEach(item => {
+
+  // Synchronisation dynamique avec les rendez-vous réels du jour
+  const listToDisplay = appointmentsList.length > 0 ? appointmentsList : agendaItems;
+
+  listToDisplay.forEach(item => {
     const itemEl = document.createElement('div');
     itemEl.className = 'agenda-item';
+
+    const timeStr = item.heure || item.time || "09:00";
+    const patientStr = item.patientNom || item.patient || "Patient";
+    const descStr = (item.motif ? `${item.motif} · ${item.bureau || ''}` : item.desc) || "Consultation";
+    const alertStr = item.notes && item.notes.includes("Retard") ? "Retard 10 min" : (item.alert || "");
+
+    let markerClass = "completed";
+    if (item.statut === "Retardé" || item.status === "warn") markerClass = "waiting";
+    else if (item.statut === "En attente" || item.status === "pri") markerClass = "in-progress";
+
     itemEl.innerHTML = `
-      <div class="agenda-marker ${item.status}"></div>
+      <div class="agenda-marker ${markerClass}"></div>
       <div class="agenda-content">
         <div class="agenda-top">
-          <span class="agenda-time">${item.time}</span>
-          ${item.alert ? `<span class="agenda-alert">${item.alert}</span>` : ''}
+          <span class="agenda-time">${timeStr}</span>
+          ${alertStr ? `<span class="agenda-alert">${alertStr}</span>` : ''}
         </div>
-        <span class="agenda-patient">${item.patient}</span>
-        <span class="agenda-desc">${item.desc}</span>
+        <span class="agenda-patient">${patientStr}</span>
+        <span class="agenda-desc">${descStr}</span>
       </div>
     `;
+
+    // Clic pour sélectionner le patient correspondant s'il existe
+    itemEl.style.cursor = 'pointer';
+    itemEl.addEventListener('click', () => {
+      const matchP = patientsList.find(p => 
+        (item.patientId && p.id === item.patientId) ||
+        (item.patientRef && p.ref === item.patientRef) ||
+        p.personalInfo.nom.includes(patientStr.split(' ')[0])
+      );
+      if (matchP) selectPatient(matchP.id);
+    });
+
     agendaContainer.appendChild(itemEl);
   });
+
+  const elAgendaBadge = document.getElementById('badge-agenda-count');
+  if (elAgendaBadge) elAgendaBadge.textContent = listToDisplay.length;
 }
 
 // 4. Rendu dynamique de la File d'attente
@@ -327,7 +356,19 @@ function selectPatient(patientId) {
   if (elShare) elShare.textContent = `Reste à charge patient : ${p.billing.patientShare}`;
   if (elBtnText) elBtnText.textContent = `Encaisser ${p.billing.formattedTotal}`;
 
+  // Mettre à jour la note du prochain patient en attente
+  const nextWaiting = patientsList.find(x => x.id !== patientId && x.medicalInfo && x.medicalInfo.status === 'waiting');
+  const elNextNote = document.getElementById('next-patient-note');
+  if (elNextNote) {
+    if (nextWaiting) {
+      elNextNote.textContent = `Prochain : ${nextWaiting.medicalInfo.time} — ${nextWaiting.personalInfo.prenom} ${nextWaiting.personalInfo.nom} · ${nextWaiting.medicalInfo.desc}`;
+    } else {
+      elNextNote.textContent = "Aucun autre patient en attente dans la file";
+    }
+  }
+
   renderQueue();
+  updateReceptionKPIs();
   showToast(`Dossier actif : ${fullName} (${p.ref})`);
 }
 
