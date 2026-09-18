@@ -358,3 +358,71 @@ window.clinicAppointments = [
     notes: "Bilan sanguin pré-opératoire complet"
   }
 ];
+
+
+// Types et tarifs des examens d'Imagerie OCT (FCFA)
+window.octTypes = [
+  { id: "oct_macula", label: "OCT Maculaire Haute Définition", tarif: 25000, formattedTarif: "25 000 FCFA", code: "OCT-MAC" },
+  { id: "oct_nerf", label: "OCT Papille & Fibres RNFL (Glaucome)", tarif: 25000, formattedTarif: "25 000 FCFA", code: "OCT-GLA" },
+  { id: "oct_angio", label: "Angio-OCT (OCT-A) Rétinien sans injection", tarif: 40000, formattedTarif: "40 000 FCFA", code: "OCT-ANG" },
+  { id: "oct_segment", label: "OCT Segment Antérieur & Cornée", tarif: 20000, formattedTarif: "20 000 FCFA", code: "OCT-ANT" },
+  { id: "oct_bilan_complet", label: "Bilan OCT Combiné Macula + Nerf Optique", tarif: 45000, formattedTarif: "45 000 FCFA", code: "OCT-DUO" }
+];
+
+// Registre des Examens d'Imagerie OCT enregistrés
+window.clinicOctExams = [
+  {
+    id: "OCT-2026-0101",
+    date: "18/09/2026",
+    heure: "08:45",
+    patientId: "P001",
+    patientNom: "TRAORÉ Mamadou",
+    patientRef: "CLI-ML-2026-0841",
+    oeil: "OD + OG (Bilatéral)",
+    typeExamen: "OCT Maculaire Haute Définition",
+    appareil: "Spectralis OCT Heidelberg (Salle Imagerie)",
+    statut: "Validé",
+    epaisseurMaculaire: "264 µm (Normal)",
+    conclusion: "Profil fovéolaire préservé, absence d'œdème maculaire ni de décollement séreux.",
+    praticien: "Dr Martin (Ophtalmologue)",
+    tarif: 25000,
+    formattedTarif: "25 000 FCFA",
+    clichesCount: 3
+  },
+  {
+    id: "OCT-2026-0102",
+    date: "18/09/2026",
+    heure: "09:50",
+    patientId: "P003",
+    patientNom: "DIARRA Oumar",
+    patientRef: "CLI-ML-2026-0843",
+    oeil: "OG (Œil Gauche)",
+    typeExamen: "OCT Papille & Fibres RNFL (Glaucome)",
+    appareil: "Cirrus HD-OCT Zeiss (Salle Imagerie)",
+    statut: "À analyser",
+    epaisseurMaculaire: "92 µm (Zone limite)",
+    conclusion: "Légère encoche inféro-temporale des fibres nerveuses, contrôle à 3 mois conseillé.",
+    praticien: "Dr Martin (Ophtalmologue)",
+    tarif: 25000,
+    formattedTarif: "25 000 FCFA",
+    clichesCount: 2
+  },
+  {
+    id: "OCT-2026-0103",
+    date: "18/09/2026",
+    heure: "10:30",
+    patientId: "P002",
+    patientNom: "COULIBALY Fatoumata",
+    patientRef: "CLI-ML-2026-0842",
+    oeil: "OD + OG (Bilatéral)",
+    typeExamen: "Bilan OCT Combiné Macula + Nerf Optique",
+    appareil: "Spectralis OCT Heidelberg (Salle Imagerie)",
+    statut: "En cours",
+    epaisseurMaculaire: "278 µm (Normal)",
+    conclusion: "Acquisition en cours de traitement par l'ophtalmologue.",
+    praticien: "Dr Petit (Optométriste)",
+    tarif: 45000,
+    formattedTarif: "45 000 FCFA",
+    clichesCount: 4
+  }
+];

@@ -405,10 +405,215 @@
             </div>
           </div>
         </div>
+
+        <!-- VUE GESTION IMAGERIE OCT -->
+        <div id="view-imagerie-oct" class="patients-view-container" style="display: none;">
+          <div class="patients-toolbar">
+            <div class="patients-filters">
+              <div class="patients-search-box">
+                <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="oct-view-search" placeholder="Rechercher par patient, réf, examen, œil...">
+              </div>
+              <select class="filter-select" id="filter-oct-type">
+                <option value="">Tous les types d'OCT</option>
+                <option value="OCT Maculaire Haute Définition">OCT Maculaire (25 000 FCFA)</option>
+                <option value="OCT Papille & Fibres RNFL (Glaucome)">OCT Papille Glaucome (25 000 FCFA)</option>
+                <option value="Angio-OCT (OCT-A) Rétinien sans injection">Angio-OCT (40 000 FCFA)</option>
+                <option value="OCT Segment Antérieur & Cornée">OCT Segment Antérieur (20 000 FCFA)</option>
+                <option value="Bilan OCT Combiné Macula + Nerf Optique">Bilan OCT Combiné (45 000 FCFA)</option>
+              </select>
+              <select class="filter-select" id="filter-oct-status">
+                <option value="">Tous les statuts</option>
+                <option value="Validé">Validé</option>
+                <option value="En cours">En cours</option>
+                <option value="À analyser">À analyser</option>
+              </select>
+            </div>
+            <div class="patients-actions-right">
+              <button class="btn-export-excel" id="btn-export-oct" title="Exporter les examens OCT en fichier Excel">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Exporter en Excel</span>
+              </button>
+              <button class="btn-add-patient" id="btn-open-create-oct">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Nouvel Examen OCT</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="patients-table-card">
+            <div class="oct-table-header">
+              <span>N° EXAMEN</span>
+              <span>PATIENT</span>
+              <span>ŒIL EXAMINÉ</span>
+              <span>TYPE D'OCT</span>
+              <span>APPAREIL</span>
+              <span>TARIF (FCFA)</span>
+              <span>STATUT</span>
+              <span>ACTIONS</span>
+            </div>
+            <div class="oct-table-body" id="oct-table-body">
+              <!-- Rendu dynamique via renderer.js -->
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
 
+  </div>
+
+
+  <!-- Modal Nouvel Examen OCT -->
+  <div class="modal-overlay" id="create-oct-modal">
+    <div class="modal-card patient-modal-card" style="width: 580px !important;">
+      <div class="patient-modal-header">
+        <div class="patient-modal-avatar">🔬</div>
+        <div class="patient-modal-title">
+          <h3 id="modal-oct-form-title" style="font-size: 16px; font-weight: 800; color: var(--oc-text-1);">Nouvel Examen d'Imagerie OCT</h3>
+          <p style="font-size: 11px; font-weight: 600; color: var(--oc-text-3);">Tomographie par Cohérence Optique & analyse rétinienne</p>
+        </div>
+        <button class="modal-close-icon-btn" id="btn-close-oct-modal">✕</button>
+      </div>
+
+      <form id="create-oct-form">
+        <div class="patient-modal-body" style="max-height: calc(85vh - 130px); overflow-y: auto; padding: 16px 24px;">
+          <div class="modal-info-section">
+            <div class="modal-section-title">PATIENT & IDENTIFICATION EXAMEN</div>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">SÉLECTION DU PATIENT *</label>
+                <select class="form-select" id="oct-patient-select" required>
+                  <!-- Options dynamiques -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">N° EXAMEN OCT</label>
+                <input class="form-input" id="oct-num" readonly style="font-family: var(--oc-font-mono); font-weight: 800; color: var(--oc-primary);">
+              </div>
+              <div class="form-group">
+                <label class="form-label">ŒIL EXAMINÉ *</label>
+                <select class="form-select" id="oct-oeil-select" required>
+                  <option value="OD + OG (Bilatéral)">OD + OG (Bilatéral - 2 yeux)</option>
+                  <option value="OD (Œil Droit)">OD (Œil Droit)</option>
+                  <option value="OG (Œil Gauche)">OG (Œil Gauche)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-info-section">
+            <div class="modal-section-title">PROTOCOLE D'ACQUISITION & TARIFICATION FCFA</div>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">TYPE D'EXAMEN TOMOGRAPHIQUE *</label>
+                <select class="form-select" id="oct-type-select" required>
+                  <option value="OCT Maculaire Haute Définition" data-tarif="25000">OCT Maculaire Haute Définition — 25 000 FCFA</option>
+                  <option value="OCT Papille & Fibres RNFL (Glaucome)" data-tarif="25000">OCT Papille & Fibres RNFL (Glaucome) — 25 000 FCFA</option>
+                  <option value="Angio-OCT (OCT-A) Rétinien sans injection" data-tarif="40000">Angio-OCT (OCT-A) Rétinien — 40 000 FCFA</option>
+                  <option value="OCT Segment Antérieur & Cornée" data-tarif="20000">OCT Segment Antérieur & Cornée — 20 000 FCFA</option>
+                  <option value="Bilan OCT Combiné Macula + Nerf Optique" data-tarif="45000">Bilan OCT Combiné Macula + Nerf — 45 000 FCFA</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">TARIF DE L'IMAGERIE</label>
+                <input class="form-input" id="oct-tarif-display" readonly value="25 000 FCFA" style="font-weight: 900; font-size: 13px; color: var(--oc-text-1);">
+              </div>
+              <div class="form-group">
+                <label class="form-label">APPAREIL TOMOGRAPHE *</label>
+                <select class="form-select" id="oct-appareil-select">
+                  <option value="Spectralis OCT Heidelberg (Salle Imagerie)">Spectralis OCT Heidelberg</option>
+                  <option value="Cirrus HD-OCT Zeiss (Salle Imagerie)">Cirrus HD-OCT Zeiss</option>
+                  <option value="Topcon DRI OCT Triton (Multimodal)">Topcon DRI OCT Triton</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">CONCLUSION MÉDICALE INITIALE</label>
+                <input class="form-input" id="oct-conclusion" placeholder="Ex: Absence d'œdème maculaire, profil rétinien régulier, fovéa normale...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-cancel" id="btn-cancel-oct">Annuler</button>
+          <button type="submit" class="btn-modal-confirm" id="btn-submit-oct">Enregistrer l'Examen OCT</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Détail & Visionneuse Cliché OCT -->
+  <div class="modal-overlay" id="detail-oct-modal">
+    <div class="modal-card patient-modal-card" style="width: 640px !important;">
+      <div class="patient-modal-header">
+        <div class="patient-modal-avatar">👁️</div>
+        <div class="patient-modal-title">
+          <div class="patient-modal-title-row">
+            <h3 id="oct-view-patient">Mamadou TRAORÉ</h3>
+            <span class="col-badge pri" id="oct-view-ref">OCT-2026-0101</span>
+          </div>
+          <p id="oct-view-subtitle">OCT Maculaire Haute Définition · OD + OG (Bilatéral)</p>
+        </div>
+        <button class="modal-close-icon-btn" id="btn-close-oct-view">✕</button>
+      </div>
+
+      <div class="patient-modal-body" style="max-height: calc(85vh - 130px); overflow-y: auto; padding: 20px 24px;">
+        <!-- Visualiseur Tomographique Stylisé -->
+        <div style="background-color: #070B12; border: 1px solid var(--oc-border); border-radius: var(--oc-radius-sm); padding: 16px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span style="font-family: var(--oc-font-mono); font-size: 10px; font-weight: 800; color: #38bdf8;">COUPE B-SCAN RETINIENNE HD</span>
+            <span style="font-family: var(--oc-font-mono); font-size: 9px; color: var(--oc-text-3);">RÉSOLUTION 3.9 µm AXIAL</span>
+          </div>
+          <svg viewBox="0 0 500 120" style="width: 100%; height: 110px; border-radius: 4px; background: linear-gradient(180deg, #020617 0%, #0B1528 100%);">
+            <!-- Grille tomographique -->
+            <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4 4"/>
+            <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4 4"/>
+            <line x1="0" y1="90" x2="500" y2="90" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4 4"/>
+            <!-- Couches rétiniennes en faux-couleur OCT -->
+            <path d="M 10 40 Q 150 42 250 56 Q 350 42 490 40" fill="none" stroke="#22d3ee" stroke-width="2.5"/>
+            <path d="M 10 46 Q 150 48 250 63 Q 350 48 490 46" fill="none" stroke="#eab308" stroke-width="3"/>
+            <path d="M 10 52 Q 150 54 250 68 Q 350 54 490 52" fill="none" stroke="#ef4444" stroke-width="2"/>
+            <path d="M 10 70 Q 150 72 250 82 Q 350 72 490 70" fill="none" stroke="#10b981" stroke-width="3"/>
+            <circle cx="250" cy="65" r="4" fill="#38bdf8" />
+            <text x="250" y="24" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="monospace">Dépression Fovéolaire (Fovéa)</text>
+          </svg>
+        </div>
+
+        <div class="modal-info-section">
+          <div class="modal-section-title">MESURES TOMOGRAPHIQUES & DIAGNOSTIC</div>
+          <div class="modal-info-grid">
+            <div class="info-cell">
+              <span class="info-label">ÉPAISSEUR MACULAIRE FOVÉALE</span>
+              <span class="info-val highlight" id="oct-view-epaisseur">264 µm (Normal)</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">APPAREIL DE CAPTURE</span>
+              <span class="info-val" id="oct-view-appareil">Spectralis OCT Heidelberg</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">PRATICIEN EXAMINATEUR</span>
+              <span class="info-val" id="oct-view-praticien">Dr Martin (Ophtalmologue)</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">STATUT DU RAPPORT</span>
+              <span class="info-val" id="oct-view-statut"><span class="cs-status-chip termine">Validé</span></span>
+            </div>
+            <div class="info-cell full-width">
+              <span class="info-label">CONCLUSION DU MÉDECIN OPHTALMOLOGUE</span>
+              <span class="info-val" id="oct-view-conclusion" style="font-size: 11px; line-height: 1.4; color: var(--oc-text-1);">
+                Profil fovéolaire préservé, absence d'œdème maculaire ni de décollement séreux.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" id="btn-close-oct-view-bottom">Fermer</button>
+        <button class="btn-modal-confirm" id="btn-imprimer-oct">Imprimer le Rapport OCT</button>
+      </div>
+    </div>
   </div>
 
   <!-- Modal Encaissement FCFA -->
@@ -834,7 +1039,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=27"></script>
-  <script src="renderer.js?v=27"></script>
+  <script src="data.js?v=28"></script>
+  <script src="renderer.js?v=28"></script>
 </body>
 </html>

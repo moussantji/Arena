@@ -8,6 +8,7 @@ let agendaItems = [...clinicData.agenda];
 let patientsList = [...clinicData.patients];
 let consultationsList = window.clinicConsultations ? [...window.clinicConsultations] : [];
 let appointmentsList = window.clinicAppointments ? [...window.clinicAppointments] : [];
+let octList = window.clinicOctExams ? [...window.clinicOctExams] : [];
 
 // Eléments DOM
 const agendaContainer = document.getElementById('agenda-container');
@@ -24,6 +25,7 @@ const viewReception = document.getElementById('view-reception');
 const viewPatients = document.getElementById('view-patients');
 const viewConsultations = document.getElementById('view-consultations');
 const viewRendezvous = document.getElementById('view-rendezvous');
+const viewImagerieOct = document.getElementById('view-imagerie-oct');
 const viewTitle = document.getElementById('view-title');
 const viewDate = document.getElementById('view-date');
 
@@ -77,6 +79,8 @@ window.switchView = function switchView(tabName) {
   if (viewConsultations) viewConsultations.style.display = 'none';
   if (viewRendezvous) viewRendezvous.style.display = 'none';
 
+  if (viewImagerieOct) viewImagerieOct.style.display = 'none';
+
   if (tabName === 'Patients') {
     if (viewPatients) viewPatients.style.display = 'flex';
     if (viewTitle) viewTitle.textContent = "Gestion des Patients";
@@ -95,6 +99,12 @@ window.switchView = function switchView(tabName) {
     if (viewDate) viewDate.textContent = `Registre médical — ${consultationsList.length} actes enregistrés aujourd'hui`;
     renderConsultationsTable();
     showToast("Module Consultations ouvert ✓");
+  } else if (tabName === 'Imagerie OCT') {
+    if (viewImagerieOct) viewImagerieOct.style.display = 'flex';
+    if (viewTitle) viewTitle.textContent = "Imagerie & Tomographie OCT";
+    if (viewDate) viewDate.textContent = `Centre d'imagerie rétinienne — ${octList.length} examens enregistrés`;
+    renderOctTable();
+    showToast("Module Imagerie OCT ouvert ✓");
   } else if (tabName === 'Tableau de bord' || tabName === 'Réception') {
     if (viewReception) viewReception.style.display = 'block';
     if (viewTitle) viewTitle.textContent = "Tableau de bord";
@@ -1235,4 +1245,262 @@ document.getElementById('btn-export-rdv')?.addEventListener('click', () => {
   URL.revokeObjectURL(url);
 
   showToast(`Export réussi : ${appointmentsList.length} rendez-vous exportés ✓`);
+});
+
+
+// ============================================================
+// 18. MODULE GESTION DE L'IMAGERIE OCT (TOMOGRAPHIE)
+// ============================================================
+
+const octTableBody = document.getElementById('oct-table-body');
+const createOctModal = document.getElementById('create-oct-modal');
+const detailOctModal = document.getElementById('detail-oct-modal');
+
+function renderOctTable(filterText = "", filterType = "", filterStatus = "") {
+  if (!octTableBody) return;
+  octTableBody.innerHTML = '';
+
+  const filtered = octList.filter(o => {
+    const q = filterText.toLowerCase();
+    const matchText = !q ||
+      o.id.toLowerCase().includes(q) ||
+      o.patientNom.toLowerCase().includes(q) ||
+      o.typeExamen.toLowerCase().includes(q) ||
+      o.oeil.toLowerCase().includes(q) ||
+      o.praticien.toLowerCase().includes(q);
+
+    const matchType = !filterType || o.typeExamen === filterType;
+    const matchStat = !filterStatus || o.statut === filterStatus;
+
+    return matchText && matchType && matchStat;
+  });
+
+  if (filtered.length === 0) {
+    octTableBody.innerHTML = `
+      <div style="padding: 30px; text-align: center; color: var(--oc-text-3); font-size: 12px; font-weight: 700;">
+        Aucun examen OCT ne correspond à votre recherche.
+      </div>
+    `;
+    return;
+  }
+
+  filtered.forEach(o => {
+    const row = document.createElement('div');
+    row.className = 'oct-row';
+
+    let chipClass = 'attente';
+    if (o.statut === 'Validé') chipClass = 'termine';
+    else if (o.statut === 'En cours') chipClass = 'cours';
+
+    row.innerHTML = `
+      <span class="cs-col-num">${o.id}</span>
+      <div>
+        <strong style="color: var(--oc-text-1); font-size: 11px;">${o.patientNom}</strong>
+        <div style="font-size: 8.5px; color: var(--oc-text-3); font-family: var(--oc-font-mono);">${o.patientRef}</div>
+      </div>
+      <span class="oeil-badge">${o.oeil}</span>
+      <span style="font-weight: 700; color: var(--oc-text-1); font-size: 10.5px;">${o.typeExamen}</span>
+      <span style="color: var(--oc-text-2); font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.appareil.split(' ')[0]}</span>
+      <span class="cs-col-tarif">${o.formattedTarif}</span>
+      <span class="cs-status-chip ${chipClass}">${o.statut}</span>
+      <div>
+        <button class="btn-modal-cancel" style="padding: 4px 8px; font-size: 9px; border-radius: var(--oc-radius-pill); font-weight: 800; border-color: var(--oc-primary); color: var(--oc-primary);" onclick="openDetailOctModal('${o.id}')">Cliché</button>
+      </div>
+    `;
+    octTableBody.appendChild(row);
+  });
+}
+
+// Filtres OCT
+document.getElementById('oct-view-search')?.addEventListener('input', (e) => {
+  const fText = e.target.value;
+  const fType = document.getElementById('filter-oct-type')?.value || "";
+  const fStat = document.getElementById('filter-oct-status')?.value || "";
+  renderOctTable(fText, fType, fStat);
+});
+
+document.getElementById('filter-oct-type')?.addEventListener('change', (e) => {
+  const fText = document.getElementById('oct-view-search')?.value || "";
+  const fType = e.target.value;
+  const fStat = document.getElementById('filter-oct-status')?.value || "";
+  renderOctTable(fText, fType, fStat);
+});
+
+document.getElementById('filter-oct-status')?.addEventListener('change', (e) => {
+  const fText = document.getElementById('oct-view-search')?.value || "";
+  const fType = document.getElementById('filter-oct-type')?.value || "";
+  const fStat = e.target.value;
+  renderOctTable(fText, fType, fStat);
+});
+
+// Modal Nouvel Examen OCT
+function openCreateOctModal() {
+  const selectPat = document.getElementById('oct-patient-select');
+  if (selectPat) {
+    selectPat.innerHTML = patientsList.map(p => 
+      `<option value="${p.id}">${p.personalInfo.nom} ${p.personalInfo.prenom} (${p.ref}) — ${p.insuranceInfo.assurance}</option>`
+    ).join('');
+  }
+
+  const nextNum = 'OCT-2026-' + String(100 + octList.length + 1).padStart(4, '0');
+  const octNumInput = document.getElementById('oct-num');
+  if (octNumInput) octNumInput.value = nextNum;
+
+  updateOctTarifDisplay();
+  if (createOctModal) createOctModal.classList.add('open');
+}
+
+function updateOctTarifDisplay() {
+  const select = document.getElementById('oct-type-select');
+  const display = document.getElementById('oct-tarif-display');
+  if (!select || !display) return;
+  const opt = select.options[select.selectedIndex];
+  const tarif = parseInt(opt.getAttribute('data-tarif')) || 25000;
+  display.value = tarif.toLocaleString('fr-FR') + " FCFA";
+}
+
+document.getElementById('oct-type-select')?.addEventListener('change', updateOctTarifDisplay);
+document.getElementById('btn-open-create-oct')?.addEventListener('click', openCreateOctModal);
+document.getElementById('btn-close-oct-modal')?.addEventListener('click', () => {
+  if (createOctModal) createOctModal.classList.remove('open');
+});
+document.getElementById('btn-cancel-oct')?.addEventListener('click', () => {
+  if (createOctModal) createOctModal.classList.remove('open');
+});
+
+// Enregistrement d'un nouvel examen OCT
+document.getElementById('create-oct-form')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const patientId = document.getElementById('oct-patient-select').value;
+  const p = patientsList.find(x => x.id === patientId) || patientsList[0];
+  const oeil = document.getElementById('oct-oeil-select').value;
+  const typeSelect = document.getElementById('oct-type-select');
+  const typeLabel = typeSelect.options[typeSelect.selectedIndex].text.split(' — ')[0];
+  const tarif = parseInt(typeSelect.options[typeSelect.selectedIndex].getAttribute('data-tarif')) || 25000;
+  const appareil = document.getElementById('oct-appareil-select').value;
+  const conclusion = document.getElementById('oct-conclusion').value.trim() || "Profil fovéolaire régulier, examen satisfaisant.";
+  const numOct = document.getElementById('oct-num').value;
+
+  const newOct = {
+    id: numOct,
+    date: "18/09/2026",
+    heure: "11:20",
+    patientId: p.id,
+    patientNom: `${p.personalInfo.nom} ${p.personalInfo.prenom}`,
+    patientRef: p.ref,
+    oeil: oeil,
+    typeExamen: typeLabel,
+    appareil: appareil,
+    statut: "Validé",
+    epaisseurMaculaire: "260 µm (Normal)",
+    conclusion: conclusion,
+    praticien: "Dr Martin (Ophtalmologue)",
+    tarif: tarif,
+    formattedTarif: tarif.toLocaleString('fr-FR') + " FCFA",
+    clichesCount: 3
+  };
+
+  octList.unshift(newOct);
+
+  // Mettre à jour la tuile OCT du patient s'il s'agit du patient actif
+  if (p.id === currentActivePatientId) {
+    const elOct = document.getElementById('vital-oct');
+    if (elOct) elOct.textContent = "03/03 ✓";
+  }
+
+  if (createOctModal) createOctModal.classList.remove('open');
+  e.target.reset();
+
+  renderOctTable();
+  updateReceptionKPIs();
+  showToast(`Examen OCT ${numOct} enregistré pour ${p.personalInfo.prenom} ${p.personalInfo.nom} ! ✓`);
+});
+
+// Visionneuse Cliché OCT
+window.openDetailOctModal = function openDetailOctModal(octId) {
+  const o = octList.find(x => x.id === octId);
+  if (!o) return;
+
+  document.getElementById('oct-view-patient').textContent = o.patientNom;
+  document.getElementById('oct-view-ref').textContent = o.id;
+  document.getElementById('oct-view-subtitle').textContent = `${o.typeExamen} · ${o.oeil}`;
+  document.getElementById('oct-view-epaisseur').textContent = o.epaisseurMaculaire;
+  document.getElementById('oct-view-appareil').textContent = o.appareil;
+  document.getElementById('oct-view-praticien').textContent = o.praticien;
+  document.getElementById('oct-view-conclusion').textContent = o.conclusion;
+
+  const elStatut = document.getElementById('oct-view-statut');
+  if (elStatut) {
+    let chipClass = 'termine';
+    if (o.statut === 'En cours') chipClass = 'cours';
+    else if (o.statut === 'À analyser') chipClass = 'attente';
+    elStatut.innerHTML = `<span class="cs-status-chip ${chipClass}">${o.statut}</span>`;
+  }
+
+  if (detailOctModal) detailOctModal.classList.add('open');
+};
+
+document.getElementById('btn-close-oct-view')?.addEventListener('click', () => {
+  if (detailOctModal) detailOctModal.classList.remove('open');
+});
+document.getElementById('btn-close-oct-view-bottom')?.addEventListener('click', () => {
+  if (detailOctModal) detailOctModal.classList.remove('open');
+});
+document.getElementById('btn-imprimer-oct')?.addEventListener('click', () => {
+  showToast("Impression du rapport tomographique OCT envoyée ✓");
+  if (detailOctModal) detailOctModal.classList.remove('open');
+});
+
+// Export Excel OCT
+document.getElementById('btn-export-oct')?.addEventListener('click', () => {
+  if (!octList || octList.length === 0) {
+    showToast("Aucun examen OCT à exporter !");
+    return;
+  }
+
+  const headers = [
+    "N° Examen",
+    "Date",
+    "Heure",
+    "Réf Patient",
+    "Nom Patient",
+    "Œil Examiné",
+    "Type d'OCT",
+    "Appareil",
+    "Épaisseur Maculaire",
+    "Tarif (FCFA)",
+    "Praticien",
+    "Statut",
+    "Conclusion Médicale"
+  ];
+
+  const rows = octList.map(o => [
+    `"${o.id}"`,
+    `"${o.date}"`,
+    `"${o.heure}"`,
+    `"${o.patientRef}"`,
+    `"${o.patientNom}"`,
+    `"${o.oeil}"`,
+    `"${o.typeExamen}"`,
+    `"${o.appareil}"`,
+    `"${o.epaisseurMaculaire}"`,
+    `"${o.tarif}"`,
+    `"${o.praticien}"`,
+    `"${o.statut}"`,
+    `"${o.conclusion}"`
+  ]);
+
+  const csvContent = "\uFEFF" + [headers.join(";"), ...rows.map(r => r.join(";"))].join("\r\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "examens_imagerie_oct_oculis.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  showToast(`Export réussi : ${octList.length} examens OCT exportés ✓`);
 });
