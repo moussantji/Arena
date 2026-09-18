@@ -1,7 +1,9 @@
 # Oculis · 3 palettes ultra-premium — Gestion clinique ophtalmo & Réception
 
+> ✅ **Palette retenue : 01 · Saphir & Ambre**
+> **PNG finale (palette 01)** : `png/01-saphir-ambre-pc-mobile-final.png` — PC (Electron) + Mobile (React Native) en pleine taille, pilotage clinique (KPI, CA, agenda, file d'attente, facturation) + photo de la clinique en fond
 > Aperçu live : `index.html` (tokens cliquables + mockups PC & mobile de l'écran Réception)
-> **PNG unifiée v2** : `png/00-3-palettes-en-1-clinique.png` — les 3 palettes en une image, écrans de pilotage clinique (KPI, agenda, file d'attente, facturation) + photos de la clinique en fond
+> PNG unifiée 3 palettes : `png/00-3-palettes-en-1-clinique.png` — les 3 palettes en une image
 > PNG par palette : dossier `png/` (1 par palette × PC Electron / Mobile React Native + comparatifs)
 > Images de fond (générées) : dossier `img/` (réception, salle d'attente, iris, texture imagerie)
 
