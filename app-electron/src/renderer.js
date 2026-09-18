@@ -552,30 +552,40 @@ function fitToWindow() {
   if (!wrapper) return;
 
   const targetWidth = 1360;
-  const availableWidth = window.innerWidth || document.documentElement.clientWidth;
+  const targetHeight = 880;
 
-  if (!availableWidth) return;
+  // Mesure robuste et stabilisée pour l'iframe d'Arena
+  const docEl = document.documentElement;
+  const availableWidth = docEl.clientWidth || window.innerWidth || 0;
+  const availableHeight = docEl.clientHeight || window.innerHeight || 0;
 
-  // Calcul basé sur la largeur disponible, avec un zoom minimum de 0.85 pour rester toujours très net, lisible et grand
-  // L'utilisateur peut scroller verticalement si la hauteur de son écran est réduite
-  let scale = availableWidth / targetWidth;
-  if (scale < 0.85) scale = 0.85; // Empêche le dézoom excessif
-  if (scale > 1.1) scale = 1.0;
+  // Si l'iframe n'a pas encore stabilisé son rendu (ex: 0 ou 300px par défaut), on attend
+  if (availableWidth < 300 || availableHeight < 200) return;
 
-  wrapper.style.transformOrigin = 'top left';
-  wrapper.style.transform = `scale(${scale})`;
+  // Calcul proportionnel strict
+  const scaleX = availableWidth / targetWidth;
+  const scaleY = availableHeight / targetHeight;
+  let scale = Math.min(scaleX, scaleY);
+
+  // Plafonner à 1.0 pour ne jamais surzoomer au-delà de la taille desktop native
+  if (scale > 1.0) scale = 1.0;
+
+  wrapper.style.transformOrigin = 'top center';
+  wrapper.style.transform = 'scale(' + scale + ')';
 
   const scaledWidth = targetWidth * scale;
+  const scaledHeight = targetHeight * scale;
+
   const offsetX = Math.max(0, (availableWidth - scaledWidth) / 2);
+  const offsetY = Math.max(0, (availableHeight - scaledHeight) / 2);
 
-  wrapper.style.position = 'relative';
-  wrapper.style.left = `${offsetX}px`;
-  wrapper.style.top = '0px';
+  wrapper.style.position = 'absolute';
+  wrapper.style.left = offsetX + 'px';
+  wrapper.style.top = offsetY + 'px';
+  wrapper.style.width = targetWidth + 'px';
+  wrapper.style.height = targetHeight + 'px';
 
-  document.body.style.margin = '0';
-  document.body.style.padding = '0';
-  document.body.style.overflowX = 'hidden';
-  document.body.style.overflowY = 'auto';
+  document.body.style.overflow = 'hidden';
   document.body.style.backgroundColor = '#0A0E17';
 }
 

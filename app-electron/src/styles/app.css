@@ -8,18 +8,21 @@
 html, body {
   width: 100%;
   height: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
+  margin: 0;
+  padding: 0;
   font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--oc-text-1);
-  background-color: var(--oc-chrome-bg);
+  background-color: #0A0E17;
   -webkit-font-smoothing: antialiased;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
 /* Scaler Wrapper pour adapter exactement la vue PC au Preview */
 #scaler-wrapper {
   transform-origin: top left;
   display: block;
+  margin: 0 auto;
 }
 
 /* Chrome Window Frame */
