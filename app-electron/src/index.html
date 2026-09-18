@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/theme.css">
-  <link rel="stylesheet" href="styles/app.css?v=2">
+  <link rel="stylesheet" href="styles/app.css?v=3">
+  <link rel="stylesheet" href="styles/patients.css?v=2">
 </head>
 <body>
   <div id="scaler-wrapper"><div class="app-window">
@@ -118,6 +119,7 @@
         </div>
 
         <!-- Banner Hero with Reception Photo -->
+        <div id="view-reception">
         <div class="clinic-banner">
           <img class="banner-bg-img" src="assets/bg-clinique-bleue.jpg" alt="Clinique Oculis">
           <div class="banner-overlay-dark"></div>
@@ -241,6 +243,51 @@
               </button>
             </div>
             <p class="dossier-footer-note" id="next-patient-note">Prochain : 10:15 — C. Dubois · Bilan</p>
+          </div>
+        </div>
+        </div>
+
+        <!-- VUE GESTION DES PATIENTS -->
+        <div id="view-patients" class="patients-view-container" style="display: none;">
+          <div class="patients-toolbar">
+            <div class="patients-filters">
+              <div class="search-patient-bar">
+                <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="patients-view-search" placeholder="Rechercher par nom, réf, tél...">
+              </div>
+              <select class="filter-select" id="filter-assurance">
+                <option value="">Toutes les assurances</option>
+                <option value="CANAM (AMO)">CANAM (AMO)</option>
+                <option value="SUNU Assurances">SUNU Assurances</option>
+                <option value="INPS / AMO">INPS / AMO</option>
+                <option value="NSIA Assurances">NSIA Assurances</option>
+              </select>
+              <select class="filter-select" id="filter-sexe">
+                <option value="">Tous les sexes</option>
+                <option value="Masculin">Masculin</option>
+                <option value="Féminin">Féminin</option>
+              </select>
+            </div>
+            <button class="btn-add-patient" id="btn-open-create-patient">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Nouveau Patient</span>
+            </button>
+          </div>
+
+          <div class="patients-table-card">
+            <div class="patients-table-header">
+              <span>RÉFÉRENCE</span>
+              <span>NOM & PRÉNOM</span>
+              <span>SEXE / ÂGE</span>
+              <span>TÉLÉPHONE</span>
+              <span>ADRESSE</span>
+              <span>ASSURANCE</span>
+              <span>NATIONALITÉ</span>
+              <span>ACTIONS</span>
+            </div>
+            <div class="patients-table-body" id="patients-table-body">
+              <!-- Rendu dynamique via renderer.js -->
+            </div>
           </div>
         </div>
       </main>
@@ -373,12 +420,103 @@
     </div>
   </div>
 
+  
+  <!-- Modal Création Patient -->
+  <div class="modal-overlay" id="create-patient-modal">
+    <div class="modal-card patient-modal-card" style="width: 620px !important;">
+      <div class="patient-modal-header">
+        <div class="patient-modal-avatar">+</div>
+        <div class="patient-modal-title">
+          <h3 style="font-size: 16px; font-weight: 800; color: var(--oc-text-1);">Nouveau Dossier Patient</h3>
+          <p style="font-size: 11px; font-weight: 600; color: var(--oc-text-3);">Enregistrement et prise en charge clinique</p>
+        </div>
+        <button class="modal-close-icon-btn" id="btn-close-create-modal">✕</button>
+      </div>
+
+      <form id="create-patient-form">
+        <div class="patient-modal-body" style="max-height: 60vh; overflow-y: auto; padding-right: 6px;">
+          <div class="modal-info-section">
+            <div class="modal-section-title">INFORMATIONS PERSONNELLES</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">NOM *</label>
+                <input class="form-input" id="f-nom" required placeholder="Ex: TRAORÉ">
+              </div>
+              <div class="form-group">
+                <label class="form-label">PRÉNOM *</label>
+                <input class="form-input" id="f-prenom" required placeholder="Ex: Mamadou">
+              </div>
+              <div class="form-group">
+                <label class="form-label">SEXE *</label>
+                <select class="form-select" id="f-sexe" required>
+                  <option value="Masculin">Masculin</option>
+                  <option value="Féminin">Féminin</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">ÂGE *</label>
+                <input class="form-input" id="f-age" type="number" required placeholder="Ex: 48">
+              </div>
+              <div class="form-group">
+                <label class="form-label">TÉLÉPHONE *</label>
+                <input class="form-input" id="f-tel" required placeholder="Ex: +223 76 45 89 12">
+              </div>
+              <div class="form-group">
+                <label class="form-label">EMAIL</label>
+                <input class="form-input" id="f-email" type="email" placeholder="Ex: contact@email.ml">
+              </div>
+              <div class="form-group">
+                <label class="form-label">NATIONALITÉ *</label>
+                <input class="form-input" id="f-nationalite" value="Malienne" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">PROFESSION</label>
+                <input class="form-input" id="f-profession" placeholder="Ex: Ingénieur, Enseignant...">
+              </div>
+              <div class="form-group full">
+                <label class="form-label">ADRESSE DE RÉSIDENCE *</label>
+                <input class="form-input" id="f-adresse" required placeholder="Ex: Badalabougou Rue 105, Bamako">
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-info-section">
+            <div class="modal-section-title">ASSURANCE & COUVERTURE</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">ORGANISME D'ASSURANCE</label>
+                <input class="form-input" id="f-assurance" placeholder="Ex: CANAM (AMO), SUNU, Direct...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">SOCIÉTÉ / EMPLOYEUR</label>
+                <input class="form-input" id="f-societe" placeholder="Ex: Entreprise ou Ministère">
+              </div>
+              <div class="form-group">
+                <label class="form-label">N° ASSURÉ / MATRICULE</label>
+                <input class="form-input" id="f-numass" placeholder="Ex: AMO-ML-XXXX">
+              </div>
+              <div class="form-group">
+                <label class="form-label">DATE DE VALIDITÉ ASSURANCE</label>
+                <input class="form-input" id="f-valiass" type="text" placeholder="JJ/MM/AAAA">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-cancel" id="btn-cancel-create">Annuler</button>
+          <button type="submit" class="btn-modal-confirm">Enregistrer le Patient</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast notification -->
   <div class="toast-notice" id="toast-notice">
     <span class="toast-dot"></span>
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script type="module" src="renderer.js?v=2"></script>
+  <script type="module" src="renderer.js?v=3"></script>
 </div></body>
 </html>
