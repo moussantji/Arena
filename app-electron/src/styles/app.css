@@ -6,11 +6,9 @@
 }
 
 html, body {
-  min-width: 1280px;
   width: 100%;
   height: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
+  overflow: hidden;
   font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--oc-text-1);
   background-color: var(--oc-chrome-bg);
@@ -18,14 +16,26 @@ html, body {
   user-select: none;
 }
 
+/* Scaler Wrapper pour adapter exactement la vue PC au Preview */
+#scaler-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1360px;
+  height: 880px;
+  transform-origin: top left;
+  display: flex;
+  flex-direction: column;
+}
+
 /* Chrome Window Frame */
 .app-window {
   display: flex;
   flex-direction: column;
-  min-width: 1280px;
-  width: 100%;
-  min-height: 100vh;
+  width: 1360px;
+  height: 880px;
   background-color: var(--oc-chrome-bg);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
 .window-titlebar {
@@ -83,16 +93,16 @@ html, body {
 .app-container {
   display: flex;
   flex: 1;
-  min-width: 1280px;
-  min-height: calc(100vh - 44px);
+  width: 1360px;
+  height: calc(880px - 44px);
   background-color: var(--oc-bg);
-  overflow-x: auto;
+  overflow: hidden;
 }
 
 /* Sidebar */
 .app-sidebar {
-  width: 220px;
-  min-width: 220px;
+  width: 210px;
+  min-width: 210px;
   background-color: var(--oc-sidebar);
   display: flex;
   flex-direction: column;
@@ -106,7 +116,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 4px 8px 16px;
+  padding: 4px 8px 14px;
 }
 
 .brand-icon {
@@ -140,7 +150,7 @@ html, body {
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2.5px;
   margin-top: 4px;
   flex: 1;
   overflow-y: auto;
@@ -158,11 +168,11 @@ html, body {
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 8px 12px;
+  padding: 7px 12px;
   border-radius: var(--oc-radius-sm);
   color: var(--oc-sidebar-text);
   text-decoration: none;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -190,8 +200,8 @@ html, body {
 }
 
 .nav-icon {
-  width: 15px;
-  height: 15px;
+  width: 14.5px;
+  height: 14.5px;
   stroke: currentColor;
   stroke-width: 2;
   stroke-linecap: round;
@@ -249,11 +259,12 @@ html, body {
 /* Main Content Area */
 .app-content {
   flex: 1;
-  min-width: 1060px;
+  width: 1150px;
   display: flex;
   flex-direction: column;
-  padding: 18px 24px 22px;
-  gap: 14px;
+  padding: 16px 22px 20px;
+  gap: 12px;
+  overflow: hidden;
 }
 
 /* Topbar */
@@ -272,7 +283,7 @@ html, body {
 }
 
 .topbar-header p {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--oc-text-3);
   margin-top: 2px;
@@ -292,7 +303,7 @@ html, body {
   border: 1px solid var(--oc-border);
   padding: 6px 14px;
   border-radius: var(--oc-radius-pill);
-  width: 230px;
+  width: 220px;
   box-shadow: var(--oc-shadow-sm);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -315,7 +326,7 @@ html, body {
   border: none;
   background: transparent;
   outline: none;
-  font-size: 10.5px;
+  font-size: 10px;
   font-family: inherit;
   font-weight: 600;
   color: var(--oc-text-1);
@@ -388,13 +399,13 @@ html, body {
 /* Banner Hero */
 .clinic-banner {
   position: relative;
-  height: 106px;
+  height: 100px;
   border-radius: var(--oc-radius);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 22px;
   box-shadow: var(--oc-shadow);
   background-color: var(--oc-sidebar);
   flex-shrink: 0;
@@ -443,17 +454,17 @@ html, body {
 }
 
 .banner-subtitle {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   opacity: 0.95;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 .banner-status {
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 600;
   opacity: 0.82;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .banner-action-btn {
@@ -480,7 +491,7 @@ html, body {
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr) !important;
-  gap: 14px;
+  gap: 12px;
   flex-shrink: 0;
 }
 
@@ -488,7 +499,7 @@ html, body {
   background-color: var(--oc-surface);
   border: 1px solid var(--oc-border);
   border-radius: var(--oc-radius);
-  padding: 12px 16px;
+  padding: 10px 14px;
   box-shadow: var(--oc-shadow-card);
 }
 
@@ -501,10 +512,10 @@ html, body {
 }
 
 .kpi-value {
-  font-size: 18px;
+  font-size: 17.5px;
   font-weight: 800;
   color: var(--oc-text-1);
-  margin: 5px 0 6px;
+  margin: 4px 0 5px;
   letter-spacing: -0.4px;
   white-space: nowrap;
 }
@@ -528,7 +539,7 @@ html, body {
 .kpi-dot.err { background-color: var(--oc-danger); }
 
 .kpi-subtext {
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 700;
   color: var(--oc-text-3);
   white-space: nowrap;
@@ -540,16 +551,16 @@ html, body {
 .dashboard-columns {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr !important;
-  gap: 14px;
+  gap: 12px;
   flex: 1;
-  min-height: 380px;
+  min-height: 0;
 }
 
 .column-card {
   background-color: var(--oc-surface);
   border: 1px solid var(--oc-border);
   border-radius: var(--oc-radius);
-  padding: 15px;
+  padding: 13px;
   display: flex;
   flex-direction: column;
   box-shadow: var(--oc-shadow-card);
@@ -560,21 +571,21 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   padding-bottom: 2px;
   flex-shrink: 0;
 }
 
 .col-title {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--oc-text-1);
 }
 
 .col-badge {
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: var(--oc-radius-pill);
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 800;
 }
 
@@ -598,7 +609,7 @@ html, body {
   display: flex;
   flex-direction: column;
   position: relative;
-  gap: 14px;
+  gap: 11px;
   overflow-y: auto;
   padding-right: 4px;
   flex: 1;
@@ -625,14 +636,14 @@ html, body {
 .agenda-item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 11px;
   position: relative;
-  padding: 2px 0;
+  padding: 1px 0;
 }
 
 .agenda-marker {
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background-color: var(--oc-primary);
   border: 2px solid var(--oc-surface);
@@ -659,19 +670,19 @@ html, body {
 }
 
 .agenda-time {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
   color: var(--oc-text-1);
 }
 
 .agenda-alert {
-  font-size: 8px;
+  font-size: 7.5px;
   font-weight: 800;
   color: var(--oc-warning);
 }
 
 .agenda-patient {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   color: var(--oc-text-1);
   margin-top: 1px;
@@ -681,7 +692,7 @@ html, body {
 }
 
 .agenda-desc {
-  font-size: 8.5px;
+  font-size: 8px;
   font-weight: 600;
   color: var(--oc-text-3);
   margin-top: 1px;
@@ -694,7 +705,7 @@ html, body {
 .queue-list {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
   flex: 1;
   overflow-y: auto;
   padding-right: 4px;
@@ -712,7 +723,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 9px;
+  padding: 6px 8px;
   border-radius: var(--oc-radius-sm);
   cursor: pointer;
   transition: all 0.15s;
@@ -731,16 +742,16 @@ html, body {
 .queue-left {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   min-width: 0;
 }
 
 .queue-time-badge {
   background-color: var(--oc-primary-soft);
   color: var(--oc-primary);
-  padding: 2px 6px;
-  border-radius: 6px;
-  font-size: 8.5px;
+  padding: 2px 5px;
+  border-radius: 5px;
+  font-size: 8px;
   font-weight: 800;
   flex-shrink: 0;
 }
@@ -756,7 +767,7 @@ html, body {
 }
 
 .queue-patient {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 800;
   color: var(--oc-text-1);
   white-space: nowrap;
@@ -765,7 +776,7 @@ html, body {
 }
 
 .queue-desc {
-  font-size: 8px;
+  font-size: 7.5px;
   font-weight: 600;
   color: var(--oc-text-3);
   margin-top: 1px;
@@ -775,9 +786,9 @@ html, body {
 }
 
 .queue-status-chip {
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: var(--oc-radius-pill);
-  font-size: 7.5px;
+  font-size: 7px;
   font-weight: 800;
   flex-shrink: 0;
 }
@@ -793,17 +804,17 @@ html, body {
 }
 
 .queue-action-btn {
-  margin-top: 10px;
+  margin-top: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 7px;
   background-color: var(--oc-primary);
   color: #FFFFFF;
   border: none;
-  padding: 8px;
+  padding: 7px;
   border-radius: var(--oc-radius-sm);
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(30, 86, 214, 0.25);
@@ -817,8 +828,8 @@ html, body {
 }
 
 .queue-btn-icon {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   stroke: currentColor;
   stroke-width: 2.2;
   fill: none;
@@ -828,21 +839,21 @@ html, body {
 .patient-profile-header {
   display: flex;
   align-items: center;
-  gap: 11px;
-  margin-bottom: 11px;
+  gap: 10px;
+  margin-bottom: 9px;
   flex-shrink: 0;
 }
 
 .patient-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   background: var(--oc-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #FFFFFF;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   box-shadow: 0 3px 10px rgba(30, 86, 214, 0.25);
   flex-shrink: 0;
@@ -853,7 +864,7 @@ html, body {
 }
 
 .patient-title h3 {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--oc-text-1);
   white-space: nowrap;
@@ -862,7 +873,7 @@ html, body {
 }
 
 .patient-title p {
-  font-size: 8.5px;
+  font-size: 8px;
   font-weight: 600;
   color: var(--oc-text-3);
   margin-top: 1px;
@@ -874,8 +885,8 @@ html, body {
 .vitals-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 7px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 8px;
   flex-shrink: 0;
 }
 
@@ -883,11 +894,11 @@ html, body {
   background-color: var(--oc-bg);
   border: 1px solid var(--oc-border);
   border-radius: var(--oc-radius-sm);
-  padding: 5px 9px;
+  padding: 5px 8px;
 }
 
 .vital-label {
-  font-size: 6.5px;
+  font-size: 6.2px;
   font-weight: 800;
   color: var(--oc-text-3);
   letter-spacing: 0.5px;
@@ -895,23 +906,23 @@ html, body {
 }
 
 .vital-value {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--oc-text-1);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .billing-card {
   background-color: var(--oc-bg);
   border: 1px solid var(--oc-border);
   border-radius: var(--oc-radius-sm);
-  padding: 8px 11px;
-  margin-bottom: 9px;
+  padding: 7px 10px;
+  margin-bottom: 8px;
   flex-shrink: 0;
 }
 
 .billing-label {
-  font-size: 6.8px;
+  font-size: 6.5px;
   font-weight: 800;
   color: var(--oc-text-3);
   letter-spacing: 0.8px;
@@ -919,24 +930,24 @@ html, body {
 }
 
 .billing-amount {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 800;
   color: var(--oc-text-1);
-  margin-top: 2px;
+  margin-top: 1px;
   white-space: nowrap;
 }
 
 .billing-cpam {
-  font-size: 8.5px;
+  font-size: 8px;
   font-weight: 700;
   color: var(--oc-text-3);
 }
 
 .billing-rest {
-  font-size: 8px;
+  font-size: 7.5px;
   font-weight: 600;
   color: var(--oc-text-3);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .dossier-actions {
@@ -950,13 +961,13 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 6px;
   background-color: var(--oc-primary);
   color: #FFFFFF;
   border: none;
-  padding: 8px;
+  padding: 7px;
   border-radius: var(--oc-radius-sm);
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(30, 86, 214, 0.25);
@@ -971,13 +982,13 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 6px;
   background-color: var(--oc-surface);
   color: var(--oc-text-2);
   border: 1px solid var(--oc-border);
-  padding: 8px;
+  padding: 7px;
   border-radius: var(--oc-radius-sm);
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.15s;
@@ -988,11 +999,11 @@ html, body {
 }
 
 .dossier-footer-note {
-  font-size: 8px;
+  font-size: 7.5px;
   font-weight: 600;
   color: var(--oc-text-3);
   margin-top: auto;
-  padding-top: 6px;
+  padding-top: 4px;
   text-align: center;
   flex-shrink: 0;
 }

@@ -207,3 +207,35 @@ searchInput?.addEventListener('input', (e) => {
 // Initialisation
 renderAgenda();
 renderQueue();
+
+// Auto-scaling dynamique pour adapter exactement l'affichage PC à la taille du Preview
+function fitToWindow() {
+  const wrapper = document.getElementById('scaler-wrapper');
+  if (!wrapper) return;
+
+  const targetWidth = 1360;
+  const targetHeight = 880;
+
+  const availableWidth = window.innerWidth;
+  const availableHeight = window.innerHeight;
+
+  // Calcul du facteur d'échelle exact pour afficher 100% de la vue PC
+  const scaleX = availableWidth / targetWidth;
+  const scaleY = availableHeight / targetHeight;
+  const scale = Math.min(scaleX, scaleY);
+
+  wrapper.style.transform = `scale(${scale})`;
+
+  // Centrer dans la fenêtre si le ratio diffère
+  const scaledWidth = targetWidth * scale;
+  const scaledHeight = targetHeight * scale;
+  const offsetX = Math.max(0, (availableWidth - scaledWidth) / 2);
+  const offsetY = Math.max(0, (availableHeight - scaledHeight) / 2);
+
+  wrapper.style.left = `${offsetX}px`;
+  wrapper.style.top = `${offsetY}px`;
+}
+
+window.addEventListener('resize', fitToWindow);
+window.addEventListener('DOMContentLoaded', fitToWindow);
+setTimeout(fitToWindow, 100);
