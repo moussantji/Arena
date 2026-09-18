@@ -289,6 +289,23 @@ function openPatientDossierModal(patientId = null) {
   document.getElementById('modal-field-email').textContent = p.personalInfo.email;
   document.getElementById('modal-field-adresse').textContent = p.personalInfo.adresse;
 
+  // Statut Sous Couvert
+  // Vérifier si le patient a une consultation associée ou si son assurance est active
+  const csAssoc = consultationsList.find(c => c.patientId === p.id);
+  const isCouvert = (csAssoc ? csAssoc.sousCouvert : (p.sousCouvert ?? true)) && !p.insuranceInfo.assurance.includes("Direct comptant");
+
+  const headerScBadge = document.getElementById('modal-header-sc-badge');
+  if (headerScBadge) {
+    headerScBadge.className = `sc-badge ${isCouvert ? 'oui' : 'non'}`;
+    headerScBadge.textContent = isCouvert ? '✓ SOUS COUVERT' : '✕ HORS COUVERTURE';
+  }
+
+  const fieldScChip = document.getElementById('modal-field-sc-chip');
+  if (fieldScChip) {
+    fieldScChip.className = `sc-badge ${isCouvert ? 'oui' : 'non'}`;
+    fieldScChip.textContent = isCouvert ? '✓ OUI (Patient Sous Couvert)' : '✕ NON (Direct Comptant / Non Couvert)';
+  }
+
   // Section 2 : Assurance
   document.getElementById('modal-field-assurance').textContent = p.insuranceInfo.assurance;
   document.getElementById('modal-field-societe').textContent = p.insuranceInfo.societe;

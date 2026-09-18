@@ -24,7 +24,7 @@ window.clinicData = {
   },
   patients: [
     {
-      id: "P001",
+      id: "P001", sousCouvert: true,
       ref: "CLI-ML-2026-0841",
       ticket: "N° 0841",
       personalInfo: {
@@ -60,7 +60,7 @@ window.clinicData = {
       }
     },
     {
-      id: "P002",
+      id: "P002", sousCouvert: true,
       ref: "CLI-ML-2026-0842",
       ticket: "N° 0842",
       personalInfo: {
@@ -96,7 +96,7 @@ window.clinicData = {
       }
     },
     {
-      id: "P003",
+      id: "P003", sousCouvert: true,
       ref: "CLI-ML-2026-0843",
       ticket: "N° 0843",
       personalInfo: {
@@ -132,7 +132,7 @@ window.clinicData = {
       }
     },
     {
-      id: "P004",
+      id: "P004", sousCouvert: true,
       ref: "CLI-ML-2026-0844",
       ticket: "N° 0844",
       personalInfo: {

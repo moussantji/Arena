@@ -404,6 +404,7 @@
           <div class="patient-modal-title-row">
             <h3 id="modal-full-name">Mamadou TRAORÉ</h3>
             <span class="col-badge acc" id="modal-full-ref">CLI-ML-2026-0841</span>
+            <span class="sc-badge oui" id="modal-header-sc-badge">✓ SOUS COUVERT</span>
           </div>
           <p id="modal-full-sub">Patient Malien · Dossier Ophtalmologique Actif</p>
         </div>
@@ -461,6 +462,12 @@
           </div>
           <div class="modal-info-grid">
             <div class="info-cell">
+              <span class="info-label">PRISE EN CHARGE</span>
+              <span class="info-val" id="modal-field-souscouvert" style="display: flex; align-items: center; gap: 6px; font-weight: 800;">
+                <span class="sc-badge oui" id="modal-field-sc-chip">✓ OUI (Sous Couvert)</span>
+              </span>
+            </div>
+            <div class="info-cell">
               <span class="info-label">ORGANISME / ASSURANCE</span>
               <span class="info-val badge-assurance" id="modal-field-assurance">CANAM (AMO)</span>
             </div>
@@ -472,8 +479,8 @@
               <span class="info-label">N° ASSURÉ / MATRICULE</span>
               <span class="info-val highlight" id="modal-field-numass">AMO-ML-78459201-B</span>
             </div>
-            <div class="info-cell">
-              <span class="info-label">DATE VALIDITÉ ASSURANCE</span>
+            <div class="info-cell full-width">
+              <span class="info-label">DATE DE VALIDITÉ DE L'ASSURANCE</span>
               <span class="info-val valid" id="modal-field-valiass">31/12/2026 (Valide)</span>
             </div>
           </div>
@@ -692,7 +699,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=22"></script>
-  <script src="renderer.js?v=22"></script>
+  <script src="data.js?v=23"></script>
+  <script src="renderer.js?v=23"></script>
 </body>
 </html>
