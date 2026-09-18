@@ -178,4 +178,4 @@ window.clinicData = {
 };
 
 // Export ESM pour compatibilité si nécessaire
-export const clinicData = window.clinicData;
+

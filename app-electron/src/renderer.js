@@ -477,14 +477,18 @@ function fitToWindow() {
   const targetWidth = 1360;
   const targetHeight = 880;
 
-  const availableWidth = window.innerWidth;
-  const availableHeight = window.innerHeight;
+  // Récupération fiable des dimensions du viewport
+  const availableWidth = document.documentElement.clientWidth || window.innerWidth;
+  const availableHeight = document.documentElement.clientHeight || window.innerHeight;
+
+  if (!availableWidth || !availableHeight) return;
 
   // Calcul du facteur d'échelle pour faire rentrer exactement toute l'app
   const scaleX = availableWidth / targetWidth;
   const scaleY = availableHeight / targetHeight;
   const scale = Math.min(scaleX, scaleY);
 
+  wrapper.style.transformOrigin = 'top left';
   wrapper.style.transform = `scale(${scale})`;
 
   const scaledWidth = targetWidth * scale;
@@ -497,10 +501,15 @@ function fitToWindow() {
   wrapper.style.position = 'absolute';
   wrapper.style.left = `${offsetX}px`;
   wrapper.style.top = `${offsetY}px`;
+
+  // Empêcher tout scroll parasite
+  document.body.style.width = `${availableWidth}px`;
+  document.body.style.height = `${availableHeight}px`;
+  document.body.style.overflow = 'hidden';
 }
 
 window.addEventListener('resize', fitToWindow);
+window.addEventListener('DOMContentLoaded', fitToWindow);
 window.addEventListener('load', fitToWindow);
 fitToWindow();
-setTimeout(fitToWindow, 100);
-setTimeout(fitToWindow, 500);
+setInterval(fitToWindow, 1000);
