@@ -12,30 +12,6 @@ const P = {
     side: '#0C1A30', sideTx: '#B9C7E0', ga: '#1E56D6', gb: '#4F86FF',
     accentName: 'Accent or', photo: IMG + '/bg-clinique-bleue.jpg',
   },
-  2: {
-    num: '02', nameA: 'Émeraude', nameB: '& Sable', mood: ['Apaisement', 'Nature', 'Prestige'],
-    use: 'Espace patient & bilans — suivi cataracte / post-op',
-    specs: ['RADIUS 14 PX', 'SIDEBAR 240 PX', 'BASE 14 PX'],
-    bg: '#F5F3EC', surface: '#FFFFFF', s2: '#EFECE1', border: '#E0DBCB',
-    t1: '#13251E', t2: '#48584F', t3: '#8A948C',
-    pri: '#0F6B52', priH: '#0B5540', priS: '#DFF0E8',
-    acc: '#B0702A', accS: '#F5E9D6',
-    ok: '#2F7D4E', okS: '#E3F1E7', warn: '#A26605', warnS: '#F6EDD8', err: '#B23F2C', errS: '#F7E5E0',
-    side: '#10221B', sideTx: '#B4C9BC', ga: '#0F6B52', gb: '#37A37F',
-    accentName: 'Accent cuivre', photo: IMG + '/bg-clinique-emeraude.jpg',
-  },
-  3: {
-    num: '03', nameA: 'Onyx', nameB: '& Iris', mood: ['Technologie', 'Nuit', 'Signature'],
-    use: 'Mode sombre — imagerie OCT, fond d’œil & gardes',
-    specs: ['RADIUS 12 PX', 'NAV GLASS', 'NIGHT MODE'],
-    bg: '#0B0D13', surface: '#141824', s2: '#1C2130', border: '#272E42',
-    t1: '#F1F3FA', t2: '#A7AEC6', t3: '#6E7592',
-    pri: '#7B5CF6', priH: '#9377FF', priS: '#292349',
-    acc: '#FF9E6D', accS: '#3B2B21',
-    ok: '#34D399', okS: '#123227', warn: '#F5B62E', warnS: '#352B10', err: '#F0716B', errS: '#3A1E1E',
-    side: '#0E1119', sideTx: '#9AA1BC', ga: '#7B5CF6', gb: '#B18CFF',
-    accentName: 'Accent abricot', photo: IMG + '/bg-iris-sombre.jpg',
-  },
 };
 
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');

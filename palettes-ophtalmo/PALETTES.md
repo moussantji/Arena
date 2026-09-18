@@ -1,70 +1,43 @@
-# Oculis · 3 palettes ultra-premium — Gestion clinique ophtalmo & Réception
+# Oculis · Saphir & Ambre — thème unique de la clinique
 
-> ✅ **Palette retenue : 01 · Saphir & Ambre**
-> **PNG finale (palette 01)** : `png/01-saphir-ambre-pc-mobile-final.png` — PC (Electron) + Mobile (React Native) en pleine taille, pilotage clinique (KPI, CA, agenda, file d'attente, facturation) + photo de la clinique en fond
-> Aperçu live : `index.html` (tokens cliquables + mockups PC & mobile de l'écran Réception)
-> PNG unifiée 3 palettes : `png/00-3-palettes-en-1-clinique.png` — les 3 palettes en une image
-> PNG par palette : dossier `png/` (1 par palette × PC Electron / Mobile React Native + comparatifs)
-> Images de fond (générées) : dossier `img/` (réception, salle d'attente, iris, texture imagerie)
+> ✅ **Seul thème retenu** (au départ 3 propositions : Saphir & Ambre, Émeraude & Sable, Onyx & Iris — les 2 autres ont été retirées du repo).
+> **PNG livrable** : `png/01-saphir-ambre-pc-mobile-final.png` — PC (Electron) + Mobile (React Native) en pleine taille, pilotage clinique (KPI, CA, agenda, file d'attente, facturation) + photo de la réception en fond
+> Aperçu live : `index.html` — tokens cliquables (copie du hex) + mockups PC & mobile de l'écran Réception + export CSS 1-clic
 
-## Fichiers de thème prêts à l'emploi
+## Identité
 
-- **Electron (PC)** → `electron/oculis.theme.css` — variables CSS, commutation `<html data-theme="saphir|emeraude|onyx">`
-- **React Native (mobile)** → `react-native/oculis.theme.js` — `import { saphir, emeraude, onyx } from './oculis.theme'`, hex + radius + shadow + dégradés
+- **Nom** : Saphir & Ambre
+- **Humeurs** : Précision · Confiance · Luxe sobre
+- **Usage** : interface PC de gestion + écran de réception (palette de référence de toute la clinique)
+- **Spécimens** : radius 14 px · sidebar 240 px · base 14 px · contraste AA
 
-## 01 · Saphir & Ambre — *Précision · Confiance · Luxe sobre*
-Recommandation : interface PC de gestion + écran de réception (palette de référence).
+## Tokens
 
 | Rôle | Hex | | Rôle | Hex |
 |---|---|---|---|---|
 | Fond | `#F3F6FB` | | Primaire | `#1E56D6` |
 | Surface | `#FFFFFF` | | Primaire hover | `#1744AC` |
 | Surface 2 | `#E9EFF8` | | Primaire soft | `#E2EAFC` |
-| Bordure | `#D7E0EE` | | Accent or | `#C08A2D` |
+| Bordure | `#D7E0EE` | | Accent (or) | `#C08A2D` |
 | Texte 1 | `#0C1A30` | | Accent soft | `#F6ECDA` |
-| Texte 2 | `#43536E` | | Succès / soft | `#1F8A58` / `#DFF3E8` |
-| Texte 3 | `#8492AB` | | Alerte / soft | `#A86400` / `#FAEDD7` |
-| Sidebar PC | `#0C1A30` | | Erreur / soft | `#C13B3B` / `#FAE4E4` |
-| Dégradé | `#1E56D6 → #4F86FF` | | | |
+| Texte 2 | `#43536E` | | Succès | `#1F8A58` |
+| Texte 3 | `#8492AB` | | Alerte | `#A86400` |
+| Erreur | `#C13B3B` | | Sidebar | `#0C1A30` |
+| Sidebar texte | `#B9C7E0` | | Dégradé | `linear-gradient(135deg, #1E56D6, #4F86FF)` |
+| Radius | 14 / 18 px | | Ombre | `0 14px 34px rgba(12,26,48,.10)` |
 
-- **PC** : sidebar 240px encre marine, item actif pastille saphir + point or, cards radius 12–14px, bordures hairline `#D7E0EE`, ombre douce 14px/10 %, base 14px.
-- **Mobile** : bottom nav blanc 56px (item actif saphir + point), hero dégradé saphir radius 18px, boutons blancs 92 %, cibles tactiles ≥ 44px, chips d'état en soft pour lecture à 2 m.
+## Fichiers de thème prêts à l'emploi
 
-## 02 · Émeraude & Sable — *Apaisement · Nature · Prestige*
-Idéal : espace patient & bilans, cliniques premium, suivi cataracte / post-op.
+- **Electron (PC)** → `electron/oculis.theme.css` — variables CSS `--oc-*` + composants types (`.oc-card`, `.oc-btn-primary`, `.oc-chip`, `.oc-sidebar`)
+- **React Native (mobile)** → `react-native/oculis.theme.js` — `import saphir from './oculis.theme'` (hex, radius, shadow, dégradé)
 
-| Rôle | Hex | | Rôle | Hex |
-|---|---|---|---|---|
-| Fond | `#F5F3EC` | | Primaire | `#0F6B52` |
-| Surface | `#FFFFFF` | | Primaire hover | `#0B5540` |
-| Surface 2 | `#EFECE1` | | Primaire soft | `#DFF0E8` |
-| Bordure | `#E0DBCB` | | Accent cuivre | `#B0702A` |
-| Texte 1 | `#13251E` | | Accent soft | `#F5E9D6` |
-| Texte 2 | `#48584F` | | Succès / soft | `#2F7D4E` / `#E3F1E7` |
-| Texte 3 | `#8A948C` | | Alerte / soft | `#A26605` / `#F6EDD8` |
-| Sidebar PC | `#10221B` | | Erreur / soft | `#B23F2C` / `#F7E5E0` |
-| Dégradé | `#0F6B52 → #37A37F` | | | |
+## Images
 
-- **PC** : sidebar 240px pin forêt, item actif émeraude + point cuivre, fond crème, cuivre en accent ≤ 5 % (points actifs, badges dossier, facturation).
-- **Mobile** : bottom nav crème + hairline sable, hero dégradé émeraude + halo blanc 14 %, pastilles d'actions soft émeraude ; tablette paysage pour la file d'attente, portrait pour le check-in.
+- `png/01-saphir-ambre-pc-mobile-final.png` — livrable final PC + Mobile (1440×1360)
+- `png/01-saphir-ambre-pc-electron.png` / `png/01-saphir-ambre-mobile-react-native.png` — écrans individuels en grand
+- `img/bg-clinique-bleue.jpg` — photo de la réception (bannière des écrans)
+- `img/bg-texture-sombre.jpg` — texture imagerie (fond des maquettes)
 
-## 03 · Onyx & Iris — *Technologie · Nuit · Signature*
-Signature : mode sombre, salle d'imagerie OCT / fond d'œil, app patient premium.
+## Régénérer les PNG (outillage)
 
-| Rôle | Hex | | Rôle | Hex |
-|---|---|---|---|---|
-| Fond | `#0B0D13` | | Primaire iris | `#7B5CF6` |
-| Surface | `#141824` | | Primaire hover | `#9377FF` |
-| Surface 2 | `#1C2130` | | Primaire soft | `#292349` |
-| Bordure | `#272E42` | | Accent abricot | `#FF9E6D` |
-| Texte 1 | `#F1F3FA` | | Accent soft | `#3B2B21` |
-| Texte 2 | `#A7AEC6` | | Succès / soft | `#34D399` / `#123227` |
-| Texte 3 | `#6E7592` | | Alerte / soft | `#F5B62E` / `#352B10` |
-| Sidebar PC | `#0E1119` | | Erreur / soft | `#F0716B` / `#3A1E1E` |
-| Dégradé | `#7B5CF6 → #B18CFF` | | | |
-
-- **PC** : 3 niveaux de surface (jamais de noir pur), bordures `#272E42`, item actif pastille iris + lueur douce + point abricot, texte blanc max 90 % (anti-éblouissement), profondeur par ombres 40 %.
-- **Mobile** : bottom nav « pillule glass » (blur 10 px, `#141824` 92 %), hero dégradé iris radius 18px, états neon-doux (pastilles sombres + texte vif), usage main courante pour le check-in.
-
----
-*Contraste : texte principal ≥ 12:1 sur fond dans les 3 palettes ; états toujours en duo « soft + saturé » pour rester accessibles.*
+`tools-shots/` : `node gen4.js` (livrable final) à partir de `mockups.js` (mockups PC 880×720 & mobile 380×860). Nécessite `fonts-ttf/` : recopier les WOFF `node_modules/@fontsource/{manrope,fraunces,jetbrains-mono}/files/*-latin-*.woff` dans `fonts/` puis `node convert-fonts.js`.

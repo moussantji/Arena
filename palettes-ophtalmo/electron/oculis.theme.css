@@ -1,10 +1,9 @@
 /* ============================================================
-   OCULIS — Thèmes CSS pour Electron (PC)
+   OCULIS — Thème Saphir & Ambre pour Electron (PC)
    Ophtalmologie · Gestion de clinique & Réception
-   Utilisation : <html data-theme="saphir"> (ou emeraude / onyx)
+   Utilisation : inclus tel quel (le thème est le seul de l'app)
    ============================================================ */
 
-/* ---------- 01 · SAPHIR & AMBRE (défaut) ---------- */
 :root,
 [data-theme="saphir"] {
   --oc-bg: #F3F6FB;
@@ -32,64 +31,6 @@
   --oc-radius-lg: 18px;
   --oc-shadow: 0 14px 34px rgba(12, 26, 48, 0.10);
   color-scheme: light;
-}
-
-/* ---------- 02 · ÉMERAUDE & SABLE ---------- */
-[data-theme="emeraude"] {
-  --oc-bg: #F5F3EC;
-  --oc-surface: #FFFFFF;
-  --oc-surface-2: #EFECE1;
-  --oc-border: #E0DBCB;
-  --oc-text-1: #13251E;
-  --oc-text-2: #48584F;
-  --oc-text-3: #8A948C;
-  --oc-primary: #0F6B52;
-  --oc-primary-hover: #0B5540;
-  --oc-primary-soft: #DFF0E8;
-  --oc-accent: #B0702A;
-  --oc-accent-soft: #F5E9D6;
-  --oc-success: #2F7D4E;
-  --oc-success-soft: #E3F1E7;
-  --oc-warning: #A26605;
-  --oc-warning-soft: #F6EDD8;
-  --oc-danger: #B23F2C;
-  --oc-danger-soft: #F7E5E0;
-  --oc-sidebar: #10221B;
-  --oc-sidebar-text: #B4C9BC;
-  --oc-gradient: linear-gradient(135deg, #0F6B52, #37A37F);
-  --oc-radius: 14px;
-  --oc-radius-lg: 18px;
-  --oc-shadow: 0 14px 34px rgba(19, 37, 30, 0.10);
-  color-scheme: light;
-}
-
-/* ---------- 03 · ONYX & IRIS (sombre) ---------- */
-[data-theme="onyx"] {
-  --oc-bg: #0B0D13;
-  --oc-surface: #141824;
-  --oc-surface-2: #1C2130;
-  --oc-border: #272E42;
-  --oc-text-1: #F1F3FA;
-  --oc-text-2: #A7AEC6;
-  --oc-text-3: #6E7592;
-  --oc-primary: #7B5CF6;
-  --oc-primary-hover: #9377FF;
-  --oc-primary-soft: #292349;
-  --oc-accent: #FF9E6D;
-  --oc-accent-soft: #3B2B21;
-  --oc-success: #34D399;
-  --oc-success-soft: #123227;
-  --oc-warning: #F5B62E;
-  --oc-warning-soft: #352B10;
-  --oc-danger: #F0716B;
-  --oc-danger-soft: #3A1E1E;
-  --oc-sidebar: #0E1119;
-  --oc-sidebar-text: #9AA1BC;
-  --oc-gradient: linear-gradient(135deg, #7B5CF6, #B18CFF);
-  --oc-radius: 12px;
-  --oc-radius-lg: 20px;
-  --oc-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
-  color-scheme: dark;
 }
 
 /* ---------- Composants types (réception) ---------- */

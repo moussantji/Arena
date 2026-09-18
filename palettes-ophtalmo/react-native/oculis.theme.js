@@ -1,11 +1,9 @@
 /* ============================================================
-   OCULIS — Thèmes pour React Native (mobile)
+   OCULIS — Thème Saphir & Ambre pour React Native (mobile)
    Ophtalmologie · Gestion de clinique & Réception
-   Import : import { saphir, emeraude, onyx } from './oculis.theme'
-   Usage  : const t = saphir;  <View style={{ backgroundColor: t.surface }} />
+   Import : import saphir from './oculis.theme'   (ou { saphir })
+   Usage  : const t = saphir;  <View style={{ backgroundColor: t.bg }} />
    ============================================================ */
-
-/** @typedef {keyof import('./types').OculisTheme} ThemeName */
 
 const saphir = {
   name: 'saphir',
@@ -36,65 +34,5 @@ const saphir = {
   shadow: { shadowColor: '#0C1A30', shadowOpacity: 0.10, shadowRadius: 17, shadowOffset: { width: 0, height: 14 }, elevation: 5 },
 };
 
-const emeraude = {
-  name: 'emeraude',
-  label: 'Émeraude & Sable',
-  dark: false,
-  bg: '#F5F3EC',
-  surface: '#FFFFFF',
-  surface2: '#EFECE1',
-  border: '#E0DBCB',
-  text1: '#13251E',
-  text2: '#48584F',
-  text3: '#8A948C',
-  primary: '#0F6B52',
-  primaryHover: '#0B5540',
-  primarySoft: '#DFF0E8',
-  accent: '#B0702A',
-  accentSoft: '#F5E9D6',
-  success: '#2F7D4E',
-  successSoft: '#E3F1E7',
-  warning: '#A26605',
-  warningSoft: '#F6EDD8',
-  danger: '#B23F2C',
-  dangerSoft: '#F7E5E0',
-  navBar: '#F5F3EC',
-  gradient: ['#0F6B52', '#37A37F'],
-  radius: 14,
-  radiusLg: 18,
-  shadow: { shadowColor: '#13251E', shadowOpacity: 0.10, shadowRadius: 17, shadowOffset: { width: 0, height: 14 }, elevation: 5 },
-};
-
-const onyx = {
-  name: 'onyx',
-  label: 'Onyx & Iris',
-  dark: true,
-  bg: '#0B0D13',
-  surface: '#141824',
-  surface2: '#1C2130',
-  border: '#272E42',
-  text1: '#F1F3FA',
-  text2: '#A7AEC6',
-  text3: '#6E7592',
-  primary: '#7B5CF6',
-  primaryHover: '#9377FF',
-  primarySoft: '#292349',
-  accent: '#FF9E6D',
-  accentSoft: '#3B2B21',
-  success: '#34D399',
-  successSoft: '#123227',
-  warning: '#F5B62E',
-  warningSoft: '#352B10',
-  danger: '#F0716B',
-  dangerSoft: '#3A1E1E',
-  navBar: '#141824',
-  gradient: ['#7B5CF6', '#B18CFF'],
-  radius: 12,
-  radiusLg: 20,
-  shadow: { shadowColor: '#000000', shadowOpacity: 0.50, shadowRadius: 22, shadowOffset: { width: 0, height: 18 }, elevation: 8 },
-};
-
-const themes = { saphir, emeraude, onyx };
-
-export { saphir, emeraude, onyx, themes };
-export default themes;
+export { saphir };
+export default saphir;
