@@ -6,9 +6,11 @@
 }
 
 html, body {
+  min-width: 1280px;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: auto;
   font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--oc-text-1);
   background-color: var(--oc-chrome-bg);
@@ -20,8 +22,9 @@ html, body {
 .app-window {
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: 100vh;
+  min-width: 1280px;
+  width: 100%;
+  min-height: 100vh;
   background-color: var(--oc-chrome-bg);
 }
 
@@ -80,9 +83,10 @@ html, body {
 .app-container {
   display: flex;
   flex: 1;
-  height: calc(100vh - 44px);
+  min-width: 1280px;
+  min-height: calc(100vh - 44px);
   background-color: var(--oc-bg);
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 /* Sidebar */
@@ -245,10 +249,10 @@ html, body {
 /* Main Content Area */
 .app-content {
   flex: 1;
+  min-width: 1060px;
   display: flex;
   flex-direction: column;
   padding: 18px 24px 22px;
-  overflow-y: auto;
   gap: 14px;
 }
 
@@ -475,7 +479,7 @@ html, body {
 /* KPI Cards Grid */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr) !important;
   gap: 14px;
   flex-shrink: 0;
 }
@@ -497,7 +501,7 @@ html, body {
 }
 
 .kpi-value {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
   color: var(--oc-text-1);
   margin: 5px 0 6px;
@@ -535,10 +539,10 @@ html, body {
 /* Columns Section */
 .dashboard-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr !important;
   gap: 14px;
   flex: 1;
-  min-height: 0;
+  min-height: 380px;
 }
 
 .column-card {
@@ -1155,32 +1159,4 @@ html, body {
   width: 7px;
   height: 7px;
   background-color: var(--oc-accent);
-}
-
-/* Verrouillage strict de la vue PC Desktop (minimum 1280px) */
-html, body {
-  min-width: 1280px;
-  overflow-x: auto;
-}
-
-.app-window {
-  min-width: 1280px;
-  width: 100%;
-}
-
-.app-container {
-  min-width: 1280px;
-}
-
-.dashboard-columns {
-  grid-template-columns: 1fr 1fr 1fr !important;
-}
-
-.kpi-grid {
-  grid-template-columns: repeat(4, 1fr) !important;
-}
-
-.app-sidebar {
-  width: 220px !important;
-  min-width: 220px !important;
 }
