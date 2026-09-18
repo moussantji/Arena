@@ -1157,3 +1157,167 @@ html, body {
   border-radius: 50%;
   background-color: var(--oc-accent);
 }
+
+/* ============================================================
+   RESPONSIVE DESIGN (PC écrans moyens, petits laptops & mobile)
+   ============================================================ */
+
+/* 1. Laptops standards & petits écrans PC (<= 1280px) */
+@media (max-width: 1280px) {
+  .app-sidebar {
+    width: 200px;
+    min-width: 200px;
+    padding: 14px 10px;
+  }
+  .app-content {
+    padding: 16px 20px 20px;
+    gap: 12px;
+  }
+  .kpi-value {
+    font-size: 18px;
+  }
+  .dashboard-columns {
+    gap: 12px;
+  }
+  .column-card {
+    padding: 13px;
+  }
+}
+
+/* 2. Format compact / fenêtré côte à côte (<= 1100px) */
+@media (max-width: 1100px) {
+  .app-sidebar {
+    width: 70px;
+    min-width: 70px;
+    padding: 14px 8px;
+    align-items: center;
+  }
+  .brand-text, 
+  .nav-item span, 
+  .nav-accent-dot, 
+  .user-info {
+    display: none !important;
+  }
+  .sidebar-brand {
+    padding: 0 0 14px;
+    justify-content: center;
+  }
+  .nav-item {
+    justify-content: center;
+    padding: 10px;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+  }
+  .sidebar-footer {
+    padding-top: 10px;
+  }
+  .user-profile {
+    padding: 0;
+    justify-content: center;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dashboard-columns {
+    grid-template-columns: 1fr 1fr;
+  }
+  .column-card:last-child {
+    grid-column: span 2;
+  }
+}
+
+/* 3. Tablettes & écran vertical (<= 860px) */
+@media (max-width: 860px) {
+  html, body {
+    overflow: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+  .app-window {
+    height: auto;
+    min-height: 100vh;
+  }
+  .app-container {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+  .app-sidebar {
+    width: 100%;
+    min-width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-radius: 0;
+  }
+  .sidebar-brand {
+    padding: 0;
+  }
+  .brand-text {
+    display: block !important;
+  }
+  .sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 6px;
+    margin: 0;
+    padding: 0 10px;
+  }
+  .nav-item {
+    width: auto;
+    height: auto;
+    padding: 6px 10px;
+  }
+  .nav-item span {
+    display: block !important;
+    font-size: 10px;
+  }
+  .sidebar-footer {
+    display: none;
+  }
+  .app-content {
+    padding: 14px;
+    overflow: visible;
+    height: auto;
+  }
+  .content-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .topbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .search-box {
+    flex: 1;
+  }
+  .dashboard-columns {
+    grid-template-columns: 1fr;
+  }
+  .column-card:last-child {
+    grid-column: auto;
+  }
+}
+
+/* 4. Téléphones (<= 480px) */
+@media (max-width: 480px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .clinic-banner {
+    height: auto;
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .banner-action-btn {
+    align-self: flex-start;
+  }
+  .vitals-grid {
+    grid-template-columns: 1fr;
+  }
+}
