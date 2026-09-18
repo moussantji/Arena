@@ -1,87 +1,154 @@
-/* ============================================================
-   VUE GESTION DES PATIENTS
-   ============================================================ */
+/* ==========================================================================
+   MODULE GESTION DES PATIENTS — OCULIS CLINIC (Saphir & Ambre)
+   ========================================================================== */
 
-.patients-view-container {
+.view-patients-container {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  flex: 1;
-  min-height: 0;
+  height: 100%;
+  gap: 16px;
 }
 
-/* Actions Header */
+/* Barre d'outils et de filtres */
 .patients-toolbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   background-color: var(--oc-surface);
   border: 1px solid var(--oc-border);
   border-radius: var(--oc-radius);
-  padding: 12px 18px;
+  padding: 12px 16px;
   box-shadow: var(--oc-shadow-card);
-  flex-shrink: 0;
+  gap: 14px;
 }
 
-.patients-filters {
+.patients-search-box {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.search-patient-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   background-color: var(--oc-bg);
   border: 1px solid var(--oc-border);
-  padding: 6px 14px;
-  border-radius: var(--oc-radius-pill);
-  width: 260px;
+  border-radius: var(--oc-radius-sm);
+  padding: 7px 14px;
+  flex: 1;
+  max-width: 360px;
+  color: var(--oc-text-3);
+  transition: all 0.2s ease;
 }
 
-.search-patient-bar input {
+.patients-search-box:focus-within {
+  border-color: var(--oc-primary);
+  box-shadow: 0 0 0 3px rgba(30, 86, 214, 0.12);
+  color: var(--oc-primary);
+}
+
+.patients-search-box input {
   border: none;
   background: transparent;
   outline: none;
-  font-size: 10.5px;
   font-family: inherit;
+  font-size: 11.5px;
   font-weight: 600;
   color: var(--oc-text-1);
   width: 100%;
 }
 
-.filter-select {
-  background-color: var(--oc-bg);
-  border: 1px solid var(--oc-border);
-  padding: 6px 12px;
-  border-radius: var(--oc-radius-sm);
-  font-size: 10.5px;
-  font-weight: 700;
-  color: var(--oc-text-2);
-  outline: none;
-  cursor: pointer;
-}
-
-.btn-add-patient {
+.patients-filters {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--oc-primary);
-  color: #FFFFFF;
-  border: none;
+}
+
+.filter-select {
+  border: 1px solid var(--oc-border);
+  background-color: var(--oc-bg);
+  color: var(--oc-text-2);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 7px 12px;
+  border-radius: var(--oc-radius-sm);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.filter-select:hover {
+  border-color: var(--oc-primary-light);
+}
+
+/* Groupe d'actions à droite : Exporter Excel à GAUCHE de Nouveau Patient */
+.patients-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Bouton Exporter Excel (style ambre/saphir soigné, pro et élégant) */
+.btn-export-excel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  color: #15803d; /* vert forêt / excel élégant */
+  border: 1px solid #bbf7d0;
   padding: 8px 16px;
   border-radius: var(--oc-radius-pill);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 800;
+  letter-spacing: 0.2px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(30, 86, 214, 0.25);
-  transition: all 0.15s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-export-excel svg {
+  color: #16a34a;
+  transition: transform 0.2s ease;
+}
+
+.btn-export-excel:hover {
+  background-color: #f0fdf4;
+  border-color: #86efac;
+  color: #166534;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+  transform: translateY(-1px);
+}
+
+.btn-export-excel:hover svg {
+  transform: scale(1.1);
+}
+
+.btn-export-excel:active {
+  transform: translateY(0);
+}
+
+/* Bouton Nouveau Patient */
+.btn-add-patient {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--oc-primary) 0%, #1545b3 100%);
+  color: #FFFFFF;
+  border: none;
+  padding: 8px 18px;
+  border-radius: var(--oc-radius-pill);
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(30, 86, 214, 0.28);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-add-patient:hover {
-  background-color: var(--oc-primary-hover);
+  background: linear-gradient(135deg, var(--oc-primary-hover) 0%, #1a4fc2 100%);
+  box-shadow: 0 6px 18px rgba(30, 86, 214, 0.38);
   transform: translateY(-1px);
+}
+
+.btn-add-patient:active {
+  transform: translateY(0);
 }
 
 /* Table Container */
@@ -99,10 +166,10 @@
 .patients-table-header {
   display: grid;
   grid-template-columns: 140px 220px 95px 145px 200px 160px 120px;
-  padding: 12px 16px;
+  padding: 12px 18px;
   background-color: var(--oc-bg);
   border-bottom: 1px solid var(--oc-border);
-  font-size: 8.5px;
+  font-size: 9px;
   font-weight: 800;
   color: var(--oc-text-3);
   letter-spacing: 0.8px;
@@ -112,23 +179,21 @@
 .patients-table-body {
   flex: 1;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
 }
 
+/* Ligne Patient (cliquable avec effet hover délicat) */
 .patient-row {
   display: grid;
   grid-template-columns: 140px 220px 95px 145px 200px 160px 120px;
-  padding: 10px 16px;
-  align-items: center;
+  padding: 12px 18px;
   border-bottom: 1px solid var(--oc-border);
-  font-size: 11px;
+  align-items: center;
+  transition: all 0.15s ease;
   cursor: pointer;
-  transition: background-color 0.15s;
 }
 
 .patient-row:hover {
-  background-color: var(--oc-surface-2);
+  background-color: rgba(30, 86, 214, 0.04);
 }
 
 .patient-row:last-child {
@@ -136,10 +201,15 @@
 }
 
 .p-col-ref {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 800;
+  font-family: var(--oc-font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
   color: var(--oc-primary);
-  font-size: 10px;
+  background-color: var(--oc-primary-soft);
+  padding: 3px 7px;
+  border-radius: var(--oc-radius-xs);
+  display: inline-block;
+  width: fit-content;
 }
 
 .p-col-name {
@@ -149,12 +219,12 @@
 }
 
 .p-avatar-sm {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  background: var(--oc-gradient);
-  color: #FFF;
-  font-size: 9.5px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--oc-radius-full);
+  background: linear-gradient(135deg, var(--oc-accent) 0%, #A3731E 100%);
+  color: #FFFFFF;
+  font-size: 10.5px;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -168,89 +238,227 @@
 }
 
 .p-name-main {
+  font-size: 11.5px;
   font-weight: 800;
   color: var(--oc-text-1);
 }
 
 .p-name-sub {
-  font-size: 8.5px;
+  font-size: 9.5px;
+  font-weight: 600;
   color: var(--oc-text-3);
 }
 
 .p-col-sexe {
+  font-size: 11px;
   font-weight: 700;
   color: var(--oc-text-2);
 }
 
 .p-col-tel {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9.5px;
-  font-weight: 600;
-  color: var(--oc-text-2);
+  font-family: var(--oc-font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--oc-text-1);
 }
 
 .p-col-addr {
-  font-size: 9.5px;
+  font-size: 10.5px;
+  font-weight: 600;
   color: var(--oc-text-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding-right: 8px;
+  padding-right: 12px;
 }
 
 .p-col-ass {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .p-ass-badge {
-  font-size: 9px;
+  background-color: var(--oc-accent-soft);
+  color: var(--oc-accent);
+  border: 1px solid rgba(192, 138, 45, 0.25);
+  font-size: 9.5px;
   font-weight: 800;
-  color: var(--oc-primary);
+  padding: 2px 6px;
+  border-radius: var(--oc-radius-xs);
+  width: fit-content;
 }
 
 .p-ass-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
+  font-family: var(--oc-font-mono);
+  font-size: 9px;
   color: var(--oc-text-3);
 }
 
 .p-col-nat {
+  font-size: 10.5px;
   font-weight: 700;
   color: var(--oc-text-2);
+}
+
+/* Modal Dossier Patient */
+.patient-modal-card {
+  width: 600px !important;
+  max-width: 90vw;
+  padding: 0 !important;
+  overflow: hidden;
+  background-color: var(--oc-surface);
+  border-radius: var(--oc-radius-lg);
+  box-shadow: var(--oc-shadow-modal);
+}
+
+.patient-modal-header {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 14px;
+  padding: 18px 24px;
+  background-color: var(--oc-primary-soft);
+  border-bottom: 1px solid var(--oc-border);
+  position: relative;
 }
 
-.p-col-actions {
+.patient-modal-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--oc-radius-full);
+  background: linear-gradient(135deg, var(--oc-accent) 0%, #A3731E 100%);
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 900;
   display: flex;
-  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(192, 138, 45, 0.25);
 }
 
-.p-btn-action {
-  padding: 4px 10px;
-  border-radius: var(--oc-radius-sm);
-  border: 1px solid var(--oc-border);
-  background: var(--oc-surface);
-  font-size: 9.5px;
-  font-weight: 800;
+.patient-modal-title {
+  flex: 1;
+}
+
+.patient-modal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.patient-modal-title-row h3 {
+  font-size: 16px;
+  font-weight: 900;
   color: var(--oc-text-1);
+}
+
+.patient-modal-title p {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--oc-text-3);
+  margin-top: 2px;
+}
+
+.modal-close-icon-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--oc-text-3);
   cursor: pointer;
+  padding: 6px;
+  border-radius: var(--oc-radius-sm);
   transition: all 0.15s;
 }
 
-.p-btn-action:hover {
-  background: var(--oc-primary);
-  color: #FFF;
-  border-color: var(--oc-primary);
+.modal-close-icon-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--oc-text-1);
 }
 
-/* Modal Création Nouveau Patient */
+.patient-modal-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.modal-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: var(--oc-primary);
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--oc-border);
+  padding-bottom: 6px;
+}
+
+.modal-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background-color: var(--oc-bg);
+  padding: 8px 12px;
+  border-radius: var(--oc-radius-sm);
+  border: 1px solid var(--oc-border);
+}
+
+.info-cell.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-label {
+  font-size: 8.5px;
+  font-weight: 800;
+  color: var(--oc-text-3);
+  letter-spacing: 0.5px;
+}
+
+.info-val {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--oc-text-1);
+}
+
+.info-val.highlight {
+  font-family: var(--oc-font-mono);
+  color: var(--oc-primary);
+  font-weight: 800;
+}
+
+.info-val.badge-assurance {
+  color: var(--oc-accent);
+  font-weight: 800;
+}
+
+.info-val.valid {
+  color: var(--oc-success);
+  font-weight: 700;
+}
+
+/* Formulaire Nouveau Patient */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px 14px;
+  gap: 12px;
+  margin-top: 10px;
 }
 
 .form-group {
@@ -259,98 +467,32 @@
   gap: 4px;
 }
 
-.form-group.full {
-  grid-column: span 2;
+.form-group.full-width {
+  grid-column: 1 / -1;
 }
 
 .form-label {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 800;
-  color: var(--oc-text-3);
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
+  color: var(--oc-text-2);
+  letter-spacing: 0.5px;
 }
 
 .form-input, .form-select {
-  background-color: var(--oc-surface);
   border: 1px solid var(--oc-border);
-  border-radius: var(--oc-radius-sm);
-  padding: 7px 10px;
-  font-size: 11px;
-  font-family: inherit;
-  font-weight: 600;
+  background-color: var(--oc-bg);
   color: var(--oc-text-1);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 7px 10px;
+  border-radius: var(--oc-radius-sm);
   outline: none;
-  transition: border-color 0.15s;
+  transition: all 0.15s;
 }
 
 .form-input:focus, .form-select:focus {
   border-color: var(--oc-primary);
-}
-
-/* Styles spécifiques boutons actions et modale de suppression */
-.p-btn-action.edit {
-  background-color: var(--oc-primary-soft);
-  color: var(--oc-primary);
-  border-color: rgba(30, 86, 214, 0.2);
-}
-.p-btn-action.edit:hover {
-  background-color: var(--oc-primary);
-  color: #FFFFFF;
-}
-
-.p-btn-action.delete {
-  background-color: var(--oc-danger-soft);
-  color: var(--oc-danger);
-  border-color: rgba(193, 59, 59, 0.2);
-}
-.p-btn-action.delete:hover {
-  background-color: var(--oc-danger);
-  color: #FFFFFF;
-}
-
-.btn-modal-danger {
-  flex: 1;
-  padding: 9px;
-  border-radius: var(--oc-radius-sm);
-  border: none;
-  background: var(--oc-danger);
-  color: #FFF;
-  font-weight: 800;
-  font-size: 11px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(193, 59, 59, 0.3);
-  transition: all 0.15s;
-}
-.btn-modal-danger:hover {
-  background: #A82E2E;
-}
-
-/* Bouton Exporter Excel */
-.patients-actions-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.btn-export-excel {
-  display: flex;
-  align-items: center;
-  gap: 7px;
+  box-shadow: 0 0 0 2px rgba(30, 86, 214, 0.15);
   background-color: var(--oc-surface);
-  color: var(--oc-success);
-  border: 1px solid rgba(31, 138, 88, 0.3);
-  padding: 8px 14px;
-  border-radius: var(--oc-radius-pill);
-  font-size: 11px;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: var(--oc-shadow-sm);
-  transition: all 0.15s;
-}
-
-.btn-export-excel:hover {
-  background-color: var(--oc-success-soft);
-  border-color: var(--oc-success);
-  transform: translateY(-1px);
 }
