@@ -48,7 +48,7 @@ document.getElementById('btn-max')?.addEventListener('click', () => {
 });
 
 // 2. Basculement des Vues (Réception vs Patients)
-function switchView(tabName) {
+window.switchView = function switchView(tabName) {
   currentView = tabName;
 
   // Mise à jour de la sidebar
@@ -413,11 +413,13 @@ document.getElementById('btn-call-next')?.addEventListener('click', callNextPati
 document.getElementById('btn-banner-attente')?.addEventListener('click', callNextPatient);
 
 // 12. Navigation de la Sidebar (Changement d'onglets)
-document.querySelectorAll('.nav-item').forEach(item => {
-  item.addEventListener('click', () => {
-    const tabName = item.dataset.tab;
-    switchView(tabName);
-  });
+document.addEventListener('click', (e) => {
+  const item = e.target.closest('.nav-item');
+  if (item && item.dataset.tab) {
+    e.preventDefault();
+    e.stopPropagation();
+    switchView(item.dataset.tab);
+  }
 });
 
 // 13. Recherche de patient en Topbar
@@ -454,19 +456,29 @@ function fitToWindow() {
   const availableWidth = window.innerWidth;
   const availableHeight = window.innerHeight;
 
+  // Calcul du ratio d'échelle pour remplir la largeur ou hauteur
   const scaleX = availableWidth / targetWidth;
   const scaleY = availableHeight / targetHeight;
-  const scale = Math.min(scaleX, scaleY);
+  // Préférer scaleX sur mobile pour éviter les marges latérales
+  let scale = scaleX;
+  if (scale * targetHeight > availableHeight && availableHeight > 500) {
+    scale = Math.min(scaleX, scaleY);
+  }
+
+  // Ne pas zoomer au-delà de 1.05 sur grand écran
+  if (scale > 1.05) scale = 1.0;
 
   wrapper.style.transform = `scale(${scale})`;
 
   const scaledWidth = targetWidth * scale;
-  const scaledHeight = targetHeight * scale;
   const offsetX = Math.max(0, (availableWidth - scaledWidth) / 2);
-  const offsetY = Math.max(0, (availableHeight - scaledHeight) / 2);
 
   wrapper.style.left = `${offsetX}px`;
-  wrapper.style.top = `${offsetY}px`;
+  wrapper.style.top = '0px';
+
+  // Ajuster la hauteur du body si besoin de scroll vertical
+  const neededHeight = targetHeight * scale;
+  document.body.style.minHeight = `${neededHeight}px`;
 }
 
 window.addEventListener('resize', fitToWindow);
