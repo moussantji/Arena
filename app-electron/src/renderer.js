@@ -554,16 +554,18 @@ function fitToWindow() {
   const targetWidth = 1360;
   const targetHeight = 880;
 
-  const availableWidth = document.documentElement.clientWidth || window.innerWidth;
-  const availableHeight = document.documentElement.clientHeight || window.innerHeight;
+  const availableWidth = window.innerWidth || document.documentElement.clientWidth;
+  const availableHeight = window.innerHeight || document.documentElement.clientHeight;
 
   if (!availableWidth || !availableHeight) return;
 
+  // Si l'écran est plus grand que 1360x880, ne pas grossir excessivement (max 1.05)
+  // Si l'écran est plus petit (ex: iframe preview ~800-1100px), réduire proportionnellement pour que TOUT tienne sans coupure
   const scaleX = availableWidth / targetWidth;
   const scaleY = availableHeight / targetHeight;
   const scale = Math.min(scaleX, scaleY);
 
-  wrapper.style.transformOrigin = 'top left';
+  wrapper.style.transformOrigin = 'top center';
   wrapper.style.transform = `scale(${scale})`;
 
   const scaledWidth = targetWidth * scale;
@@ -576,9 +578,10 @@ function fitToWindow() {
   wrapper.style.left = `${offsetX}px`;
   wrapper.style.top = `${offsetY}px`;
 
-  document.body.style.width = `${availableWidth}px`;
-  document.body.style.height = `${availableHeight}px`;
+  document.body.style.margin = '0';
+  document.body.style.padding = '0';
   document.body.style.overflow = 'hidden';
+  document.body.style.backgroundColor = '#0A0E17';
 }
 
 window.addEventListener('resize', fitToWindow);
