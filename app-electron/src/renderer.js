@@ -2650,3 +2650,95 @@ document.getElementById('btn-imprimer-rdv')?.addEventListener('click', () => {
   showToast(`Ticket de RDV pour ${r.patientNom} (${r.date} à ${r.heure}) envoyé à l'imprimante ✓`);
   if (detailRdvModal) detailRdvModal.classList.remove('open');
 });
+
+// ============================================================
+// COMPOSANT ULTRA-MODERNE CUSTOM DROPDOWN (REMPLACE LES SELECTS BRUTS)
+// ============================================================
+
+function initCustomDropdowns() {
+  document.querySelectorAll('select.filter-select').forEach(sel => {
+    // Éviter la double initialisation
+    if (sel.nextElementSibling && sel.nextElementSibling.classList.contains('custom-dropdown-wrap')) {
+      return;
+    }
+
+    // Masquer le select natif
+    sel.style.display = 'none';
+
+    // Créer le wrapper custom
+    const wrap = document.createElement('div');
+    wrap.className = 'custom-dropdown-wrap';
+    wrap.style.position = 'relative';
+    wrap.style.display = 'inline-block';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'custom-dropdown-btn';
+
+    // Obtenir le texte de l'option sélectionnée
+    const currentOpt = sel.options[sel.selectedIndex] || sel.options[0];
+    const triggerText = currentOpt ? currentOpt.textContent : "Sélectionner";
+
+    trigger.innerHTML = `
+      <span class="custom-dropdown-label">${triggerText}</span>
+      <svg class="custom-dropdown-chevron" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#1E56D6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    `;
+
+    const menu = document.createElement('div');
+    menu.className = 'custom-dropdown-menu';
+
+    Array.from(sel.options).forEach((opt, idx) => {
+      const item = document.createElement('div');
+      item.className = 'custom-dropdown-item' + (idx === sel.selectedIndex ? ' active' : '');
+      item.textContent = opt.textContent;
+      item.dataset.value = opt.value;
+
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sel.value = opt.value;
+        trigger.querySelector('.custom-dropdown-label').textContent = opt.textContent;
+
+        menu.querySelectorAll('.custom-dropdown-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+
+        wrap.classList.remove('open');
+
+        // Déclencher l'événement change sur le vrai select pour activer les filtres de la table
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      menu.appendChild(item);
+    });
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Fermer tous les autres menus ouverts
+      document.querySelectorAll('.custom-dropdown-wrap.open').forEach(w => {
+        if (w !== wrap) w.classList.remove('open');
+      });
+      wrap.classList.toggle('open');
+    });
+
+    wrap.appendChild(trigger);
+    wrap.appendChild(menu);
+    sel.parentNode.insertBefore(wrap, sel.nextSibling);
+  });
+}
+
+// Fermer les dropdowns au clic extérieur
+document.addEventListener('click', () => {
+  document.querySelectorAll('.custom-dropdown-wrap.open').forEach(w => {
+    w.classList.remove('open');
+  });
+});
+
+// Initialiser après le chargement du DOM
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCustomDropdowns);
+} else {
+  initCustomDropdowns();
+}
+
+window.initCustomDropdowns = initCustomDropdowns;
