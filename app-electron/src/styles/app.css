@@ -1305,3 +1305,55 @@ select.filter-select {
   width: 0 !important;
   height: 0 !important;
 }
+
+/* MASQUER STRICTEMENT TOUS LES SELECTS NATIFS (FILTRES ET FORMULAIRES AJOUTER / MODIFIER) */
+select.filter-select,
+select.form-select,
+.form-group select {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* COMPOSANT CUSTOM DROPDOWN POUR FORMULAIRE (AJOUTER & MODIFIER) */
+.form-group .custom-dropdown-wrap {
+  width: 100% !important;
+  display: block !important;
+}
+
+.form-group .custom-dropdown-btn {
+  width: 100% !important;
+  height: 38px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  background-color: var(--oc-bg) !important;
+  border: 1px solid var(--oc-border) !important;
+  border-radius: var(--oc-radius-sm) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+}
+
+.form-group .custom-dropdown-btn:hover {
+  border-color: var(--oc-primary) !important;
+  background-color: #ffffff !important;
+}
+
+.form-group .custom-dropdown-wrap.open .custom-dropdown-btn {
+  border-color: var(--oc-primary) !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(30, 86, 214, 0.15) !important;
+}
+
+.form-group .custom-dropdown-menu {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  max-height: 220px !important;
+  z-index: 99999999 !important;
+}

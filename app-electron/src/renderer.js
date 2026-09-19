@@ -2656,18 +2656,43 @@ document.getElementById('btn-imprimer-rdv')?.addEventListener('click', () => {
 // ============================================================
 
 
+
 function initCustomDropdowns() {
-  document.querySelectorAll('select.filter-select').forEach(sel => {
-    // Si déjà transformé, juste vérifier la valeur
+  document.querySelectorAll('select.filter-select, select.form-select, .form-group select').forEach(sel => {
+    // Si déjà transformé, synchroniser le texte affiché
     if (sel.nextElementSibling && sel.nextElementSibling.classList.contains('custom-dropdown-wrap')) {
       const wrap = sel.nextElementSibling;
       const currentOpt = sel.options[sel.selectedIndex] || sel.options[0];
       const lbl = wrap.querySelector('.custom-dropdown-label');
       if (lbl && currentOpt) lbl.textContent = currentOpt.textContent;
+
+      // Reconstruire les items si les options ont changé dynamiquement (ex: liste de patients)
+      const menu = wrap.querySelector('.custom-dropdown-menu');
+      if (menu && menu.children.length !== sel.options.length) {
+        menu.innerHTML = '';
+        Array.from(sel.options).forEach((opt, idx) => {
+          const item = document.createElement('div');
+          item.className = 'custom-dropdown-item' + (idx === sel.selectedIndex ? ' active' : '');
+          item.textContent = opt.textContent;
+          item.dataset.value = opt.value;
+
+          item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sel.value = opt.value;
+            lbl.textContent = opt.textContent;
+            menu.querySelectorAll('.custom-dropdown-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            wrap.classList.remove('open');
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+            sel.dispatchEvent(new Event('input', { bubbles: true }));
+          });
+          menu.appendChild(item);
+        });
+      }
       return;
     }
 
-    // Masquage absolu
+    // Masquage absolu du select natif
     sel.style.setProperty('display', 'none', 'important');
 
     const wrap = document.createElement('div');
@@ -2678,7 +2703,7 @@ function initCustomDropdowns() {
     trigger.className = 'custom-dropdown-btn';
 
     const currentOpt = sel.options[sel.selectedIndex] || sel.options[0];
-    const triggerText = currentOpt ? currentOpt.textContent : "Sélectionner";
+    const triggerText = currentOpt ? currentOpt.textContent : "Sélectionner...";
 
     trigger.innerHTML = `
       <span class="custom-dropdown-label">${triggerText}</span>
@@ -2705,7 +2730,6 @@ function initCustomDropdowns() {
         item.classList.add('active');
         wrap.classList.remove('open');
 
-        // Déclencher le changement sur la table
         sel.dispatchEvent(new Event('change', { bubbles: true }));
         sel.dispatchEvent(new Event('input', { bubbles: true }));
       });
@@ -2726,6 +2750,7 @@ function initCustomDropdowns() {
     sel.parentNode.insertBefore(wrap, sel.nextSibling);
   });
 }
+
 
 
 // Fermer les dropdowns au clic extérieur
