@@ -69,20 +69,27 @@ html, body {
 }
 
 .win-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 46px;
   height: 100%;
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: #cbd5e1;
   cursor: pointer;
-  transition: all 0.15s ease;
+  outline: none;
+  padding: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.win-btn svg {
+  display: block;
+  pointer-events: none;
 }
 
 .win-btn:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.12);
   color: #ffffff;
 }
 

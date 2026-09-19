@@ -30,16 +30,26 @@
         <span class="window-url-text">app.clinique-lerenouveau.ml/pilotage</span>
       </div>
 
-      <!-- Partie Droite : Contrôles Windows (Min, Max, Fermer) -->
+      <!-- Partie Droite : Contrôles Windows Officiels (Min, Max, Fermer) -->
       <div class="window-controls-windows">
-        <button class="win-btn min" id="btn-min" title="Réduire">
-          <svg viewBox="0 0 10 10" width="10" height="10"><path d="M 0,5 L 10,5" stroke="currentColor" stroke-width="1"/></svg>
+        <!-- Réduire -->
+        <button class="win-btn min" id="btn-min" title="Réduire" aria-label="Réduire">
+          <svg width="11" height="11" viewBox="0 0 12 12">
+            <rect y="5.5" width="11" height="1.2" fill="currentColor"/>
+          </svg>
         </button>
-        <button class="win-btn max" id="btn-max" title="Agrandir">
-          <svg viewBox="0 0 10 10" width="10" height="10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+        <!-- Agrandir / Maximiser -->
+        <button class="win-btn max" id="btn-max" title="Agrandir / Niveau inférieur" aria-label="Agrandir">
+          <svg width="11" height="11" viewBox="0 0 12 12">
+            <rect x="1" y="1" width="9.5" height="9.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
         </button>
-        <button class="win-btn close" id="btn-close" title="Fermer">
-          <svg viewBox="0 0 10 10" width="10" height="10"><path d="M 1,1 L 9,9 M 9,1 L 1,9" stroke="currentColor" stroke-width="1.1"/></svg>
+        <!-- Fermer -->
+        <button class="win-btn close" id="btn-close" title="Fermer" aria-label="Fermer">
+          <svg width="11" height="11" viewBox="0 0 12 12">
+            <line x1="1.5" y1="1.5" x2="10" y2="10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="10" y1="1.5" x2="1.5" y2="10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
         </button>
       </div>
     </header>
@@ -1753,7 +1763,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=38"></script>
-  <script src="renderer.js?v=38"></script>
+  <script src="data.js?v=39"></script>
+  <script src="renderer.js?v=39"></script>
 </body>
 </html>
