@@ -1463,8 +1463,9 @@ function renderOctTable(filterText = "", filterType = "", filterStatus = "") {
       <span style="color: var(--oc-text-2); font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.appareil.split(' ')[0]}</span>
       <span class="cs-col-tarif">${o.formattedTarif}</span>
       <span class="cs-status-chip ${chipClass}">${o.statut}</span>
-      <div>
-        <button class="btn-modal-cancel" style="padding: 4px 8px; font-size: 9px; border-radius: var(--oc-radius-pill); font-weight: 800; border-color: var(--oc-primary); color: var(--oc-primary);" onclick="openDetailOctModal('${o.id}')">Cliché</button>
+      <div style="display: flex; gap: 4px;">
+        <button class="btn-modal-cancel" style="padding: 3px 6px; font-size: 8.5px; border-radius: var(--oc-radius-pill); font-weight: 800; border-color: var(--oc-primary); color: var(--oc-primary);" onclick="openDetailOctModal('${o.id}')">Voir</button>
+        <button class="btn-modal-cancel" style="padding: 3px 6px; font-size: 8.5px; border-radius: var(--oc-radius-pill); font-weight: 800; border-color: var(--oc-accent); color: var(--oc-accent);" onclick="openEditOctModal('${o.id}')">Modifier</button>
       </div>
     `;
     octTableBody.appendChild(row);
@@ -1569,6 +1570,48 @@ document.getElementById('create-oct-form')?.addEventListener('submit', (e) => {
   if (epaisseurVal > 300) epaisseurLabel = `${epaisseurVal} µm (Épaissi / Œdème)`;
   else if (epaisseurVal < 220) epaisseurLabel = `${epaisseurVal} µm (Aminci / Atrophie)`;
 
+  const clichesAcquis = parseInt(document.getElementById('oct-cliches-acquis').value) || 1;
+  const clichesTotal = parseInt(document.getElementById('oct-cliches-total').value) || 3;
+  const clichesRatioStr = `${String(clichesAcquis).padStart(2, '0')}/${String(clichesTotal).padStart(2, '0')}`;
+
+  let statutExamen = clichesAcquis >= clichesTotal ? "Validé" : "En cours";
+
+  if (editingOctId) {
+    const o = octList.find(x => x.id === editingOctId);
+    if (o) {
+      o.patientId = p.id;
+      o.patientNom = `${p.personalInfo.nom} ${p.personalInfo.prenom}`;
+      o.patientRef = p.ref;
+      o.oeil = oeil;
+      o.typeExamen = typeLabel;
+      o.appareil = appareil;
+      o.statut = statutExamen;
+      o.epaisseurMaculaire = epaisseurLabel;
+      o.conclusion = conclusion;
+      o.tarif = tarif;
+      o.formattedTarif = tarif.toLocaleString('fr-FR') + " FCFA";
+      o.clichesAcquis = clichesAcquis;
+      o.clichesTotal = clichesTotal;
+      o.clichesCount = clichesAcquis;
+      if (currentOctImageData) o.imageData = currentOctImageData;
+
+      // Mettre à jour la tuile du patient s'il est actif
+      if (p.id === currentActivePatientId) {
+        const elOct = document.getElementById('vital-oct');
+        if (elOct) elOct.textContent = clichesAcquis >= clichesTotal ? `${clichesRatioStr} ✓` : clichesRatioStr;
+      }
+      if (p.medicalInfo && p.medicalInfo.vitals) {
+        p.medicalInfo.vitals.oct = clichesAcquis >= clichesTotal ? `${clichesRatioStr} ✓` : clichesRatioStr;
+      }
+
+      if (createOctModal) createOctModal.classList.remove('open');
+      renderOctTable();
+      updateReceptionKPIs();
+      showToast(`Examen OCT ${o.id} mis à jour avec succès (${clichesRatioStr}) ! ✓`);
+      return;
+    }
+  }
+
   const newOct = {
     id: numOct,
     date: "18/09/2026",
@@ -1579,22 +1622,27 @@ document.getElementById('create-oct-form')?.addEventListener('submit', (e) => {
     oeil: oeil,
     typeExamen: typeLabel,
     appareil: appareil,
-    statut: "Validé",
+    statut: statutExamen,
     epaisseurMaculaire: epaisseurLabel,
     conclusion: conclusion,
     praticien: "Dr Martin (Ophtalmologue)",
     tarif: tarif,
     formattedTarif: tarif.toLocaleString('fr-FR') + " FCFA",
     imageData: currentOctImageData || null,
-    clichesCount: currentOctImageData ? 4 : 3
+    clichesAcquis: clichesAcquis,
+    clichesTotal: clichesTotal,
+    clichesCount: clichesAcquis
   };
 
   octList.unshift(newOct);
 
-  // Mettre à jour la tuile OCT du patient s'il s'agit du patient actif
+  // Mettre à jour la tuile OCT du patient
   if (p.id === currentActivePatientId) {
     const elOct = document.getElementById('vital-oct');
-    if (elOct) elOct.textContent = "03/03 ✓";
+    if (elOct) elOct.textContent = clichesAcquis >= clichesTotal ? `${clichesRatioStr} ✓` : clichesRatioStr;
+  }
+  if (p.medicalInfo && p.medicalInfo.vitals) {
+    p.medicalInfo.vitals.oct = clichesAcquis >= clichesTotal ? `${clichesRatioStr} ✓` : clichesRatioStr;
   }
 
   if (createOctModal) createOctModal.classList.remove('open');
@@ -1602,7 +1650,7 @@ document.getElementById('create-oct-form')?.addEventListener('submit', (e) => {
 
   renderOctTable();
   updateReceptionKPIs();
-  showToast(`Examen OCT ${numOct} enregistré pour ${p.personalInfo.prenom} ${p.personalInfo.nom} ! ✓`);
+  showToast(`Examen OCT ${numOct} enregistré (${clichesRatioStr}) pour ${p.personalInfo.prenom} ${p.personalInfo.nom} ! ✓`);
 });
 
 // Visionneuse Cliché OCT
