@@ -1463,11 +1463,13 @@ function renderOctTable(filterText = "", filterType = "", filterStatus = "") {
       <span style="color: var(--oc-text-2); font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${o.appareil.split(' ')[0]}</span>
       <span class="cs-col-tarif">${o.formattedTarif}</span>
       <span class="cs-status-chip ${chipClass}">${o.statut}</span>
-      <div style="display: flex; gap: 4px;">
-        <button class="btn-modal-cancel" style="padding: 3px 6px; font-size: 8.5px; border-radius: var(--oc-radius-pill); font-weight: 800; border-color: var(--oc-primary); color: var(--oc-primary);" onclick="openDetailOctModal('${o.id}')">Voir</button>
-        <button class="btn-modal-cancel" style="padding: 3px 6px; font-size: 8.5px; border-radius: var(--oc-radius-pill); font-weight: 800; border-color: var(--oc-accent); color: var(--oc-accent);" onclick="openEditOctModal('${o.id}')">Modifier</button>
-      </div>
     `;
+
+    // Clic n'importe où sur la ligne pour ouvrir le modal (comme pour les patients)
+    row.addEventListener('click', () => {
+      openDetailOctModal(o.id);
+    });
+
     octTableBody.appendChild(row);
   });
 }
@@ -1767,9 +1769,12 @@ document.getElementById('create-oct-form')?.addEventListener('submit', (e) => {
 });
 
 // Visionneuse Cliché OCT
+let currentViewingOctId = null;
+
 window.openDetailOctModal = function openDetailOctModal(octId) {
   const o = octList.find(x => x.id === octId);
   if (!o) return;
+  currentViewingOctId = octId;
 
   document.getElementById('oct-view-patient').textContent = o.patientNom;
   document.getElementById('oct-view-ref').textContent = o.id;
@@ -2491,4 +2496,11 @@ btnLogout?.addEventListener('click', () => {
 document.getElementById('link-forgot-pass')?.addEventListener('click', (e) => {
   e.preventDefault();
   showToast("Mot de passe par défaut pour tous les comptes : oculis2024");
+});
+
+document.getElementById('btn-edit-from-oct-detail')?.addEventListener('click', () => {
+  if (detailOctModal) detailOctModal.classList.remove('open');
+  if (currentViewingOctId) {
+    window.openEditOctModal(currentViewingOctId);
+  }
 });
