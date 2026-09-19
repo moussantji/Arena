@@ -92,16 +92,24 @@
     <div style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 40%, rgba(15, 23, 42, 0.45) 0%, rgba(10, 18, 38, 0.88) 100%), linear-gradient(135deg, rgba(30, 86, 214, 0.25) 0%, rgba(192, 138, 45, 0.15) 100%); backdrop-filter: blur(4px);"></div>
     <div style="position: relative; z-index: 10; width: 100%; max-width: 440px; background: rgba(255, 255, 255, 0.98); border-radius: 20px; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.2); overflow: hidden; backdrop-filter: blur(16px);">
       
-      <!-- En-tête Connexion -->
-      <div style="background: linear-gradient(135deg, #1E56D6 0%, #0f2e82 100%); padding: 28px 24px; text-align: center; color: #ffffff; position: relative;">
-        <div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: rgba(255, 255, 255, 0.15); border-radius: 12px; margin-bottom: 12px; backdrop-filter: blur(8px);">
-          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#ffffff" stroke-width="2.2">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-          </svg>
+      <!-- En-tête Connexion avec Hero Background -->
+      <div style="position: relative; overflow: hidden; height: 135px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #ffffff;">
+        <!-- Photo d'arrière-plan de la Clinique Le Renouveau -->
+        <img src="assets/hero-clinique-le-renouveau.jpg" alt="Clinique Le Renouveau" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center;">
+        <!-- Superposition dégradé bleu saphir semi-transparent -->
+        <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(30, 86, 214, 0.78) 0%, rgba(15, 46, 130, 0.85) 100%);"></div>
+        
+        <!-- Contenu en-tête -->
+        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
+          <div style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.18); border-radius: 12px; margin-bottom: 8px; backdrop-filter: blur(6px); border: 1px solid rgba(255, 255, 255, 0.25);">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffffff" stroke-width="2.2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            </svg>
+          </div>
+          <h1 style="font-size: 19px; font-weight: 800; letter-spacing: -0.2px; margin: 0 0 3px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">CLINIQUE LE RENOUVEAU</h1>
+          <p style="font-size: 10.5px; margin: 0; color: rgba(255, 255, 255, 0.9); font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.3);">Portail Médical & Gestion Hospitalière — Bamako</p>
         </div>
-        <h1 style="font-size: 20px; font-weight: 800; letter-spacing: -0.3px; margin: 0 0 4px 0;">CLINIQUE LE RENOUVEAU</h1>
-        <p style="font-size: 11px; margin: 0; color: rgba(255, 255, 255, 0.85); font-weight: 500;">Portail Médical & Gestion Hospitalière — Bamako</p>
       </div>
 
       <!-- Formulaire de Connexion -->
@@ -1727,7 +1735,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=36"></script>
-  <script src="renderer.js?v=36"></script>
+  <script src="data.js?v=37"></script>
+  <script src="renderer.js?v=37"></script>
 </body>
 </html>
