@@ -1222,3 +1222,18 @@ html, body {
 .search-result-item strong {
   color: #0f172a !important;
 }
+
+/* Assurer l'affichage forcé de n'importe quel modal avec la classe open */
+.modal-overlay.open {
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  z-index: 9999999 !important;
+}
+
+.modal-overlay.open .modal-card {
+  display: flex !important;
+  transform: translateY(0) scale(1) !important;
+  opacity: 1 !important;
+}

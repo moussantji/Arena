@@ -2516,13 +2516,16 @@ const detailFacModal = document.getElementById('detail-fac-modal');
 let currentDetailFactureNum = null;
 
 window.openDetailFactureModal = function openDetailFactureModal(numFacture) {
-  const f = invoicesList.find(x => x.numFacture === numFacture);
+  const f = invoicesList.find(x => x.numFacture === numFacture) || invoicesList[0];
   if (!f) return;
-  currentDetailFactureNum = numFacture;
+  currentDetailFactureNum = f.numFacture;
 
-  document.getElementById('fac-detail-patient').textContent = f.patientNom;
-  document.getElementById('fac-detail-num').textContent = f.numFacture;
-  document.getElementById('fac-detail-date').textContent = `${f.date || '18/09/2026'} · Caisse Clinique Le Renouveau`;
+  const elPatient = document.getElementById('fac-detail-patient');
+  if (elPatient) elPatient.textContent = f.patientNom;
+  const elNum = document.getElementById('fac-detail-num');
+  if (elNum) elNum.textContent = f.numFacture;
+  const elDate = document.getElementById('fac-detail-date');
+  if (elDate) elDate.textContent = `${f.date || '18/09/2026'} · Caisse Clinique Le Renouveau`;
 
   const elStat = document.getElementById('fac-detail-statut');
   if (elStat) {
@@ -2530,21 +2533,42 @@ window.openDetailFactureModal = function openDetailFactureModal(numFacture) {
     elStat.className = `cs-status-chip ${f.statut === 'Payée' ? 'termine' : 'attente'}`;
   }
 
-  document.getElementById('fac-detail-pat-name').textContent = f.patientNom;
-  document.getElementById('fac-detail-pat-ref').textContent = f.patientRef;
-  document.getElementById('fac-detail-assurance').textContent = f.organismeAssurance;
-  document.getElementById('fac-detail-taux').textContent = `Taux de prise en charge : ${f.tauxPriseEnCharge}`;
-  document.getElementById('fac-detail-actes').textContent = f.actes;
-  document.getElementById('fac-detail-brut').textContent = f.formattedBrut;
-  document.getElementById('fac-detail-part-ass').textContent = `- ${f.formattedPartAssurance}`;
-  document.getElementById('fac-detail-net').textContent = f.formattedRestePatient;
-  document.getElementById('fac-detail-mode').textContent = f.modePaiement;
+  const elPatName = document.getElementById('fac-detail-pat-name');
+  if (elPatName) elPatName.textContent = f.patientNom;
+  const elPatRef = document.getElementById('fac-detail-pat-ref');
+  if (elPatRef) elPatRef.textContent = f.patientRef;
+  const elAss = document.getElementById('fac-detail-assurance');
+  if (elAss) elAss.textContent = f.organismeAssurance;
+  const elTaux = document.getElementById('fac-detail-taux');
+  if (elTaux) elTaux.textContent = `Taux de prise en charge : ${f.tauxPriseEnCharge}`;
+  const elActes = document.getElementById('fac-detail-actes');
+  if (elActes) elActes.textContent = f.actes;
+  const elBrut = document.getElementById('fac-detail-brut');
+  if (elBrut) elBrut.textContent = f.formattedBrut;
+  const elPart = document.getElementById('fac-detail-part-ass');
+  if (elPart) elPart.textContent = `- ${f.formattedPartAssurance}`;
+  const elNet = document.getElementById('fac-detail-net');
+  if (elNet) elNet.textContent = f.formattedRestePatient;
+  const elMode = document.getElementById('fac-detail-mode');
+  if (elMode) elMode.textContent = f.modePaiement;
 
-  if (detailFacModal) detailFacModal.classList.add('open');
+  const m = document.getElementById('detail-fac-modal');
+  if (m) {
+    m.classList.add('open');
+    m.style.display = 'flex';
+    m.style.opacity = '1';
+    m.style.pointerEvents = 'auto';
+  }
 };
 
 document.getElementById('btn-close-fac-detail')?.addEventListener('click', () => {
-  if (detailFacModal) detailFacModal.classList.remove('open');
+  const m = document.getElementById('detail-fac-modal');
+  if (m) {
+    m.classList.remove('open');
+    m.style.display = 'none';
+    m.style.opacity = '0';
+    m.style.pointerEvents = 'none';
+  }
 });
 
 document.getElementById('btn-imprimer-fac-detail')?.addEventListener('click', () => {
@@ -2559,20 +2583,30 @@ const detailRdvModal = document.getElementById('detail-rdv-modal');
 let currentDetailRdvId = null;
 
 window.openDetailRdvModal = function openDetailRdvModal(rdvId) {
-  const r = appointmentsList.find(x => x.id === rdvId);
+  const r = appointmentsList.find(x => x.id === rdvId) || appointmentsList[0];
   if (!r) return;
-  currentDetailRdvId = rdvId;
+  currentDetailRdvId = r.id;
 
-  document.getElementById('rdv-detail-patient').textContent = r.patientNom;
-  document.getElementById('rdv-detail-num').textContent = r.id;
-  document.getElementById('rdv-detail-date').textContent = r.date || '18/09/2026';
-  document.getElementById('rdv-detail-heure').textContent = r.heure;
-  document.getElementById('rdv-detail-praticien').textContent = r.praticien;
-  document.getElementById('rdv-detail-bureau').textContent = r.bureau;
-  document.getElementById('rdv-detail-motif').textContent = r.motif;
-  document.getElementById('rdv-detail-nom').textContent = r.patientNom;
-  document.getElementById('rdv-detail-tel').textContent = r.patientTel;
-  document.getElementById('rdv-detail-notes').textContent = r.notes || "Aucune note particulière";
+  const elPatient = document.getElementById('rdv-detail-patient');
+  if (elPatient) elPatient.textContent = r.patientNom;
+  const elNum = document.getElementById('rdv-detail-num');
+  if (elNum) elNum.textContent = r.id;
+  const elDate = document.getElementById('rdv-detail-date');
+  if (elDate) elDate.textContent = r.date || '18/09/2026';
+  const elHeure = document.getElementById('rdv-detail-heure');
+  if (elHeure) elHeure.textContent = r.heure;
+  const elPrat = document.getElementById('rdv-detail-praticien');
+  if (elPrat) elPrat.textContent = r.praticien;
+  const elBur = document.getElementById('rdv-detail-bureau');
+  if (elBur) elBur.textContent = r.bureau;
+  const elMotif = document.getElementById('rdv-detail-motif');
+  if (elMotif) elMotif.textContent = r.motif;
+  const elNom = document.getElementById('rdv-detail-nom');
+  if (elNom) elNom.textContent = r.patientNom;
+  const elTel = document.getElementById('rdv-detail-tel');
+  if (elTel) elTel.textContent = r.patientTel;
+  const elNotes = document.getElementById('rdv-detail-notes');
+  if (elNotes) elNotes.textContent = r.notes || "Aucune note particulière";
 
   const elStat = document.getElementById('rdv-detail-statut');
   if (elStat) {
@@ -2583,11 +2617,23 @@ window.openDetailRdvModal = function openDetailRdvModal(rdvId) {
     elStat.className = `cs-status-chip ${cls}`;
   }
 
-  if (detailRdvModal) detailRdvModal.classList.add('open');
+  const m = document.getElementById('detail-rdv-modal');
+  if (m) {
+    m.classList.add('open');
+    m.style.display = 'flex';
+    m.style.opacity = '1';
+    m.style.pointerEvents = 'auto';
+  }
 };
 
 document.getElementById('btn-close-rdv-detail')?.addEventListener('click', () => {
-  if (detailRdvModal) detailRdvModal.classList.remove('open');
+  const m = document.getElementById('detail-rdv-modal');
+  if (m) {
+    m.classList.remove('open');
+    m.style.display = 'none';
+    m.style.opacity = '0';
+    m.style.pointerEvents = 'none';
+  }
 });
 
 document.getElementById('btn-open-dossier-from-rdv')?.addEventListener('click', () => {
