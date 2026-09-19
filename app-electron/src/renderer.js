@@ -2655,27 +2655,28 @@ document.getElementById('btn-imprimer-rdv')?.addEventListener('click', () => {
 // COMPOSANT ULTRA-MODERNE CUSTOM DROPDOWN (REMPLACE LES SELECTS BRUTS)
 // ============================================================
 
+
 function initCustomDropdowns() {
   document.querySelectorAll('select.filter-select').forEach(sel => {
-    // Éviter la double initialisation
+    // Si déjà transformé, juste vérifier la valeur
     if (sel.nextElementSibling && sel.nextElementSibling.classList.contains('custom-dropdown-wrap')) {
+      const wrap = sel.nextElementSibling;
+      const currentOpt = sel.options[sel.selectedIndex] || sel.options[0];
+      const lbl = wrap.querySelector('.custom-dropdown-label');
+      if (lbl && currentOpt) lbl.textContent = currentOpt.textContent;
       return;
     }
 
-    // Masquer le select natif
-    sel.style.display = 'none';
+    // Masquage absolu
+    sel.style.setProperty('display', 'none', 'important');
 
-    // Créer le wrapper custom
     const wrap = document.createElement('div');
     wrap.className = 'custom-dropdown-wrap';
-    wrap.style.position = 'relative';
-    wrap.style.display = 'inline-block';
 
     const trigger = document.createElement('button');
     trigger.type = 'button';
     trigger.className = 'custom-dropdown-btn';
 
-    // Obtenir le texte de l'option sélectionnée
     const currentOpt = sel.options[sel.selectedIndex] || sel.options[0];
     const triggerText = currentOpt ? currentOpt.textContent : "Sélectionner";
 
@@ -2702,11 +2703,11 @@ function initCustomDropdowns() {
 
         menu.querySelectorAll('.custom-dropdown-item').forEach(i => i.classList.remove('active'));
         item.classList.add('active');
-
         wrap.classList.remove('open');
 
-        // Déclencher l'événement change sur le vrai select pour activer les filtres de la table
+        // Déclencher le changement sur la table
         sel.dispatchEvent(new Event('change', { bubbles: true }));
+        sel.dispatchEvent(new Event('input', { bubbles: true }));
       });
 
       menu.appendChild(item);
@@ -2714,7 +2715,6 @@ function initCustomDropdowns() {
 
     trigger.addEventListener('click', (e) => {
       e.stopPropagation();
-      // Fermer tous les autres menus ouverts
       document.querySelectorAll('.custom-dropdown-wrap.open').forEach(w => {
         if (w !== wrap) w.classList.remove('open');
       });
@@ -2726,6 +2726,7 @@ function initCustomDropdowns() {
     sel.parentNode.insertBefore(wrap, sel.nextSibling);
   });
 }
+
 
 // Fermer les dropdowns au clic extérieur
 document.addEventListener('click', () => {
@@ -2742,3 +2743,9 @@ if (document.readyState === 'loading') {
 }
 
 window.initCustomDropdowns = initCustomDropdowns;
+
+// Boucle de sécurité pour transformer instantanément tout select présent
+setTimeout(initCustomDropdowns, 10);
+setTimeout(initCustomDropdowns, 100);
+setTimeout(initCustomDropdowns, 300);
+setInterval(initCustomDropdowns, 1000);
