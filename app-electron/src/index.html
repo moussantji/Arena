@@ -14,15 +14,33 @@
 <body>
   <div id="scaler-wrapper">
   <div class="app-window">
-    <!-- Chrome Frameless Titlebar -->
+    <!-- Windows Frameless Titlebar -->
     <header class="window-titlebar">
-      <div class="window-controls">
-        <button class="window-control close" id="btn-close" title="Fermer"></button>
-        <button class="window-control min" id="btn-min" title="Réduire"></button>
-        <button class="window-control max" id="btn-max" title="Agrandir"></button>
+      <!-- Partie Gauche : Identité application -->
+      <div class="titlebar-left">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#3b82f6" stroke-width="2.2" style="vertical-align: middle; margin-right: 6px;">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+        </svg>
+        <span class="titlebar-app-name">Clinique Le Renouveau — Gestion Hospitalière</span>
       </div>
+
+      <!-- Partie Centrale : URL Pill -->
       <div class="window-url-pill">
         <span class="window-url-text">app.clinique-lerenouveau.ml/pilotage</span>
+      </div>
+
+      <!-- Partie Droite : Contrôles Windows (Min, Max, Fermer) -->
+      <div class="window-controls-windows">
+        <button class="win-btn min" id="btn-min" title="Réduire">
+          <svg viewBox="0 0 10 10" width="10" height="10"><path d="M 0,5 L 10,5" stroke="currentColor" stroke-width="1"/></svg>
+        </button>
+        <button class="win-btn max" id="btn-max" title="Agrandir">
+          <svg viewBox="0 0 10 10" width="10" height="10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+        </button>
+        <button class="win-btn close" id="btn-close" title="Fermer">
+          <svg viewBox="0 0 10 10" width="10" height="10"><path d="M 1,1 L 9,9 M 9,1 L 1,9" stroke="currentColor" stroke-width="1.1"/></svg>
+        </button>
       </div>
     </header>
 
@@ -1735,7 +1753,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=37"></script>
-  <script src="renderer.js?v=37"></script>
+  <script src="data.js?v=38"></script>
+  <script src="renderer.js?v=38"></script>
 </body>
 </html>
