@@ -1924,10 +1924,13 @@ function renderFacturationTable(filterText = "", filterAss = "", filterStatus = 
       <span style="color: var(--oc-primary); font-weight: 900; font-family: var(--oc-font-mono); font-size: 11px;">${f.formattedRestePatient}</span>
       <span style="font-size: 9.5px; color: var(--oc-text-2); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${f.modePaiement}</span>
       <span class="cs-status-chip ${chipClass}">${f.statut}</span>
-      <div>
-        <button class="btn-modal-cancel" style="padding: 4px 8px; font-size: 9px; border-radius: var(--oc-radius-pill);" onclick="imprimerRecuFacture('${f.numFacture}')">Reçu</button>
-      </div>
     `;
+
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', () => {
+      openDetailFactureModal(f.numFacture);
+    });
+
     facTableBody.appendChild(row);
   });
 }
