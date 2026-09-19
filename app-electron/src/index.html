@@ -1086,15 +1086,39 @@
                   <span style="font-size: 10.5px; color: var(--oc-text-3);">clichés</span>
                 </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">IMAGE DU CLICHÉ (B-SCAN)</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                  <label class="btn-modal-cancel" style="padding: 8px 12px; font-size: 10.5px; border-radius: var(--oc-radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; margin: 0;">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                    <span>Charger une photo</span>
-                    <input type="file" id="oct-file-input" accept="image/*" style="display: none;">
-                  </label>
-                  <span id="oct-file-name" style="font-size: 10px; color: var(--oc-text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px;">Image actuelle</span>
+              <div class="form-group full-width">
+                <label class="form-label">LES 3 CLICHÉS TOMOGRAPHIQUES OCT (B-SCAN, MACULA, NERF OPTIQUE)</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 4px;">
+                  <!-- Cliché 1 -->
+                  <div style="background: var(--oc-bg); border: 1px dashed var(--oc-border); border-radius: 8px; padding: 10px; text-align: center;">
+                    <div style="font-size: 10px; font-weight: 700; color: var(--oc-primary); margin-bottom: 6px;">Cliché 1 (Macula OD)</div>
+                    <label class="btn-modal-cancel" style="padding: 5px 8px; font-size: 9.5px; border-radius: var(--oc-radius-sm); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: 100%; box-sizing: border-box; margin: 0;">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                      <span>Photo 1</span>
+                      <input type="file" id="oct-file-1" accept="image/*" style="display: none;">
+                    </label>
+                    <div id="oct-file-1-name" style="font-size: 8.5px; color: var(--oc-text-3); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">B-Scan fovéolaire</div>
+                  </div>
+                  <!-- Cliché 2 -->
+                  <div style="background: var(--oc-bg); border: 1px dashed var(--oc-border); border-radius: 8px; padding: 10px; text-align: center;">
+                    <div style="font-size: 10px; font-weight: 700; color: var(--oc-primary); margin-bottom: 6px;">Cliché 2 (Macula OG)</div>
+                    <label class="btn-modal-cancel" style="padding: 5px 8px; font-size: 9.5px; border-radius: var(--oc-radius-sm); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: 100%; box-sizing: border-box; margin: 0;">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                      <span>Photo 2</span>
+                      <input type="file" id="oct-file-2" accept="image/*" style="display: none;">
+                    </label>
+                    <div id="oct-file-2-name" style="font-size: 8.5px; color: var(--oc-text-3); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">B-Scan controlatéral</div>
+                  </div>
+                  <!-- Cliché 3 -->
+                  <div style="background: var(--oc-bg); border: 1px dashed var(--oc-border); border-radius: 8px; padding: 10px; text-align: center;">
+                    <div style="font-size: 10px; font-weight: 700; color: var(--oc-accent); margin-bottom: 6px;">Cliché 3 (Nerf / RNFL)</div>
+                    <label class="btn-modal-cancel" style="padding: 5px 8px; font-size: 9.5px; border-radius: var(--oc-radius-sm); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: 100%; box-sizing: border-box; margin: 0;">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                      <span>Photo 3</span>
+                      <input type="file" id="oct-file-3" accept="image/*" style="display: none;">
+                    </label>
+                    <div id="oct-file-3-name" style="font-size: 8.5px; color: var(--oc-text-3); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Cartographie papillaire</div>
+                  </div>
                 </div>
               </div>
               <div class="form-group full-width">
@@ -1772,7 +1796,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=45"></script>
-  <script src="renderer.js?v=45"></script>
+  <script src="data.js?v=46"></script>
+  <script src="renderer.js?v=46"></script>
 </body>
 </html>

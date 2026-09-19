@@ -1494,30 +1494,137 @@ document.getElementById('filter-oct-status')?.addEventListener('change', (e) => 
   renderOctTable(fText, fType, fStat);
 });
 
-let currentOctImageData = null;
+let octImagesData = { img1: null, img2: null, img3: null };
+let editingOctId = null;
 
 // Écouteur pour le chargement d'image cliché
-document.getElementById('oct-file-input')?.addEventListener('change', (e) => {
+
+// Écouteurs pour les 3 clichés tomographiques
+document.getElementById('oct-file-1')?.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (file) {
     const reader = new FileReader();
-    reader.onload = function(evt) {
-      currentOctImageData = evt.target.result;
-      const elFileName = document.getElementById('oct-file-name');
-      if (elFileName) elFileName.textContent = file.name;
-      showToast(`Image chargée : ${file.name} ✓`);
+    reader.onload = (evt) => {
+      octImagesData.img1 = evt.target.result;
+      const el = document.getElementById('oct-file-1-name');
+      if (el) el.textContent = file.name;
+      showToast(`Cliché 1 chargé : ${file.name} ✓`);
     };
     reader.readAsDataURL(file);
   }
 });
 
+document.getElementById('oct-file-2')?.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      octImagesData.img2 = evt.target.result;
+      const el = document.getElementById('oct-file-2-name');
+      if (el) el.textContent = file.name;
+      showToast(`Cliché 2 chargé : ${file.name} ✓`);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+document.getElementById('oct-file-3')?.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      octImagesData.img3 = evt.target.result;
+      const el = document.getElementById('oct-file-3-name');
+      if (el) el.textContent = file.name;
+      showToast(`Cliché 3 chargé : ${file.name} ✓`);
+    };
+    reader.readAsDataURL(file);
+  }
+});
 // Modal Nouvel Examen OCT
+
+window.openEditOctModal = function openEditOctModal(octId) {
+  const o = octList.find(x => x.id === octId);
+  if (!o) return;
+
+  editingOctId = octId;
+  const modalTitle = document.getElementById('modal-oct-form-title');
+  if (modalTitle) modalTitle.textContent = `Modifier l'Examen OCT (${o.id})`;
+  const submitBtn = document.getElementById('btn-submit-oct');
+  if (submitBtn) submitBtn.textContent = "Mettre à jour l'Examen";
+
+  // Remplissage des champs
+  const selectPat = document.getElementById('oct-patient-select');
+  if (selectPat) {
+    selectPat.innerHTML = patientsList.map(p => 
+      `<option value="${p.id}" ${p.id === o.patientId ? 'selected' : ''}>${p.personalInfo.nom} ${p.personalInfo.prenom} (${p.ref}) — ${p.insuranceInfo.assurance}</option>`
+    ).join('');
+    selectPat.value = o.patientId;
+  }
+
+  const octNum = document.getElementById('oct-num');
+  if (octNum) octNum.value = o.id;
+
+  const oeilSel = document.getElementById('oct-oeil-select');
+  if (oeilSel) oeilSel.value = o.oeil;
+
+  const typeSel = document.getElementById('oct-type-select');
+  if (typeSel) typeSel.value = o.typeExamen;
+
+  const tarifDisp = document.getElementById('oct-tarif-display');
+  if (tarifDisp) tarifDisp.value = o.formattedTarif || "25 000 FCFA";
+
+  const appSel = document.getElementById('oct-appareil-select');
+  if (appSel) appSel.value = o.appareil;
+
+  const epaisseurNumber = parseInt(o.epaisseurMaculaire) || 260;
+  const epIn = document.getElementById('oct-epaisseur-input');
+  if (epIn) epIn.value = epaisseurNumber;
+
+  const conclIn = document.getElementById('oct-conclusion');
+  if (conclIn) conclIn.value = o.conclusion || "";
+
+  // Restaurer les 3 images
+  octImagesData.img1 = o.images ? o.images.img1 : (o.imageData || null);
+  octImagesData.img2 = o.images ? o.images.img2 : null;
+  octImagesData.img3 = o.images ? o.images.img3 : null;
+
+  const f1 = document.getElementById('oct-file-1-name');
+  if (f1) f1.textContent = octImagesData.img1 ? "Photo 1 chargée ✓" : "B-scan fovéolaire";
+
+  const f2 = document.getElementById('oct-file-2-name');
+  if (f2) f2.textContent = octImagesData.img2 ? "Photo 2 chargée ✓" : "B-scan controlatéral";
+
+  const f3 = document.getElementById('oct-file-3-name');
+  if (f3) f3.textContent = octImagesData.img3 ? "Photo 3 chargée ✓" : "Cartographie papillaire";
+
+  // Clichés
+  const acquis = o.clichesAcquis || o.clichesCount || 3;
+  const total = o.clichesTotal || 3;
+  const caIn = document.getElementById('oct-cliches-acquis');
+  if (caIn) caIn.value = acquis;
+  const ctIn = document.getElementById('oct-cliches-total');
+  if (ctIn) ctIn.value = total;
+
+  if (createOctModal) createOctModal.classList.add('open');
+};
+
 function openCreateOctModal() {
-  currentOctImageData = null;
-  const elFileName = document.getElementById('oct-file-name');
-  if (elFileName) elFileName.textContent = "B-scan par défaut";
-  const fileInput = document.getElementById('oct-file-input');
-  if (fileInput) fileInput.value = "";
+  editingOctId = null;
+  octImagesData = { img1: null, img2: null, img3: null };
+
+  const modalTitle = document.getElementById('modal-oct-form-title');
+  if (modalTitle) modalTitle.textContent = "Nouvel Examen d'Imagerie OCT";
+  const submitBtn = document.getElementById('btn-submit-oct');
+  if (submitBtn) submitBtn.textContent = "Enregistrer l'Examen OCT";
+
+  const f1 = document.getElementById('oct-file-1-name');
+  if (f1) f1.textContent = "B-scan fovéolaire";
+  const f2 = document.getElementById('oct-file-2-name');
+  if (f2) f2.textContent = "B-scan controlatéral";
+  const f3 = document.getElementById('oct-file-3-name');
+  if (f3) f3.textContent = "Cartographie papillaire";
+
   const selectPat = document.getElementById('oct-patient-select');
   if (selectPat) {
     selectPat.innerHTML = patientsList.map(p => 
@@ -1529,9 +1636,15 @@ function openCreateOctModal() {
   const octNumInput = document.getElementById('oct-num');
   if (octNumInput) octNumInput.value = nextNum;
 
+  const caIn = document.getElementById('oct-cliches-acquis');
+  if (caIn) caIn.value = 3;
+  const ctIn = document.getElementById('oct-cliches-total');
+  if (ctIn) ctIn.value = 3;
+
   updateOctTarifDisplay();
   if (createOctModal) createOctModal.classList.add('open');
 }
+
 
 function updateOctTarifDisplay() {
   const select = document.getElementById('oct-type-select');
