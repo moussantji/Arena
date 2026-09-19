@@ -1,3 +1,12 @@
+function safeEscape(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 // Récupérer les données depuis window.clinicData
 const clinicData = window.clinicData;
 
@@ -752,7 +761,7 @@ function performGlobalPatientSearch(query) {
   if (matches.length === 0) {
     searchResultsBox.innerHTML = `
       <div style="padding: 14px; text-align: center; color: var(--oc-text-3); font-size: 11px;">
-        Aucun dossier patient trouvé pour "<strong>${escapeHtml(query)}</strong>"
+        Aucun dossier patient trouvé pour "<strong>${safeEscape(query)}</strong>"
       </div>
     `;
     searchResultsBox.style.display = 'block';
