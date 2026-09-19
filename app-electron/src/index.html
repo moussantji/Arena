@@ -622,7 +622,7 @@
           </div>
 
           <div class="patients-table-card">
-            <div class="fac-table-header">
+            <div class="fac-table-header" style="grid-template-columns: 110px 160px 1.8fr 110px 120px 110px 135px 85px;">
               <span>N° FACTURE</span>
               <span>PATIENT</span>
               <span>ACTES FACTURÉS</span>
@@ -631,7 +631,6 @@
               <span>RESTE PATIENT</span>
               <span>PAIEMENT</span>
               <span>STATUT</span>
-              <span>ACTIONS</span>
             </div>
             <div class="fac-table-body" id="fac-table-body">
               <!-- Rendu dynamique via renderer.js -->
@@ -1793,13 +1792,102 @@
     </div>
   </div>
 
+
+  <!-- Modal Détail & Reçu de Facture -->
+  <div class="modal-overlay" id="detail-fac-modal">
+    <div class="modal-card patient-modal-card" style="width: 620px !important;">
+      <div class="patient-modal-header">
+        <div class="patient-modal-avatar">🧾</div>
+        <div class="patient-modal-title">
+          <div class="patient-modal-title-row">
+            <h3 id="fac-detail-patient">TRAORÉ Mamadou</h3>
+            <span class="col-badge pri" id="fac-detail-num">FAC-2026-0210</span>
+          </div>
+          <p id="fac-detail-sub">Reçu d'encaissement clinique officiel · Clinique Le Renouveau</p>
+        </div>
+        <button class="modal-close-icon-btn" id="btn-close-fac-detail">✕</button>
+      </div>
+
+      <div class="patient-modal-body" style="max-height: calc(85vh - 130px); overflow-y: auto; padding: 20px 24px;">
+        
+        <!-- Reçu formaté Caisse Clinique -->
+        <div style="background: #ffffff; border: 1.5px dashed var(--oc-border); border-radius: var(--oc-radius-sm); padding: 18px 20px; box-shadow: var(--oc-shadow-sm); margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--oc-border-light); padding-bottom: 12px; margin-bottom: 12px;">
+            <div>
+              <strong style="font-size: 13px; color: var(--oc-primary); letter-spacing: -0.2px;">CLINIQUE OPHTALMOLOGIQUE LE RENOUVEAU</strong>
+              <div style="font-size: 9.5px; color: var(--oc-text-3); margin-top: 2px;">Hamdallaye ACI 2000 · Bamako, Mali · Tél: +223 20 29 45 00</div>
+              <div style="font-size: 9px; color: var(--oc-text-3);">Agrément : MS-ML-OPHTA-2024-089 · NIF : 084129532M</div>
+            </div>
+            <div style="text-align: right;">
+              <span class="cs-status-chip termine" id="fac-detail-statut" style="font-size: 10px; padding: 4px 10px;">Payée</span>
+              <div style="font-size: 9.5px; color: var(--oc-text-3); margin-top: 4px;" id="fac-detail-date">18/09/2026 · Caisse 1</div>
+            </div>
+          </div>
+
+          <!-- Détails Patient & Prise en Charge -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; background: var(--oc-bg); padding: 10px 14px; border-radius: var(--oc-radius-sm);">
+            <div>
+              <div style="font-size: 9px; font-weight: 800; color: var(--oc-text-3); text-transform: uppercase;">PATIENT BÉNÉFICIAIRE</div>
+              <div style="font-size: 11.5px; font-weight: 800; color: var(--oc-text-1);" id="fac-detail-pat-name">TRAORÉ Mamadou</div>
+              <div style="font-size: 9.5px; color: var(--oc-primary); font-family: var(--oc-font-mono); font-weight: 700;" id="fac-detail-pat-ref">CLI-ML-2026-0841</div>
+            </div>
+            <div>
+              <div style="font-size: 9px; font-weight: 800; color: var(--oc-text-3); text-transform: uppercase;">ORGANISME / ASSURANCE</div>
+              <div style="font-size: 11.5px; font-weight: 800; color: var(--oc-text-1);" id="fac-detail-assurance">CANAM (AMO)</div>
+              <div style="font-size: 9.5px; color: var(--oc-accent); font-weight: 700;" id="fac-detail-taux">Taux de couverture : 80%</div>
+            </div>
+          </div>
+
+          <!-- Actes Réalisés -->
+          <div style="margin-bottom: 14px;">
+            <div style="font-size: 9px; font-weight: 800; color: var(--oc-text-3); text-transform: uppercase; margin-bottom: 6px;">DESIGNATION DES ACTES MÉDICAUX</div>
+            <div style="padding: 10px 12px; background: #f8fafc; border: 1px solid var(--oc-border-light); border-radius: var(--oc-radius-sm); font-size: 11px; font-weight: 600; color: var(--oc-text-1);" id="fac-detail-actes">
+              Consultation ophtalmo + OCT Maculaire
+            </div>
+          </div>
+
+          <!-- Décomposition Financière FCFA -->
+          <div style="border-top: 1px solid var(--oc-border-light); padding-top: 12px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--oc-text-2); margin-bottom: 4px;">
+              <span>Montant Brut des Honoraires :</span>
+              <strong style="color: var(--oc-text-1); font-family: var(--oc-font-mono);" id="fac-detail-brut">40 000 FCFA</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #059669; margin-bottom: 4px;">
+              <span>Part Prise en Charge Assurance (AMO) :</span>
+              <strong style="font-family: var(--oc-font-mono);" id="fac-detail-part-ass">- 32 000 FCFA</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13.5px; color: var(--oc-primary); font-weight: 900; margin-top: 8px; border-top: 1.5px solid var(--oc-border); padding-top: 8px;">
+              <span>NET PAYÉ PAR LE PATIENT :</span>
+              <span style="font-family: var(--oc-font-mono);" id="fac-detail-net">8 000 FCFA</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--oc-text-3); margin-top: 6px;">
+              <span>Mode de Règlement Caisse :</span>
+              <strong style="color: var(--oc-accent);" id="fac-detail-mode">Orange Money Mali</strong>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; font-size: 9px; color: var(--oc-text-3);">
+          Mention légale : Facture certifiée conforme aux conventions CANAM / INPS Mali. Quittance d'encaissement délivrée au patient.
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-modal-confirm" id="btn-imprimer-fac-detail" style="flex: 1; padding: 11px; justify-content: center; font-size: 12px;">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span>Imprimer la Facture / Reçu de Caisse</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast notification -->
   <div class="toast-notice" id="toast-notice">
     <span class="toast-dot"></span>
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=48"></script>
-  <script src="renderer.js?v=48"></script>
+  <script src="data.js?v=49"></script>
+  <script src="renderer.js?v=49"></script>
 </body>
 </html>

@@ -2504,3 +2504,46 @@ document.getElementById('btn-edit-from-oct-detail')?.addEventListener('click', (
     window.openEditOctModal(currentViewingOctId);
   }
 });
+
+// Modal Détail Facture & Reçu d'encaissement
+const detailFacModal = document.getElementById('detail-fac-modal');
+let currentDetailFactureNum = null;
+
+window.openDetailFactureModal = function openDetailFactureModal(numFacture) {
+  const f = invoicesList.find(x => x.numFacture === numFacture);
+  if (!f) return;
+  currentDetailFactureNum = numFacture;
+
+  document.getElementById('fac-detail-patient').textContent = f.patientNom;
+  document.getElementById('fac-detail-num').textContent = f.numFacture;
+  document.getElementById('fac-detail-date').textContent = `${f.date || '18/09/2026'} · Caisse Clinique Le Renouveau`;
+
+  const elStat = document.getElementById('fac-detail-statut');
+  if (elStat) {
+    elStat.textContent = f.statut;
+    elStat.className = `cs-status-chip ${f.statut === 'Payée' ? 'termine' : 'attente'}`;
+  }
+
+  document.getElementById('fac-detail-pat-name').textContent = f.patientNom;
+  document.getElementById('fac-detail-pat-ref').textContent = f.patientRef;
+  document.getElementById('fac-detail-assurance').textContent = f.organismeAssurance;
+  document.getElementById('fac-detail-taux').textContent = `Taux de prise en charge : ${f.tauxPriseEnCharge}`;
+  document.getElementById('fac-detail-actes').textContent = f.actes;
+  document.getElementById('fac-detail-brut').textContent = f.formattedBrut;
+  document.getElementById('fac-detail-part-ass').textContent = `- ${f.formattedPartAssurance}`;
+  document.getElementById('fac-detail-net').textContent = f.formattedRestePatient;
+  document.getElementById('fac-detail-mode').textContent = f.modePaiement;
+
+  if (detailFacModal) detailFacModal.classList.add('open');
+};
+
+document.getElementById('btn-close-fac-detail')?.addEventListener('click', () => {
+  if (detailFacModal) detailFacModal.classList.remove('open');
+});
+
+document.getElementById('btn-imprimer-fac-detail')?.addEventListener('click', () => {
+  if (currentDetailFactureNum) {
+    imprimerRecuFacture(currentDetailFactureNum);
+    if (detailFacModal) detailFacModal.classList.remove('open');
+  }
+});

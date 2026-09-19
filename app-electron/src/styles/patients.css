@@ -1027,13 +1027,18 @@
 
 .fac-row {
   display: grid;
-  grid-template-columns: 105px 145px 170px 105px 115px 105px 125px 75px 65px;
+  grid-template-columns: 110px 160px 1.8fr 110px 120px 110px 135px 85px;
   padding: 12px 16px;
-  column-gap: 8px;
+  column-gap: 10px;
   border-bottom: 1px solid var(--oc-border);
   align-items: center;
+  cursor: pointer;
   transition: all 0.15s ease;
   font-size: 11px;
+}
+
+.fac-row:hover {
+  background-color: rgba(30, 86, 214, 0.05);
 }
 
 .fac-row:hover {
