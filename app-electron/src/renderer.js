@@ -634,12 +634,29 @@ document.getElementById('create-patient-form')?.addEventListener('submit', (e) =
   }
 });
 
-// 9. Filtres vue Patients
+// 9. Filtres vue Patients avec Menu Déroulant
 document.getElementById('patients-view-search')?.addEventListener('input', (e) => {
-  const fText = e.target.value;
+  const fText = e.target.value.trim();
   const fAss = document.getElementById('filter-assurance')?.value || "";
   const fSex = document.getElementById('filter-sexe')?.value || "";
   renderPatientsTable(fText, fAss, fSex);
+
+  if (patientsViewSearchResultsBox) {
+    if (!fText) {
+      patientsViewSearchResultsBox.style.display = 'none';
+    } else {
+      const matches = searchPatientsList(fText);
+      renderDropdownResults(patientsViewSearchResultsBox, matches, fText);
+    }
+  }
+});
+
+document.getElementById('patients-view-search')?.addEventListener('focus', (e) => {
+  const fText = e.target.value.trim();
+  if (fText && patientsViewSearchResultsBox) {
+    const matches = searchPatientsList(fText);
+    renderDropdownResults(patientsViewSearchResultsBox, matches, fText);
+  }
 });
 
 document.getElementById('filter-assurance')?.addEventListener('change', (e) => {
@@ -712,32 +729,59 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// 13. Recherche Globale Instantanée de Patient (Topbar)
+// 13. Recherche Globale Instantanée de Patient (Topbar + Vue Patients)
 const searchInput = document.getElementById('patient-search');
 const searchResultsBox = document.getElementById('patient-search-results');
+const patientsViewSearchInput = document.getElementById('patients-view-search');
+const patientsViewSearchResultsBox = document.getElementById('patients-view-search-results');
 
-function performGlobalPatientSearch(query) {
-  if (!searchResultsBox) return;
-  const q = (query || "").toLowerCase().trim();
+function renderDropdownResults(targetBox, matches, query) {
+  if (!targetBox) return;
 
-  // Si l'utilisateur est sur la vue "Patients", synchroniser le filtre du tableau
-  const patientsViewSearchInput = document.getElementById('patients-view-search');
-  if (currentActiveTab === 'Patients') {
-    if (patientsViewSearchInput) patientsViewSearchInput.value = query;
-    const fAss = document.getElementById('filter-assurance')?.value || "";
-    const fSex = document.getElementById('filter-sexe')?.value || "";
-    renderPatientsTable(q, fAss, fSex);
-  }
-
-  // Si vide, fermer les résultats
-  if (!q) {
-    searchResultsBox.style.display = 'none';
-    searchResultsBox.innerHTML = '';
+  if (matches.length === 0) {
+    targetBox.innerHTML = `
+      <div style="padding: 14px; text-align: center; color: #64748b; font-size: 11px;">
+        Aucun dossier patient trouvé pour "<strong>${safeEscape(query)}</strong>"
+      </div>
+    `;
+    targetBox.style.display = 'block';
     return;
   }
 
-  // Rechercher dans tous les critères du dossier patient
-  const matches = patientsList.filter(p => {
+  let html = `<div style="padding: 6px 14px; font-size: 9.5px; font-weight: 800; color: #64748b; border-bottom: 1px solid #f1f5f9; text-transform: uppercase;">${matches.length} PATIENT(S) IDENTIFIÉ(S)</div>`;
+
+  matches.slice(0, 8).forEach(p => {
+    const initials = (p.personalInfo.prenom[0] || '') + (p.personalInfo.nom[0] || '');
+    html += `
+      <div class="search-result-item" onclick="selectAndOpenPatientFromSearch('${p.id}')">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 30px; height: 30px; border-radius: 50%; background: #eff6ff; color: #1E56D6; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #bfdbfe;">
+            ${initials}
+          </div>
+          <div>
+            <div style="font-size: 11.5px; font-weight: 700; color: #0f172a;">
+              ${p.personalInfo.prenom} ${p.personalInfo.nom}
+              <span style="font-size: 9.5px; color: #1E56D6; font-family: var(--oc-font-mono); font-weight: 800; margin-left: 4px;">${p.ref}</span>
+            </div>
+            <div style="font-size: 9.5px; color: #64748b; margin-top: 2px;">
+              ${p.personalInfo.telephone} · ${p.personalInfo.age} ans · ${p.insuranceInfo.nom} (${p.insuranceInfo.taux})
+            </div>
+          </div>
+        </div>
+        <span class="cs-status-chip termine" style="font-size: 9px; padding: 3px 8px; font-weight: 700;">Consulter ➔</span>
+      </div>
+    `;
+  });
+
+  targetBox.innerHTML = html;
+  targetBox.style.display = 'block';
+}
+
+function searchPatientsList(query) {
+  const q = (query || "").toLowerCase().trim();
+  if (!q) return [];
+
+  return patientsList.filter(p => {
     const nom = (p.personalInfo.nom || "").toLowerCase();
     const prenom = (p.personalInfo.prenom || "").toLowerCase();
     const fullName = `${prenom} ${nom}`;
@@ -746,7 +790,6 @@ function performGlobalPatientSearch(query) {
     const cleanQ = q.replace(/\s+/g, '');
     const ass = (p.insuranceInfo.nom || "").toLowerCase();
     const numAss = (p.insuranceInfo.numAss || "").toLowerCase();
-    const societe = (p.insuranceInfo.societe || "").toLowerCase();
 
     return nom.includes(q) ||
            prenom.includes(q) ||
@@ -754,50 +797,23 @@ function performGlobalPatientSearch(query) {
            ref.includes(q) ||
            (cleanQ.length >= 3 && tel.includes(cleanQ)) ||
            ass.includes(q) ||
-           numAss.includes(q) ||
-           societe.includes(q);
+           numAss.includes(q);
   });
+}
 
-  if (matches.length === 0) {
-    searchResultsBox.innerHTML = `
-      <div style="padding: 14px; text-align: center; color: var(--oc-text-3); font-size: 11px;">
-        Aucun dossier patient trouvé pour "<strong>${safeEscape(query)}</strong>"
-      </div>
-    `;
-    searchResultsBox.style.display = 'block';
+function performGlobalPatientSearch(query) {
+  const q = (query || "").trim();
+  if (!searchResultsBox) return;
+
+  if (!q) {
+    searchResultsBox.style.display = 'none';
+    searchResultsBox.innerHTML = '';
     return;
   }
 
-  // Générer la liste des résultats cliquables
-  let html = `<div style="padding: 6px 12px; font-size: 9.5px; font-weight: 800; color: var(--oc-text-3); border-bottom: 1px solid var(--oc-border); text-transform: uppercase;">${matches.length} PATIENT(S) TROUVÉ(S)</div>`;
+  const matches = searchPatientsList(q);
+  renderDropdownResults(searchResultsBox, matches, q);
 
-  matches.slice(0, 7).forEach(p => {
-    const initials = (p.personalInfo.prenom[0] || '') + (p.personalInfo.nom[0] || '');
-    html += `
-      <div class="search-result-item" onclick="selectAndOpenPatientFromSearch('${p.id}')" style="display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid var(--oc-border-light); cursor: pointer; transition: background 0.15s ease;">
-        <div style="display: flex; align-items: center; gap: 9px;">
-          <div style="width: 28px; height: 28px; border-radius: 50%; background: #eff6ff; color: var(--oc-primary); font-weight: 800; font-size: 10.5px; display: flex; align-items: center; justify-content: center; border: 1px solid #bfdbfe;">
-            ${initials}
-          </div>
-          <div>
-            <div style="font-size: 11.5px; font-weight: 700; color: var(--oc-text-1);">
-              ${p.personalInfo.prenom} ${p.personalInfo.nom}
-              <span style="font-size: 9.5px; color: var(--oc-primary); font-family: var(--oc-font-mono); font-weight: 800; margin-left: 4px;">${p.ref}</span>
-            </div>
-            <div style="font-size: 9px; color: var(--oc-text-3); margin-top: 1px;">
-              ${p.personalInfo.telephone} · ${p.personalInfo.age} ans · ${p.insuranceInfo.nom} (${p.insuranceInfo.taux})
-            </div>
-          </div>
-        </div>
-        <span class="cs-status-chip termine" style="font-size: 8.5px; padding: 2px 7px;">Ouvrir Dossier</span>
-      </div>
-    `;
-  });
-
-  searchResultsBox.innerHTML = html;
-  searchResultsBox.style.display = 'block';
-
-  // Si on est sur le tableau de bord, sélectionner directement le 1er trouvé
   if (currentActiveTab === 'Tableau de bord' && matches.length > 0) {
     selectPatient(matches[0].id);
   }
@@ -821,10 +837,13 @@ searchInput?.addEventListener('focus', (e) => {
   }
 });
 
-// Fermer le menu si clic en dehors
+// Fermer les menus déroulants si clic en dehors
 document.addEventListener('click', (e) => {
   if (!searchInput?.contains(e.target) && !searchResultsBox?.contains(e.target)) {
     if (searchResultsBox) searchResultsBox.style.display = 'none';
+  }
+  if (!patientsViewSearchInput?.contains(e.target) && !patientsViewSearchResultsBox?.contains(e.target)) {
+    if (patientsViewSearchResultsBox) patientsViewSearchResultsBox.style.display = 'none';
   }
 });
 

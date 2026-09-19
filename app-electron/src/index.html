@@ -374,9 +374,10 @@
         <div id="view-patients" class="patients-view-container" style="display: none;">
           <div class="patients-toolbar">
             <div class="patients-filters">
-              <div class="patients-search-box">
+              <div class="patients-search-box" style="position: relative;">
                 <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="patients-view-search" placeholder="Rechercher par nom, réf, tél...">
+                <input type="text" id="patients-view-search" placeholder="Rechercher par nom, réf, tél, assurance..." autocomplete="off">
+                <div id="patients-view-search-results" style="display: none; position: absolute; top: calc(100% + 6px); left: 0; width: 420px; max-height: 380px; overflow-y: auto; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.35); z-index: 999999; padding: 6px 0;"></div>
               </div>
               <select class="filter-select" id="filter-assurance">
                 <option value="">Toutes les assurances</option>
@@ -1762,7 +1763,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=42"></script>
-  <script src="renderer.js?v=42"></script>
+  <script src="data.js?v=43"></script>
+  <script src="renderer.js?v=43"></script>
 </body>
 </html>
