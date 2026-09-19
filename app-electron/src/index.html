@@ -458,7 +458,7 @@
           </div>
 
           <div class="patients-table-card">
-            <div class="rdv-table-header">
+            <div class="rdv-table-header" style="grid-template-columns: 110px 95px 1.6fr 115px 1.8fr 1.3fr 110px 95px;">
               <span>DATE & HEURE</span>
               <span>N° RDV</span>
               <span>PATIENT</span>
@@ -467,7 +467,6 @@
               <span>PRATICIEN</span>
               <span>BUREAU</span>
               <span>STATUT</span>
-              <span>ACTIONS</span>
             </div>
             <div class="rdv-table-body" id="rdv-table-body">
               <!-- Rendu dynamique via renderer.js -->
@@ -1881,13 +1880,94 @@
     </div>
   </div>
 
+
+  <!-- Modal Détail Rendez-vous Médical -->
+  <div class="modal-overlay" id="detail-rdv-modal">
+    <div class="modal-card patient-modal-card" style="width: 580px !important;">
+      <div class="patient-modal-header">
+        <div class="patient-modal-avatar">📅</div>
+        <div class="patient-modal-title">
+          <div class="patient-modal-title-row">
+            <h3 id="rdv-detail-patient">TRAORÉ Mamadou</h3>
+            <span class="col-badge pri" id="rdv-detail-num">RDV-2026-001</span>
+          </div>
+          <p id="rdv-detail-sub">Rendez-vous clinique · Clinique Le Renouveau</p>
+        </div>
+        <button class="modal-close-icon-btn" id="btn-close-rdv-detail">✕</button>
+      </div>
+
+      <div class="patient-modal-body" style="max-height: calc(85vh - 130px); overflow-y: auto; padding: 20px 24px;">
+        <div class="modal-info-section">
+          <div class="modal-section-title">PLANNING & AFFECTATION CLINIQUE</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">DATE DU RENDEZ-VOUS</label>
+              <div class="form-input" id="rdv-detail-date" style="font-weight: 700; background: var(--oc-bg);">18/09/2026</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">HEURE DU RENDEZ-VOUS</label>
+              <div class="form-input" id="rdv-detail-heure" style="font-weight: 800; font-family: var(--oc-font-mono); color: var(--oc-primary); background: var(--oc-bg);">08:30</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">PRATICIEN RÉFÉRENT</label>
+              <div class="form-input" id="rdv-detail-praticien" style="font-weight: 700; background: var(--oc-bg);">Dr Martin (Ophtalmologue)</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">BUREAU D'AFFECTATION</label>
+              <div class="form-input" id="rdv-detail-bureau" style="font-weight: 700; background: var(--oc-bg);">Bureau 1 (Ophtalmo)</div>
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">MOTIF DE LA CONSULTATION</label>
+              <div class="form-input" id="rdv-detail-motif" style="font-weight: 700; color: var(--oc-text-1); background: var(--oc-bg);">Contrôle DMLA & Bilan Visuel</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-info-section">
+          <div class="modal-section-title">COORDONNÉES PATIENT & ÉTAT</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">NOM & PRÉNOM</label>
+              <div class="form-input" id="rdv-detail-nom" style="font-weight: 700; background: var(--oc-bg);">TRAORÉ Mamadou</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">TÉLÉPHONE CONTACT</label>
+              <div class="form-input" id="rdv-detail-tel" style="font-weight: 700; font-family: var(--oc-font-mono); background: var(--oc-bg);">+223 76 45 12 89</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">STATUT DU RDV</label>
+              <div style="padding-top: 4px;">
+                <span class="cs-status-chip termine" id="rdv-detail-statut" style="font-size: 10px; padding: 5px 12px;">Confirmé</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">NOTES SPÉCIALES</label>
+              <div class="form-input" id="rdv-detail-notes" style="font-size: 10.5px; background: var(--oc-bg);">Patient ponctuel</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" id="btn-open-dossier-from-rdv" style="border-color: var(--oc-primary); color: var(--oc-primary); font-weight: 800;">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Ouvrir Dossier Patient
+        </button>
+        <button class="btn-modal-confirm" id="btn-imprimer-rdv" style="padding: 9px 16px;">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: middle;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Imprimer Ticket RDV
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast notification -->
   <div class="toast-notice" id="toast-notice">
     <span class="toast-dot"></span>
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=50"></script>
-  <script src="renderer.js?v=50"></script>
+  <script src="data.js?v=51"></script>
+  <script src="renderer.js?v=51"></script>
 </body>
 </html>

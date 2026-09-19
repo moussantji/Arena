@@ -808,7 +808,7 @@
 /* Styles pour le Module Gestion des Rendez-vous */
 .rdv-table-header {
   display: grid;
-  grid-template-columns: 100px 105px 150px 110px 180px 135px 125px 85px 60px;
+  grid-template-columns: 110px 100px 165px 120px 200px 145px 130px 95px;
   padding: 12px 16px;
   column-gap: 8px;
   background-color: var(--oc-bg);
@@ -827,7 +827,8 @@
 
 .rdv-row {
   display: grid;
-  grid-template-columns: 100px 105px 150px 110px 180px 135px 125px 85px 60px;
+  cursor: pointer;
+  grid-template-columns: 110px 100px 165px 120px 200px 145px 130px 95px;
   padding: 12px 16px;
   column-gap: 8px;
   border-bottom: 1px solid var(--oc-border);

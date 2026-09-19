@@ -1256,10 +1256,13 @@ function renderRdvTable(filterText = "", filterPraticien = "", filterStatus = ""
       <span style="font-weight: 600; color: var(--oc-text-2); font-size: 10px;">${r.praticien}</span>
       <span class="bureau-badge">${r.bureau}</span>
       <span class="rdv-badge-statut ${statClass}">${r.statut}</span>
-      <div>
-        <button class="btn-modal-cancel" style="padding: 4px 8px; font-size: 9px; border-radius: var(--oc-radius-pill);" onclick="openPatientDossierModal('${r.patientId}')">Fiche</button>
-      </div>
     `;
+
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', () => {
+      openDetailRdvModal(r.id);
+    });
+
     rdvTableBody.appendChild(row);
   });
 }
@@ -2549,4 +2552,55 @@ document.getElementById('btn-imprimer-fac-detail')?.addEventListener('click', ()
     imprimerRecuFacture(currentDetailFactureNum);
     if (detailFacModal) detailFacModal.classList.remove('open');
   }
+});
+
+// Modal Détail Rendez-vous & Impression Ticket
+const detailRdvModal = document.getElementById('detail-rdv-modal');
+let currentDetailRdvId = null;
+
+window.openDetailRdvModal = function openDetailRdvModal(rdvId) {
+  const r = appointmentsList.find(x => x.id === rdvId);
+  if (!r) return;
+  currentDetailRdvId = rdvId;
+
+  document.getElementById('rdv-detail-patient').textContent = r.patientNom;
+  document.getElementById('rdv-detail-num').textContent = r.id;
+  document.getElementById('rdv-detail-date').textContent = r.date || '18/09/2026';
+  document.getElementById('rdv-detail-heure').textContent = r.heure;
+  document.getElementById('rdv-detail-praticien').textContent = r.praticien;
+  document.getElementById('rdv-detail-bureau').textContent = r.bureau;
+  document.getElementById('rdv-detail-motif').textContent = r.motif;
+  document.getElementById('rdv-detail-nom').textContent = r.patientNom;
+  document.getElementById('rdv-detail-tel').textContent = r.patientTel;
+  document.getElementById('rdv-detail-notes').textContent = r.notes || "Aucune note particulière";
+
+  const elStat = document.getElementById('rdv-detail-statut');
+  if (elStat) {
+    elStat.textContent = r.statut;
+    let cls = "termine";
+    if (r.statut === "En attente") cls = "attente";
+    else if (r.statut === "Retardé" || r.statut === "Annulé") cls = "retarde";
+    elStat.className = `cs-status-chip ${cls}`;
+  }
+
+  if (detailRdvModal) detailRdvModal.classList.add('open');
+};
+
+document.getElementById('btn-close-rdv-detail')?.addEventListener('click', () => {
+  if (detailRdvModal) detailRdvModal.classList.remove('open');
+});
+
+document.getElementById('btn-open-dossier-from-rdv')?.addEventListener('click', () => {
+  if (detailRdvModal) detailRdvModal.classList.remove('open');
+  const r = appointmentsList.find(x => x.id === currentDetailRdvId);
+  if (r && r.patientId) {
+    openPatientDossierModal(r.patientId);
+  }
+});
+
+document.getElementById('btn-imprimer-rdv')?.addEventListener('click', () => {
+  const r = appointmentsList.find(x => x.id === currentDetailRdvId);
+  if (!r) return;
+  showToast(`Ticket de RDV pour ${r.patientNom} (${r.date} à ${r.heure}) envoyé à l'imprimante ✓`);
+  if (detailRdvModal) detailRdvModal.classList.remove('open');
 });
