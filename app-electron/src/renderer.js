@@ -390,15 +390,11 @@ function selectPatient(patientId) {
   if (elName) elName.textContent = fullName;
   if (elMeta) elMeta.textContent = `${p.personalInfo.age} ans · ${p.personalInfo.nationalite} · ${p.insuranceInfo.assurance}`;
   
-  const elOd = document.getElementById('vital-od');
-  const elOg = document.getElementById('vital-og');
+  const elAcuite = document.getElementById('vital-acuite');
   const elTa = document.getElementById('vital-ta');
-  const elFondOeil = document.getElementById('vital-fond-oeil');
 
-  if (elOd) elOd.textContent = p.medicalInfo.vitals.od;
-  if (elOg) elOg.textContent = p.medicalInfo.vitals.og;
+  if (elAcuite) elAcuite.textContent = `OD: ${p.medicalInfo.vitals.od} · OG: ${p.medicalInfo.vitals.og}`;
   if (elTa) elTa.textContent = p.medicalInfo.vitals.tension;
-  if (elFondOeil) elFondOeil.textContent = (p.medicalInfo.vitals.fondOeil || 'Normal');
   
   const elTotal = document.getElementById('billing-total');
   const elShare = document.getElementById('billing-patient-share');
