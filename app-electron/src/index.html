@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/theme.css">
-  <link rel="stylesheet" href="styles/app.css?v=85">
-  <link rel="stylesheet" href="styles/patients.css?v=85">
+  <link rel="stylesheet" href="styles/app.css?v=88">
+  <link rel="stylesheet" href="styles/patients.css?v=88">
 
   <!-- STYLES EMBARQUÉS ULTRA-PRIORITAIRES POUR LES SELECTS -->
   <style id="custom-select-styles">
@@ -403,15 +403,23 @@
                 <p id="patient-meta">48 ans · Malienne · CANAM (AMO)</p>
               </div>
             </div>
-            <div class="vitals-grid" style="grid-template-columns: 1fr 1fr;">
-              <div class="vital-tile">
-                <div class="vital-label">ACUITÉ VISUELLE (OD / OG)</div>
-                <div class="vital-value" id="vital-acuite">OD: 10/10 · OG: 9/10</div>
+            <!-- Données de Consultation Active -->
+            <div class="vitals-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 10px;">
+              <div class="vital-tile" style="padding: 9px 12px;">
+                <div class="vital-label">ACTE DE CONSULTATION</div>
+                <div class="vital-value" id="dossier-cs-type" style="font-size: 11px; color: var(--oc-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Consultation ophtalmo</div>
               </div>
-              <div class="vital-tile">
-                <div class="vital-label">TENSION OCULAIRE (T.A.)</div>
-                <div class="vital-value" id="vital-ta">14/15 mmHg</div>
+              <div class="vital-tile" style="padding: 9px 12px;">
+                <div class="vital-label">BUREAU / CABINET</div>
+                <div class="vital-value" id="dossier-cs-bureau" style="font-size: 11px; color: var(--oc-text-1);">Bureau 1 (Ophtalmo)</div>
               </div>
+            </div>
+            <div style="background: var(--oc-bg); border: 1px solid var(--oc-border); border-radius: var(--oc-radius-sm); padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-size: 8.5px; font-weight: 800; color: var(--oc-text-3); text-transform: uppercase;">Praticien référent</span>
+                <div style="font-size: 11px; font-weight: 700; color: var(--oc-text-1);" id="dossier-cs-praticien">Dr Martin (Ophtalmologue)</div>
+              </div>
+              <span class="cs-status-chip termine" id="dossier-cs-couverture" style="font-size: 9px; padding: 3px 8px;">Sous Couvert : OUI</span>
             </div>
             <div class="billing-card">
               <div class="billing-label">FACTURE DU JOUR</div>
@@ -2009,7 +2017,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=85"></script>
-  <script src="renderer.js?v=85"></script>
+  <script src="data.js?v=88"></script>
+  <script src="renderer.js?v=88"></script>
 </body>
 </html>

@@ -390,11 +390,26 @@ function selectPatient(patientId) {
   if (elName) elName.textContent = fullName;
   if (elMeta) elMeta.textContent = `${p.personalInfo.age} ans · ${p.personalInfo.nationalite} · ${p.insuranceInfo.assurance}`;
   
-  const elAcuite = document.getElementById('vital-acuite');
-  const elTa = document.getElementById('vital-ta');
+  // Informations de Consultation Médicale
+  const elCsType = document.getElementById('dossier-cs-type');
+  const elCsBureau = document.getElementById('dossier-cs-bureau');
+  const elCsPrat = document.getElementById('dossier-cs-praticien');
+  const elCsCouv = document.getElementById('dossier-cs-couverture');
 
-  if (elAcuite) elAcuite.textContent = `OD: ${p.medicalInfo.vitals.od} · OG: ${p.medicalInfo.vitals.og}`;
-  if (elTa) elTa.textContent = p.medicalInfo.vitals.tension;
+  // Trouver la consultation associée au patient
+  const matchCs = consultationsList.find(c => c.patientId === patientId || c.patientRef === p.ref);
+  const csType = matchCs ? matchCs.typeConsultation : (p.medicalInfo.desc || "Consultation ophtalmologie");
+  const csBureau = matchCs ? matchCs.bureau : "Bureau 1 (Ophtalmo)";
+  const csPrat = matchCs ? matchCs.praticien : "Dr Martin (Ophtalmologue)";
+  const isSousCouvert = matchCs ? matchCs.sousCouvert : (p.insuranceInfo.assurance !== "Direct comptant");
+
+  if (elCsType) elCsType.textContent = csType;
+  if (elCsBureau) elCsBureau.textContent = csBureau;
+  if (elCsPrat) elCsPrat.textContent = csPrat;
+  if (elCsCouv) {
+    elCsCouv.textContent = isSousCouvert ? "Sous Couvert : OUI" : "Sous Couvert : NON";
+    elCsCouv.className = isSousCouvert ? "cs-status-chip termine" : "cs-status-chip attente";
+  }
   
   const elTotal = document.getElementById('billing-total');
   const elShare = document.getElementById('billing-patient-share');
