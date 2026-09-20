@@ -52,11 +52,11 @@ window.clinicData = {
         vitals: { od: "10/10", og: "8/10", tension: "14/15 mmHg", fondOeil: "Normal" }
       },
       billing: {
-        total: 120000,
-        formattedTotal: "120 000 FCFA",
+        total: 15000,
+        formattedTotal: "15 000 FCFA",
         coverage: "AMO 80%",
-        patientShare: "25 000 FCFA",
-        insuranceShare: "95 000 FCFA"
+        patientShare: "3 000 FCFA",
+        insuranceShare: "12 000 FCFA"
       }
     },
     {
