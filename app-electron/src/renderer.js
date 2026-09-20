@@ -120,10 +120,9 @@ window.switchView = function switchView(tabName) {
     showToast("Module Consultations ouvert ✓");
   } else if (tabName === 'Imagerie OCT') {
     if (viewImagerieOct) viewImagerieOct.style.display = 'flex';
-    if (viewTitle) viewTitle.textContent = "Imagerie & Tomographie OCT";
-    if (viewDate) viewDate.textContent = `Centre d'imagerie rétinienne — ${octList.length} examens enregistrés`;
-    renderOctTable();
-    showToast("Module Imagerie OCT ouvert ✓");
+    if (viewTitle) viewTitle.textContent = "Imagerie OCT (En cours de finalisation)";
+    if (viewDate) viewDate.textContent = "Module tomographique — Bientôt disponible";
+    showToast("Imagerie OCT : Bientôt disponible !");
   } else if (tabName === 'Facturation') {
     if (viewFacturation) viewFacturation.style.display = 'flex';
     if (viewTitle) viewTitle.textContent = "Facturation & Encaissements";
@@ -1411,7 +1410,9 @@ document.getElementById('btn-export-rdv')?.addEventListener('click', () => {
 
 
 // ============================================================
-// 18. MODULE GESTION DE L'IMAGERIE OCT (TOMOGRAPHIE)
+/* ============================================================
+// MODULE IMAGERIE OCT - MIS EN ATTENTE (BIENTÔT DISPONIBLE)
+// ============================================================
 // ============================================================
 
 const octTableBody = document.getElementById('oct-table-body');
@@ -1878,6 +1879,7 @@ document.getElementById('btn-export-oct')?.addEventListener('click', () => {
 
 
 // ============================================================
+*/
 // 19. MODULE FACTURATION & ENCAISSEMENTS EN FCFA
 // ============================================================
 

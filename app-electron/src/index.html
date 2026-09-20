@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/theme.css">
-  <link rel="stylesheet" href="styles/app.css?v=65">
-  <link rel="stylesheet" href="styles/patients.css?v=65">
+  <link rel="stylesheet" href="styles/app.css?v=70">
+  <link rel="stylesheet" href="styles/patients.css?v=70">
 
   <!-- STYLES EMBARQUÉS ULTRA-PRIORITAIRES POUR LES SELECTS -->
   <style id="custom-select-styles">
@@ -162,6 +162,7 @@
           <a class="nav-item" data-tab="Imagerie OCT" onclick="switchView('Imagerie OCT')">
             <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
             <span>Imagerie OCT</span>
+            <span style="font-size: 7.5px; font-weight: 800; background: rgba(192, 138, 45, 0.2); color: var(--oc-accent); padding: 2px 5px; border-radius: 4px; margin-left: auto; text-transform: uppercase;">Bientôt</span>
           </a>
           <a class="nav-item" data-tab="Facturation" onclick="switchView('Facturation')">
             <svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
@@ -602,58 +603,37 @@
           </div>
         </div>
 
-        <!-- VUE GESTION IMAGERIE OCT -->
-        <div id="view-imagerie-oct" class="patients-view-container" style="display: none;">
-          <div class="patients-toolbar">
-            <div class="patients-filters">
-              <div class="patients-search-box">
-                <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="oct-view-search" placeholder="Rechercher par patient, réf, examen, œil...">
-              </div>
-              <select class="filter-select" id="filter-oct-type">
-                <option value="">Tous les types d'OCT</option>
-                <option value="OCT Maculaire Haute Définition">OCT Maculaire (25 000 FCFA)</option>
-                <option value="OCT Papille & Fibres RNFL (Glaucome)">OCT Papille Glaucome (25 000 FCFA)</option>
-                <option value="Angio-OCT (OCT-A) Rétinien sans injection">Angio-OCT (40 000 FCFA)</option>
-                <option value="OCT Segment Antérieur & Cornée">OCT Segment Antérieur (20 000 FCFA)</option>
-                <option value="Bilan OCT Combiné Macula + Nerf Optique">Bilan OCT Combiné (45 000 FCFA)</option>
-              </select>
-              <select class="filter-select" id="filter-oct-status">
-                <option value="">Tous les statuts</option>
-                <option value="Validé">Validé</option>
-                <option value="En cours">En cours</option>
-                <option value="À analyser">À analyser</option>
-              </select>
+        <!-- VUE GESTION IMAGERIE OCT (BIENTÔT DISPONIBLE) -->
+        <div id="view-imagerie-oct" class="patients-view-container" style="display: none; align-items: center; justify-content: center; height: 100%;">
+          <div style="text-align: center; max-width: 480px; padding: 40px 30px; background: #ffffff; border-radius: 16px; border: 1px solid var(--oc-border); box-shadow: 0 20px 40px rgba(0,0,0,0.06);">
+            <div style="width: 64px; height: 64px; border-radius: 16px; background: rgba(30, 86, 214, 0.1); color: var(--oc-primary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
             </div>
-            <div class="patients-actions-right">
-              <button class="btn-export-excel" id="btn-export-oct" title="Exporter les examens OCT en fichier Excel">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                <span>Exporter en Excel</span>
-              </button>
-              <button class="btn-add-patient" id="btn-open-create-oct">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                <span>Nouvel Examen OCT</span>
-              </button>
+            <h2 style="font-size: 20px; font-weight: 800; color: var(--oc-text-1); margin: 0 0 8px 0; letter-spacing: -0.3px;">Imagerie & Tomographie OCT</h2>
+            <div style="display: inline-block; padding: 4px 12px; background: rgba(192, 138, 45, 0.15); color: var(--oc-accent); font-weight: 800; font-size: 11px; border-radius: 20px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
+              Bientôt disponible
             </div>
-          </div>
-
-          <div class="patients-table-card">
-            <div class="oct-table-header">
-              <span>N° EXAMEN</span>
-              <span>PATIENT</span>
-              <span>ŒIL</span>
-              <span>TYPE D'OCT</span>
-              <span>ÉPAISSEUR</span>
-              <span>APPAREIL</span>
-              <span>TARIF (FCFA)</span>
-              <span>STATUT</span>
-              <span>ACTIONS</span>
-            </div>
-            <div class="oct-table-body" id="oct-table-body">
-              <!-- Rendu dynamique via renderer.js -->
+            <p style="font-size: 12.5px; line-height: 1.5; color: var(--oc-text-3); margin: 0 0 20px 0;">
+              Le module d'acquisition tomographique haute définition, interfaçage Spectralis Heidelberg / Zeiss Cirrus et cartographie 3D de la rétine est en cours de finalisation pour la Clinique Le Renouveau.
+            </p>
+            <div style="padding: 12px 16px; background: var(--oc-bg); border-radius: 8px; border: 1px dashed var(--oc-border); font-size: 11px; color: var(--oc-text-2); font-weight: 600;">
+              🚀 Déploiement prévu dans la prochaine mise à jour logicielle.
             </div>
           </div>
         </div>
+
+        <!-- CODE ORIGINAL DU MODULE OCT COMMENTÉ :
+        /*
+        <div class="patients-toolbar">
+          <div class="patients-filters">...</div>
+        </div>
+        <div class="patients-table-card">...</div>
+        */
+        -->
 
         <!-- VUE GESTION DE LA FACTURATION & ENCAISSEMENTS -->
         <div id="view-facturation" class="patients-view-container" style="display: none;">
@@ -2037,7 +2017,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=65"></script>
-  <script src="renderer.js?v=65"></script>
+  <script src="data.js?v=70"></script>
+  <script src="renderer.js?v=70"></script>
 </body>
 </html>
