@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/theme.css">
-  <link rel="stylesheet" href="styles/app.css?v=70">
-  <link rel="stylesheet" href="styles/patients.css?v=70">
+  <link rel="stylesheet" href="styles/app.css?v=75">
+  <link rel="stylesheet" href="styles/patients.css?v=75">
 
   <!-- STYLES EMBARQUÉS ULTRA-PRIORITAIRES POUR LES SELECTS -->
   <style id="custom-select-styles">
@@ -417,19 +417,19 @@
                 <div class="vital-value" id="vital-ta">14/15 mmHg</div>
               </div>
               <div class="vital-tile">
-                <div class="vital-label">OCT</div>
-                <div class="vital-value" id="vital-oct">02/03</div>
+                <div class="vital-label">FOND D'ŒIL</div>
+                <div class="vital-value" id="vital-fond-oeil">Normal</div>
               </div>
             </div>
             <div class="billing-card">
               <div class="billing-label">FACTURE DU JOUR</div>
-              <div class="billing-amount" id="billing-total">120 000 FCFA <span class="billing-cpam" id="billing-coverage">· Prise en charge 80%</span></div>
-              <div class="billing-rest" id="billing-patient-share">Reste à charge patient : 25 000 FCFA</div>
+              <div class="billing-amount" id="billing-total">15 000 FCFA <span class="billing-cpam" id="billing-coverage">· AMO 80%</span></div>
+              <div class="billing-rest" id="billing-patient-share">Reste à charge patient : 3 000 FCFA</div>
             </div>
             <div class="dossier-actions">
               <button class="btn-dossier-primary" id="btn-encaissement">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                <span id="btn-encaissement-text">Encaisser 120 000 FCFA</span>
+                <span id="btn-encaissement-text">Encaisser 15 000 FCFA</span>
               </button>
               <button class="btn-dossier-secondary" id="btn-check-dossier">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
@@ -794,16 +794,16 @@
                     <span style="color: var(--oc-primary);">45%</span>
                   </div>
                   <div style="background: var(--oc-bg); height: 8px; border-radius: 4px; overflow: hidden;">
-                    <div style="background: var(--oc-primary); width: 45%; height: 100%; border-radius: 4px;"></div>
+                    <div style="background: var(--oc-primary); width: 48%; height: 100%; border-radius: 4px;"></div>
                   </div>
                 </div>
                 <div>
                   <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; margin-bottom: 5px;">
-                    <span>Imagerie OCT & Tomographie</span>
-                    <span style="color: var(--oc-accent);">25%</span>
+                    <span>Réfraction & Lunettes</span>
+                    <span style="color: var(--oc-accent);">28%</span>
                   </div>
                   <div style="background: var(--oc-bg); height: 8px; border-radius: 4px; overflow: hidden;">
-                    <div style="background: var(--oc-accent); width: 25%; height: 100%; border-radius: 4px;"></div>
+                    <div style="background: var(--oc-accent); width: 28%; height: 100%; border-radius: 4px;"></div>
                   </div>
                 </div>
                 <div>
@@ -1713,7 +1713,7 @@
                   <option value="Bureau 2 (Réfraction)">Bureau 2 (Réfraction)</option>
                   <option value="Bureau 3 (Orthopsie)">Bureau 3 (Orthopsie)</option>
                   <option value="Bureau 4 (Généraliste)">Bureau 4 (Généraliste)</option>
-                  <option value="Salle d'Imagerie OCT">Salle d'Imagerie OCT</option>
+                  
                   <option value="Bureau Urgences">Bureau Urgences</option>
                 </select>
               </div>
@@ -1781,7 +1781,7 @@
                   <option value="Bureau 3 (Orthopsie)">Bureau 3 (Orthopsie)</option>
                   <option value="Bureau 4 (Généraliste)">Bureau 4 (Généraliste)</option>
                   <option value="Bureau Urgences">Bureau Urgences</option>
-                  <option value="Salle d'Imagerie OCT">Salle d'Imagerie OCT</option>
+                  
                 </select>
               </div>
               <div class="form-group">
@@ -2017,7 +2017,7 @@
     <span id="toast-msg">Opération réussie</span>
   </div>
 
-  <script src="data.js?v=70"></script>
-  <script src="renderer.js?v=70"></script>
+  <script src="data.js?v=75"></script>
+  <script src="renderer.js?v=75"></script>
 </body>
 </html>

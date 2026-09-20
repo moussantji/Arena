@@ -393,12 +393,12 @@ function selectPatient(patientId) {
   const elOd = document.getElementById('vital-od');
   const elOg = document.getElementById('vital-og');
   const elTa = document.getElementById('vital-ta');
-  const elOct = document.getElementById('vital-oct');
+  const elFondOeil = document.getElementById('vital-fond-oeil');
 
   if (elOd) elOd.textContent = p.medicalInfo.vitals.od;
   if (elOg) elOg.textContent = p.medicalInfo.vitals.og;
   if (elTa) elTa.textContent = p.medicalInfo.vitals.tension;
-  if (elOct) elOct.textContent = p.medicalInfo.vitals.oct;
+  if (elFondOeil) elFondOeil.textContent = (p.medicalInfo.vitals.fondOeil || 'Normal');
   
   const elTotal = document.getElementById('billing-total');
   const elShare = document.getElementById('billing-patient-share');

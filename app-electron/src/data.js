@@ -46,10 +46,10 @@ window.clinicData = {
       },
       medicalInfo: {
         time: "09:12",
-        desc: "OCT Macula + Réfraction",
+        desc: "Consultation ophtalmo + Réfraction",
         status: "in-progress",
         statusLabel: "En cours",
-        vitals: { od: "10/10", og: "8/10", tension: "14/15 mmHg", oct: "02/03" }
+        vitals: { od: "10/10", og: "8/10", tension: "14/15 mmHg", fondOeil: "Normal" }
       },
       billing: {
         total: 120000,
@@ -85,7 +85,7 @@ window.clinicData = {
         desc: "Tonométrie + Fond d’œil",
         status: "waiting",
         statusLabel: "En attente",
-        vitals: { od: "9/10", og: "9/10", tension: "16/16 mmHg", oct: "Normal" }
+        vitals: { od: "9/10", og: "9/10", tension: "16/16 mmHg", fondOeil: "Normal" }
       },
       billing: {
         total: 45000,
@@ -121,7 +121,7 @@ window.clinicData = {
         desc: "Suivi chirurgie cataracte",
         status: "waiting",
         statusLabel: "En attente",
-        vitals: { od: "8/10", og: "10/10", tension: "13/14 mmHg", oct: "Post-op OK" }
+        vitals: { od: "8/10", og: "10/10", tension: "13/14 mmHg", fondOeil: "Calme" }
       },
       billing: {
         total: 60000,
@@ -157,7 +157,7 @@ window.clinicData = {
         desc: "Bilan complet réfraction",
         status: "waiting",
         statusLabel: "En attente",
-        vitals: { od: "7/10", og: "6/10", tension: "15/15 mmHg", oct: "Non requis" }
+        vitals: { od: "7/10", og: "6/10", tension: "15/15 mmHg", fondOeil: "Non requis" }
       },
       billing: {
         total: 50000,
@@ -169,7 +169,7 @@ window.clinicData = {
     }
   ],
   agenda: [
-    { id: "A1", time: "09:00", patient: "Mamadou Traoré", desc: "Consultation + OCT · cab. 1", status: "pri" },
+    { id: "A1", time: "09:00", patient: "Mamadou Traoré", desc: "Consultation ophtalmo · Bureau 1", status: "pri" },
     { id: "A2", time: "09:30", patient: "Fatoumata Coulibaly", desc: "Tonométrie · cab. 2", status: "pri" },
     { id: "A3", time: "10:00", patient: "Oumar Diarra", desc: "Suivi cataracte · cab. 1", alert: "retard 10 min", status: "warn" },
     { id: "A4", time: "10:30", patient: "Aminata Kéïta", desc: "Bilan réfraction · cab. 2", status: "pri" },
@@ -275,7 +275,7 @@ window.clinicAppointments = [
     patientNom: "TRAORÉ Mamadou",
     patientRef: "CLI-ML-2026-0841",
     patientTel: "+223 76 45 89 12",
-    motif: "Consultation ophtalmologie + Bilan OCT",
+    motif: "Consultation ophtalmologie approfondie",
     praticien: "Dr Martin (Ophtalmologue)",
     bureau: "Bureau 1 (Ophtalmo)",
     statut: "Confirmé",
@@ -436,15 +436,15 @@ window.clinicInvoices = [
     patientId: "P001",
     patientNom: "TRAORÉ Mamadou",
     patientRef: "CLI-ML-2026-0841",
-    actes: "Consultation ophtalmo (15 000) + OCT Maculaire (25 000)",
-    montantBrut: 40000,
-    formattedBrut: "40 000 FCFA",
+    actes: "Consultation ophtalmologie (15 000 FCFA)",
+    montantBrut: 15000,
+    formattedBrut: "15 000 FCFA",
     organismeAssurance: "CANAM (AMO)",
     tauxPriseEnCharge: "80%",
-    partAssurance: 32000,
-    formattedPartAssurance: "32 000 FCFA",
-    restePatient: 8000,
-    formattedRestePatient: "8 000 FCFA",
+    partAssurance: 12000,
+    formattedPartAssurance: "12 000 FCFA",
+    restePatient: 3000,
+    formattedRestePatient: "3 000 FCFA",
     modePaiement: "Orange Money Mali",
     statut: "Payée"
   },
@@ -454,15 +454,15 @@ window.clinicInvoices = [
     patientId: "P002",
     patientNom: "COULIBALY Fatoumata",
     patientRef: "CLI-ML-2026-0842",
-    actes: "Consultation optométrie (5 000) + Bilan OCT Duo (45 000)",
-    montantBrut: 50000,
-    formattedBrut: "50 000 FCFA",
+    actes: "Consultation optométrie & réfraction (5 000 FCFA)",
+    montantBrut: 5000,
+    formattedBrut: "5 000 FCFA",
     organismeAssurance: "SUNU Assurances",
     tauxPriseEnCharge: "80%",
-    partAssurance: 40000,
-    formattedPartAssurance: "40 000 FCFA",
-    restePatient: 10000,
-    formattedRestePatient: "10 000 FCFA",
+    partAssurance: 4000,
+    formattedPartAssurance: "4 000 FCFA",
+    restePatient: 1000,
+    formattedRestePatient: "1 000 FCFA",
     modePaiement: "Espèces (Comptant)",
     statut: "Payée"
   },
@@ -472,15 +472,15 @@ window.clinicInvoices = [
     patientId: "P003",
     patientNom: "DIARRA Oumar",
     patientRef: "CLI-ML-2026-0843",
-    actes: "Consultation en urgence (25 000) + OCT Papille (25 000)",
-    montantBrut: 50000,
-    formattedBrut: "50 000 FCFA",
+    actes: "Consultation en urgence ophtalmologique (25 000 FCFA)",
+    montantBrut: 25000,
+    formattedBrut: "25 000 FCFA",
     organismeAssurance: "INPS / AMO",
     tauxPriseEnCharge: "70%",
-    partAssurance: 35000,
-    formattedPartAssurance: "35 000 FCFA",
-    restePatient: 15000,
-    formattedRestePatient: "15 000 FCFA",
+    partAssurance: 17500,
+    formattedPartAssurance: "17 500 FCFA",
+    restePatient: 7500,
+    formattedRestePatient: "7 500 FCFA",
     modePaiement: "Moov Money",
     statut: "En attente"
   },
