@@ -1,10 +1,35 @@
 # Figma — DIALLO · Indigo Minuit
 
-Le design system et les écrans sont **générés dans Figma** par un plugin local.
-(Un fichier `.fig` binaire ne peut pas être produit hors de Figma : le plugin le
-construit en un clic, avec de vrais composants, styles et auto-layout.)
+## 0. Le plus simple : un fichier à importer
 
-## 1. Importer le plugin
+**`figma/DIALLO-Indigo-Minuit.sketch`** — c'est le fichier à glisser dans Figma.
+
+1. Figma → **File → Import…** (ou glisser le fichier sur le canvas)
+2. Choisir `DIALLO-Indigo-Minuit.sketch`
+
+Figma importe les fichiers Sketch nativement ; le `.fig` étant un format binaire
+propriétaire, `.sketch` est le format pivot. Contenu du fichier (2 pages, 13 artboards) :
+
+| Page | Contenu |
+|---|---|
+| `01 · Écrans` | 12 écrans desktop 1440 × 900 : Tableau de bord, Élèves, Classes, Emploi du temps, Finances, Personnel, Messagerie, Notes, Absences, Fiche élève, Admissions, Paramètres |
+| `02 · Design system` | palette Indigo Minuit (12 nuances nommées + HEX), 8 styles typographiques Inter, composants vectoriels : boutons, pills de statut, carte KPI, avatar, ligne de tableau |
+
+Vérifications avant diffusion :
+
+```bash
+python3 tools/check-sketch.py figma/DIALLO-Indigo-Minuit.sketch      # structure
+python3 tools/validate-sketch.py figma/DIALLO-Indigo-Minuit.sketch   # schéma Sketch officiel
+```
+
+Régénération : `python3 tools/make-figma-sketch.py` (nécessite Pillow).
+
+---
+
+## Alternative : le plugin Sketch
+
+
+## 1. Importer le plugin (variante)
 
 1. Ouvrir Figma (desktop ou web) → **Plugins → Development → Import plugin from manifest…**
 2. Choisir `figma/diallo-indigo/manifest.json`
@@ -18,7 +43,7 @@ Trois commandes sont disponibles :
 | Générer uniquement les styles | 12 couleurs, 8 typographies, 2 effets |
 | Générer uniquement les écrans | board palette/typo + 10 écrans 1440 × 900 |
 
-## 2. Ce qui est créé
+## 2. Ce que crée le plugin
 
 **Page `01 · Design system · DIALLO`**
 - board « Indigo Minuit » : 12 nuances avec noms et hex, échelle typographique complète
