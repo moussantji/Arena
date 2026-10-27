@@ -1,0 +1,13 @@
+{
+  "name": "DIALLO — Indigo Minuit",
+  "id": "diallo-indigo-minuit-generator",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "menu": [
+    { "name": "Générer le design system + les écrans", "command": "build-all" },
+    { "name": "Générer uniquement les styles", "command": "build-styles" },
+    { "name": "Générer uniquement les écrans", "command": "build-screens" }
+  ]
+}
