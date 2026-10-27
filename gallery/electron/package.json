@@ -1,0 +1,14 @@
+{
+  "name": "diallo-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DIALLO — application desktop de gestion d'école (direction Indigo Minuit)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}
