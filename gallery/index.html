@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Palettes — École Premium · React Native</title>
+<meta name="description" content="Trois directions visuelles pour une application premium de gestion d'école (React Native / MySQL)." />
+<style>
+  :root{
+    --bg:#0a0a0b;
+    --bg-soft:#101012;
+    --line:rgba(242,239,233,.12);
+    --line-strong:rgba(242,239,233,.22);
+    --ink:#f2efe9;
+    --ink-dim:#a7a49d;
+    --ink-faint:#6f6d68;
+    --gold:#c6a667;
+    --serif: ui-serif, "Didot", "Bodoni MT", "Playfair Display", Georgia, "Times New Roman", serif;
+    --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --r:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(198,166,103,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(107,124,116,.10), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    min-height:100vh;
+  }
+  a{color:inherit}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+
+  /* ---------- header ---------- */
+  header{padding:54px 0 26px;border-bottom:1px solid var(--line)}
+  .eyebrow{
+    display:flex;align-items:center;gap:12px;
+    font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-faint);
+    margin-bottom:26px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 14px rgba(198,166,103,.7)}
+  .eyebrow .sep{flex:0 0 34px;height:1px;background:var(--line-strong)}
+  h1{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:clamp(38px,6vw,74px);
+    line-height:.96;
+    letter-spacing:-.02em;
+    margin:0 0 18px;
+  }
+  h1 em{font-style:italic;color:var(--gold)}
+  .lede{
+    color:var(--ink-dim);font-size:15px;line-height:1.7;max-width:58ch;margin:0 0 30px;
+  }
+  .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+  .meta span{display:inline-flex;align-items:center;gap:9px}
+  .meta span::before{content:"";width:4px;height:4px;background:var(--ink-faint);border-radius:50%}
+
+  /* ---------- filters ---------- */
+  .bar{
+    position:sticky;top:0;z-index:20;
+    background:rgba(10,10,11,.82);
+    backdrop-filter:saturate(140%) blur(14px);
+    -webkit-backdrop-filter:saturate(140%) blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .bar-in{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 0;flex-wrap:wrap}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .tab{
+    appearance:none;border:1px solid transparent;background:transparent;color:var(--ink-dim);
+    font:inherit;font-size:12.5px;letter-spacing:.06em;padding:9px 16px;border-radius:999px;cursor:pointer;
+    transition:.22s ease;
+  }
+  .tab:hover{color:var(--ink);background:rgba(242,239,233,.05)}
+  .tab[aria-selected="true"]{background:var(--ink);color:#0a0a0b;border-color:var(--ink);font-weight:600}
+  .count{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:.12em}
+
+  /* ---------- grid ---------- */
+  main{padding:44px 0 30px}
+  .grid{display:grid;grid-template-columns:1fr;gap:34px}
+  @media (min-width:900px){.grid{grid-template-columns:1fr 1fr}}
+  .card{
+    border:1px solid var(--line);
+    border-radius:calc(var(--r) + 6px);
+    background:linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
+    overflow:hidden;
+    transition:border-color .3s ease, transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease;
+    display:flex;flex-direction:column;
+  }
+  .card:hover{border-color:var(--line-strong);transform:translateY(-3px);box-shadow:0 24px 60px -34px rgba(0,0,0,.9)}
+  .shot{
+    position:relative;display:block;width:100%;padding:0;border:0;background:#000;cursor:zoom-in;overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .shot img{display:block;width:100%;height:auto;transition:transform .7s cubic-bezier(.2,.8,.2,1), filter .4s}
+  .shot:hover img{transform:scale(1.018)}
+  .shot .zoom{
+    position:absolute;right:14px;bottom:14px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+    background:rgba(10,10,11,.72);color:var(--ink);border:1px solid var(--line-strong);
+    padding:7px 11px;border-radius:999px;opacity:0;transform:translateY(6px);transition:.3s;
+  }
+  .shot:hover .zoom{opacity:1;transform:none}
+
+  .body{padding:24px 24px 26px;display:flex;flex-direction:column;gap:18px}
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+  .name{
+    font-family:var(--serif);font-weight:400;font-size:27px;line-height:1.1;letter-spacing:-.01em;margin:0 0 7px;
+  }
+  .sub{font-size:12px;color:var(--ink-faint);letter-spacing:.1em;text-transform:uppercase}
+  .badge{
+    flex:none;font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+    padding:6px 10px;border-radius:999px;border:1px solid var(--line-strong);color:var(--ink-dim);white-space:nowrap;
+  }
+  .badge.dark{background:rgba(0,0,0,.5)}
+  .badge.light{background:rgba(242,239,233,.1)}
+
+  .swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .sw{
+    appearance:none;border:0;padding:0;background:transparent;cursor:pointer;font:inherit;text-align:left;
+    display:flex;flex-direction:column;gap:7px;
+  }
+  .chip{
+    height:52px;border-radius:10px;border:1px solid rgba(242,239,233,.16);
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .sw:hover .chip{transform:translateY(-3px);box-shadow:0 10px 24px -12px rgba(0,0,0,.9)}
+  .hex{font-family:var(--mono);font-size:9.5px;letter-spacing:.02em;color:var(--ink-faint)}
+  .role{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);opacity:.65;margin-top:-3px}
+
+  .note{margin:0;font-size:13px;line-height:1.65;color:var(--ink-dim)}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:2px}
+  .ghost{
+    appearance:none;font:inherit;font-size:12px;letter-spacing:.04em;cursor:pointer;
+    background:transparent;color:var(--ink);border:1px solid var(--line-strong);
+    padding:10px 15px;border-radius:999px;transition:.2s;
+  }
+  .ghost:hover{background:var(--ink);color:#0a0a0b;border-color:var(--ink)}
+  .copied{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);opacity:0;transition:opacity .3s}
+  .copied.on{opacity:1}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line);padding:34px 0 60px;color:var(--ink-faint);font-size:12px;letter-spacing:.04em}
+  footer .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+  /* ---------- lightbox ---------- */
+  .lb{
+    position:fixed;inset:0;z-index:60;display:none;
+    background:rgba(6,6,7,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    align-items:center;justify-content:center;padding:3vmin;
+  }
+  .lb.open{display:flex}
+  .lb img{max-width:min(1100px,96vw);max-height:92vh;width:auto;border-radius:8px;box-shadow:0 40px 120px -40px #000;border:1px solid var(--line)}
+  .lb-btn{
+    position:absolute;appearance:none;cursor:pointer;color:var(--ink);
+    background:rgba(255,255,255,.06);border:1px solid var(--line-strong);
+    width:44px;height:44px;border-radius:50%;font-size:18px;line-height:1;display:grid;place-items:center;transition:.2s;
+  }
+  .lb-btn:hover{background:var(--ink);color:#0a0a0b}
+  .lb-close{top:22px;right:22px}
+  .lb-prev{left:22px;top:50%;transform:translateY(-50%)}
+  .lb-next{right:22px;top:50%;transform:translateY(-50%)}
+  .lb-cap{
+    position:absolute;bottom:20px;left:0;right:0;text-align:center;color:var(--ink-dim);
+    font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  }
+
+  .empty{padding:60px 0;color:var(--ink-faint);text-align:center;font-size:14px}
+  ::selection{background:rgba(198,166,103,.28)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow"><span class="dot"></span> Direction artistique <span class="sep"></span> 2026</div>
+    <h1>Palettes pour une<br><em>école premium</em></h1>
+    <p class="lede">Trois directions visuelles pour une application de gestion scolaire sous React Native, avec une API MySQL. Chaque planche contient la palette complète, les codes hex et un aperçu des écrans clés : tableau de bord, élèves, emploi du temps, paiements.</p>
+    <div class="meta"><span>React Native</span><span>MySQL</span><span>iOS · Android</span><span>Cliquez sur un code pour le copier</span></div>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="wrap bar-in">
+    <div class="tabs" role="tablist" aria-label="Filtrer les palettes">
+      <button class="tab" role="tab" data-filter="all" aria-selected="true">Toutes</button>
+      <button class="tab" role="tab" data-filter="modern" aria-selected="false">Sophistiquées &amp; modernes</button>
+      <button class="tab" role="tab" data-filter="classic" aria-selected="false">Luxe classique</button>
+    </div>
+    <div class="count" id="count"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  <div class="wrap row">
+    <div>École premium · exploration de palettes · v2 « Sophistiquées &amp; modernes »</div>
+    <div>5 couleurs · 3 écrans · 1 accent par palette</div>
+  </div>
+</footer>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Aperçu de la planche">
+  <button class="lb-btn lb-close" id="lbClose" aria-label="Fermer">✕</button>
+  <button class="lb-btn lb-prev" id="lbPrev" aria-label="Précédent">‹</button>
+  <button class="lb-btn lb-next" id="lbNext" aria-label="Suivant">›</button>
+  <img id="lbImg" alt="" />
+  <div class="lb-cap" id="lbCap"></div>
+</div>
+
+<script>
+const PALETTES = [
+  {
+    id: 'onyx-champagne',
+    name: 'Onyx & Champagne',
+    sub: 'Sombre · luxe contemporain',
+    group: 'modern',
+    mode: 'dark',
+    img: 'palettes/v2-01-onyx-champagne.png',
+    note: "Noir profond, ivoire et un unique accent champagne. La direction la plus « premium discret » : parfaite pour un établissement privé haut de gamme, avec des chiffres mis en scène en grand et des filets fins.",
+    colors: [
+      ['#0B0B0C','Fond'], ['#17181A','Surface'], ['#C6A667','Accent'], ['#F2EFE9','Texte'], ['#6B7C74','Secondaire']
+    ]
+  },
+  {
+    id: 'sable-encre',
+    name: 'Sable & Encre',
+    sub: 'Clair · chaleureux éditorial',
+    group: 'modern',
+    mode: 'light',
+    img: 'palettes/v2-02-sable-encre.png',
+    note: "Sable chaud, encre quasi noire et terre cuite. Une identité éditoriale et accueillante, lisible en plein soleil — idéale pour les parents et le personnel administratif sur le terrain.",
+    colors: [
+      ['#F7F3EC','Fond'], ['#14120F','Texte'], ['#B4552F','Accent'], ['#D8CFC0','Neutre'], ['#4B5A50','Secondaire']
+    ]
+  },
+  {
+    id: 'celadon-ardoise',
+    name: 'Céladon & Ardoise',
+    sub: 'Clair · minimalisme suisse',
+    group: 'modern',
+    mode: 'light',
+    img: 'palettes/v2-03-celadon-ardoise.png',
+    note: "Gris-vert pâle, ardoise et graphite : une grille suisse, des barres de progression fines, aucune décoration. La palette la plus institutionnelle et la plus sobre des trois.",
+    colors: [
+      ['#F3F5F2','Fond'], ['#0E1311','Texte'], ['#7F9C88','Accent'], ['#2A3138','Ardoise'], ['#C4CBC2','Neutre']
+    ]
+  },
+  {
+    id: 'noir-academie',
+    name: 'Noir Académie',
+    sub: 'Sombre · or et sauge',
+    group: 'classic',
+    mode: 'dark',
+    img: 'palettes/palette-1-noir-academie.png',
+    note: "Version classique : or véritable sur noir, serif d'apparat et sauge en contrepoint. Plus « institution historique » que la v2, avec davantage de matière.",
+    colors: [
+      ['#0B0E14','Fond'], ['#1C2230','Surface'], ['#C9A227','Or'], ['#F5F1E8','Ivoire'], ['#4C7A68','Sauge']
+    ]
+  },
+  {
+    id: 'ivoire-emeraude',
+    name: 'Ivoire & Émeraude',
+    sub: 'Clair · émeraude et laiton',
+    group: 'classic',
+    mode: 'light',
+    img: 'palettes/palette-2-ivoire-emeraude.png',
+    note: "Ivoire, émeraude profond et laiton. Une élégance très « campus international », rassurante et patrimoniale, avec des entêtes sombres pleine largeur.",
+    colors: [
+      ['#FDFCF8','Fond'], ['#0F3D2E','Émeraude'], ['#1F6F54','Accent'], ['#CBB68A','Laiton'], ['#1A1A1A','Texte']
+    ]
+  },
+  {
+    id: 'indigo-minuit',
+    name: 'Indigo Minuit',
+    sub: 'Sombre · indigo et cuivre',
+    group: 'classic',
+    mode: 'dark',
+    img: 'palettes/palette-3-indigo-minuit.png',
+    note: "Bleu nuit, indigo lumineux et touches de cuivre, avec des cartes en verre. La direction la plus « produit tech » — pensée pour les analyses et les tableaux de bord.",
+    colors: [
+      ['#070B1F','Fond'], ['#1B2A6B','Indigo'], ['#5B7CFA','Accent'], ['#A7B6FF','Clair'], ['#E0A86F','Cuivre']
+    ]
+  }
+];
+
+const grid = document.getElementById('grid');
+const countEl = document.getElementById('count');
+const lb = document.getElementById('lb');
+const lbImg = document.getElementById('lbImg');
+const lbCap = document.getElementById('lbCap');
+let filter = 'all';
+let visible = [];
+let lbIndex = 0;
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function render(){
+  const list = PALETTES.filter(p => filter === 'all' || p.group === filter);
+  visible = list;
+  countEl.textContent = String(list.length).padStart(2,'0') + ' planches';
+
+  grid.innerHTML = list.map((p, i) => `
+    <article class="card" data-id="${p.id}">
+      <button class="shot" data-open="${i}" aria-label="Agrandir ${esc(p.name)}">
+        <img src="${p.img}" alt="Planche de palette ${esc(p.name)} — ${esc(p.sub)}" loading="${i < 2 ? 'eager' : 'lazy'}" decoding="async" />
+        <span class="zoom">Agrandir ↗</span>
+      </button>
+      <div class="body">
+        <div class="head">
+          <div>
+            <h2 class="name">${esc(p.name)}</h2>
+            <div class="sub">${esc(p.sub)}</div>
+          </div>
+          <span class="badge ${p.mode}">${p.mode === 'dark' ? 'Sombre' : 'Clair'}</span>
+        </div>
+        <div class="swatches">
+          ${p.colors.map(([hex, role]) => `
+            <button class="sw" data-hex="${hex}" title="Copier ${hex}">
+              <span class="chip" style="background:${hex}"></span>
+              <span class="hex">${hex}</span>
+              <span class="role">${esc(role)}</span>
+            </button>
+          `).join('')}
+        </div>
+        <p class="note">${esc(p.note)}</p>
+        <div class="foot">
+          <button class="ghost" data-open="${i}">Voir la planche</button>
+          <span class="copied" data-copied="${p.id}">Copié</span>
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
+
+grid.addEventListener('click', (e) => {
+  const openBtn = e.target.closest('[data-open]');
+  if (openBtn){ openLightbox(Number(openBtn.dataset.open)); return; }
+
+  const sw = e.target.closest('[data-hex]');
+  if (sw){
+    const hex = sw.dataset.hex;
+    copy(hex);
+    const card = sw.closest('.card');
+    const flag = card && card.querySelector('.copied');
+    if (flag){
+      flag.textContent = hex + ' copié';
+      flag.classList.add('on');
+      clearTimeout(flag._t);
+      flag._t = setTimeout(() => flag.classList.remove('on'), 1400);
+    }
+  }
+});
+
+function copy(text){
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch {}
+  ta.remove();
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+    filter = tab.dataset.filter;
+    render();
+  });
+});
+
+/* ---- lightbox ---- */
+function openLightbox(i){
+  lbIndex = (i + visible.length) % visible.length;
+  const p = visible[lbIndex];
+  lbImg.src = p.img;
+  lbImg.alt = 'Planche de palette ' + p.name;
+  lbCap.textContent = p.name + ' — ' + p.sub;
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(){
+  lb.classList.remove('open');
+  document.body.style.overflow = '';
+}
+function step(d){ if (visible.length) openLightbox((lbIndex + d + visible.length) % visible.length); }
+
+document.getElementById('lbClose').addEventListener('click', closeLightbox);
+document.getElementById('lbPrev').addEventListener('click', () => step(-1));
+document.getElementById('lbNext').addEventListener('click', () => step(1));
+lb.addEventListener('click', (e) => { if (e.target === lb) closeLightbox(); });
+document.addEventListener('keydown', (e) => {
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') step(-1);
+  if (e.key === 'ArrowRight') step(1);
+});
+
+render();
+</script>
+</body>
+</html>
