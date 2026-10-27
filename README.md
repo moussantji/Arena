@@ -7,8 +7,8 @@ Palette retenue : **Indigo Minuit** (`#070B1F` · `#5B7CFA` · `#E0A86F`).
 
 | Dossier | Contenu |
 |---|---|
-| `app/` | **Dashboard React** — interface desktop, composants, affichage uniquement |
-| `figma/` | **Plugin Figma** qui génère les styles, composants et écrans + tokens |
+| `app/` | **Dashboard React** — interface desktop, composants, modales personnalisées, affichage uniquement |
+| `figma/` | **Plugin Figma** qui génère les styles, composants, 10 écrans et la modale + tokens |
 | `gallery/` | Écrans d'accueil (exports PNG) et coquille Electron |
 
 ## Démarrer
@@ -32,9 +32,13 @@ de développement, puis **Plugins → Development → DIALLO — Indigo Minuit**
 ## Écrans
 
 Écrans React (composants) : tableau de bord, élèves, classes, emploi du temps,
-finances, personnel, messagerie, notes, absences, fiche élève, admissions, paramètres.
+finances, personnel, messagerie, notes, absences, fiche élève, admissions, paramètres,
+plus une page **Modales** de démonstration.
 
-Écrans exportés (PNG, 1312 × 816) : `gallery/palettes/indigo-page-*.png`
+Modales personnalisées : formulaire, paiement, confirmation destructive, justificatif,
+export, rédaction, succès et panneau latéral — pile, focus piégé, animations.
+
+Écrans exportés (PNG, 1312 × 816) : `gallery/palettes/indigo-page-*.png` (12 fichiers)
 + bannière `hero-06-indigo-minuit.png` et planche `palette-3-indigo-minuit.png`.
 
 ## Conventions

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { TitleBar, Sidebar, TopBar, PageHeader, PAGES as NAV_PAGES } from './layout.jsx';
 import { META, PAGES } from './pages.jsx';
+import { useModals } from './modal.jsx';
 
 /* ============================================================
    DIALLO — coquille de l'application
@@ -20,6 +21,7 @@ export default function App() {
   const [tour, setTour] = useState(false);
   const [dir, setDir] = useState(1);
   const bodyRef = useRef(null);
+  const modals = useModals();
 
   const page = META[pageId];
   const Page = PAGES[pageId];
@@ -38,7 +40,12 @@ export default function App() {
     setPageId(id);
     setSidebar(false);
     window.history.replaceState(null, '', '#' + id);
-    if (bodyRef.current) bodyRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    const node = bodyRef.current;
+    if (node && typeof node.scrollTo === 'function') {
+      node.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (node) {
+      node.scrollTop = 0;
+    }
   };
 
   /* raccourcis clavier — confort d'affichage */
@@ -55,6 +62,10 @@ export default function App() {
         document.querySelector('.search input')?.focus();
       }
       if (e.key.toLowerCase() === 't') setTour((v) => !v);
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        modals.student();
+      }
       const n = Number(e.key);
       if (!Number.isNaN(n) && n >= 1 && n <= 9) go(ORDER[n - 1]);
       if (e.key === '0') go(ORDER[9]);
@@ -81,9 +92,28 @@ export default function App() {
     document.title = `${page.label} — DIALLO`;
   }, [page.label]);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') window.scrollTo(0, 0);
-  }, []);
+  /* actions d'en-tête : chaque page ouvre sa modale */
+  const primaryActions = {
+    dashboard: () => modals.student(),
+    eleves: () => modals.student(),
+    classes: () => modals.student(),
+    'emploi-du-temps': () => modals.success({ title: 'Cours ajouté', sub: 'Le créneau est visible dans l’emploi du temps.', rows: [['Classe', 'Terminale S'], ['Créneau', 'Jeudi 10:00'], ['Salle', 'S204']] }),
+    finances: () => modals.payment(),
+    personnel: () => modals.student({ title: 'Ajouter un membre', sub: 'Personnel · 2025 — 2026' }),
+    messagerie: () => modals.message(),
+    notes: () => modals.student({ title: 'Saisir les notes', sub: 'Terminale S · Trimestre 1', icon: 'grades', eyebrow: 'Évaluation' }),
+    absences: () => modals.absence(),
+    fiche: () => modals.student({ title: 'Modifier la fiche', sub: 'Aminata Traoré · Terminale S' }),
+    admissions: () => modals.student({ title: 'Nouveau dossier', sub: 'Admissions · Rentrée 2026' }),
+    parametres: () => modals.success({ title: 'Paramètres enregistrés', sub: 'Les modifications sont appliquées à l’établissement.', rows: [['Établissement', 'École Internationale Diallo'], ['Devise', 'FCFA'], ['Langue', 'Français']] }),
+    modales: () => modals.student(),
+  };
+
+  const secondaryActions = {
+    parametres: () => modals.confirm({ title: 'Réinitialiser les paramètres ?', confirmLabel: 'Réinitialiser' }),
+  };
+
+
 
   return (
     <div className="shell">
@@ -106,7 +136,11 @@ export default function App() {
         />
 
         <div className="page" ref={bodyRef}>
-          <PageHeader page={page} />
+          <PageHeader
+            page={page}
+            onPrimary={primaryActions[pageId] || (() => modals.success({}))}
+            onSecondary={secondaryActions[pageId] || (() => modals.exportData())}
+          />
 
           <div className="stage">
             <div

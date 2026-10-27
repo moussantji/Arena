@@ -24,7 +24,10 @@ export const NAV = {
     { id: 'fiche', label: 'Fiche élève', icon: 'profile' },
     { id: 'admissions', label: 'Admissions', icon: 'admissions' },
   ],
-  Système: [{ id: 'parametres', label: 'Paramètres', icon: 'settings' }],
+  Système: [
+    { id: 'modales', label: 'Modales', icon: 'external' },
+    { id: 'parametres', label: 'Paramètres', icon: 'settings' },
+  ],
 };
 
 export const PAGES = Object.values(NAV).flat();
@@ -158,7 +161,7 @@ export function TopBar({ page, onSearch, query, results, onPick }) {
   );
 }
 
-export function PageHeader({ page, children }) {
+export function PageHeader({ page, children, onPrimary, onSecondary }) {
   return (
     <div className="page-head">
       <div className="ttl">
@@ -166,8 +169,8 @@ export function PageHeader({ page, children }) {
         <p>{page.sub}</p>
       </div>
       <div className="head-actions">
-        {page.secondary && <Btn icon="download">{page.secondary}</Btn>}
-        {page.primary && <Btn icon="plus" solid>{page.primary}</Btn>}
+        {page.secondary && <Btn icon="download" onClick={onSecondary}>{page.secondary}</Btn>}
+        {page.primary && <Btn icon="plus" solid onClick={onPrimary}>{page.primary}</Btn>}
         {children}
       </div>
     </div>

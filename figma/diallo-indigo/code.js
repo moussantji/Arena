@@ -795,6 +795,305 @@ function screenSettings(dsPage) {
   return s;
 }
 
+/* --- écran : classes --- */
+function screenClasses(dsPage) {
+  const s = frame('08 · Classes', W, H, solid(C.bg));
+  dsPage.appendChild(s);
+  sidebar(s);
+  topbar(s, 'Classes', 'Année 2025–2026');
+  pageHead(s, 'Classes', '42 classes · 1 284 élèves', 'Créer une classe', 'Archiver');
+
+  const stats = [['42', 'Classes'], ['31,2', 'Élèves / classe'], ['96,8 %', 'Taux d’occupation'], ['6', 'Terminales']];
+  const sw = (W - SIDEBAR - 44 - 36) / 4;
+  stats.forEach(([v, l], i) => {
+    const x = SIDEBAR + 22 + i * (sw + 12);
+    const c = card(s, x, 148, sw, 74);
+    label(c, v, 15, 14, 21, 'Bold', i === 2 ? C.accent2 : C.ink);
+    label(c, l, 15, 45, 11, 'Regular', C.faint);
+  });
+
+  const names = ['Terminale S', 'Terminale L', 'Première S', 'Première ES', 'Seconde A', 'Seconde B'];
+  const teachers = ['M. Martior', 'Mme Diallo', 'M. Hilorma', 'Mme Traoré', 'M. Framiéma', 'Mme Rifa'];
+  const cw = (W - SIDEBAR - 44 - 24) / 3;
+
+  names.forEach((n, i) => {
+    const x = SIDEBAR + 22 + (i % 3) * (cw + 12);
+    const y = 240 + Math.floor(i / 3) * 200;
+    const c = card(s, x, y, cw, 184);
+    if (i === 4) {
+      c.strokes = [solid(C.accent, 0.55)];
+      c.effects = [
+        { type: 'DROP_SHADOW', color: rgba(C.accent, 0.3), offset: { x: 0, y: 0 }, radius: 40, spread: -14, visible: true, blendMode: 'NORMAL' },
+      ];
+    }
+    label(c, n, 16, 15, 16, 'Bold', C.ink);
+    if (i === 4) badge(c, 'Active', cw - 76, 16, { fg: '#CDD8FF' });
+    label(c, 'Effectif', 16, 52, 10.5, 'Regular', C.faint);
+    label(c, '32', cw - 60, 48, 13, 'Medium', C.ink);
+    label(c, '/ 35', cw - 32, 51, 10, 'Regular', C.faint);
+    rect(c, 16, 74, cw - 32, 3, { fill: solid(C.line, 0.18), radius: 999 });
+    rect(c, 16, 74, (cw - 32) * 0.91, 3, { fill: grad(C.accent, C.accent2), radius: 999 });
+    ['AM', 'IK', 'FD'].forEach((ini, k) => {
+      ellipse(c, 16 + k * 16, 94, 22, { fill: grad('#9DB0FF', '#5B7CFA'), stroke: C.bg2 });
+    });
+    rect(c, 16, 136, cw - 32, 1, { fill: solid(C.line, 0.16) });
+    label(c, teachers[i], 16, 148, 11.5, 'Regular', C.dim);
+    ellipse(c, cw - 30, 150, 5, { fill: solid(C.faint) });
+  });
+
+  return s;
+}
+
+/* --- écran : notes --- */
+function screenNotes(dsPage) {
+  const s = frame('09 · Notes', W, H, solid(C.bg));
+  dsPage.appendChild(s);
+  sidebar(s);
+  topbar(s, 'Élèves', 'Notes · Trimestre 1');
+  pageHead(s, 'Notes', 'Terminale S · Trimestre 1 · 32 élèves', 'Saisir les notes', 'Bulletins');
+
+  const stats = [['12,8 / 20', 'Moyenne de classe', true], ['18,4', 'Meilleure moyenne'], ['12,1', 'Médiane'], ['6,2 %', 'Sous la moyenne']];
+  const sw = (W - SIDEBAR - 44 - 36) / 4;
+  stats.forEach(([v, l, acc], i) => {
+    const c = card(s, SIDEBAR + 22 + i * (sw + 12), 148, sw, 74);
+    label(c, v, 15, 14, 21, 'Bold', acc ? C.accent2 : C.ink);
+    label(c, l, 15, 45, 11, 'Regular', C.faint);
+  });
+
+  const rep = card(s, SIDEBAR + 22, 240, 360, 230, { title: 'Répartition', sub: 'Tranches de notes' });
+  [['0–5', 8], ['5–10', 22], ['10–15', 46], ['15–18', 20], ['18–20', 4]].forEach(([lab, v], i) => {
+    const y = 64 + i * 30;
+    label(rep, lab, 16, y + 4, 11, 'Regular', C.dim);
+    rect(rep, 70, y + 8, 200, 5, { fill: solid(C.line, 0.1), radius: 999 });
+    rect(rep, 70, y + 8, 200 * (v / 46), 5, { fill: grad(C.accent, C.accent2), radius: 999 });
+    label(rep, v + ' %', 288, y + 4, 10, 'Medium', C.faint);
+  });
+
+  const grades = [
+    ['Aminata Traoré', '16,0', '14,5', '15,0', '15,20', 'Excellent'],
+    ['Ibrahim Konaté', '11,0', '9,5', '12,0', '10,85', 'Passable'],
+    ['Fatoumata Diallo', '18,0', '17,0', '16,5', '17,15', 'Excellent'],
+    ['Moussa Camara', '13,0', '12,0', '11,5', '12,15', 'Bien'],
+    ['Awa Sow', '9,0', '8,0', '7,5', '8,15', 'Insuffisant'],
+    ['Seydou Keïta', '12,0', '13,5', '12,0', '12,50', 'Bien'],
+  ];
+
+  const t = card(s, SIDEBAR + 22, 490, W - SIDEBAR - 44, 380, { title: 'Notes · Terminale S', sub: 'Trimestre 1' });
+  ['ÉLÈVE', 'DEVOIR 1', 'DEVOIR 2', 'COMPOSITION', 'MOYENNE', 'APPRÉCIATION'].forEach((h, i) => {
+    label(t, h, [16, 400, 520, 640, 800, 920][i], 56, 8.5, 'Medium', C.faint, { letterSpacing: 1.4 });
+  });
+  rect(t, 16, 78, t.width - 32, 1, { fill: solid(C.line, 0.16) });
+
+  grades.forEach((g, i) => {
+    const y = 92 + i * 46;
+    rect(t, 16, y + 42, t.width - 32, 1, { fill: solid(C.line, 0.08) });
+    avatar(t, g[0].split(' ').map((w) => w[0]).join(''), 16, y + 7, 26);
+    label(t, g[0], 52, y + 12, 12, 'Medium', C.ink);
+    label(t, g[1], 400, y + 12, 11.5, 'Regular', C.dim);
+    label(t, g[2], 520, y + 12, 11.5, 'Regular', C.dim);
+    label(t, g[3], 640, y + 12, 11.5, 'Regular', C.dim);
+    label(t, g[4], 800, y + 12, 11.5, 'Medium', C.ink);
+    badge(t, g[5], 920, y + 8, { fg: g[5] === 'Insuffisant' ? '#FFC9C9' : '#CDD8FF', bg: g[5] === 'Insuffisant' ? C.danger : C.accent });
+  });
+
+  return s;
+}
+
+/* --- écran : admissions (kanban) --- */
+function screenAdmissions(dsPage) {
+  const s = frame('10 · Admissions', W, H, solid(C.bg));
+  dsPage.appendChild(s);
+  sidebar(s);
+  topbar(s, 'Admissions', 'Rentrée 2026');
+  pageHead(s, 'Admissions', 'Rentrée 2026 · 128 dossiers en cours', 'Nouveau dossier', 'Exporter');
+
+  const stats = [['128', 'Dossiers'], ['64', 'Validés', true], ['12', 'En attente'], ['41', 'Entretiens']];
+  const sw = (W - SIDEBAR - 44 - 36) / 4;
+  stats.forEach(([v, l, acc], i) => {
+    const c = card(s, SIDEBAR + 22 + i * (sw + 12), 148, sw, 74);
+    label(c, v, 15, 14, 21, 'Bold', acc ? C.accent2 : C.ink);
+    label(c, l, 15, 45, 11, 'Regular', C.faint);
+  });
+
+  const cols = [
+    ['NOUVEAU', '34', ['Aminata Cissé', 'Ibrahim Traoré', 'Fatou Diallo']],
+    ['ENTRETIEN', '41', ['Moussa Bâ', 'Awa Konaté', 'Seydou Sow']],
+    ['VALIDÉ', '41', ['Nafissatou Sy', 'Oumar Barry', 'Kadidia Camara']],
+    ['INSCRIT', '12', ['Mariam Traoré', 'Jean Cissé', 'Aminata Sow']],
+  ];
+  const cw = (W - SIDEBAR - 44 - 30) / 4;
+
+  cols.forEach(([title, count, names], ci) => {
+    const x = SIDEBAR + 22 + ci * (cw + 10);
+    const col = frame(`Colonne ${title}`, cw, 540, solid(C.panel, 0.18), { radius: 12, stroke: C.line, strokeOpacity: 0.16 });
+    s.appendChild(col);
+    col.x = x;
+    col.y = 240;
+
+    label(col, title, 12, 12, 9, 'Medium', C.dim, { letterSpacing: 1.4 });
+    label(col, count, cw - 30, 12, 10, 'Medium', C.faint);
+    rect(col, 12, 32, cw - 24, 1, { fill: solid(C.line, 0.2) });
+    rect(col, 12, 32, cw - 24, 1, { fill: solid(C.accent, 0.55) });
+
+    names.forEach((n, k) => {
+      const cardY = 46 + k * 96;
+      const lifted = ci === 1 && k === 1;
+      const c = frame('Carte dossier', cw - 24, 86, solid(C.panel, 0.34), {
+        radius: 10,
+        stroke: lifted ? C.accent : C.line,
+        strokeOpacity: lifted ? 0.6 : 0.16,
+      });
+      col.appendChild(c);
+      c.x = 12;
+      c.y = cardY;
+      if (lifted) {
+        c.effects = [{ type: 'DROP_SHADOW', color: rgba(C.accent, 0.35), offset: { x: 0, y: 12 }, radius: 30, spread: -12, visible: true, blendMode: 'NORMAL' }];
+      }
+      avatar(c, n.split(' ').map((w) => w[0]).join(''), 10, 10, 26);
+      label(c, n, 44, 9, 11.5, 'Medium', C.ink);
+      label(c, 'Terminale S · 2026', 44, 25, 9.5, 'Regular', C.faint);
+      label(c, `REF-2026-0${42 + k}`, 10, 60, 8.5, 'Regular', C.faint);
+      badge(c, 'Dossier', c.width - 62, 58, { fg: C.dim, bg: C.accent2, op: 0.14 });
+    });
+  });
+
+  return s;
+}
+
+/* --- écran : fiche élève --- */
+function screenFiche(dsPage) {
+  const s = frame('11 · Fiche élève', W, H, solid(C.bg));
+  dsPage.appendChild(s);
+  sidebar(s);
+  topbar(s, 'Élèves', 'Fiche élève');
+
+  label(s, 'Aminata Traoré', SIDEBAR + 22, 76, 26, 'Bold', C.ink, { letterSpacing: -0.5 });
+  label(s, 'Terminale S · Matricule 2026-0142', SIDEBAR + 22, 112, 12, 'Regular', C.dim);
+
+  const head = card(s, SIDEBAR + 22, 148, W - SIDEBAR - 44, 120);
+  avatar(head, 'AT', 18, 26, 64);
+  label(head, 'Aminata Traoré', 100, 28, 20, 'Bold', C.ink);
+  label(head, 'Terminale S · Matricule 2026-0142', 100, 54, 10.5, 'Regular', C.faint);
+  badge(head, 'Boursière', 100, 76, { fg: C.dim, bg: C.accent2, op: 0.14 });
+  badge(head, 'Interne', 178, 76, { fg: C.dim, bg: C.accent2, op: 0.14 });
+  badge(head, 'À jour', 244, 76, { fg: '#CDD8FF' });
+  rect(head, head.width - 230, 44, 96, 32, { fill: solid(C.line, 0.08), radius: 8, stroke: C.line, strokeOpacity: 0.5 });
+  label(head, 'Message', head.width - 212, 53, 11, 'Regular', C.ink);
+  rect(head, head.width - 122, 44, 104, 32, { fill: grad(C.accent2, C.accent), radius: 8, stroke: C.white, strokeOpacity: 0.2 });
+  label(head, 'Modifier', head.width - 104, 53, 11, 'Semi Bold', C.white);
+
+  const colW = (W - SIDEBAR - 44 - 12) / 2;
+
+  const info = card(s, SIDEBAR + 22, 286, colW, 236, { title: 'Informations', sub: 'Dossier scolaire' });
+  [['Date de naissance', '12/03/2009'], ['Tuteur', 'Mme Traoré'], ['Téléphone', '+223 76 00 00 00'], ['Adresse', 'Hamdallaye ACI 2000'], ['E-mail', 'a.traore@famille.ml']].forEach(([k, v], i) => {
+    const y = 60 + i * 32;
+    rect(info, 16, y + 28, info.width - 32, 1, { fill: solid(C.line, 0.08) });
+    label(info, k, 16, y, 11.5, 'Regular', C.faint);
+    label(info, v, info.width - 32 - v.length * 6.2, y, 12, 'Regular', C.ink);
+  });
+
+  const docs = card(s, SIDEBAR + 22, 538, colW, 180, { title: 'Documents', sub: '3 fichiers' });
+  [['Bulletin trimestre 1', 'PDF · 240 Ko'], ['Certificat de scolarité', 'PDF · 120 Ko'], ['Attestation de paiement', 'PDF · 96 Ko']].forEach(([n, m], i) => {
+    const y = 58 + i * 40;
+    rect(docs, 16, y + 34, docs.width - 32, 1, { fill: solid(C.line, 0.08) });
+    rect(docs, 16, y, 26, 26, { fill: solid(C.accent, 0.16), radius: 7 });
+    label(docs, n, 52, y + 3, 11.5, 'Medium', C.ink);
+    label(docs, m, 52, y + 17, 9.5, 'Regular', C.faint);
+    rect(docs, docs.width - 44, y + 4, 26, 22, { fill: solid(C.line, 0.08), radius: 6, stroke: C.line, strokeOpacity: 0.5 });
+  });
+
+  const att = card(s, SIDEBAR + 34 + colW, 286, colW, 150, { title: 'Assiduité', sub: '30 derniers jours' });
+  badge(att, '96,8 %', att.width - 78, 15, { fg: '#CDD8FF' });
+  rect(att, 16, 66, att.width - 32, 4, { fill: solid(C.line, 0.16), radius: 999 });
+  rect(att, 16, 66, (att.width - 32) * 0.968, 4, { fill: grad(C.accent, C.accent2), radius: 999 });
+  for (let i = 0; i < 30; i++) {
+    const abs = i === 7 || i === 18 || i === 26;
+    rect(att, 16 + i * 13.6, 92, 10, 26, { fill: solid(abs ? C.copper : C.accent, abs ? 0.85 : 0.55), radius: 2 });
+  }
+
+  const notes = card(s, SIDEBAR + 34 + colW, 452, colW, 266, { title: 'Notes du trimestre', sub: '5 matières' });
+  label(notes, '12,8', notes.width - 74, 14, 19, 'Bold', C.accent2);
+  label(notes, '/ 20', notes.width - 34, 20, 10, 'Regular', C.faint);
+  [['Mathématiques', 15.5], ['Physique-Chimie', 13.0], ['Français', 16.0], ['Anglais', 14.5], ['Histoire-Géo', 12.5]].forEach(([k, v], i) => {
+    const y = 62 + i * 38;
+    label(notes, k, 16, y, 11.5, 'Regular', C.dim);
+    rect(notes, 150, y + 5, notes.width - 210, 3, { fill: solid(C.line, 0.1), radius: 999 });
+    rect(notes, 150, y + 5, (notes.width - 210) * (v / 20), 3, { fill: grad(C.accent, C.accent2), radius: 999 });
+    label(notes, v.toFixed(1), notes.width - 42, y, 11, 'Medium', C.ink);
+  });
+
+  return s;
+}
+
+/* --- écran : modales (démonstration) --- */
+function screenModals(dsPage) {
+  const base = screenDashboard(dsPage);
+  base.name = '12 · Modales — fond';
+
+  /* voile */
+  const dim = frame('Voile', W, H, solid('#040612', 0.68));
+  base.appendChild(dim);
+
+  /* panneau */
+  const mx = (W - 760) / 2;
+  const my = 118;
+  const m = frame('Modale · Nouvel élève', 760, 664, solid(C.panel, 0.33), {
+    radius: 18, stroke: C.line, strokeOpacity: 0.28,
+  });
+  m.fills = [grad(C.panel, '#090D26', 0.96)];
+  m.effects = [
+    { type: 'DROP_SHADOW', color: rgba('#000000', 0.7), offset: { x: 0, y: 60 }, radius: 120, spread: -50, visible: true, blendMode: 'NORMAL' },
+    { type: 'DROP_SHADOW', color: rgba(C.accent, 0.35), offset: { x: 0, y: 0 }, radius: 90, spread: -50, visible: true, blendMode: 'NORMAL' },
+  ];
+  base.appendChild(m);
+  m.x = mx;
+  m.y = my;
+
+  rect(m, 20, 20, 38, 38, { fill: solid(C.accent, 0.18), radius: 11, stroke: C.accent, strokeOpacity: 0.4 });
+  label(m, 'ADMISSIONS', 70, 20, 8.5, 'Medium', C.faint, { letterSpacing: 1.6 });
+  label(m, 'Nouvel élève', 70, 34, 17, 'Bold', C.ink);
+  label(m, 'Inscription · année scolaire 2025 — 2026', 70, 56, 11.5, 'Regular', C.dim);
+  ellipse(m, m.width - 46, 22, 28, { stroke: C.line, fill: null });
+  label(m, '×', m.width - 39, 26, 14, 'Regular', C.faint);
+  rect(m, 0, 88, m.width, 1, { fill: solid(C.line, 0.16) });
+
+  /* sections */
+  [['Identité', 108], ['Scolarité', 300], ['Tuteur', 492]].forEach(([title, y]) => {
+    rect(m, 20, y, m.width - 40, 176, { fill: solid(C.line, 0.035), radius: 12, stroke: C.line, strokeOpacity: 0.12 });
+    label(m, title.toUpperCase(), 32, y + 14, 8.5, 'Medium', C.faint, { letterSpacing: 1.6 });
+  });
+
+  const field = (x, y, w, lab, val) => {
+    label(m, lab, x, y, 10.5, 'Regular', C.faint);
+    rect(m, x, y + 16, w, 34, { fill: solid(C.line, 0.06), radius: 9, stroke: C.line, strokeOpacity: 0.45 });
+    label(m, val, x + 11, y + 26, 12, 'Regular', C.ink);
+  };
+  const cw2 = (m.width - 40 - 24 - 24) / 2;
+  field(32, 136, cw2, 'Prénom', 'Aminata');
+  field(32 + cw2 + 12, 136, cw2, 'Nom', 'Traoré');
+  field(32, 210, cw2, 'Date de naissance', '12/03/2009');
+  field(32 + cw2 + 12, 210, cw2, 'Sexe', 'Féminin');
+
+  field(32, 328, cw2, 'Classe', 'Terminale S');
+  field(32 + cw2 + 12, 328, cw2, 'Régime', 'Interne');
+  field(32, 402, cw2, 'Matricule', '2026-0204');
+  field(32 + cw2 + 12, 402, cw2, 'Statut', 'À jour');
+
+  field(32, 520, cw2, 'Nom du tuteur', 'Mme Traoré');
+  field(32 + cw2 + 12, 520, cw2, 'Téléphone', '+223 76 00 00 00');
+
+  /* pied */
+  const footY = m.height - 66;
+  rect(m, 0, footY, m.width, 1, { fill: solid(C.line, 0.16) });
+  label(m, 'ÉCHAP POUR ANNULER', 20, footY + 24, 8.5, 'Regular', C.faint, { letterSpacing: 1.2 });
+  rect(m, m.width - 258, footY + 16, 110, 34, { fill: solid(C.line, 0.08), radius: 9, stroke: C.line, strokeOpacity: 0.5 });
+  label(m, 'Annuler', m.width - 224, footY + 26, 11.5, 'Regular', C.ink);
+  rect(m, m.width - 138, footY + 16, 118, 34, { fill: grad(C.accent2, C.accent), radius: 9, stroke: C.white, strokeOpacity: 0.2 });
+  label(m, '+ Créer', m.width - 118, footY + 26, 11.5, 'Semi Bold', C.white);
+
+  return base;
+}
+
 /* ---------------- orchestration ---------------- */
 async function main(cmd) {
   if (typeof figma.loadAllPagesAsync === 'function') {
@@ -848,23 +1147,37 @@ async function main(cmd) {
       t.y = y + (14 - size / 2);
     });
 
-    const screens = [];
-    try { screens.push(screenDashboard(dsPage).name); } catch (e) { figma.notify('Dashboard : ' + e.message, { error: true }); }
-    try { screens.push(screenEleves(dsPage).name); } catch (e) { figma.notify('Élèves : ' + e.message, { error: true }); }
-    try { screens.push(screenFinances(dsPage).name); } catch (e) { figma.notify('Finances : ' + e.message, { error: true }); }
-    try { screens.push(screenTimetable(dsPage).name); } catch (e) { figma.notify('Emploi du temps : ' + e.message, { error: true }); }
-    try { screens.push(screenSettings(dsPage).name); } catch (e) { figma.notify('Paramètres : ' + e.message, { error: true }); }
+    const SCREENS = [
+      ['Tableau de bord', screenDashboard],
+      ['Élèves', screenEleves],
+      ['Classes', screenClasses],
+      ['Emploi du temps', screenTimetable],
+      ['Finances', screenFinances],
+      ['Notes', screenNotes],
+      ['Admissions', screenAdmissions],
+      ['Fiche élève', screenFiche],
+      ['Paramètres', screenSettings],
+      ['Modales', screenModals],
+    ];
 
-    // disposition des écrans
-    const screensOnPage = dsPage.children.filter((n) => n.name.startsWith('03 ·') || n.name.startsWith('04 ·') || n.name.startsWith('05 ·') || n.name.startsWith('06 ·') || n.name.startsWith('07 ·'));
-    screensOnPage.forEach((n, i) => {
+    const made = [];
+    for (const [label, fn] of SCREENS) {
+      try {
+        made.push(fn(dsPage));
+      } catch (e) {
+        figma.notify(`${label} : ${e.message}`, { error: true });
+      }
+    }
+
+    made.forEach((n, i) => {
       n.x = (i % 3) * (W + 80);
       n.y = 760 + Math.floor(i / 3) * (H + 80);
     });
+
     board.x = 0;
     board.y = 0;
 
-    figma.notify(`Écrans générés · ${screens.length}/5`);
+    figma.notify(`Écrans générés · ${made.length}/${SCREENS.length}`);
   }
 
   figma.closePlugin();

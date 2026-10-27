@@ -14,15 +14,18 @@ Trois commandes sont disponibles :
 
 | Commande | Effet |
 |---|---|
-| **Générer le design system + les écrans** | styles + composants + 5 écrans |
+| **Générer le design system + les écrans** | styles + composants + 10 écrans |
 | Générer uniquement les styles | 12 couleurs, 8 typographies, 2 effets |
-| Générer uniquement les écrans | board palette/typo + 5 écrans 1440 × 900 |
+| Générer uniquement les écrans | board palette/typo + 10 écrans 1440 × 900 |
 
 ## 2. Ce qui est créé
 
 **Page `01 · Design system · DIALLO`**
 - board « Indigo Minuit » : 12 nuances avec noms et hex, échelle typographique complète
-- écrans 1440 × 900 (Electron) : `Tableau de bord`, `Élèves`, `Finances`, `Emploi du temps`, `Paramètres`
+- écrans 1440 × 900 (Electron) : `Tableau de bord`, `Élèves`, `Classes`, `Emploi du temps`,
+  `Finances`, `Notes`, `Admissions`, `Fiche élève`, `Paramètres`
+- **`Modales`** : le tableau de bord voilé avec une modale « Nouvel élève » par-dessus
+  (voile 68 %, panneau 760 px, entête, sections, champs, pied Annuler / Créer)
 - chaque écran est composé de vrais calques : sidebar, topbar, cartes, KPI, tableaux, grille horaire
 
 **Page `02 · Composants`**
@@ -54,6 +57,9 @@ Les écrans générés utilisent exactement les valeurs de `app/src/styles.css` 
 | Sidebar | 238 px |
 | Topbar | 54 px |
 | Rayon carte | 14 px |
+| Rayon modale | 18 px |
+| Modale large | 760 px |
+| Drawer | 440 px |
 | Filet | 1 px, `#A7B6FF` à 14 % |
 | Accent | `#5B7CFA` |
 | Police | Inter (Regular / Medium / Semi Bold / Bold) |

@@ -4,6 +4,8 @@ import {
   Toggle, Tabs, Stat, Kpi, Sparkline, AreaChart, BarChart, Donut, HBarList, Table, Tr,
 } from './ui.jsx';
 import * as M from './mock.js';
+import { useModals } from './modal.jsx';
+import { Modales } from './modals-page.jsx';
 
 /* ============================================================
    Pages — affichage pur (données statiques de mock.js)
@@ -21,6 +23,7 @@ export const META = {
   absences: { label: 'Absences', group: 'Pédagogie', crumb: ['Élèves', 'Absences · Octobre'], title: 'Absences', sub: 'Octobre 2026 · 96,8 % de présence', primary: 'Justifier une absence', secondary: 'Exporter' },
   fiche: { label: 'Fiche élève', group: 'Pédagogie', crumb: ['Élèves', 'Fiche élève'], title: 'Aminata Traoré', sub: 'Terminale S · Matricule 2026-0142', secondary: 'Message' },
   admissions: { label: 'Admissions', group: 'Pédagogie', crumb: ['Admissions', 'Rentrée 2026'], title: 'Admissions', sub: 'Rentrée 2026 · 128 dossiers en cours', primary: 'Nouveau dossier', secondary: 'Exporter' },
+  modales: { label: 'Modales', group: 'Système', crumb: ['Système', 'Modales'], title: 'Modales', sub: 'Formulaires, confirmations, panneaux latéraux' },
   parametres: { label: 'Paramètres', group: 'Système', crumb: ['Paramètres', 'Établissement'], title: 'Paramètres', sub: 'Établissement · Compte · Notifications', primary: 'Enregistrer', secondary: 'Réinitialiser' },
 };
 
@@ -37,6 +40,7 @@ const tagTone = (t) =>
    1 · Tableau de bord
    ============================================================ */
 export function Dashboard() {
+  const modals = useModals();
   return (
     <>
       <div className="kpis">
@@ -78,7 +82,7 @@ export function Dashboard() {
         <CardHead
           title="Élèves récents"
           sub="1 284 élèves inscrits"
-          right={<Btn icon="external">Tout voir</Btn>}
+          right={<Btn icon="external" onClick={() => modals.exportData()}>Tout voir</Btn>}
         />
         <Table
           columns={['Élève', 'Classe', 'Statut', 'Moyenne', 'Solde', '']}
@@ -95,7 +99,9 @@ export function Dashboard() {
               <span className="cell"><Pill tone={statusTone(s.status)}>{s.status}</Pill></span>
               <span className="cell mono">{s.avg}</span>
               <span className="cell mono right">{s.balance}</span>
-              <span className="cell right"><IconBtn icon="dots" title="Actions" /></span>
+              <span className="cell right">
+                <IconBtn icon="dots" title="Actions" onClick={() => modals.drawer(s)} />
+              </span>
             </Tr>
           ))}
         </Table>
@@ -108,6 +114,7 @@ export function Dashboard() {
    2 · Élèves
    ============================================================ */
 export function Eleves() {
+  const modals = useModals();
   return (
     <>
       <div className="toolbar rise">
@@ -134,7 +141,9 @@ export function Eleves() {
               <span className="cell"><Pill tone={statusTone(s.status)}>{s.status}</Pill></span>
               <span className="cell mono">{s.avg}</span>
               <span className="cell mono right">{s.balance}</span>
-              <span className="cell right"><IconBtn icon="dots" title="Actions" /></span>
+              <span className="cell right">
+                <IconBtn icon="dots" title="Actions" onClick={() => modals.drawer(s)} />
+              </span>
             </Tr>
           ))}
         </Table>
@@ -247,6 +256,7 @@ export function EmploiDuTemps() {
    5 · Finances
    ============================================================ */
 export function Finances() {
+  const modals = useModals();
   return (
     <>
       <div className="kpis three">
@@ -275,7 +285,7 @@ export function Finances() {
       </div>
 
       <Card className="rise" style={{ animationDelay: '240ms' }}>
-        <CardHead title="Derniers paiements" sub="Octobre 2026" right={<Btn icon="plus" solid>Encaisser</Btn>} />
+        <CardHead title="Derniers paiements" sub="Octobre 2026" right={<Btn icon="plus" solid onClick={() => modals.payment()}>Encaisser</Btn>} />
         <Table
           columns={['Élève', 'Motif', 'Date', 'Montant', 'Statut']}
           template="1.5fr 1.2fr .8fr 1fr .8fr"
@@ -303,6 +313,7 @@ export function Finances() {
    6 · Personnel
    ============================================================ */
 export function Personnel() {
+  const modals = useModals();
   return (
     <>
       <div className="stats-row rise">
@@ -326,8 +337,8 @@ export function Personnel() {
               {s.tags.map((t) => <Pill key={t} tone="muted">{t}</Pill>)}
             </div>
             <div className="staff-actions">
-              <Btn icon="messages">Message</Btn>
-              <Btn icon="profile">Profil</Btn>
+              <Btn icon="messages" onClick={() => modals.message()}>Message</Btn>
+              <Btn icon="profile" onClick={() => open(StudentDrawer({ name: s.name, ref: 'Personnel · 2026', cls: s.role, who: s.who, status: 'Actif', avg: '—', balance: '—' }))}>Profil</Btn>
             </div>
           </Card>
         ))}
@@ -340,6 +351,7 @@ export function Personnel() {
    7 · Notes
    ============================================================ */
 export function Notes() {
+  const modals = useModals();
   return (
     <>
       <div className="stats-row rise">
@@ -367,7 +379,7 @@ export function Notes() {
       </div>
 
       <Card className="rise" style={{ animationDelay: '200ms' }}>
-        <CardHead title="Notes · Terminale S" sub="Trimestre 1" right={<Btn icon="download">Exporter</Btn>} />
+        <CardHead title="Notes · Terminale S" sub="Trimestre 1" right={<Btn icon="download" onClick={() => modals.exportData()}>Exporter</Btn>} />
         <Table
           columns={['Élève', 'Devoir 1', 'Devoir 2', 'Composition', 'Moyenne', 'Appréciation']}
           template="1.6fr .7fr .7fr .9fr .7fr 1fr"
@@ -396,6 +408,7 @@ export function Notes() {
    8 · Absences
    ============================================================ */
 export function Absences() {
+  const modals = useModals();
   const firstOffset = 2; /* présentation : le mois commence un mardi */
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
@@ -433,7 +446,7 @@ export function Absences() {
       </div>
 
       <Card className="rise" style={{ animationDelay: '200ms' }}>
-        <CardHead title="Dernières absences" sub="5 enregistrements" right={<Btn icon="plus" solid>Justifier</Btn>} />
+        <CardHead title="Dernières absences" sub="5 enregistrements" right={<Btn icon="plus" solid onClick={() => modals.absence()}>Justifier</Btn>} />
         <Table columns={['Élève', 'Classe', 'Date', 'Statut', '']} template="1.6fr 1fr .8fr .9fr 34px">
           {M.absences.map((a) => (
             <Tr key={a.who} template="1.6fr 1fr .8fr .9fr 34px">
@@ -446,7 +459,9 @@ export function Absences() {
               <span className="cell">
                 <Pill tone={a.justified ? 'accent' : 'copper'}>{a.justified ? 'Justifié' : 'Non justifié'}</Pill>
               </span>
-              <span className="cell right"><IconBtn icon="dots" title="Actions" /></span>
+              <span className="cell right">
+                <IconBtn icon="dots" title="Actions" onClick={() => modals.absence()} />
+              </span>
             </Tr>
           ))}
         </Table>
@@ -459,6 +474,7 @@ export function Absences() {
    9 · Fiche élève
    ============================================================ */
 export function Fiche() {
+  const modals = useModals();
   const p = M.studentProfile;
   return (
     <>
@@ -472,8 +488,8 @@ export function Fiche() {
           </div>
         </div>
         <div className="ph-actions">
-          <Btn icon="messages">Message</Btn>
-          <Btn icon="profile" solid>Modifier</Btn>
+          <Btn icon="messages" onClick={() => modals.message()}>Message</Btn>
+          <Btn icon="profile" solid onClick={() => modals.student()}>Modifier</Btn>
         </div>
       </Card>
 
@@ -533,6 +549,7 @@ export function Fiche() {
    10 · Admissions (kanban)
    ============================================================ */
 export function Admissions() {
+  const modals = useModals();
   return (
     <>
       <div className="stats-row rise">
@@ -551,7 +568,11 @@ export function Admissions() {
             </div>
             <div className="kb-body">
               {col.cards.map((c) => (
-                <Card key={c.ref} className={`kb-card ${c === col.cards[1] ? 'lifted' : ''}`}>
+                <Card
+                  key={c.ref}
+                  className={`kb-card ${c === col.cards[1] ? 'lifted' : ''}`}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className="kb-top">
                     <Avatar initials={c.who.split(' ').map((w) => w[0]).join('').slice(0, 2)} size={26} tone="muted" />
                     <span><b>{c.who}</b><em>{c.cls} · 2026</em></span>
@@ -574,6 +595,7 @@ export function Admissions() {
    11 · Messagerie
    ============================================================ */
 export function Messagerie() {
+  const modals = useModals();
   return (
     <Card className="rise messenger" pad={false}>
       <div className="msg-list">
@@ -620,7 +642,7 @@ export function Messagerie() {
         <div className="msg-compose">
           <IconBtn icon="plus" title="Joindre" />
           <input className="input" placeholder="Écrire un message…" readOnly />
-          <Btn icon="chevronR" solid>Envoyer</Btn>
+          <Btn icon="chevronR" solid onClick={() => open(SuccessModal({ title: 'Message envoyé', sub: 'Mme Traoré recevra une notification.', rows: [['Destinataire', 'Mme Traoré'], ['Objet', 'Suivi de l’assiduité'], ['Envoi', 'maintenant']] }))}>Envoyer</Btn>
         </div>
       </div>
     </Card>
@@ -631,6 +653,7 @@ export function Messagerie() {
    12 · Paramètres
    ============================================================ */
 export function Parametres() {
+  const modals = useModals();
   return (
     <div className="settings">
       <nav className="set-nav rise">
@@ -670,7 +693,16 @@ export function Parametres() {
           </div>
           <div className="danger-row">
             <span><b>Zone sensible</b><em>Réinitialiser les données de démonstration</em></span>
-            <Btn>Réinitialiser</Btn>
+            <Btn
+              icon="close"
+              onClick={() => modals.confirm({
+                title: 'Réinitialiser les données ?',
+                body: <p className="mtext">Toutes les données de démonstration seront remplacées par le jeu initial. Les comptes réels ne sont pas concernés.</p>,
+                confirmLabel: 'Réinitialiser',
+              })}
+            >
+              Réinitialiser
+            </Btn>
           </div>
         </Card>
       </div>
@@ -690,5 +722,6 @@ export const PAGES = {
   absences: Absences,
   fiche: Fiche,
   admissions: Admissions,
+  modales: Modales,
   parametres: Parametres,
 };
