@@ -134,15 +134,57 @@
   .role{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);opacity:.65;margin-top:-3px}
 
   .note{margin:0;font-size:13px;line-height:1.65;color:var(--ink-dim)}
-  .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:2px}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:2px;flex-wrap:wrap}
+  .foot-l{display:flex;gap:8px;flex-wrap:wrap}
   .ghost{
     appearance:none;font:inherit;font-size:12px;letter-spacing:.04em;cursor:pointer;
     background:transparent;color:var(--ink);border:1px solid var(--line-strong);
     padding:10px 15px;border-radius:999px;transition:.2s;
   }
   .ghost:hover{background:var(--ink);color:#0a0a0b;border-color:var(--ink)}
+  .ghost.quiet{border-color:var(--line);color:var(--ink-dim)}
+  .ghost.quiet:hover{background:transparent;color:var(--ink);border-color:var(--line-strong)}
   .copied{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);opacity:0;transition:opacity .3s}
   .copied.on{opacity:1}
+
+  /* ---------- heroes ---------- */
+  .heroes{margin-top:78px;padding-top:52px;border-top:1px solid var(--line);scroll-margin-top:76px}
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:26px;flex-wrap:wrap;margin-bottom:30px}
+  .sec-eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+  .sec-eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 14px rgba(198,166,103,.7)}
+  h2.sec{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.4vw,40px);line-height:1.05;letter-spacing:-.015em;margin:0 0 10px}
+  .sec-lede{margin:0;color:var(--ink-dim);font-size:14px;line-height:1.7;max-width:56ch}
+  .ratio-note{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap}
+
+  .hero-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+  @media (min-width:760px){.hero-thumbs{grid-template-columns:repeat(6,1fr)}}
+  .hthumb{
+    appearance:none;padding:0;border:1px solid var(--line);background:transparent;cursor:pointer;font:inherit;
+    border-radius:12px;overflow:hidden;position:relative;transition:.25s ease;
+  }
+  .hthumb img{display:block;width:100%;aspect-ratio:21/9;object-fit:cover}
+  .hthumb span{
+    display:block;padding:7px 8px;font-size:9.5px;letter-spacing:.06em;text-align:left;
+    color:var(--ink-faint);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    border-top:1px solid var(--line);
+  }
+  .hthumb:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+  .hthumb[aria-pressed="true"]{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold), 0 14px 34px -20px rgba(198,166,103,.6)}
+  .hthumb[aria-pressed="true"] span{color:var(--ink)}
+
+  .hero-stage{
+    border:1px solid var(--line);border-radius:calc(var(--r) + 6px);overflow:hidden;
+    background:#000;position:relative;
+  }
+  .hero-stage img{display:block;width:100%;aspect-ratio:21/9;object-fit:cover}
+  .hero-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding:15px 18px;border-top:1px solid var(--line);background:rgba(255,255,255,.02);
+  }
+  .hero-title{font-family:var(--serif);font-size:19px;letter-spacing:-.01em}
+  .hero-title small{display:block;font-family:var(--sans);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-top:5px}
+  .hero-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  a.ghost{text-decoration:none;display:inline-flex;align-items:center}
 
   /* ---------- footer ---------- */
   footer{border-top:1px solid var(--line);padding:34px 0 60px;color:var(--ink-faint);font-size:12px;letter-spacing:.04em}
@@ -198,6 +240,34 @@
 
 <main class="wrap">
   <div class="grid" id="grid"></div>
+
+  <section class="heroes" id="heros" aria-labelledby="heros-title">
+    <div class="sec-head">
+      <div>
+        <div class="sec-eyebrow">Bannières hero</div>
+        <h2 class="sec" id="heros-title">Un bandeau par thème</h2>
+        <p class="sec-lede">Six bannières cinématiques au format 21:9, une par palette : même structure (titre, bouton, composition abstraite à droite), mais un traitement visuel entièrement différent. Choisissez un thème pour l'afficher en grand.</p>
+      </div>
+      <div class="ratio-note">Format 21:9 · 1584 × 672 px · PNG</div>
+    </div>
+
+    <div class="hero-thumbs" id="heroThumbs" role="group" aria-label="Choisir un thème"></div>
+
+    <div class="hero-stage">
+      <img id="heroImg" alt="" />
+      <div class="hero-bar">
+        <div>
+          <div class="hero-title" id="heroTitle"></div>
+          <small id="heroTag" style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)"></small>
+        </div>
+        <div class="hero-actions">
+          <button class="ghost quiet" id="heroZoom">Agrandir</button>
+          <a class="ghost" id="heroDl" download>Télécharger</a>
+          <button class="ghost" id="heroPalette">Voir la palette</button>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
@@ -224,6 +294,9 @@ const PALETTES = [
     group: 'modern',
     mode: 'dark',
     img: 'palettes/v2-01-onyx-champagne.png',
+    hero: 'palettes/hero-01-onyx-champagne.png',
+    headline: 'Votre établissement, orchestré.',
+    cta: 'Tableau de bord',
     note: "Noir profond, ivoire et un unique accent champagne. La direction la plus « premium discret » : parfaite pour un établissement privé haut de gamme, avec des chiffres mis en scène en grand et des filets fins.",
     colors: [
       ['#0B0B0C','Fond'], ['#17181A','Surface'], ['#C6A667','Accent'], ['#F2EFE9','Texte'], ['#6B7C74','Secondaire']
@@ -236,6 +309,9 @@ const PALETTES = [
     group: 'modern',
     mode: 'light',
     img: 'palettes/v2-02-sable-encre.png',
+    hero: 'palettes/hero-02-sable-encre.png',
+    headline: 'Chaque élève, un parcours.',
+    cta: 'Découvrir',
     note: "Sable chaud, encre quasi noire et terre cuite. Une identité éditoriale et accueillante, lisible en plein soleil — idéale pour les parents et le personnel administratif sur le terrain.",
     colors: [
       ['#F7F3EC','Fond'], ['#14120F','Texte'], ['#B4552F','Accent'], ['#D8CFC0','Neutre'], ['#4B5A50','Secondaire']
@@ -248,6 +324,9 @@ const PALETTES = [
     group: 'modern',
     mode: 'light',
     img: 'palettes/v2-03-celadon-ardoise.png',
+    hero: 'palettes/hero-03-celadon-ardoise.png',
+    headline: 'La clarté, chaque jour.',
+    cta: "Voir l'emploi du temps",
     note: "Gris-vert pâle, ardoise et graphite : une grille suisse, des barres de progression fines, aucune décoration. La palette la plus institutionnelle et la plus sobre des trois.",
     colors: [
       ['#F3F5F2','Fond'], ['#0E1311','Texte'], ['#7F9C88','Accent'], ['#2A3138','Ardoise'], ['#C4CBC2','Neutre']
@@ -260,6 +339,9 @@ const PALETTES = [
     group: 'classic',
     mode: 'dark',
     img: 'palettes/palette-1-noir-academie.png',
+    hero: 'palettes/hero-04-noir-academie.png',
+    headline: "L'excellence, sans compromis.",
+    cta: "Découvrir l'établissement",
     note: "Version classique : or véritable sur noir, serif d'apparat et sauge en contrepoint. Plus « institution historique » que la v2, avec davantage de matière.",
     colors: [
       ['#0B0E14','Fond'], ['#1C2230','Surface'], ['#C9A227','Or'], ['#F5F1E8','Ivoire'], ['#4C7A68','Sauge']
@@ -272,6 +354,9 @@ const PALETTES = [
     group: 'classic',
     mode: 'light',
     img: 'palettes/palette-2-ivoire-emeraude.png',
+    hero: 'palettes/hero-05-ivoire-emeraude.png',
+    headline: 'Un campus, une famille.',
+    cta: 'Espace parents',
     note: "Ivoire, émeraude profond et laiton. Une élégance très « campus international », rassurante et patrimoniale, avec des entêtes sombres pleine largeur.",
     colors: [
       ['#FDFCF8','Fond'], ['#0F3D2E','Émeraude'], ['#1F6F54','Accent'], ['#CBB68A','Laiton'], ['#1A1A1A','Texte']
@@ -284,6 +369,9 @@ const PALETTES = [
     group: 'classic',
     mode: 'dark',
     img: 'palettes/palette-3-indigo-minuit.png',
+    hero: 'palettes/hero-06-indigo-minuit.png',
+    headline: 'Les données au service des élèves.',
+    cta: 'Ouvrir le tableau de bord',
     note: "Bleu nuit, indigo lumineux et touches de cuivre, avec des cartes en verre. La direction la plus « produit tech » — pensée pour les analyses et les tableaux de bord.",
     colors: [
       ['#070B1F','Fond'], ['#1B2A6B','Indigo'], ['#5B7CFA','Accent'], ['#A7B6FF','Clair'], ['#E0A86F','Cuivre']
@@ -298,7 +386,6 @@ const lbImg = document.getElementById('lbImg');
 const lbCap = document.getElementById('lbCap');
 let filter = 'all';
 let visible = [];
-let lbIndex = 0;
 
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
@@ -332,7 +419,10 @@ function render(){
         </div>
         <p class="note">${esc(p.note)}</p>
         <div class="foot">
-          <button class="ghost" data-open="${i}">Voir la planche</button>
+          <div class="foot-l">
+            <button class="ghost" data-open="${i}">Voir la planche</button>
+            <button class="ghost quiet" data-hero="${p.id}">Bannière hero →</button>
+          </div>
           <span class="copied" data-copied="${p.id}">Copié</span>
         </div>
       </div>
@@ -386,12 +476,28 @@ document.querySelectorAll('.tab').forEach(tab => {
 });
 
 /* ---- lightbox ---- */
+let lbIndex = -1;
+
 function openLightbox(i){
+  if (!visible.length) return;
   lbIndex = (i + visible.length) % visible.length;
   const p = visible[lbIndex];
-  lbImg.src = p.img;
-  lbImg.alt = 'Planche de palette ' + p.name;
-  lbCap.textContent = p.name + ' — ' + p.sub;
+  showLightbox(p.img, 'Planche de palette ' + p.name, p.name + ' — ' + p.sub);
+  document.getElementById('lbPrev').style.display = '';
+  document.getElementById('lbNext').style.display = '';
+}
+function openHeroLightbox(){
+  const p = byId(currentHero);
+  if (!p) return;
+  lbIndex = -1;
+  showLightbox(p.hero, 'Bannière hero ' + p.name, p.name + ' — ' + p.headline);
+  document.getElementById('lbPrev').style.display = 'none';
+  document.getElementById('lbNext').style.display = 'none';
+}
+function showLightbox(src, alt, cap){
+  lbImg.src = src;
+  lbImg.alt = alt;
+  lbCap.textContent = cap;
   lb.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -399,7 +505,10 @@ function closeLightbox(){
   lb.classList.remove('open');
   document.body.style.overflow = '';
 }
-function step(d){ if (visible.length) openLightbox((lbIndex + d + visible.length) % visible.length); }
+function step(d){
+  if (lbIndex < 0 || !visible.length) return;
+  openLightbox((lbIndex + d + visible.length) % visible.length);
+}
 
 document.getElementById('lbClose').addEventListener('click', closeLightbox);
 document.getElementById('lbPrev').addEventListener('click', () => step(-1));
@@ -411,6 +520,71 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') step(-1);
   if (e.key === 'ArrowRight') step(1);
 });
+
+/* ---- hero section ---- */
+const heroThumbs = document.getElementById('heroThumbs');
+const heroImg = document.getElementById('heroImg');
+const heroTitle = document.getElementById('heroTitle');
+const heroTag = document.getElementById('heroTag');
+const heroDl = document.getElementById('heroDl');
+const heroZoom = document.getElementById('heroZoom');
+const heroPalette = document.getElementById('heroPalette');
+let currentHero = PALETTES[0].id;
+
+function byId(id){ return PALETTES.find(p => p.id === id); }
+
+function renderHeroThumbs(){
+  heroThumbs.innerHTML = PALETTES.map(p => `
+    <button class="hthumb" data-theme="${p.id}" aria-pressed="false" title="${esc(p.name)}">
+      <img src="${p.hero}" alt="Bannière ${esc(p.name)}" loading="lazy" decoding="async" />
+      <span>${esc(p.name)}</span>
+    </button>
+  `).join('');
+}
+
+function selectHero(id, scrollIntoView){
+  const p = byId(id);
+  if (!p) return;
+  currentHero = id;
+  heroImg.src = p.hero;
+  heroImg.alt = 'Bannière hero — ' + p.name + ' — ' + p.headline;
+  heroTitle.textContent = p.name;
+  heroTag.textContent = '« ' + p.headline + ' » · ' + p.cta;
+  heroDl.href = p.hero;
+  heroDl.setAttribute('download', 'hero-' + p.id + '.png');
+  heroThumbs.querySelectorAll('.hthumb').forEach(t => {
+    t.setAttribute('aria-pressed', String(t.dataset.theme === id));
+  });
+  if (scrollIntoView){
+    document.getElementById('heros').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+heroThumbs.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-theme]');
+  if (t) selectHero(t.dataset.theme, false);
+});
+
+heroZoom.addEventListener('click', openHeroLightbox);
+heroPalette.addEventListener('click', () => {
+  const p = byId(currentHero);
+  const mode = p.group === 'modern' ? 'modern' : 'classic';
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.filter === mode)));
+  filter = mode;
+  render();
+  const card = grid.querySelector('[data-id="' + currentHero + '"]');
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+heroImg.addEventListener('click', openHeroLightbox);
+
+document.getElementById('grid').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-hero]');
+  if (b) selectHero(b.dataset.hero, true);
+});
+
+renderHeroThumbs();
+selectHero(PALETTES[0].id, false);
 
 render();
 </script>
