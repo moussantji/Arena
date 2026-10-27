@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DIALLO — ce que le plugin construit dans Figma</title>
+<style>
+  :root{
+    --bg:#070B1F; --bg2:#0B1030; --panel:#1B2A6B;
+    --ink:#F0F2FF; --dim:#A7B6FF; --faint:#6B78A8;
+    --line:rgba(167,182,255,.15); --line2:rgba(167,182,255,.28);
+    --accent:#5B7CFA; --accent2:#7E9BFF; --copper:#E0A86F; --success:#6FD3A8; --danger:#F08A8A;
+    --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:
+      radial-gradient(900px 480px at 80% -10%, rgba(91,124,250,.18), transparent 62%),
+      var(--bg);
+    color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:34px 26px 70px}
+  .eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:12px;margin-bottom:20px}
+  .eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent)}
+  h1{margin:0 0 12px;font-size:clamp(28px,4.4vw,44px);line-height:1.05;letter-spacing:-.025em}
+  h1 em{font-style:normal;color:var(--accent2)}
+  .lede{margin:0 0 26px;max-width:66ch;color:var(--dim);font-size:14.5px;line-height:1.7}
+  .lede b{color:var(--ink);font-weight:600}
+  .grid{display:grid;gap:12px}
+  .card{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,rgba(27,42,107,.28),rgba(11,16,48,.42));padding:18px}
+  .card h2{margin:0 0 4px;font-size:14px;letter-spacing:-.01em}
+  .card .sub{margin:0 0 14px;font-size:11.5px;color:var(--faint)}
+  .steps{counter-reset:s;display:grid;gap:10px;margin:0;padding:0;list-style:none}
+  .steps li{counter-increment:s;display:flex;gap:11px;align-items:flex-start;font-size:12.5px;line-height:1.6;color:var(--dim)}
+  .steps li::before{
+    content:counter(s);flex:none;width:20px;height:20px;border-radius:50%;
+    display:grid;place-items:center;font-family:var(--mono);font-size:9.5px;color:#0B1030;font-weight:700;
+    background:linear-gradient(160deg,var(--accent2),var(--accent));margin-top:1px;
+  }
+  .steps b{color:var(--ink);font-weight:600}
+  code,kbd{font-family:var(--mono);font-size:11px;background:rgba(167,182,255,.1);border:1px solid var(--line);border-radius:5px;padding:1.5px 6px;color:var(--ink)}
+  a{color:var(--accent2);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  .sw{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+  @media(max-width:900px){.sw{grid-template-columns:repeat(3,1fr)}}
+  .swatch{border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+  .swatch i{display:block;height:66px}
+  .swatch span{display:block;padding:7px 9px;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);background:rgba(7,11,31,.5)}
+  .swatch b{display:block;padding:0 9px 9px;font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink);background:rgba(7,11,31,.5)}
+
+  .type{display:grid;gap:0;border-top:1px solid var(--line)}
+  .type-row{display:grid;grid-template-columns:150px 1fr 150px;gap:16px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
+  .type-row span{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .type-row em{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--faint);text-align:right}
+  @media(max-width:760px){.type-row{grid-template-columns:100px 1fr;}.type-row em{display:none}}
+
+  .frames{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media(max-width:760px){.frames{grid-template-columns:1fr}}
+  .frame-item{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:rgba(167,182,255,.04)}
+  .frame-item .n{font-family:var(--mono);font-size:10px;color:var(--faint);width:22px;flex:none}
+  .frame-item b{font-size:12.5px;font-weight:550;display:block}
+  .frame-item span{display:block;font-size:10.5px;color:var(--faint);margin-top:2px}
+  .frame-item a{margin-left:auto;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:5px 10px;white-space:nowrap}
+  .frame-item a:hover{color:#fff;border-color:var(--line2);background:rgba(91,124,250,.16);text-decoration:none}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;height:21px;padding:0 9px;border-radius:999px;font-family:var(--mono);font-size:9.5px;border:1px solid var(--line);color:var(--dim);background:rgba(167,182,255,.06)}
+  .pill.accent{color:#cdd8ff;border-color:rgba(91,124,250,.5);background:rgba(91,124,250,.18)}
+  .row{display:flex;flex-wrap:wrap;gap:8px}
+  .note{margin-top:14px;padding:11px 13px;border-radius:10px;font-size:11.5px;line-height:1.6;color:var(--dim);background:rgba(224,168,111,.09);border:1px solid rgba(224,168,111,.28)}
+  .note b{color:#F6D3B0}
+  .foot{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow"><i></i> Figma · DIALLO Indigo Minuit</div>
+  <h1>Ce que le plugin <em>construit</em> dans Figma</h1>
+  <p class="lede">
+    Il n’y a pas de fichier <code>.fig</code> dans le dépôt : Figma ne permet pas de produire un fichier de design
+    depuis un serveur. Le fichier Figma se crée <b>en un clic</b> avec le plugin local fourni dans
+    <code>figma/diallo-indigo/</code>. Cette page montre exactement ce qu’il génère : couleurs, typographies,
+    composants et 10 écrans 1440 × 900.
+  </p>
+
+  <div class="grid" style="grid-template-columns:1.1fr .9fr;margin-bottom:12px" id="top">
+    <div class="card">
+      <h2>Ouvrir le fichier Figma (30 secondes)</h2>
+      <p class="sub">Aucune installation, aucun compte développeur</p>
+      <ol class="steps">
+        <li>Ouvrir <b>Figma</b> (application desktop ou figma.com) et créer un fichier vide.</li>
+        <li>Menu <b>Plugins → Development → Import plugin from manifest…</b></li>
+        <li>Sélectionner <code>figma/diallo-indigo/manifest.json</code> du dépôt.</li>
+        <li>Menu <b>Plugins → Development → DIALLO — Indigo Minuit</b></li>
+        <li>Choisir <b>Générer le design system + les écrans</b>.</li>
+      </ol>
+      <div class="note">
+        <b>À savoir</b> — le plugin est un fichier JavaScript (<code>code.js</code>, 1 195 lignes) qui dessine
+        les calques avec l’API Figma. Il est déjà testé : 149 frames, 385 rectangles, 1 001 textes, 11 composants,
+        22 styles, aucune géométrie invalide.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Fichiers du plugin</h2>
+      <p class="sub">Chemins exacts dans le dépôt</p>
+      <div class="row" style="margin-bottom:14px">
+        <span class="pill accent">manifest.json</span>
+        <span class="pill">code.js</span>
+        <span class="pill">tokens.json</span>
+      </div>
+      <div class="frames" style="grid-template-columns:1fr">
+        <div class="frame-item"><span class="n">—</span><div><b>manifest.json</b><span>déclaration + 3 commandes de menu</span></div><a href="../figma/diallo-indigo/manifest.json">voir</a></div>
+        <div class="frame-item"><span class="n">—</span><div><b>code.js</b><span>générateur : styles, composants, écrans</span></div><a href="../figma/diallo-indigo/code.js">voir</a></div>
+        <div class="frame-item"><span class="n">—</span><div><b>tokens.json</b><span>format Tokens Studio (alternative)</span></div><a href="../figma/diallo-indigo/tokens.json">voir</a></div>
+        <div class="frame-item"><span class="n">—</span><div><b>README.md</b><span>mode d’emploi détaillé</span></div><a href="../figma/README.md">voir</a></div>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <span class="pill">Pas de .fig : normal</span>
+        <span class="pill">Figma API</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <h2>Styles créés : 12 couleurs</h2>
+    <p class="sub">Page « 01 · Design system · DIALLO » · nommés DIALLO/&lt;token&gt;</p>
+    <div class="sw">
+      <div class="swatch"><i style="background:#070B1F"></i><span>bg</span><b>#070B1F</b></div>
+      <div class="swatch"><i style="background:#0B1030"></i><span>bg-elevated</span><b>#0B1030</b></div>
+      <div class="swatch"><i style="background:#1B2A6B"></i><span>panel</span><b>#1B2A6B</b></div>
+      <div class="swatch"><i style="background:#F0F2FF"></i><span>ink</span><b>#F0F2FF</b></div>
+      <div class="swatch"><i style="background:#A7B6FF"></i><span>dim</span><b>#A7B6FF</b></div>
+      <div class="swatch"><i style="background:#6B78A8"></i><span>faint</span><b>#6B78A8</b></div>
+      <div class="swatch"><i style="background:#A7B6FF26"></i><span>line</span><b>#A7B6FF · 15 %</b></div>
+      <div class="swatch"><i style="background:#5B7CFA"></i><span>accent</span><b>#5B7CFA</b></div>
+      <div class="swatch"><i style="background:#7E9BFF"></i><span>accent-soft</span><b>#7E9BFF</b></div>
+      <div class="swatch"><i style="background:#E0A86F"></i><span>copper</span><b>#E0A86F</b></div>
+      <div class="swatch"><i style="background:#F08A8A"></i><span>danger</span><b>#F08A8A</b></div>
+      <div class="swatch"><i style="background:#6FD3A8"></i><span>success</span><b>#6FD3A8</b></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <h2>Styles créés : 8 text styles + 2 effets</h2>
+    <p class="sub">Inter · Regular / Medium / Semi Bold / Bold</p>
+    <div class="type">
+      <div class="type-row"><span>Display / 28</span><div style="font-size:28px;font-weight:700;letter-spacing:-.02em">École Internationale Diallo</div><em>Bold · #F0F2FF</em></div>
+      <div class="type-row"><span>Title / 20</span><div style="font-size:20px;font-weight:700">École Internationale Diallo</div><em>Bold · #F0F2FF</em></div>
+      <div class="type-row"><span>Heading / 15</span><div style="font-size:15px;font-weight:600">École Internationale Diallo</div><em>Semi Bold · #F0F2FF</em></div>
+      <div class="type-row"><span>Body / 12</span><div style="font-size:12px;color:#A7B6FF">École Internationale Diallo</div><em>Regular · #A7B6FF</em></div>
+      <div class="type-row"><span>Body strong / 12</span><div style="font-size:12px;font-weight:500">École Internationale Diallo</div><em>Medium · #F0F2FF</em></div>
+      <div class="type-row"><span>Caption / 10.5</span><div style="font-size:10.5px;color:#6B78A8">École Internationale Diallo</div><em>Regular · #6B78A8</em></div>
+      <div class="type-row"><span>Label / 9</span><div style="font-size:9px;letter-spacing:.3px;color:#6B78A8">ÉCOLE INTERNATIONALE DIALLO</div><em>Medium · #6B78A8</em></div>
+      <div class="type-row"><span>Mono / 10</span><div style="font-family:var(--mono);font-size:10px;color:#A7B6FF">2026-0142 · 8,45 M FCFA</div><em>Medium · #A7B6FF</em></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <span class="pill accent">DIALLO/Glow accent</span>
+      <span class="pill">DIALLO/Card shadow</span>
+      <span class="pill">rayons 7 · 10 · 14 · 18 · 999</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <h2>Composants · page « 02 · Composants »</h2>
+    <p class="sub">Vrais composants Figma, prêts à instancier</p>
+    <div class="row">
+      <span class="pill">Button / Primaire</span>
+      <span class="pill">Button / Secondaire</span>
+      <span class="pill">Pill / À jour</span>
+      <span class="pill">Pill / En retard</span>
+      <span class="pill">Pill / Boursier</span>
+      <span class="pill">Pill / Payé</span>
+      <span class="pill">Avatar / MD</span>
+      <span class="pill">Avatar / AT</span>
+      <span class="pill">Avatar / IK</span>
+      <span class="pill">KPI / Default</span>
+      <span class="pill">Table / Row</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <h2>Écrans · 1440 × 900 · Electron</h2>
+    <p class="sub">Disposés en grille sous le board du design system</p>
+    <div class="frames">
+      <div class="frame-item"><span class="n">01</span><div><b>Tableau de bord</b><span>KPI, aire chart, table des élèves</span></div><a href="../gallery/palettes/indigo-page-tableau-de-bord.png">aperçu</a></div>
+      <div class="frame-item"><span class="n">02</span><div><b>Élèves</b><span>filtres, table 8 lignes, pagination</span></div><a href="../gallery/palettes/indigo-page-eleves.png">aperçu</a></div>
+      <div class="frame-item"><span class="n">03</span><div><b>Classes</b><span>6 cartes, effectifs, avatars</span></div><a href="../gallery/palettes/indigo-page-classes.png">aperçu</a></div>
+      <div class="frame-item"><span class="n">04</span><div><b>Emploi du temps</b><span>grille 5 jours, créneaux, ligne du jour</span></div><a href="../gallery/palettes/indigo-page-emploi-du-temps.png">aperçu</a></div>
+      <div class="frame-item"><span class="n">05</span><div><b>Finances</b><span>KPI, chart, donut, paiements</span></div><a href="../gallery/palettes/indigo-page-finances.png">aperçu</a></div>
+      <div class="frame-item"><span class="n">06</span><div><b>Notes</b><span>répartition, table des notes</span></div><a href="../gallery/palettes/indigo-page-notes.png">aperçu</a></div>
+      <div class="frame-item"><span class="n">07</span><div><b>Admissions</b><span>kanban 4 colonnes, carte soulevée</span></div><a href="../gallery/palettes/indigo-page-admissions.png">aperçu</a></div>
+      <div class="frame-item"><span class="n">08</span><div><b>Fiche élève</b><span>entête, infos, documents, notes</span></div><a href="../gallery/palettes/indigo-page-profil.png">aperçu</a></div>
+      <div class="frame-item"><span class="n">09</span><div><b>Paramètres</b><span>nav secondaire, formulaire, toggles</span></div><a href="../gallery/palettes/indigo-page-parametres.png">aperçu</a></div>
+      <div class="frame-item"><span class="n">10</span><div><b>Modales</b><span>dashboard voilé + modale 760 px</span></div><a href="../app/README.md">détail</a></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Alternative : importer les tokens sans le plugin</h2>
+    <p class="sub">Tokens Studio for Figma</p>
+    <ol class="steps">
+      <li>Installer <b>Tokens Studio for Figma</b>.</li>
+      <li>Onglet <b>Tools → Load from file</b> puis choisir <code>figma/diallo-indigo/tokens.json</code>.</li>
+      <li>Appliquer : couleurs, rayons, espacements, tailles de police et ombres sont créés.</li>
+    </ol>
+    <div class="note" style="background:rgba(91,124,250,.09);border-color:rgba(91,124,250,.3)">
+      Cette méthode crée les <b>styles</b> seulement. Pour les composants et les 10 écrans,
+      c’est le plugin qu’il faut lancer.
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>DIALLO · Indigo Minuit</span>
+    <span>plugin Figma · 10 écrans · 11 composants · 22 styles</span>
+  </div>
+</div>
+</body>
+</html>
