@@ -22,14 +22,13 @@ const MIME = {
   '.sketch': 'application/octet-stream',
 };
 
-// Téléchargements servis depuis le dépôt (hors de gallery/).
-const DOWNLOADS = {
-  '/download/DIALLO-Indigo-Minuit.sketch': path.join(
-    __dirname,
-    '..',
-    'figma',
-    'DIALLO-Indigo-Minuit.sketch'
-  ),
+// Le fichier Figma vit dans figma/ : ces deux chemins l'exposent sans dupliquer 2,2 Mo.
+const SKETCH = path.join(__dirname, '..', 'figma', 'DIALLO-Indigo-Minuit.sketch');
+const ALIASES = {
+  // servi exactement comme un fichier statique de gallery/ (mêmes en-têtes, même streaming)
+  '/DIALLO-Indigo-Minuit.sketch': SKETCH,
+  // variante « téléchargement » avec Content-Disposition
+  '/download/DIALLO-Indigo-Minuit.sketch': SKETCH,
 };
 
 const server = http.createServer((req, res) => {
@@ -47,7 +46,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  const download = DOWNLOADS[pathname];
+  const download = pathname.startsWith('/download/') ? ALIASES[pathname] : null;
   if (download) {
     fs.stat(download, (err, stat) => {
       if (err || !stat.isFile()) {
@@ -68,10 +67,11 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname.endsWith('/')) pathname += 'index.html';
-  const filePath = path.join(ROOT, path.normalize(pathname));
+  const aliased = ALIASES[pathname];
+  const filePath = aliased || path.join(ROOT, path.normalize(pathname));
 
   // Prevent path traversal outside the gallery folder.
-  if (!filePath.startsWith(ROOT + path.sep) && filePath !== ROOT) {
+  if (!aliased && !filePath.startsWith(ROOT + path.sep) && filePath !== ROOT) {
     res.writeHead(403).end('Forbidden');
     return;
   }
@@ -92,7 +92,7 @@ const server = http.createServer((req, res) => {
 
     // Basic range support so large PNGs stream nicely.
     const range = req.headers.range;
-    if (range && type.startsWith('image/')) {
+    if (range && (type.startsWith('image/') || type === 'application/octet-stream')) {
       const match = /bytes=(\d*)-(\d*)/.exec(range);
       if (match) {
         const start = match[1] ? Number(match[1]) : 0;
@@ -110,7 +110,11 @@ const server = http.createServer((req, res) => {
       }
     }
 
-    res.writeHead(200, { ...headers, 'Content-Length': stat.size });
+    res.writeHead(200, {
+      ...headers,
+      'Content-Length': stat.size,
+      'Accept-Ranges': 'bytes',
+    });
     fs.createReadStream(filePath).pipe(res);
   });
 });
