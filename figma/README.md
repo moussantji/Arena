@@ -12,7 +12,7 @@ propriétaire, `.sketch` est le format pivot. Contenu du fichier (2 pages, 13 ar
 
 | Page | Contenu |
 |---|---|
-| `01 · Écrans` | 12 écrans desktop 1440 × 900 + une modale, **en calques réels** (groupes nommés, formes vectorielles, texte Inter éditable — aucun bitmap) : Tableau de bord, Élèves, Classes, Emploi du temps, Finances, Personnel, Messagerie, Notes, Absences, Fiche élève, Admissions, Paramètres |
+| `01 · Écrans` | 13 écrans desktop 1440 × 900 + une modale, **en calques réels** (groupes nommés, formes vectorielles, texte Inter éditable — aucun bitmap) : Tableau de bord, Élèves, Classes, Matières, Emploi du temps, Finances, Personnel, Messagerie, Notes, Absences, Fiche élève, Admissions, Paramètres |
 | `02 · Design system` | palette Indigo Minuit (12 nuances nommées + HEX), 8 styles typographiques Inter, composants vectoriels : boutons, pills de statut, carte KPI, avatar, ligne de tableau |
 
 Vérifications avant diffusion :

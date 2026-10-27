@@ -19,6 +19,7 @@ export const NAV = {
     { id: 'messagerie', label: 'Messagerie', icon: 'messages', badge: 2 },
   ],
   Pédagogie: [
+    { id: 'matieres', label: 'Matières', icon: 'grades' },
     { id: 'notes', label: 'Notes', icon: 'grades' },
     { id: 'absences', label: 'Absences', icon: 'absences' },
     { id: 'fiche', label: 'Fiche élève', icon: 'profile' },

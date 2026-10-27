@@ -19,6 +19,7 @@ export const META = {
   finances: { label: 'Finances', group: 'Gestion', crumb: ['Finances', 'Octobre 2026'], title: 'Finances', sub: 'Recouvrement · Exercice 2026', primary: 'Enregistrer un paiement', secondary: 'Exporter' },
   personnel: { label: 'Personnel', group: 'Gestion', crumb: ['Personnel', 'Enseignants'], title: 'Personnel', sub: '68 membres · 42 enseignants', primary: 'Ajouter un membre', secondary: 'Annuaire' },
   messagerie: { label: 'Messagerie', group: 'Gestion', crumb: ['Messagerie', 'Boîte de réception'], title: 'Messagerie', sub: '4 conversations · 2 non lus', primary: 'Nouveau message', secondary: 'Tout marquer lu' },
+  matieres: { label: 'Matières', group: 'Pédagogie', crumb: ['Pédagogie', 'Matières'], title: 'Matières', sub: '14 matières · 42 classes · 86 enseignants', primary: 'Nouvelle matière', secondary: 'Exporter' },
   notes: { label: 'Notes', group: 'Pédagogie', crumb: ['Élèves', 'Notes · Trimestre 1'], title: 'Notes', sub: 'Terminale S · Trimestre 1 · 32 élèves', primary: 'Saisir les notes', secondary: 'Bulletins' },
   absences: { label: 'Absences', group: 'Pédagogie', crumb: ['Élèves', 'Absences · Octobre'], title: 'Absences', sub: 'Octobre 2026 · 96,8 % de présence', primary: 'Justifier une absence', secondary: 'Exporter' },
   fiche: { label: 'Fiche élève', group: 'Pédagogie', crumb: ['Élèves', 'Fiche élève'], title: 'Aminata Traoré', sub: 'Terminale S · Matricule 2026-0142', secondary: 'Message' },
@@ -350,6 +351,68 @@ export function Personnel() {
 /* ============================================================
    7 · Notes
    ============================================================ */
+/* ============================================================
+   Matières
+   ============================================================ */
+export function Matieres() {
+  const modals = useModals();
+  const rows = M.catalogue;
+  return (
+    <>
+      <div className="stats-row rise">
+        <Stat value="14" label="Matières enseignées" />
+        <Stat value="13,1" label="Moyenne générale" tone="accent" />
+        <Stat value="312" label="Heures / semaine" />
+        <Stat value="4" label="Postes à pourvoir" />
+      </div>
+
+      <div className="grid-main">
+        <Card className="rise">
+          <CardHead
+            title="Matières"
+            sub="Année 2025–2026 · triées par moyenne"
+            right={<Tabs items={['Toutes', 'Sciences', 'Lettres', 'Langues']} active={0} />}
+          />
+          <Table
+            columns={['Matière', 'Département', 'Profs', 'Classes', 'Moyenne', '']}
+            template="1.5fr 1fr .5fr .6fr .7fr 34px"
+            foot={<><span className="tf-l">1–14 sur 14</span><span className="tf-r">Page 1 / 1</span></>}
+          >
+            {rows.map((m) => (
+              <Tr key={m.name} template="1.5fr 1fr .5fr .6fr .7fr 34px">
+                <span className="cell-who">
+                  <span className={`subj-dot tone-${m.tone}`} />
+                  <b>{m.name}</b>
+                </span>
+                <span className="cell">{m.dept}</span>
+                <span className="cell mono">{m.teachers}</span>
+                <span className="cell mono">{m.classes}</span>
+                <span className="cell mono">{m.avg}</span>
+                <span className="cell right">
+                  <IconBtn icon="dots" title="Actions" onClick={() => modals.confirm()} />
+                </span>
+              </Tr>
+            ))}
+          </Table>
+        </Card>
+
+        <Card className="rise" style={{ animationDelay: '160ms' }}>
+          <CardHead title="Volume horaire" sub="Heures / semaine · toutes classes" />
+          <ul className="subjects">
+            {M.matieres.map((m) => (
+              <li key={m.name}>
+                <span className="subj-row"><b>{m.name}</b><em>{`${m.avg} / 20`}</em></span>
+                <Progress value={m.value} height={3} tone={m.tone} />
+              </li>
+            ))}
+          </ul>
+          <div className="subj-foot"><span>Total hebdo</span><b>312 h</b></div>
+        </Card>
+      </div>
+    </>
+  );
+}
+
 export function Notes() {
   const modals = useModals();
   return (
@@ -718,6 +781,7 @@ export const PAGES = {
   finances: Finances,
   personnel: Personnel,
   messagerie: Messagerie,
+  matieres: Matieres,
   notes: Notes,
   absences: Absences,
   fiche: Fiche,

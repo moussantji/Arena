@@ -53,6 +53,32 @@ export const today = [
   { time: '14:00', subject: 'Français', room: 'Salle 112', who: 'PT', tone: 'copper' },
 ];
 
+export const matieres = [
+  { name: 'Mathématiques', avg: '13,4', value: 67, tone: 'accent' },
+  { name: 'Physique-Chimie', avg: '12,1', value: 60, tone: 'accent' },
+  { name: 'Français', avg: '14,2', value: 71, tone: 'success' },
+  { name: 'Anglais', avg: '13,8', value: 69, tone: 'success' },
+  { name: 'Histoire-Géo', avg: '11,9', value: 59, tone: 'copper' },
+];
+
+/* Catalogue des matières — page « Matières » */
+export const catalogue = [
+  { name: 'Mathématiques', dept: 'Sciences', teachers: 6, classes: 12, avg: '13,40', hours: 42, value: 67, tone: 'accent' },
+  { name: 'Physique-Chimie', dept: 'Sciences', teachers: 5, classes: 10, avg: '12,10', hours: 36, value: 60, tone: 'accent' },
+  { name: 'SVT', dept: 'Sciences', teachers: 3, classes: 8, avg: '12,80', hours: 24, value: 64, tone: 'accent' },
+  { name: 'Français', dept: 'Lettres', teachers: 7, classes: 14, avg: '14,20', hours: 48, value: 71, tone: 'success' },
+  { name: 'Philosophie', dept: 'Lettres', teachers: 3, classes: 6, avg: '11,40', hours: 18, value: 57, tone: 'copper' },
+  { name: 'Histoire-Géo', dept: 'Sciences humaines', teachers: 4, classes: 11, avg: '11,90', hours: 28, value: 59, tone: 'copper' },
+  { name: 'Anglais', dept: 'Langues', teachers: 5, classes: 14, avg: '13,80', hours: 32, value: 69, tone: 'success' },
+  { name: 'Arabe', dept: 'Langues', teachers: 3, classes: 9, avg: '12,60', hours: 18, value: 63, tone: 'accent' },
+  { name: 'Espagnol', dept: 'Langues', teachers: 2, classes: 6, avg: '13,10', hours: 12, value: 65, tone: 'accent' },
+  { name: 'Informatique', dept: 'Sciences', teachers: 2, classes: 8, avg: '15,20', hours: 16, value: 76, tone: 'success' },
+  { name: 'Économie', dept: 'Sciences humaines', teachers: 2, classes: 5, avg: '12,30', hours: 14, value: 61, tone: 'accent' },
+  { name: 'EPS', dept: 'Sport', teachers: 4, classes: 14, avg: '15,80', hours: 28, value: 79, tone: 'success' },
+  { name: 'Arts plastiques', dept: 'Arts', teachers: 2, classes: 7, avg: '14,90', hours: 14, value: 74, tone: 'success' },
+  { name: 'Musique', dept: 'Arts', teachers: 1, classes: 4, avg: '14,40', hours: 8, value: 72, tone: 'accent' },
+];
+
 export const students = [
   { name: 'Aminata Traoré', ref: '2026-0142', cls: 'Terminale S', status: 'À jour', avg: '12,80', balance: '8,45 M FCFA', who: 'AT' },
   { name: 'Ibrahim Konaté', ref: '2026-0143', cls: 'Terminale S', status: 'En retard', avg: '11,20', balance: '47 000 FCFA', who: 'IK' },

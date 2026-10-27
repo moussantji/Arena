@@ -379,7 +379,7 @@ function buildComponents(root) {
 }
 
 /* ---------------- écrans ---------------- */
-function sidebar(parent) {
+function sidebar(parent, active = 'Tableau de bord') {
   const f = frame('Sidebar', SIDEBAR, H - TOPBAR, solid(C.bg, 0.55), { stroke: C.line, strokeOpacity: 0.14 });
   f.fills = [grad(C.panel, C.bg, 0.3)];
   parent.appendChild(f);
@@ -394,24 +394,22 @@ function sidebar(parent) {
   const groups = [
     ['PILOTAGE', ['Tableau de bord', 'Élèves', 'Classes', 'Emploi du temps']],
     ['GESTION', ['Finances', 'Personnel', 'Messagerie']],
-    ['PÉDAGOGIE', ['Notes', 'Absences', 'Fiche élève', 'Admissions']],
+    ['PÉDAGOGIE', ['Matières', 'Notes', 'Absences', 'Fiche élève', 'Admissions']],
     ['SYSTÈME', ['Paramètres']],
   ];
 
   let y = 78;
-  let first = true;
   groups.forEach(([g, items]) => {
     label(f, g, 24, y, 8, 'Medium', C.faint, { letterSpacing: 1.4 });
     y += 18;
     items.forEach((it) => {
-      const active = first;
-      first = false;
-      if (active) {
+      const on = it === active;
+      if (on) {
         rect(f, 12, y - 4, 214, 34, { fill: solid(C.accent, 0.22), radius: 10, stroke: C.accent, strokeOpacity: 0.4 });
         rect(f, 12, y + 4, 2, 18, { fill: solid(C.accent), radius: 2 });
       }
-      ellipse(f, 24, y + 7, 12, { stroke: active ? C.accent2 : C.faint, fill: null });
-      label(f, it, 46, y + 6, 12.5, active ? 'Medium' : 'Regular', active ? C.white : C.dim);
+      ellipse(f, 24, y + 7, 12, { stroke: on ? C.accent2 : C.faint, fill: null });
+      label(f, it, 46, y + 6, 12.5, on ? 'Medium' : 'Regular', on ? C.white : C.dim);
       y += 34;
     });
     y += 10;
@@ -512,7 +510,7 @@ function tableCard(parent, x, y, w, h, title, sub, rows, cols) {
 function screenDashboard(dsPage) {
   const s = frame('01 · Tableau de bord', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Tableau de bord');
   topbar(s, 'Tableau de bord', 'Semestre 1');
   pageHead(s, 'Tableau de bord', 'Lundi 27 octobre · 42 classes actives', 'Nouvel élève', 'Exporter');
 
@@ -558,8 +556,29 @@ function screenDashboard(dsPage) {
   rect(today, 16, 236, 120, 3, { fill: grad(C.accent, C.accent2), radius: 999 });
   label(today, '62 % de la journée', 146, 231, 10, 'Regular', C.faint);
 
+  /* moyennes par matière */
+  const mat = card(s, W - 338, 552, 316, 326, { title: 'Moyennes par matière', sub: 'Terminale S · trimestre 1' });
+  const subjects = [
+    ['Mathématiques', 13.4, C.accent2],
+    ['Physique-Chimie', 12.1, C.accent2],
+    ['Français', 14.2, C.success],
+    ['Anglais', 13.8, C.success],
+    ['Histoire-Géo', 11.9, C.copper],
+  ];
+  subjects.forEach(([name, avg, tone], i) => {
+    const y = 58 + i * 48;
+    label(mat, name, 16, y, 11.5, 'Medium', C.ink);
+    label(mat, avg.toFixed(1).replace('.', ','), mat.width - 62, y - 1, 12, 'Medium', tone);
+    rect(mat, 16, y + 22, mat.width - 32, 3, { fill: solid(C.line, 0.16), radius: 999 });
+    rect(mat, 16, y + 22, (mat.width - 32) * (avg / 20), 3, { fill: solid(tone), radius: 999 });
+    if (i < subjects.length - 1) rect(mat, 16, y + 40, mat.width - 32, 1, { fill: solid(C.line, 0.07) });
+  });
+  rect(mat, 16, 298, mat.width - 32, 1, { fill: solid(C.line, 0.16) });
+  label(mat, 'MOYENNE GÉNÉRALE', 16, 306, 8.5, 'Medium', C.faint, { letterSpacing: 1.4 });
+  label(mat, '13,08', mat.width - 62, 302, 13, 'Bold', C.ink);
+
   /* table */
-  tableCard(s, SIDEBAR + 22, 552, W - SIDEBAR - 44, 326, 'Élèves récents', '1 284 élèves inscrits', [
+  tableCard(s, SIDEBAR + 22, 552, W - SIDEBAR - 372, 326, 'Élèves récents', '1 284 élèves inscrits', [
     { initials: 'AT', name: 'Aminata Traoré', sub: '2026-0142', cls: 'Terminale S', pill: 'À jour', avg: '12,80', solde: '8,45 M FCFA' },
     { initials: 'IK', name: 'Ibrahim Konaté', sub: '2026-0143', cls: 'Terminale S', pill: 'En retard', avg: '11,20', solde: '47 000 FCFA' },
     { initials: 'FD', name: 'Fatoumata Diallo', sub: '2026-0151', cls: 'Première S', pill: 'À jour', avg: '14,60', solde: '0 FCFA' },
@@ -567,10 +586,10 @@ function screenDashboard(dsPage) {
     { initials: 'AS', name: 'Awa Sow', sub: '2026-0177', cls: 'Terminale L', pill: 'À jour', avg: '15,40', solde: '120 000 FCFA' },
   ], [
     { label: 'Élève', x: 16 },
-    { label: 'Classe', x: 430, key: 'cls' },
-    { label: 'Statut', x: 560, kind: 'pill' },
-    { label: 'Moyenne', x: 690, key: 'avg' },
-    { label: 'Solde', x: 830, key: 'solde' },
+    { label: 'Classe', x: 296, key: 'cls' },
+    { label: 'Statut', x: 412, kind: 'pill' },
+    { label: 'Moyenne', x: 536, key: 'avg' },
+    { label: 'Solde', x: 648, key: 'solde' },
   ]);
 
   return s;
@@ -580,7 +599,7 @@ function screenDashboard(dsPage) {
 function screenEleves(dsPage) {
   const s = frame('02 · Élèves', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Élèves');
   topbar(s, 'Élèves', 'Tous les élèves');
   pageHead(s, 'Élèves', '1 284 élèves · 42 classes', 'Nouvel élève', 'Importer');
 
@@ -616,9 +635,9 @@ function screenEleves(dsPage) {
 
 /* --- écran : finances --- */
 function screenFinances(dsPage) {
-  const s = frame('05 · Finances', W, H, solid(C.bg));
+  const s = frame('06 · Finances', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Finances');
   topbar(s, 'Finances', 'Octobre 2026');
   pageHead(s, 'Finances', 'Recouvrement · Exercice 2026', 'Enregistrer un paiement', 'Exporter');
 
@@ -665,9 +684,9 @@ function screenFinances(dsPage) {
 
 /* --- écran : emploi du temps --- */
 function screenTimetable(dsPage) {
-  const s = frame('04 · Emploi du temps', W, H, solid(C.bg));
+  const s = frame('05 · Emploi du temps', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Emploi du temps');
   topbar(s, 'Emploi du temps', 'Semaine 44');
   pageHead(s, 'Emploi du temps', 'Semaine du 27 octobre au 1er novembre', 'Ajouter un cours', 'Exporter l’ICS');
 
@@ -733,9 +752,9 @@ function screenTimetable(dsPage) {
 
 /* --- écran : paramètres --- */
 function screenSettings(dsPage) {
-  const s = frame('12 · Paramètres', W, H, solid(C.bg));
+  const s = frame('13 · Paramètres', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Paramètres');
   topbar(s, 'Paramètres', 'Établissement');
   pageHead(s, 'Paramètres', 'Établissement · Compte · Notifications', 'Enregistrer', 'Réinitialiser');
 
@@ -799,7 +818,7 @@ function screenSettings(dsPage) {
 function screenClasses(dsPage) {
   const s = frame('03 · Classes', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Classes');
   topbar(s, 'Classes', 'Année 2025–2026');
   pageHead(s, 'Classes', '42 classes · 1 284 élèves', 'Créer une classe', 'Archiver');
 
@@ -846,9 +865,9 @@ function screenClasses(dsPage) {
 
 /* --- écran : notes --- */
 function screenNotes(dsPage) {
-  const s = frame('08 · Notes', W, H, solid(C.bg));
+  const s = frame('09 · Notes', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Notes');
   topbar(s, 'Élèves', 'Notes · Trimestre 1');
   pageHead(s, 'Notes', 'Terminale S · Trimestre 1 · 32 élèves', 'Saisir les notes', 'Bulletins');
 
@@ -901,9 +920,9 @@ function screenNotes(dsPage) {
 
 /* --- écran : admissions (kanban) --- */
 function screenAdmissions(dsPage) {
-  const s = frame('11 · Admissions', W, H, solid(C.bg));
+  const s = frame('12 · Admissions', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Admissions');
   topbar(s, 'Admissions', 'Rentrée 2026');
   pageHead(s, 'Admissions', 'Rentrée 2026 · 128 dossiers en cours', 'Nouveau dossier', 'Exporter');
 
@@ -962,9 +981,9 @@ function screenAdmissions(dsPage) {
 
 /* --- écran : fiche élève --- */
 function screenFiche(dsPage) {
-  const s = frame('10 · Fiche élève', W, H, solid(C.bg));
+  const s = frame('11 · Fiche élève', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Fiche élève');
   topbar(s, 'Élèves', 'Fiche élève');
 
   label(s, 'Aminata Traoré', SIDEBAR + 22, 76, 26, 'Bold', C.ink, { letterSpacing: -0.5 });
@@ -1028,7 +1047,7 @@ function screenFiche(dsPage) {
 /* --- écran : modales (démonstration) --- */
 function screenModals(dsPage) {
   const base = screenDashboard(dsPage);
-  base.name = '13 · Modales';
+  base.name = '14 · Modales';
 
   /* voile */
   const dim = frame('Voile', W, H, solid('#040612', 0.68));
@@ -1094,11 +1113,63 @@ function screenModals(dsPage) {
   return base;
 }
 
+/* --- écran : matières --- */
+function screenMatieres(dsPage) {
+  const s = frame('04 · Matières', W, H, solid(C.bg));
+  dsPage.appendChild(s);
+  sidebar(s, 'Matières');
+  topbar(s, 'Matières', 'Année 2025–2026');
+  pageHead(s, 'Matières', '14 matières · 42 classes · 86 enseignants', 'Nouvelle matière', 'Exporter');
+
+  const stats = [['14', 'Matières enseignées'], ['13,1', 'Moyenne générale'], ['312 h', 'Volume hebdomadaire'], ['4', 'Postes à pourvoir']];
+  const sw = (W - SIDEBAR - 44 - 36) / 4;
+  stats.forEach(([v, l], i) => {
+    const c = card(s, SIDEBAR + 22 + i * (sw + 12), 148, sw, 74);
+    label(c, v, 15, 14, 21, 'Bold', i === 1 ? C.accent2 : C.ink);
+    label(c, l, 15, 45, 11, 'Regular', C.faint);
+  });
+
+  tableCard(s, SIDEBAR + 22, 240, W - SIDEBAR - 372, 638, 'Matières', 'Année 2025–2026 · triées par moyenne', [
+    { initials: 'MA', name: 'Mathématiques', sub: 'Sciences · 6 enseignants', teachers: '6', classes: '12', avg: '13,40', pill: 'Tronc commun' },
+    { initials: 'PH', name: 'Physique-Chimie', sub: 'Sciences · 5 enseignants', teachers: '5', classes: '10', avg: '12,10', pill: 'Tronc commun' },
+    { initials: 'FR', name: 'Français', sub: 'Lettres · 7 enseignants', teachers: '7', classes: '14', avg: '14,20', pill: 'Tronc commun' },
+    { initials: 'AN', name: 'Anglais', sub: 'Langues · 5 enseignants', teachers: '5', classes: '14', avg: '13,80', pill: 'Tronc commun' },
+    { initials: 'HG', name: 'Histoire-Géo', sub: 'Sciences humaines · 4 enseignants', teachers: '4', classes: '11', avg: '11,90', pill: 'Tronc commun' },
+    { initials: 'SV', name: 'SVT', sub: 'Sciences · 3 enseignants', teachers: '3', classes: '8', avg: '12,80', pill: 'Option' },
+    { initials: 'PL', name: 'Philosophie', sub: 'Lettres · 3 enseignants', teachers: '3', classes: '6', avg: '11,40', pill: 'Option' },
+    { initials: 'IN', name: 'Informatique', sub: 'Sciences · 2 enseignants', teachers: '2', classes: '8', avg: '15,20', pill: 'Option' },
+  ], [
+    { label: 'Matière', x: 16 },
+    { label: 'Profs', x: 400, key: 'teachers' },
+    { label: 'Classes', x: 500, key: 'classes' },
+    { label: 'Moyenne', x: 610, key: 'avg' },
+    { label: 'Statut', x: 716, kind: 'pill' },
+  ]);
+
+  const vol = card(s, W - 338, 240, 316, 638, { title: 'Volume horaire', sub: 'Heures / semaine · toutes classes' });
+  const load = [['Mathématiques', 42], ['Français', 48], ['Physique-Chimie', 36], ['Anglais', 32], ['EPS', 28], ['Histoire-Géo', 28], ['SVT', 24], ['Informatique', 16]];
+  load.forEach(([n, h], i) => {
+    const y = 60 + i * 44;
+    label(vol, n, 16, y, 11.5, 'Medium', C.ink);
+    label(vol, h + ' h', vol.width - 58, y, 11, 'Medium', C.dim);
+    rect(vol, 16, y + 20, vol.width - 32, 3, { fill: solid(C.line, 0.16), radius: 999 });
+    rect(vol, 16, y + 20, (vol.width - 32) * (h / 48), 3, { fill: grad(C.accent, C.accent2), radius: 999 });
+  });
+  rect(vol, 16, 456, vol.width - 32, 1, { fill: solid(C.line, 0.16) });
+  label(vol, 'TOTAL HEBDOMADAIRE', 16, 470, 8.5, 'Medium', C.faint, { letterSpacing: 1.4 });
+  label(vol, '312 h', vol.width - 58, 466, 13, 'Bold', C.ink);
+  rect(vol, 16, 500, vol.width - 32, 1, { fill: solid(C.line, 0.1) });
+  label(vol, 'Moyenne toutes matières', 16, 514, 11, 'Regular', C.dim);
+  label(vol, '13,10', vol.width - 62, 512, 12, 'Medium', C.accent2);
+
+  return s;
+}
+
 /* --- écran : personnel --- */
 function screenPersonnel(dsPage) {
-  const s = frame('06 · Personnel', W, H, solid(C.bg));
+  const s = frame('07 · Personnel', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Personnel');
   topbar(s, 'Personnel', 'Équipe pédagogique');
   pageHead(s, 'Personnel', '86 collaborateurs · 42 enseignants', 'Ajouter un membre', 'Exporter');
 
@@ -1129,9 +1200,9 @@ function screenPersonnel(dsPage) {
 
 /* --- écran : messagerie --- */
 function screenMessagerie(dsPage) {
-  const s = frame('07 · Messagerie', W, H, solid(C.bg));
+  const s = frame('08 · Messagerie', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Messagerie');
   topbar(s, 'Messagerie', 'Boîte de réception');
   pageHead(s, 'Messagerie', '4 messages non lus · 12 conversations', 'Nouveau message', 'Tout marquer lu');
 
@@ -1193,9 +1264,9 @@ function screenMessagerie(dsPage) {
 
 /* --- écran : absences --- */
 function screenAbsences(dsPage) {
-  const s = frame('09 · Absences', W, H, solid(C.bg));
+  const s = frame('10 · Absences', W, H, solid(C.bg));
   dsPage.appendChild(s);
-  sidebar(s);
+  sidebar(s, 'Absences');
   topbar(s, 'Absences', 'Semaine 44');
   pageHead(s, 'Absences', '96,8 % de présence · 41 absences cette semaine', 'Justifier une absence', 'Exporter');
 
@@ -1298,6 +1369,7 @@ async function main(cmd) {
       ['Tableau de bord', screenDashboard],
       ['Élèves', screenEleves],
       ['Classes', screenClasses],
+      ['Matières', screenMatieres],
       ['Emploi du temps', screenTimetable],
       ['Finances', screenFinances],
       ['Personnel', screenPersonnel],
