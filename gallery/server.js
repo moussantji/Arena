@@ -19,6 +19,17 @@ const MIME = {
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
+  '.sketch': 'application/octet-stream',
+};
+
+// Téléchargements servis depuis le dépôt (hors de gallery/).
+const DOWNLOADS = {
+  '/download/DIALLO-Indigo-Minuit.sketch': path.join(
+    __dirname,
+    '..',
+    'figma',
+    'DIALLO-Indigo-Minuit.sketch'
+  ),
 };
 
 const server = http.createServer((req, res) => {
@@ -33,6 +44,26 @@ const server = http.createServer((req, res) => {
   if (pathname === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: true }));
+    return;
+  }
+
+  const download = DOWNLOADS[pathname];
+  if (download) {
+    fs.stat(download, (err, stat) => {
+      if (err || !stat.isFile()) {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Fichier introuvable');
+        return;
+      }
+      res.writeHead(200, {
+        'Content-Type': 'application/octet-stream',
+        'Content-Length': stat.size,
+        'Content-Disposition': 'attachment; filename="DIALLO-Indigo-Minuit.sketch"',
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+      });
+      fs.createReadStream(download).pipe(res);
+    });
     return;
   }
 
