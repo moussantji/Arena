@@ -12,7 +12,7 @@ propriétaire, `.sketch` est le format pivot. Contenu du fichier (2 pages, 13 ar
 
 | Page | Contenu |
 |---|---|
-| `01 · Écrans` | 12 écrans desktop 1440 × 900 : Tableau de bord, Élèves, Classes, Emploi du temps, Finances, Personnel, Messagerie, Notes, Absences, Fiche élève, Admissions, Paramètres |
+| `01 · Écrans` | 12 écrans desktop 1440 × 900 + une modale, **en calques réels** (groupes nommés, formes vectorielles, texte Inter éditable — aucun bitmap) : Tableau de bord, Élèves, Classes, Emploi du temps, Finances, Personnel, Messagerie, Notes, Absences, Fiche élève, Admissions, Paramètres |
 | `02 · Design system` | palette Indigo Minuit (12 nuances nommées + HEX), 8 styles typographiques Inter, composants vectoriels : boutons, pills de statut, carte KPI, avatar, ligne de tableau |
 
 Vérifications avant diffusion :
@@ -22,7 +22,16 @@ python3 tools/check-sketch.py figma/DIALLO-Indigo-Minuit.sketch      # structure
 python3 tools/validate-sketch.py figma/DIALLO-Indigo-Minuit.sketch   # schéma Sketch officiel
 ```
 
-Régénération : `python3 tools/make-figma-sketch.py` (nécessite Pillow).
+Régénération (nécessite Node + Pillow) :
+
+```bash
+node tools/figma-mock.js                  # rejoue le layout du plugin → tools/scene.json
+python3 tools/make-figma-sketch.py        # scene.json → .sketch vectoriel
+```
+
+`tools/figma-mock.js` exécute `figma/diallo-indigo/code.js` dans un faux contexte Figma
+et capture l'arbre de calques (positions calculées par l'auto-layout). Le `.sketch` et
+le plugin partagent donc **la même source de vérité** : les layouts ne divergent pas.
 
 ---
 

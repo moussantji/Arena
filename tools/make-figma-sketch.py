@@ -16,7 +16,6 @@ Sortie :
     figma/DIALLO-Indigo-Minuit.sketch
 """
 
-import hashlib
 import io
 import json
 import os
@@ -303,17 +302,335 @@ def text_layer(string, x, y, size, weight, hex_color, w=None, line_height=None, 
     )
 
 
-def bitmap_layer(name, x, y, w, h, image_ref):
+# ---------------------------------------------------------------- scène → Sketch
+SCENE = os.path.join(ROOT, "tools", "scene.json")
+FONT_FILES = {
+    "Regular": "Inter-Regular",
+    "Medium": "Inter-Medium",
+    "Semi Bold": "Inter-SemiBold",
+    "Bold": "Inter-Bold",
+}
+ALIGN = {"LEFT": 0, "CENTER": 2, "RIGHT": 1, "JUSTIFIED": 3}
+
+
+def gradient_fill(stops):
+    stops = [s for s in (stops or []) if s] or [{"position": 0, "hex": "#5B7CFA", "alpha": 1.0}]
+    return {
+        "_class": "fill",
+        "isEnabled": True,
+        "fillType": 1,
+        "color": color(stops[0]["hex"], stops[0]["alpha"]),
+        "contextSettings": context_settings(),
+        "gradient": {
+            "_class": "gradient",
+            "gradientType": 0,
+            "elipseLength": 0,
+            "from": "{0, 0.5}",
+            "to": "{1, 0.5}",
+            "stops": [
+                {"_class": "gradientStop", "color": color(st["hex"], st["alpha"]), "position": st["position"]}
+                for st in stops
+            ],
+        },
+        "noiseIndex": 0,
+        "noiseIntensity": 0,
+        "patternFillType": 1,
+        "patternTileScale": 1,
+    }
+
+
+def sketch_fill(spec):
+    if not spec:
+        return None
+    if spec.get("kind") == "solid":
+        return fill(spec["hex"], spec.get("alpha", 1.0))
+    return gradient_fill(spec.get("stops"))
+
+
+def sketch_border(spec):
+    if not spec:
+        return None
+    return border(spec["hex"], spec.get("alpha", 1.0), spec.get("weight", 1) or 1)
+
+
+def shape(name, x, y, w, h, radius=0, fill_spec=None, stroke_spec=None):
+    """Rectangle arrondi vectoriel (une ellipse = rayon = moitié du côté)."""
+    radius = max(0, min(radius or 0, (min(w, h) / 2) if w and h else 0))
+    points = []
+    for px, py in [(0, 0), (1, 0), (1, 1), (0, 1)]:
+        points.append({
+            "_class": "curvePoint",
+            "cornerRadius": radius,
+            "cornerStyle": 0,
+            "curveFrom": f"{{{px}, {py}}}",
+            "curveTo": f"{{{px}, {py}}}",
+            "hasCurveFrom": False,
+            "hasCurveTo": False,
+            "point": f"{{{px}, {py}}}",
+            "curveMode": 1,
+        })
+
+    inner = common(
+        "rectangle", name, rect(0, 0, w, h),
+        edited=False, isClosed=True,
+        pointRadiusBehaviour=1, fixedRadius=radius, points=points,
+        hasConvertedToNewRoundCorners=True, needsConvertionToNewRoundCorners=False,
+    )
+
+    f = sketch_fill(fill_spec)
+    b = sketch_border(stroke_spec)
     return common(
-        "bitmap",
-        name,
-        rect(x, y, w, h),
-        clippingMask=f"{{{{0, 0}}, {{{w}, 0}}, {{{w}, {h}}}, {{0, {h}}}}}",
-        image={"_class": "MSJSONFileReference", "_ref_class": "MSImageData", "_ref": f"images/{image_ref}"},
-        fillReplacesImage=False,
-        intendedDPI=72,
+        "shapeGroup", name, rect(x, y, w, h),
+        hasClickThrough=False,
+        windingRule=1,
+        layers=[inner],
+        style=style([f] if f else [], [b] if b else []),
+    )
+
+
+def text_from_node(node, x, y, w, h):
+    chars = node.get("characters") or ""
+    size = node.get("fontSize") or 12
+    fname = FONT_FILES.get(node.get("fontStyle"), "Inter-Regular")
+    col = node.get("color") or {"hex": "#F0F2FF", "alpha": 1.0}
+    alpha = col.get("alpha", 1.0) * (node.get("opacity") if node.get("opacity") is not None else 1.0)
+    box_w = max(w, 8) + 24
+    box_h = max(h, size * 1.2)
+
+    attrs = {
+        "MSAttributedStringFontAttribute": {
+            "_class": "fontDescriptor",
+            "attributes": {"name": fname, "size": size},
+        },
+        "MSAttributedStringColorAttribute": color(col.get("hex", "#F0F2FF"), alpha),
+        "textStyleVerticalAlignmentKey": 0,
+        "kerning": node.get("kerning") or 0,
+        "paragraphStyle": {"_class": "paragraphStyle", "alignment": ALIGN.get(node.get("align"), 0)},
+    }
+
+    return common(
+        "text",
+        (chars[:40] or "Texte"),
+        rect(x, y, box_w, box_h),
+        attributedString={
+            "_class": "attributedString",
+            "string": chars,
+            "attributes": [{
+                "_class": "stringAttribute",
+                "location": 0,
+                "length": len(chars),
+                "attributes": attrs,
+            }],
+        },
+        automaticallyDrawOnUnderlyingPath=False,
+        dontSynchroniseWithSymbol=False,
+        glyphBounds=f"{{{{0, 0}}, {{{box_w}, {box_h}}}}}",
+        lineSpacingBehaviour=2,
+        textBehaviour=0,
         style=style(),
     )
+
+
+def group_layer(name, x, y, w, h, layers):
+    return common(
+        "group", name or "Groupe", rect(x, y, w, h),
+        hasClickThrough=False,
+        layers=layers,
+    )
+
+
+def convert(node, parent_x, parent_y, out):
+    x = round(node["x"] - parent_x, 2)
+    y = round(node["y"] - parent_y, 2)
+    w = round(node.get("w") or 0, 2)
+    h = round(node.get("h") or 0, 2)
+
+    if node["kind"] == "text":
+        if not (node.get("characters") or "").strip():
+            return
+        out.append(text_from_node(node, x, y, w, h))
+        return
+
+    if w <= 0 or h <= 0:
+        return
+
+    if node["kind"] in ("rect", "ellipse"):
+        out.append(shape(node.get("name") or "Forme", x, y, w, h,
+                         node.get("radius") or 0, node.get("fill"), node.get("stroke")))
+        return
+
+    kids = []
+    if node.get("fill") or node.get("stroke"):
+        kids.append(shape("Fond", 0, 0, w, h, node.get("radius") or 0, node.get("fill"), node.get("stroke")))
+    for child in node.get("children") or []:
+        convert(child, node["x"], node["y"], kids)
+    out.append(group_layer(node.get("name"), x, y, w, h, kids))
+
+
+# ---------------------------------------------------------------- images
+# ---------------------------------------------------------------- scène → Sketch
+SCENE = os.path.join(ROOT, "tools", "scene.json")
+FONT_FILES = {
+    "Regular": "Inter-Regular",
+    "Medium": "Inter-Medium",
+    "Semi Bold": "Inter-SemiBold",
+    "Bold": "Inter-Bold",
+}
+ALIGN = {"LEFT": 0, "CENTER": 2, "RIGHT": 1, "JUSTIFIED": 3}
+
+
+def gradient_fill(stops):
+    stops = [s for s in (stops or []) if s] or [{"position": 0, "hex": "#5B7CFA", "alpha": 1.0}]
+    return {
+        "_class": "fill",
+        "isEnabled": True,
+        "fillType": 1,
+        "color": color(stops[0]["hex"], stops[0]["alpha"]),
+        "contextSettings": context_settings(),
+        "gradient": {
+            "_class": "gradient",
+            "gradientType": 0,
+            "elipseLength": 0,
+            "from": "{0, 0.5}",
+            "to": "{1, 0.5}",
+            "stops": [
+                {"_class": "gradientStop", "color": color(st["hex"], st["alpha"]), "position": st["position"]}
+                for st in stops
+            ],
+        },
+        "noiseIndex": 0,
+        "noiseIntensity": 0,
+        "patternFillType": 1,
+        "patternTileScale": 1,
+    }
+
+
+def sketch_fill(spec):
+    if not spec:
+        return None
+    if spec.get("kind") == "solid":
+        return fill(spec["hex"], spec.get("alpha", 1.0))
+    return gradient_fill(spec.get("stops"))
+
+
+def sketch_border(spec):
+    if not spec:
+        return None
+    return border(spec["hex"], spec.get("alpha", 1.0), spec.get("weight", 1) or 1)
+
+
+def shape(name, x, y, w, h, radius=0, fill_spec=None, stroke_spec=None):
+    """Rectangle arrondi vectoriel (une ellipse = rayon = moitié du côté)."""
+    radius = max(0, min(radius or 0, (min(w, h) / 2) if w and h else 0))
+    points = []
+    for px, py in [(0, 0), (1, 0), (1, 1), (0, 1)]:
+        points.append({
+            "_class": "curvePoint",
+            "cornerRadius": radius,
+            "cornerStyle": 0,
+            "curveFrom": f"{{{px}, {py}}}",
+            "curveTo": f"{{{px}, {py}}}",
+            "hasCurveFrom": False,
+            "hasCurveTo": False,
+            "point": f"{{{px}, {py}}}",
+            "curveMode": 1,
+        })
+
+    inner = common(
+        "rectangle", name, rect(0, 0, w, h),
+        edited=False, isClosed=True,
+        pointRadiusBehaviour=1, fixedRadius=radius, points=points,
+        hasConvertedToNewRoundCorners=True, needsConvertionToNewRoundCorners=False,
+    )
+
+    f = sketch_fill(fill_spec)
+    b = sketch_border(stroke_spec)
+    return common(
+        "shapeGroup", name, rect(x, y, w, h),
+        hasClickThrough=False,
+        windingRule=1,
+        layers=[inner],
+        style=style([f] if f else [], [b] if b else []),
+    )
+
+
+def text_from_node(node, x, y, w, h):
+    chars = node.get("characters") or ""
+    size = node.get("fontSize") or 12
+    fname = FONT_FILES.get(node.get("fontStyle"), "Inter-Regular")
+    col = node.get("color") or {"hex": "#F0F2FF", "alpha": 1.0}
+    alpha = col.get("alpha", 1.0) * (node.get("opacity") if node.get("opacity") is not None else 1.0)
+    box_w = max(w, 8) + 24
+    box_h = max(h, size * 1.2)
+
+    attrs = {
+        "MSAttributedStringFontAttribute": {
+            "_class": "fontDescriptor",
+            "attributes": {"name": fname, "size": size},
+        },
+        "MSAttributedStringColorAttribute": color(col.get("hex", "#F0F2FF"), alpha),
+        "textStyleVerticalAlignmentKey": 0,
+        "kerning": node.get("kerning") or 0,
+        "paragraphStyle": {"_class": "paragraphStyle", "alignment": ALIGN.get(node.get("align"), 0)},
+    }
+
+    return common(
+        "text",
+        (chars[:40] or "Texte"),
+        rect(x, y, box_w, box_h),
+        attributedString={
+            "_class": "attributedString",
+            "string": chars,
+            "attributes": [{
+                "_class": "stringAttribute",
+                "location": 0,
+                "length": len(chars),
+                "attributes": attrs,
+            }],
+        },
+        automaticallyDrawOnUnderlyingPath=False,
+        dontSynchroniseWithSymbol=False,
+        glyphBounds=f"{{{{0, 0}}, {{{box_w}, {box_h}}}}}",
+        lineSpacingBehaviour=2,
+        textBehaviour=0,
+        style=style(),
+    )
+
+
+def group_layer(name, x, y, w, h, layers):
+    return common(
+        "group", name or "Groupe", rect(x, y, w, h),
+        hasClickThrough=False,
+        layers=layers,
+    )
+
+
+def convert(node, parent_x, parent_y, out):
+    x = round(node["x"] - parent_x, 2)
+    y = round(node["y"] - parent_y, 2)
+    w = round(node.get("w") or 0, 2)
+    h = round(node.get("h") or 0, 2)
+
+    if node["kind"] == "text":
+        if not (node.get("characters") or "").strip():
+            return
+        out.append(text_from_node(node, x, y, w, h))
+        return
+
+    if w <= 0 or h <= 0:
+        return
+
+    if node["kind"] in ("rect", "ellipse"):
+        out.append(shape(node.get("name") or "Forme", x, y, w, h,
+                         node.get("radius") or 0, node.get("fill"), node.get("stroke")))
+        return
+
+    kids = []
+    if node.get("fill") or node.get("stroke"):
+        kids.append(shape("Fond", 0, 0, w, h, node.get("radius") or 0, node.get("fill"), node.get("stroke")))
+    for child in node.get("children") or []:
+        convert(child, node["x"], node["y"], kids)
+    out.append(group_layer(node.get("name"), x, y, w, h, kids))
 
 
 # ---------------------------------------------------------------- images
@@ -328,24 +645,18 @@ def image_bytes(path, target_w=1440):
     return buf.getvalue()
 
 
-SCREENS = [
-    ("Tableau de bord", "indigo-page-tableau-de-bord.png"),
-    ("Élèves", "indigo-page-eleves.png"),
-    ("Classes", "indigo-page-classes.png"),
-    ("Emploi du temps", "indigo-page-emploi-du-temps.png"),
-    ("Finances", "indigo-page-finances.png"),
-    ("Personnel", "indigo-page-personnel.png"),
-    ("Messagerie", "indigo-page-messagerie.png"),
-    ("Notes", "indigo-page-notes.png"),
-    ("Absences", "indigo-page-absences.png"),
-    ("Fiche élève", "indigo-page-profil.png"),
-    ("Admissions", "indigo-page-admissions.png"),
-    ("Paramètres", "indigo-page-parametres.png"),
-]
+DEFAULT_BG = "#070B1F"
 
 
-# ---------------------------------------------------------------- pages
-def build_screens_page(images):
+def load_screens():
+    """Écrans produits par tools/figma-mock.js : vrais calques, pas des captures."""
+    with open(SCENE, encoding="utf-8") as fh:
+        scene = json.load(fh)
+    page = next((p for p in scene["pages"] if p["name"].startswith("01")), scene["pages"][0])
+    return [f for f in page["frames"] if f["w"] == W and f["h"] == H]
+
+
+def build_screens_page():
     page = common(
         "page",
         "01 · Écrans",
@@ -356,11 +667,14 @@ def build_screens_page(images):
         layers=[],
     )
 
-    for i, (label, filename) in enumerate(SCREENS):
+    for i, screen in enumerate(load_screens()):
         col, row = i % 3, i // 3
-        ab = artboard(f"{i + 1:02d} · {label}", col * (W + GAP), row * (H + GAP), W, H)
-        digest = images[filename]
-        ab["layers"].append(bitmap_layer(label, 0, 0, W, H, digest))
+        bg = DEFAULT_BG
+        if (screen.get("fill") or {}).get("kind") == "solid":
+            bg = screen["fill"]["hex"]
+        ab = artboard(screen["name"] or f"Écran {i + 1:02d}", col * (W + GAP), row * (H + GAP), W, H, bg=bg)
+        for child in screen["children"]:
+            convert(child, screen["x"], screen["y"], ab["layers"])
         page["layers"].append(ab)
 
     return page
@@ -479,17 +793,7 @@ def build_design_page():
 
 # ---------------------------------------------------------------- assemblage
 def main():
-    images = {}
-    blobs = {}
-
-    for _, filename in SCREENS:
-        path = os.path.join(PALETTES, filename)
-        data = image_bytes(path)
-        digest = hashlib.sha1(data).hexdigest()
-        images[filename] = digest
-        blobs[digest] = data
-
-    screens_page = build_screens_page(images)
+    screens_page = build_screens_page()
     design_page = build_design_page()
     pages = [screens_page, design_page]
 
@@ -556,7 +860,7 @@ def main():
         user[p["do_objectID"]] = {"scrollOrigin": "{0, 0}", "zoomValue": 0.5}
 
     # aperçu du document (Sketch l'affiche dans le Finder et Figma s'en sert à l'import)
-    cover = Image.open(os.path.join(PALETTES, SCREENS[0][1])).convert("RGB")
+    cover = Image.open(os.path.join(PALETTES, "indigo-page-tableau-de-bord.png")).convert("RGB")
     cover.thumbnail((1200, 1200), Image.LANCZOS)
     buf = io.BytesIO()
     cover.save(buf, format="PNG", optimize=True)
@@ -570,13 +874,12 @@ def main():
         z.writestr("user.json", json.dumps(user, ensure_ascii=False))
         for p in pages:
             z.writestr(f"pages/{p['do_objectID']}.json", json.dumps(p, ensure_ascii=False))
-        for digest, data in blobs.items():
-            z.writestr(f"images/{digest}", data)
         z.writestr("previews/preview.png", preview_png)
 
     size = os.path.getsize(OUT)
     print(f"OK  {OUT}")
-    print(f"    {len(pages)} pages · {len(SCREENS) + 1} artboards · {len(blobs)} images")
+    total = sum(len(p["layers"]) for p in pages)
+    print(f"    {len(pages)} pages · {total} artboards · calques vectoriels")
     print(f"    {size / 1024 / 1024:.1f} Mo")
 
 

@@ -474,7 +474,7 @@ function kpiRow(parent, items, y) {
     const c = card(parent, x, y, w, 106);
     label(c, it.label, 15, 14, 11.5, 'Regular', C.dim);
     label(c, it.value, 15, 38, 24, 'Bold', C.ink, { letterSpacing: -0.4 });
-    if (it.unit) label(c, it.unit, 15 + it.value.length * 12, 48, 10, 'Medium', C.faint);
+    if (it.unit) label(c, it.unit, 15 + it.value.length * 14, 48, 10, 'Medium', C.faint);
     if (it.progress !== undefined) {
       rect(c, 15, 80, w - 30, 3, { fill: solid(C.line, 0.2), radius: 999 });
       rect(c, 15, 80, (w - 30) * (it.progress / 100), 3, { fill: grad(C.accent, C.accent2), radius: 999 });
@@ -488,14 +488,14 @@ function kpiRow(parent, items, y) {
 
 function tableCard(parent, x, y, w, h, title, sub, rows, cols) {
   const c = card(parent, x, y, w, h, { title, sub });
-  const headY = 46;
+  const headY = title ? 68 : 20;
   cols.forEach((col) => {
     label(c, col.label.toUpperCase(), col.x, headY, 8.5, 'Medium', C.faint, { letterSpacing: 1.4 });
   });
   rect(c, 16, headY + 22, w - 32, 1, { fill: solid(C.line, 0.16) });
 
   rows.forEach((r, i) => {
-    const ry = headY + 32 + i * 48;
+    const ry = headY + 26 + i * 48;
     rect(c, 16, ry + 46, w - 32, 1, { fill: solid(C.line, 0.08) });
     avatar(c, r.initials, 16, ry + 9, 28);
     label(c, r.name, 52, ry + 7, 12.5, 'Medium', C.ink);
@@ -510,7 +510,7 @@ function tableCard(parent, x, y, w, h, title, sub, rows, cols) {
 
 /* --- écran : tableau de bord --- */
 function screenDashboard(dsPage) {
-  const s = frame('03 · Tableau de bord', W, H, solid(C.bg));
+  const s = frame('01 · Tableau de bord', W, H, solid(C.bg));
   dsPage.appendChild(s);
   sidebar(s);
   topbar(s, 'Tableau de bord', 'Semestre 1');
@@ -578,7 +578,7 @@ function screenDashboard(dsPage) {
 
 /* --- écran : élèves --- */
 function screenEleves(dsPage) {
-  const s = frame('04 · Élèves', W, H, solid(C.bg));
+  const s = frame('02 · Élèves', W, H, solid(C.bg));
   dsPage.appendChild(s);
   sidebar(s);
   topbar(s, 'Élèves', 'Tous les élèves');
@@ -665,7 +665,7 @@ function screenFinances(dsPage) {
 
 /* --- écran : emploi du temps --- */
 function screenTimetable(dsPage) {
-  const s = frame('06 · Emploi du temps', W, H, solid(C.bg));
+  const s = frame('04 · Emploi du temps', W, H, solid(C.bg));
   dsPage.appendChild(s);
   sidebar(s);
   topbar(s, 'Emploi du temps', 'Semaine 44');
@@ -733,7 +733,7 @@ function screenTimetable(dsPage) {
 
 /* --- écran : paramètres --- */
 function screenSettings(dsPage) {
-  const s = frame('07 · Paramètres', W, H, solid(C.bg));
+  const s = frame('12 · Paramètres', W, H, solid(C.bg));
   dsPage.appendChild(s);
   sidebar(s);
   topbar(s, 'Paramètres', 'Établissement');
@@ -797,7 +797,7 @@ function screenSettings(dsPage) {
 
 /* --- écran : classes --- */
 function screenClasses(dsPage) {
-  const s = frame('08 · Classes', W, H, solid(C.bg));
+  const s = frame('03 · Classes', W, H, solid(C.bg));
   dsPage.appendChild(s);
   sidebar(s);
   topbar(s, 'Classes', 'Année 2025–2026');
@@ -846,7 +846,7 @@ function screenClasses(dsPage) {
 
 /* --- écran : notes --- */
 function screenNotes(dsPage) {
-  const s = frame('09 · Notes', W, H, solid(C.bg));
+  const s = frame('08 · Notes', W, H, solid(C.bg));
   dsPage.appendChild(s);
   sidebar(s);
   topbar(s, 'Élèves', 'Notes · Trimestre 1');
@@ -901,7 +901,7 @@ function screenNotes(dsPage) {
 
 /* --- écran : admissions (kanban) --- */
 function screenAdmissions(dsPage) {
-  const s = frame('10 · Admissions', W, H, solid(C.bg));
+  const s = frame('11 · Admissions', W, H, solid(C.bg));
   dsPage.appendChild(s);
   sidebar(s);
   topbar(s, 'Admissions', 'Rentrée 2026');
@@ -962,7 +962,7 @@ function screenAdmissions(dsPage) {
 
 /* --- écran : fiche élève --- */
 function screenFiche(dsPage) {
-  const s = frame('11 · Fiche élève', W, H, solid(C.bg));
+  const s = frame('10 · Fiche élève', W, H, solid(C.bg));
   dsPage.appendChild(s);
   sidebar(s);
   topbar(s, 'Élèves', 'Fiche élève');
@@ -1028,7 +1028,7 @@ function screenFiche(dsPage) {
 /* --- écran : modales (démonstration) --- */
 function screenModals(dsPage) {
   const base = screenDashboard(dsPage);
-  base.name = '12 · Modales — fond';
+  base.name = '13 · Modales';
 
   /* voile */
   const dim = frame('Voile', W, H, solid('#040612', 0.68));
@@ -1094,6 +1094,153 @@ function screenModals(dsPage) {
   return base;
 }
 
+/* --- écran : personnel --- */
+function screenPersonnel(dsPage) {
+  const s = frame('06 · Personnel', W, H, solid(C.bg));
+  dsPage.appendChild(s);
+  sidebar(s);
+  topbar(s, 'Personnel', 'Équipe pédagogique');
+  pageHead(s, 'Personnel', '86 collaborateurs · 42 enseignants', 'Ajouter un membre', 'Exporter');
+
+  kpiRow(s, [
+    { label: 'Enseignants', value: '42', delta: '+3', hint: 'depuis la rentrée' },
+    { label: 'Présence', value: '98,2 %', progress: 98.2, hint: 'cette semaine' },
+    { label: 'Masse salariale', value: '31,4 M', unit: 'FCFA', hint: 'octobre 2026' },
+    { label: 'Postes ouverts', value: '4', dot: true, hint: 'dont 2 en mathématiques' },
+  ], 148);
+
+  tableCard(s, SIDEBAR + 22, 270, W - SIDEBAR - 44, 420, 'Équipe', '86 collaborateurs · tri par ancienneté', [
+    { initials: 'MD', name: 'Mariam Diallo', sub: 'Mathématiques · 2021', poste: 'Professeure', pill: 'Titulaire', charge: '18 h', classe: 'Terminale S' },
+    { initials: 'OM', name: 'Oumar Martior', sub: 'Physique-Chimie · 2018', poste: 'Professeur', pill: 'Titulaire', charge: '16 h', classe: 'Première S' },
+    { initials: 'TD', name: 'Tata Hilorma', sub: 'Français · 2022', poste: 'Professeure', pill: 'Contractuel', charge: '14 h', classe: 'Seconde A' },
+    { initials: 'FR', name: 'Fatou Rifa', sub: 'Anglais · 2019', poste: 'Professeure', pill: 'Titulaire', charge: '17 h', classe: 'Terminale L' },
+    { initials: 'SK', name: 'Seydou Keïta', sub: 'Histoire-Géo · 2024', poste: 'Professeur', pill: 'Stagiaire', charge: '9 h', classe: 'Seconde B' },
+    { initials: 'AC', name: 'Aminata Cissé', sub: 'Vie scolaire · 2020', poste: 'C.P.E.', pill: 'Titulaire', charge: '35 h', classe: 'Toutes' },
+  ], [
+    { label: 'Membre', x: 16 },
+    { label: 'Poste', x: 430, key: 'poste' },
+    { label: 'Statut', x: 560, kind: 'pill' },
+    { label: 'Charge', x: 690, key: 'charge' },
+    { label: 'Classe principale', x: 810, key: 'classe' },
+  ]);
+
+  return s;
+}
+
+/* --- écran : messagerie --- */
+function screenMessagerie(dsPage) {
+  const s = frame('07 · Messagerie', W, H, solid(C.bg));
+  dsPage.appendChild(s);
+  sidebar(s);
+  topbar(s, 'Messagerie', 'Boîte de réception');
+  pageHead(s, 'Messagerie', '4 messages non lus · 12 conversations', 'Nouveau message', 'Tout marquer lu');
+
+  const listW = 420;
+  const list = card(s, SIDEBAR + 22, 148, listW, 730, { title: 'Conversations', sub: 'Récentes' });
+  const threads = [
+    ['MD', 'Mariam Diallo', 'Les notes du trimestre sont prêtes.', '09:42', true],
+    ['OM', 'Oumar Martior', 'Peut-on décaler le cours de 14 h ?', '08:15', true],
+    ['AT', 'Aminata Traoré', 'Merci pour le rendez-vous de lundi.', 'Hier', false],
+    ['PD', 'Parent · M. Diallo', 'Justificatif d’absence en pièce jointe.', 'Hier', true],
+    ['AD', 'Administration', 'Conseil de classe · 4 novembre.', 'Lun.', false],
+    ['SK', 'Seydou Keïta', 'Emploi du temps de la semaine 45.', 'Lun.', false],
+  ];
+  threads.forEach((t, i) => {
+    const y = 66 + i * 86;
+    if (i === 0) {
+      rect(list, 10, y - 10, list.width - 20, 78, { fill: solid(C.accent, 0.14), radius: 11 });
+      rect(list, 10, y - 10, 2, 78, { fill: solid(C.accent2), radius: 2 });
+    }
+    avatar(list, t[0], 20, y, 30, i === 3);
+    label(list, t[1], 60, y - 2, 12.5, i === 0 || t[4] ? 'Medium' : 'Regular', C.ink);
+    label(list, t[2], 60, y + 16, 10.5, 'Regular', C.faint);
+    label(list, t[3], list.width - 66, y, 9.5, 'Medium', C.faint);
+    if (t[4]) ellipse(list, list.width - 26, y + 18, 7, { fill: solid(C.accent2) });
+    if (i < threads.length - 1) rect(list, 20, y + 68, list.width - 40, 1, { fill: solid(C.line, 0.08) });
+  });
+
+  const conv = card(s, SIDEBAR + 22 + listW + 14, 148, W - SIDEBAR - 44 - listW - 14, 730);
+  avatar(conv, 'MD', 20, 20, 38);
+  label(conv, 'Mariam Diallo', 68, 20, 13.5, 'Semi Bold', C.ink);
+  label(conv, 'Professeure · Mathématiques', 68, 38, 10.5, 'Regular', C.faint);
+  badge(conv, 'En ligne', conv.width - 92, 28, { fg: '#BFF0DA', bg: C.success });
+  rect(conv, 0, 76, conv.width, 1, { fill: solid(C.line, 0.16) });
+
+  const bubbles = [
+    ['received', 'Bonjour, les notes du trimestre sont saisies pour la Terminale S.', '09:38'],
+    ['sent', 'Parfait. Pouvez-vous publier les bulletins avant vendredi ?', '09:40'],
+    ['received', 'C’est prévu. Il reste deux conseils de classe à valider.', '09:42'],
+    ['sent', 'Merci. Je préviens les familles dans la journée.', '09:44'],
+  ];
+  bubbles.forEach((b, i) => {
+    const y = 100 + i * 78;
+    const mine = b[0] === 'sent';
+    const bw = Math.min(conv.width - 120, Math.max(240, b[1].length * 5.4));
+    const x = mine ? conv.width - 20 - bw : 20;
+    rect(conv, x, y, bw, 52, { fill: mine ? grad(C.accent, C.accent2, 0.9) : solid(C.line, 0.07), radius: 13, stroke: mine ? null : C.line, strokeOpacity: 0.18 });
+    const t = label(conv, b[1], x + 14, y + 12, 11.5, 'Regular', mine ? C.white : C.ink);
+    label(conv, b[2], x + 14, y + 30, 9, 'Regular', mine ? '#DCE4FF' : C.faint);
+  });
+
+  rect(conv, 0, conv.height - 84, conv.width, 1, { fill: solid(C.line, 0.16) });
+  rect(conv, 20, conv.height - 64, conv.width - 150, 44, { fill: solid(C.line, 0.06), radius: 11, stroke: C.line, strokeOpacity: 0.3 });
+  label(conv, 'Écrire un message…', 36, conv.height - 49, 11.5, 'Regular', C.faint);
+  rect(conv, conv.width - 118, conv.height - 64, 98, 44, { fill: grad(C.accent2, C.accent), radius: 11, stroke: C.white, strokeOpacity: 0.2 });
+  label(conv, 'Envoyer', conv.width - 94, conv.height - 49, 11.5, 'Semi Bold', C.white);
+
+  return s;
+}
+
+/* --- écran : absences --- */
+function screenAbsences(dsPage) {
+  const s = frame('09 · Absences', W, H, solid(C.bg));
+  dsPage.appendChild(s);
+  sidebar(s);
+  topbar(s, 'Absences', 'Semaine 44');
+  pageHead(s, 'Absences', '96,8 % de présence · 41 absences cette semaine', 'Justifier une absence', 'Exporter');
+
+  kpiRow(s, [
+    { label: 'Absences', value: '41', delta: '−12 %', hint: 'vs semaine 43' },
+    { label: 'Non justifiées', value: '9', dot: true, hint: 'à traiter aujourd’hui' },
+    { label: 'Retards', value: '27', progress: 62, hint: '62 % du total' },
+    { label: 'Justificatifs', value: '32', hint: 'reçus cette semaine' },
+  ], 148);
+
+  const chart = card(s, SIDEBAR + 22, 270, 520, 300, { title: 'Absences par jour', sub: 'Semaine 44 · lundi à vendredi' });
+  const days = [['Lun', 9], ['Mar', 12], ['Mer', 7], ['Jeu', 8], ['Ven', 5]];
+  const max = 12;
+  days.forEach(([d, v], i) => {
+    const bh = (v / max) * 160;
+    rect(chart, 34 + i * 96, 76 + (160 - bh), 44, bh, { fill: grad(C.accent2, C.accent, 0.95), radius: 6 });
+    label(chart, String(v), 34 + i * 96 + 16, 62 + (160 - bh), 10, 'Medium', C.ink);
+    label(chart, d, 34 + i * 96 + 12, 250, 10, 'Regular', C.faint);
+  });
+  rect(chart, 22, 236, chart.width - 44, 1, { fill: solid(C.line, 0.2) });
+
+  const todo = card(s, SIDEBAR + 556, 270, W - SIDEBAR - 578, 300, { title: 'À justifier', sub: '9 absences sans motif' });
+  [['AT', 'Aminata Traoré', 'Mardi · 2 h'], ['MC', 'Moussa Camara', 'Mercredi · 1 h'], ['AS', 'Awa Sow', 'Jeudi · 3 h']].forEach(([ini, n, d], i) => {
+    const y = 62 + i * 62;
+    avatar(todo, ini, 16, y, 28);
+    label(todo, n, 52, y + 2, 12, 'Medium', C.ink);
+    label(todo, d, 52, y + 19, 10, 'Regular', C.faint);
+    badge(todo, 'Justifier', todo.width - 92, y + 6, { fg: '#CDD8FF' });
+    if (i < 2) rect(todo, 16, y + 50, todo.width - 32, 1, { fill: solid(C.line, 0.08) });
+  });
+
+  tableCard(s, SIDEBAR + 22, 590, W - SIDEBAR - 44, 288, 'Registre', 'Lundi 27 octobre', [
+    { initials: 'IK', name: 'Ibrahim Konaté', sub: 'Terminale S · 2026-0143', statut: 'Non justifiée', duree: '2 h', periode: 'Matin' },
+    { initials: 'FD', name: 'Fatoumata Diallo', sub: 'Première S · 2026-0151', statut: 'Justifiée', duree: '1 h', periode: 'Après-midi' },
+    { initials: 'SK', name: 'Seydou Keïta', sub: 'Seconde B · 2026-0188', statut: 'Retard', duree: '15 min', periode: 'Matin' },
+  ], [
+    { label: 'Élève', x: 16 },
+    { label: 'Motif', x: 430, kind: 'pill' },
+    { label: 'Durée', x: 640, key: 'duree' },
+    { label: 'Période', x: 790, key: 'periode' },
+  ]);
+
+  return s;
+}
+
 /* ---------------- orchestration ---------------- */
 async function main(cmd) {
   if (typeof figma.loadAllPagesAsync === 'function') {
@@ -1153,9 +1300,12 @@ async function main(cmd) {
       ['Classes', screenClasses],
       ['Emploi du temps', screenTimetable],
       ['Finances', screenFinances],
+      ['Personnel', screenPersonnel],
+      ['Messagerie', screenMessagerie],
       ['Notes', screenNotes],
-      ['Admissions', screenAdmissions],
+      ['Absences', screenAbsences],
       ['Fiche élève', screenFiche],
+      ['Admissions', screenAdmissions],
       ['Paramètres', screenSettings],
       ['Modales', screenModals],
     ];
