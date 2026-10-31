@@ -1,98 +1,147 @@
 import React from 'react';
 import { Card, CardHead, Btn, Pill, Icon } from './ui.jsx';
-import { useModals } from './modal.jsx';
+import { useModal } from './modal.jsx';
+import { useData } from './data.jsx';
+import { useActions } from './actions.jsx';
+import { openConfirm } from './forms.jsx';
+import { PageHead } from './pages/common.jsx';
 
 /* ============================================================
-   Page de démonstration des modales personnalisées
+   Atelier des modales — chaque carte ouvre un vrai formulaire
+   relié à l’API, avec validation, confirmation et toast.
    ============================================================ */
 
-const MINI = ({ kind }) => (
-  <div className="mg-preview">
-    <div className={`mini ${kind}`}>
+const PREVIEW = ({ tone = '' }) => (
+  <div className={`mg-preview ${tone}`}>
+    <div className={`mini ${tone}`}>
       <i /><i /><i /><i />
     </div>
   </div>
 );
 
 export function Modales() {
-  const modals = useModals();
-  const { stack, closeAll, open } = modals;
+  const modal = useModal();
+  const { notify, meta } = useData();
+  const actions = useActions();
+  const student = meta?.students?.[0];
 
   const items = [
     {
+      kind: 'wide',
+      title: 'Nouvel élève',
+      desc: 'Formulaire long en deux colonnes : identité, scolarité, tuteur. Validation serveur et focus piégé.',
+      action: 'Ouvrir le formulaire',
+      run: () => actions.student(),
+    },
+    {
       kind: 'center',
-      title: 'Formulaire',
-      desc: 'Champs, sections, aide contextuelle. Deux colonnes sur desktop, une sur mobile.',
-      action: 'Nouvel élève',
-      run: () => modals.student(),
+      title: 'Encaissement',
+      desc: 'Montant, facture, moyen de paiement. Le statut de la facture est recalculé à l’enregistrement.',
+      action: 'Encaisser',
+      run: () => actions.payment(),
+    },
+    {
+      kind: 'center',
+      title: 'Facture',
+      desc: 'Création d’une facture avec élève, nature des frais, échéance et montant.',
+      action: 'Créer une facture',
+      run: () => actions.invoice(),
     },
     {
       kind: 'wide',
-      title: 'Formulaire long',
-      desc: 'Variante large (760 px) pour les dossiers complets, corps défilant, pied fixe.',
+      title: 'Membre du personnel',
+      desc: 'Dossier RH complet : fonction, département, contrat et coordonnées.',
       action: 'Ajouter un membre',
-      run: () => modals.student({ title: 'Ajouter un membre', sub: 'Personnel · année 2025 — 2026', icon: 'staff', eyebrow: 'Ressources humaines' }),
-    },
-    {
-      kind: 'center',
-      title: 'Paiement',
-      desc: 'Saisie d’un encaissement, montant rappelé dans l’action principale.',
-      action: 'Encaisser',
-      run: () => modals.payment(),
+      run: () => actions.staff(),
     },
     {
       kind: 'center danger',
       title: 'Confirmation destructive',
       desc: 'Ton rouge, action unique en bas à droite, Échap pour annuler.',
-      action: 'Supprimer',
-      run: () => modals.confirm({}),
-    },
-    {
-      kind: 'center success',
-      title: 'Succès',
-      desc: 'Retour immédiat après une action, résumé des valeurs enregistrées.',
-      action: 'Voir le succès',
-      run: () => modals.success({
-        title: 'Élève créé',
-        sub: 'Aminata Cissé a été ajoutée à la Terminale S.',
-        rows: [['Matricule', '2026-0204'], ['Classe', 'Terminale S'], ['Statut', 'À jour']],
+      action: 'Tester la confirmation',
+      run: () => openConfirm(modal, {
+        title: 'Supprimer cet enregistrement ?',
+        message: 'Cette démonstration ne modifie aucune donnée. La confirmation destructive est identique à celle utilisée pour les suppressions réelles.',
+        confirmLabel: 'Confirmer la démonstration',
+        onConfirm: async () => true,
+        success: 'Démonstration confirmée — aucune donnée supprimée.',
       }),
     },
     {
-      kind: 'wide',
-      title: 'Choix multiples',
-      desc: 'Options radio avec description et badge — export PDF, Excel ou CSV.',
-      action: 'Exporter',
-      run: () => modals.exportData(),
+      kind: 'center success',
+      title: 'Notification',
+      desc: 'Chaque mutation affiche un toast non bloquant, avec le détail de l’opération.',
+      action: 'Afficher un toast',
+      run: () => notify('Élève créé et inscrit.', { detail: 'Aminata Cissé · Terminale S' }),
     },
     {
       kind: 'center',
-      title: 'Justification',
-      desc: 'Motif, durée et commentaire libre pour justifier une absence.',
-      action: 'Justifier',
-      run: () => modals.absence(),
+      title: 'Absence',
+      desc: 'Enregistrement d’une absence avec élève, date, créneau et motif.',
+      action: 'Signaler une absence',
+      run: () => actions.absence(),
+    },
+    {
+      kind: 'center',
+      title: 'Saisie de note',
+      desc: 'Élève, matière, évaluation et barème. Les champs obligatoires sont validés côté client et serveur.',
+      action: 'Saisir une note',
+      run: () => actions.grade(),
+    },
+    {
+      kind: 'wide',
+      title: 'Candidature',
+      desc: 'Dossier d’admission avec classe demandée, responsable légal et étape du pipeline.',
+      action: 'Nouveau dossier',
+      run: () => actions.admission(),
     },
     {
       kind: 'center',
       title: 'Rédaction',
-      desc: 'Destinataire, objet et corps du message avant envoi aux familles.',
+      desc: 'Objet, destinataires et corps du message avant envoi aux familles ou à l’équipe.',
       action: 'Nouveau message',
-      run: () => modals.message(),
+      run: () => actions.thread(),
     },
     {
       kind: 'drawer',
       title: 'Panneau latéral',
-      desc: 'Variante drawer (440 px) glissant depuis la droite : fiche rapide, détails.',
-      action: 'Ouvrir le drawer',
-      run: () => modals.drawer(),
+      desc: 'Variante drawer glissant depuis la droite : fiche rapide de l’élève et actions.',
+      action: 'Ouvrir la fiche rapide',
+      run: () => actions.studentDrawer(student),
+      hidden: !student,
     },
-  ];
+    {
+      kind: 'center',
+      title: 'Document',
+      desc: 'Téléversement multipart dans le dossier élève : PDF, image ou document bureautique.',
+      action: 'Ajouter un document',
+      run: () => actions.document(student),
+      hidden: !student,
+    },
+  ].filter((item) => !item.hidden);
 
   return (
     <>
+      <PageHead
+        id="modales"
+        sub="Formulaires, confirmations et notifications reliés à l’API"
+        primary="Nouvel élève"
+        secondary="Confirmation"
+        onPrimary={() => actions.student()}
+        onSecondary={() => openConfirm(modal, {
+          title: 'Action de démonstration',
+          message: 'Aucune donnée ne sera modifiée.',
+          confirmLabel: 'Continuer',
+          busyLabel: 'Traitement…',
+          destructive: false,
+          onConfirm: async () => true,
+          success: 'Démonstration validée.',
+        })}
+      />
+
       <div className="stats-row rise">
         <div className="stat">
-          <b>{stack.length}</b>
+          <b>{modal.stack.length}</b>
           <span>Modales dans la pile</span>
         </div>
         <div className="stat">
@@ -105,56 +154,58 @@ export function Modales() {
         </div>
         <div className="stat">
           <b>⌘ ⇧ M</b>
-          <span>Raccourci de démonstration</span>
+          <span>Raccourci nouvel élève</span>
         </div>
       </div>
 
       <div className="trigger-row rise">
-        <Btn icon="plus" solid onClick={() => modals.student()}>Nouvel élève</Btn>
-        <Btn icon="finance" onClick={() => modals.payment()}>Encaisser</Btn>
-        <Btn icon="absences" onClick={() => modals.absence()}>Justifier</Btn>
-        <Btn icon="download" onClick={() => modals.exportData()}>Exporter</Btn>
-        <Btn icon="messages" onClick={() => modals.message()}>Message</Btn>
-        <Btn icon="profile" onClick={() => modals.drawer()}>Fiche rapide</Btn>
-        <Btn icon="close" onClick={() => modals.confirm({})}>Supprimer</Btn>
+        <Btn icon="plus" solid onClick={() => actions.student()}>Nouvel élève</Btn>
+        <Btn icon="finance" onClick={() => actions.payment()}>Encaisser</Btn>
+        <Btn icon="absences" onClick={() => actions.absence()}>Absence</Btn>
+        <Btn icon="grades" onClick={() => actions.grade()}>Note</Btn>
+        <Btn icon="messages" onClick={() => actions.thread()}>Message</Btn>
+        {student && <Btn icon="profile" onClick={() => actions.studentDrawer(student)}>Fiche rapide</Btn>}
         <Btn
-          icon="dots"
-          onClick={() => {
-            modals.student();
-            setTimeout(() => modals.confirm({ title: 'Créer sans photo ?', confirmLabel: 'Continuer' }), 280);
-          }}
+          icon="close"
+          onClick={() => openConfirm(modal, {
+            title: 'Action de démonstration',
+            message: 'Aucune donnée ne sera modifiée.',
+            confirmLabel: 'Continuer',
+            onConfirm: async () => true,
+            success: 'Démonstration validée.',
+          })}
         >
-          Pile à deux niveaux
+          Confirmation
         </Btn>
-        {stack.length > 0 && <Btn icon="close" onClick={closeAll}>Tout fermer</Btn>}
+        {modal.stack.length > 0 && <Btn icon="close" onClick={modal.closeAll}>Tout fermer</Btn>}
       </div>
 
       <div className="modal-grid">
-        {items.map((it, i) => (
-          <Card key={it.title} className="mg-card rise" style={{ animationDelay: `${i * 45}ms` }}>
-            <MINI kind={it.kind} />
-            <h3>{it.title}</h3>
-            <p>{it.desc}</p>
-            <Btn icon="external" onClick={it.run}>{it.action}</Btn>
+        {items.map((item, index) => (
+          <Card key={item.title} className="mg-card rise" style={{ animationDelay: `${index * 40}ms` }}>
+            <PREVIEW tone={item.kind} />
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
+            <Btn icon="external" onClick={item.run}>{item.action}</Btn>
           </Card>
         ))}
       </div>
 
       <div className="grid-main">
         <Card className="rise">
-          <CardHead title="Comportement" sub="Ce que fait la couche modale" />
+          <CardHead title="Comportement" sub="La couche modale partagée" />
           <ul className="notes-list" style={{ gap: 14 }}>
             {[
               ['Pile de modales', 'Chaque modale s’empile (z-index +10), la plus récente capte le focus.'],
               ['Focus piégé', 'Tab et Maj+Tab bouclent dans la modale ; le focus revient au déclencheur à la fermeture.'],
               ['Échap', 'Ferme la modale du dessus. Le clic sur le fond est désactivé si dismissible = false.'],
-              ['Animations', 'Entrée 420 ms (opacité + échelle + flou), sortie 220 ms, contenu en cascade.'],
+              ['Animations', 'Entrée fluide (opacité + échelle + flou), sortie courte, contenu en cascade.'],
               ['Verrou de scroll', 'body.modal-open fige la page derrière, sans saut de mise en page.'],
               ['Accessibilité', 'role="dialog", aria-modal, aria-labelledby, aria-describedby, fermeture nommée.'],
-            ].map(([k, v]) => (
-              <li key={k} style={{ gridTemplateColumns: '150px 1fr', alignItems: 'start' }}>
-                <b style={{ textAlign: 'left', fontSize: 11.5 }}>{k}</b>
-                <span style={{ fontSize: 11.5, color: 'var(--faint)', lineHeight: 1.55 }}>{v}</span>
+            ].map(([key, value]) => (
+              <li key={key} style={{ gridTemplateColumns: '150px 1fr', alignItems: 'start' }}>
+                <b style={{ textAlign: 'left', fontSize: 11.5 }}>{key}</b>
+                <span style={{ fontSize: 11.5, color: 'var(--faint)', lineHeight: 1.55 }}>{value}</span>
               </li>
             ))}
           </ul>
@@ -169,10 +220,10 @@ export function Modales() {
               ['drawer', 'Panneau latéral · 440 px'],
               ['tone-danger', 'Confirmation destructive'],
               ['tone-success', 'Confirmation positive'],
-            ].map(([k, v]) => (
-              <div key={k} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                <Pill tone={k.includes('danger') ? 'danger' : k.includes('success') ? 'accent' : 'muted'}>{k}</Pill>
-                <span style={{ fontSize: 11, color: 'var(--faint)' }}>{v}</span>
+            ].map(([key, value]) => (
+              <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                <Pill tone={key.includes('danger') ? 'danger' : key.includes('success') ? 'accent' : 'muted'}>{key}</Pill>
+                <span style={{ fontSize: 11, color: 'var(--faint)' }}>{value}</span>
               </div>
             ))}
           </div>
@@ -182,7 +233,7 @@ export function Modales() {
           </div>
           <div className="mnote" style={{ marginTop: 8 }}>
             <Icon name="external" size={14} />
-            useModals() expose student(), payment(), confirm(), absence(), exportData(), drawer(), message(), success().
+            Les formulaires sont fournis par useActions() et écrivent directement dans l’API.
           </div>
         </Card>
       </div>

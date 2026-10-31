@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import defaultAvatar from './assets/avatar-default.svg';
 
 /* ============================================================
    DIALLO — composants d'affichage (présentation pure)
@@ -33,6 +34,15 @@ const P = {
   pause: 'M9 5h3v14H9zM14 5h3v14h-3z',
   menu: 'M4 7h16M4 12h16M4 17h16',
   external: 'M14 4h6v6M20 4l-9 9M18 14v6H4V6h6',
+  edit: 'M4 20h4l10.5-10.5a2.1 2.1 0 00-3-3L5 17v3zM14 6l4 4',
+  trash: 'M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6',
+  refresh: 'M20 11a8 8 0 10-2 6M20 5v6h-6',
+  send: 'M4 12l16-8-6 16-3-6-7-2z',
+  archive: 'M4 8h16v12H4zM3 4h18v4H3zM9 12h6',
+  eye: 'M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12zM12 15a3 3 0 100-6 3 3 0 000 6z',
+  upload: 'M12 21V9M8 13l4-4 4 4M4 4h16',
+  userPlus: 'M10 12.4a3.4 3.4 0 100-6.8 3.4 3.4 0 000 6.8zM4 20c0-3.6 3-6 6-6 1.4 0 2.6.3 3.6 1M18 11v8M14 15h8',
+  clock: 'M12 21a9 9 0 100-18 9 9 0 000 18zM12 7v5l3 2',
 };
 
 export function Icon({ name, size = 16, className = '' }) {
@@ -55,10 +65,28 @@ export function Icon({ name, size = 16, className = '' }) {
 }
 
 /* ---------- atomes ---------- */
-export function Avatar({ initials = 'MD', tone = 'accent', size = 30 }) {
+export function Avatar({
+  initials = 'MD', tone = 'accent', size = 30, src = null, alt,
+}) {
+  const [broken, setBroken] = useState(false);
+
+  useEffect(() => {
+    setBroken(false);
+  }, [src]);
+
+  const hasOwnPhoto = Boolean(src) && !broken;
+
   return (
-    <span className={`avatar tone-${tone}`} style={{ width: size, height: size, fontSize: size * 0.34 }}>
-      {initials}
+    <span className={`avatar tone-${tone} ${hasOwnPhoto ? 'has-photo' : 'has-default'}`} style={{ width: size, height: size, fontSize: size * 0.34 }}>
+      <img
+        src={hasOwnPhoto ? src : defaultAvatar}
+        alt={alt || initials || 'Photo de profil par défaut'}
+        loading="lazy"
+        decoding="async"
+        onError={() => {
+          if (hasOwnPhoto) setBroken(true);
+        }}
+      />
     </span>
   );
 }
@@ -140,22 +168,36 @@ export function Field({ label, value, children }) {
   );
 }
 
-export function Toggle({ on = false, label }) {
+export function Toggle({ on = false, label, onChange }) {
   return (
     <div className="toggle-row">
       <span>{label}</span>
-      <span className={`toggle ${on ? 'on' : ''}`} role="switch" aria-checked={on} tabIndex={0}>
+      <button
+        type="button"
+        className={`toggle ${on ? 'on' : ''}`}
+        role="switch"
+        aria-checked={on}
+        aria-label={label}
+        onClick={() => onChange?.(!on)}
+      >
         <i />
-      </span>
+      </button>
     </div>
   );
 }
 
-export function Tabs({ items, active = 0 }) {
+export function Tabs({ items, active = 0, onChange }) {
   return (
-    <div className="tabs">
+    <div className="tabs" role="tablist">
       {items.map((it, i) => (
-        <button key={it} type="button" className={`tab ${i === active ? 'active' : ''}`}>
+        <button
+          key={it}
+          type="button"
+          role="tab"
+          aria-selected={i === active}
+          className={`tab ${i === active ? 'active' : ''}`}
+          onClick={() => onChange?.(i)}
+        >
           {it}
         </button>
       ))}
@@ -345,7 +387,7 @@ export function HBarList({ items = [] }) {
       {items.map((it, k) => (
         <div className="hrow" key={it.label}>
           <span className="hlabel">{it.label}</span>
-          <span className="hvalue">{it.v}%</span>
+          <span className="hvalue">{it.display ?? `${it.v}%`}</span>
           <span className="hbar">
             <i style={{ width: `${(it.v / max) * 100}%`, animationDelay: `${k * 60}ms` }} />
           </span>
@@ -359,12 +401,15 @@ export function HBarList({ items = [] }) {
 export function Table({ columns = [], template, children, foot }) {
   return (
     <div className="table">
-      <div className="thead" style={{ gridTemplateColumns: template }}>
-        {columns.map((c, i) => (
-          <span key={i} className={c === '' ? 'right' : ''}>{c}</span>
-        ))}
+      <span className="table-scroll-hint">Glissez pour explorer</span>
+      <div className="table-scroll">
+        <div className="thead" style={{ gridTemplateColumns: template }}>
+          {columns.map((c, i) => (
+            <span key={i} className={c === '' ? 'right' : ''}>{c}</span>
+          ))}
+        </div>
+        <div className="tbody">{children}</div>
       </div>
-      <div className="tbody">{children}</div>
       {foot && <div className="tfoot">{foot}</div>}
     </div>
   );
