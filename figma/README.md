@@ -8,11 +8,11 @@
 2. Choisir `DIALLO-Indigo-Minuit.sketch`
 
 Figma importe les fichiers Sketch nativement ; le `.fig` étant un format binaire
-propriétaire, `.sketch` est le format pivot. Contenu du fichier (2 pages, 13 artboards) :
+propriétaire, `.sketch` est le format pivot. Contenu du fichier (2 pages, 15 artboards) :
 
 | Page | Contenu |
 |---|---|
-| `01 · Écrans` | 13 écrans desktop 1440 × 900 + une modale, **en calques réels** (groupes nommés, formes vectorielles, texte Inter éditable — aucun bitmap) : Tableau de bord, Élèves, Classes, Matières, Emploi du temps, Finances, Personnel, Messagerie, Notes, Absences, Fiche élève, Admissions, Paramètres |
+| `01 · Écrans` | 14 écrans desktop 1440 × 900, **en calques réels** (groupes nommés, formes vectorielles, texte Inter éditable — aucun bitmap) : Tableau de bord, Élèves, Classes, Matières, Emploi du temps, Finances, Personnel, Messagerie, Notes, Absences, Fiche élève, Admissions, Paramètres, Modales |
 | `02 · Design system` | palette Indigo Minuit (12 nuances nommées + HEX), 8 styles typographiques Inter, composants vectoriels : boutons, pills de statut, carte KPI, avatar, ligne de tableau |
 
 Vérifications avant diffusion :
@@ -48,9 +48,9 @@ Trois commandes sont disponibles :
 
 | Commande | Effet |
 |---|---|
-| **Générer le design system + les écrans** | styles + composants + 10 écrans |
+| **Générer le design system + les écrans** | styles + composants + 14 écrans |
 | Générer uniquement les styles | 12 couleurs, 8 typographies, 2 effets |
-| Générer uniquement les écrans | board palette/typo + 10 écrans 1440 × 900 |
+| Générer uniquement les écrans | board palette/typo + 14 écrans 1440 × 900 |
 
 ## 2. Ce que crée le plugin
 

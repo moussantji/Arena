@@ -3,3 +3,7 @@ dist/
 .vite/
 *.log
 .DS_Store
+
+# Paquets desktop
+gallery/electron/release/
+release/
