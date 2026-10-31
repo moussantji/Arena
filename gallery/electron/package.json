@@ -1,14 +1,92 @@
 {
   "name": "diallo-desktop",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "DIALLO — application desktop de gestion d'école (direction Indigo Minuit)",
+  "author": "DIALLO <direction@diallo.test>",
+  "homepage": "https://github.com/moussantji/Arena",
+  "desktopName": "DIALLO",
   "main": "main.js",
   "scripts": {
+    "build:app": "npm --prefix ../../app run build",
+    "prestart": "npm run build:app",
     "start": "electron .",
-    "dev": "electron . --dev"
+    "dev": "node dev.js",
+    "dev:electron": "electron . --dev",
+    "dist:linux": "npm run build:app && electron-builder --linux AppImage deb",
+    "dist:dir": "npm run build:app && electron-builder --linux dir"
   },
   "devDependencies": {
-    "electron": "^33.0.0"
+    "electron": "^33.0.0",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "com.diallo.arena",
+    "productName": "DIALLO",
+    "artifactName": "DIALLO-${version}-${arch}.${ext}",
+    "asar": true,
+    "compression": "normal",
+    "npmRebuild": false,
+    "directories": {
+      "output": "../../release",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "splash.html",
+      "build/icon.png",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../../app/dist",
+        "to": "app",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../../api",
+        "to": "api",
+        "filter": [
+          "**/*",
+          "!tests/**",
+          "!phpunit.xml",
+          "!README.md",
+          "!storage/logs/**",
+          "!storage/framework/**",
+          "!bootstrap/cache/*.php"
+        ]
+      }
+    ],
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Office",
+      "executableName": "diallo",
+      "syncDesktopName": true,
+      "desktop": {
+        "entry": {
+          "StartupWMClass": "diallo-desktop"
+        }
+      },
+      "icon": "build/icon.png",
+      "synopsis": "Gestion scolaire DIALLO",
+      "description": "Application desktop de gestion d'école : élèves, classes, notes, finances, admissions et messagerie.",
+      "maintainer": "DIALLO <direction@diallo.test>"
+    }
   }
 }

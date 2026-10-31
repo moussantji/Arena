@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:;" />
+  <title>DIALLO</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      display: grid; place-items: center; overflow: hidden;
+      background:
+        radial-gradient(900px 520px at 50% -10%, rgba(91, 124, 250, 0.22), transparent 68%),
+        radial-gradient(700px 480px at 90% 100%, rgba(224, 168, 111, 0.08), transparent 70%),
+        #070B1F;
+      color: #e8ecff; font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+      -webkit-user-select: none; user-select: none;
+    }
+    .wrap { display: flex; flex-direction: column; align-items: center; gap: 26px; transform: translateY(-2vh); }
+    .mark {
+      width: 78px; height: 78px; border-radius: 22px;
+      display: grid; place-items: center;
+      background: linear-gradient(145deg, #6d8bff, #4059d8);
+      box-shadow: 0 30px 70px -28px rgba(91, 124, 250, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    }
+    .mark svg { width: 48px; height: 48px; display: block; }
+    .name { font-size: 26px; font-weight: 700; letter-spacing: 0.22em; margin-left: 0.22em; }
+    .school {
+      margin-top: 7px; text-align: center; font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+      font-size: 9px; letter-spacing: 0.3em; color: #7f8ab8; text-transform: uppercase;
+    }
+    .rule { width: 210px; height: 1px; background: linear-gradient(90deg, transparent, rgba(167, 182, 255, 0.28), transparent); }
+    .status { display: flex; align-items: center; gap: 10px; font-size: 11.5px; color: #9aa6d8; }
+    .spinner {
+      width: 13px; height: 13px; border-radius: 50%;
+      border: 1.5px solid rgba(167, 182, 255, 0.22); border-top-color: #8fa6ff;
+      animation: spin 0.9s linear infinite;
+    }
+    .hint { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: 8px; letter-spacing: 0.16em; color: #4f5a86; text-transform: uppercase; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.4s; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="mark" aria-hidden="true">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M340 166c-27-25-62-39-101-39-80 0-145 60-145 129s65 129 145 129c39 0 74-14 101-39l-44-53c-15 13-35 21-57 21-40 0-73-26-73-58s33-58 73-58c22 0 42 8 57 21z" fill="#fff"/>
+        <circle cx="356" cy="256" r="26" fill="#E0A86F"/>
+      </svg>
+    </div>
+    <div>
+      <div class="name">DIALLO</div>
+      <div class="school">École internationale · Direction</div>
+    </div>
+    <div class="rule"></div>
+    <div class="status"><span class="spinner"></span><span>Initialisation du service local…</span></div>
+    <div class="hint">Arena · Indigo Minuit</div>
+  </div>
+</body>
+</html>
