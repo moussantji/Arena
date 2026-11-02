@@ -6,8 +6,10 @@ import {
   useApi, useData, useDebounced, number, date, time, fullName,
 } from '../data.jsx';
 import { useActions } from '../actions.jsx';
+import { errorMessage } from '../api.js';
+import { exportAbsencesWorkbook, fetchAllAbsences } from '../exports.js';
 import {
-  ActionMenu, exportCsv, ListState, Pager, SearchInput, SelectFilter,
+  ActionMenu, ListState, Pager, SearchInput, SelectFilter,
 } from '../forms.jsx';
 import { PageHead, StudentCell } from './common.jsx';
 
@@ -83,7 +85,7 @@ function MonthCalendar({ value, onChange, absences, onPick }) {
 }
 
 export function Absences() {
-  const { meta } = useData();
+  const { meta, notify } = useData();
   const actions = useActions();
   const [q, setQ] = useState('');
   const [classId, setClassId] = useState('');
@@ -92,6 +94,7 @@ export function Absences() {
   const [justified, setJustified] = useState('');
   const [page, setPage] = useState(1);
   const [month, setMonth] = useState(() => new Date());
+  const [exporting, setExporting] = useState(false);
   const search = useDebounced(q);
   const classes = meta?.classes || [];
 
@@ -144,17 +147,41 @@ export function Absences() {
     setPage(1);
   };
 
-  const exportRows = () => exportCsv('diallo-absences', [
-    { label: 'Élève', value: (row) => fullName(row.student) },
-    { label: 'Matricule', value: (row) => row.student?.matricule || '' },
-    { label: 'Classe', value: (row) => row.student?.school_class?.name || row.school_class?.name || '' },
-    { label: 'Date', value: (row) => date(row.date) },
-    { label: 'Début', value: (row) => time(row.starts_at) },
-    { label: 'Fin', value: (row) => time(row.ends_at) },
-    { label: 'Motif', value: (row) => row.reason || '' },
-    { label: 'Justifiée', value: (row) => (row.is_justified ? 'Oui' : 'Non') },
-    { label: 'Justification', value: (row) => row.justification || '' },
-  ], rows);
+  const exportRows = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const all = await fetchAllAbsences({
+        q: search || undefined,
+        class_id: classId || undefined,
+        from: from || undefined,
+        to: to || undefined,
+        justified: justified === '' ? undefined : justified,
+      });
+      if (!all.length) {
+        notify('Aucune absence à exporter.');
+        return;
+      }
+      const className = classes.find((item) => String(item.id) === String(classId))?.name;
+      const justLabel = justified === '1' ? 'justifiées' : justified === '0' ? 'non justifiées' : '';
+      const filterLabel = [
+        search ? `recherche « ${search} »` : '',
+        className ? `classe ${className}` : '',
+        from || to ? `du ${from || '…'} au ${to || '…'}` : '',
+        justLabel,
+      ].filter(Boolean).join(' · ');
+      await exportAbsencesWorkbook(all, {
+        schoolName: meta?.school?.name,
+        termName: meta?.term?.name,
+        filterLabel,
+      });
+      notify(`${all.length} absence${all.length > 1 ? 's' : ''} exportée${all.length > 1 ? 's' : ''}.`, { tone: 'success' });
+    } catch (error) {
+      notify(errorMessage(error, 'Export impossible.'), { tone: 'danger' });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const statTotal = stats.total ?? total;
   const statUnjustified = stats.unjustified ?? monthUnjustified.length;

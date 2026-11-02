@@ -149,6 +149,18 @@ export function DataProvider({ children }) {
     const stored = Number(window.localStorage.getItem('arena.student'));
     return Number.isFinite(stored) && stored > 0 ? stored : null;
   });
+  const [classId, setClassIdState] = useState(() => {
+    const stored = Number(window.localStorage.getItem('arena.class'));
+    return Number.isFinite(stored) && stored > 0 ? stored : null;
+  });
+  const [staffId, setStaffIdState] = useState(() => {
+    const stored = Number(window.localStorage.getItem('arena.staff'));
+    return Number.isFinite(stored) && stored > 0 ? stored : null;
+  });
+  const [admissionId, setAdmissionIdState] = useState(() => {
+    const stored = Number(window.localStorage.getItem('arena.admission'));
+    return Number.isFinite(stored) && stored > 0 ? stored : null;
+  });
   const toastSeq = useRef(0);
 
   const notify = useCallback((message, options = {}) => {
@@ -275,6 +287,27 @@ export function DataProvider({ children }) {
     else window.localStorage.removeItem('arena.student');
   }, []);
 
+  const setClassId = useCallback((id) => {
+    const next = id == null ? null : Number(id);
+    setClassIdState(next);
+    if (next) window.localStorage.setItem('arena.class', String(next));
+    else window.localStorage.removeItem('arena.class');
+  }, []);
+
+  const setStaffId = useCallback((id) => {
+    const next = id == null ? null : Number(id);
+    setStaffIdState(next);
+    if (next) window.localStorage.setItem('arena.staff', String(next));
+    else window.localStorage.removeItem('arena.staff');
+  }, []);
+
+  const setAdmissionId = useCallback((id) => {
+    const next = id == null ? null : Number(id);
+    setAdmissionIdState(next);
+    if (next) window.localStorage.setItem('arena.admission', String(next));
+    else window.localStorage.removeItem('arena.admission');
+  }, []);
+
   const unread = notifications.filter((item) => !item.read_at).length;
 
   const value = useMemo(() => ({
@@ -299,10 +332,17 @@ export function DataProvider({ children }) {
     setUser,
     studentId,
     setStudentId,
+    classId,
+    setClassId,
+    staffId,
+    setStaffId,
+    admissionId,
+    setAdmissionId,
   }), [
     meta, booting, bootError, bootstrap, version, refresh, notifications, unread,
     unreadThreads, loadThreads, markNotification, markAllNotifications, deleteNotification, loadNotifications,
-    toasts, notify, dismissToast, user, studentId, setStudentId,
+    toasts, notify, dismissToast, user, studentId, setStudentId, classId, setClassId,
+    staffId, setStaffId, admissionId, setAdmissionId,
   ]);
 
   return (

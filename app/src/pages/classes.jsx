@@ -1,19 +1,24 @@
 import React, { useMemo, useState } from 'react';
 import {
-  Avatar, Btn, Card, IconBtn, Pill, Progress, Tabs,
+  Avatar, Btn, Card, Pill, Progress, Tabs,
 } from '../ui.jsx';
 import { useApi, useData, number, fullName, initials } from '../data.jsx';
 import { useActions } from '../actions.jsx';
+import { errorMessage } from '../api.js';
 import {
-  ActionMenu, exportCsv, ListState, SearchInput,
+  exportLatestExamWorkbook, fetchLatestExamGrades,
+} from '../exports.js';
+import {
+  ActionMenu, ListState, SearchInput,
 } from '../forms.jsx';
 import { PageHead } from './common.jsx';
 
 export function Classes() {
-  const { meta } = useData();
+  const { meta, setClassId, notify } = useData();
   const actions = useActions();
   const [q, setQ] = useState('');
   const [level, setLevel] = useState('');
+  const [exporting, setExporting] = useState(false);
   const { data, loading, error, reload } = useApi('/classes');
   const rows = data?.classes || [];
   const studentsTotal = meta?.counts?.students || rows.reduce((sum, item) => sum + (item.students_count || 0), 0);
@@ -34,15 +39,29 @@ export function Classes() {
   const effectif = rows.reduce((sum, item) => sum + Number(item.students_count || 0), 0);
   const occupation = capacity ? Math.round((effectif / capacity) * 100) : 0;
 
-  const exportRows = () => exportCsv('diallo-classes', [
-    { label: 'Classe', value: 'name' },
-    { label: 'Niveau', value: 'level' },
-    { label: 'Effectif', value: 'students_count' },
-    { label: 'Capacité', value: 'capacity' },
-    { label: 'Salle', value: 'room' },
-    { label: 'Professeur principal', value: (row) => (row.head_teacher ? fullName(row.head_teacher) : '') },
-    { label: 'Matières', value: 'class_subjects_count' },
-  ], filtered);
+  const openClass = (item) => {
+    if (!item?.id) return;
+    setClassId(item.id);
+    window.location.hash = 'classe';
+  };
+
+  const exportRows = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const { grades, exam } = await fetchLatestExamGrades();
+      if (!grades.length) {
+        notify('Aucune note enregistrée pour le dernier examen.', { tone: 'danger' });
+        return;
+      }
+      await exportLatestExamWorkbook(grades, exam, { schoolName: meta?.school?.name });
+      notify(`Notes du dernier examen exportées : ${number(grades.length)} note${grades.length > 1 ? 's' : ''}.`, { tone: 'success' });
+    } catch (exportError) {
+      notify(errorMessage(exportError, 'Export impossible.'), { tone: 'danger' });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <>
@@ -80,7 +99,13 @@ export function Classes() {
           {filtered.map((item, index) => {
             const fill = item.capacity ? Math.round((item.students_count / item.capacity) * 100) : 0;
             return (
-              <Card key={item.id} className={`class-card rise ${item.is_active ? 'active' : ''}`} style={{ animationDelay: `${index * 50}ms` }}>
+              <Card
+                key={item.id}
+                className={`class-card rise ${item.is_active ? 'active' : ''}`}
+                style={{ animationDelay: `${index * 50}ms` }}
+                onClick={() => openClass(item)}
+                title={`Ouvrir la fiche de ${item.name}`}
+              >
                 <div className="class-head">
                   <h3>{item.name}</h3>
                   {item.is_active ? <Pill tone="accent">Active</Pill> : <Pill tone="muted">Fermée</Pill>}
@@ -103,11 +128,14 @@ export function Classes() {
                     {item.head_teacher ? fullName(item.head_teacher) : 'Sans professeur principal'}
                     <em>{item.class_subjects_count || 0} matières</em>
                   </span>
-                  <ActionMenu actions={[
-                    { label: 'Modifier la classe', icon: 'edit', onClick: () => actions.classRoom(item) },
-                    { label: 'Voir les élèves', icon: 'students', onClick: () => { window.localStorage.setItem('arena.class', item.id); window.location.hash = 'eleves'; } },
-                    { label: 'Supprimer', icon: 'trash', tone: 'danger', onClick: () => actions.deleteClass(item) },
-                  ]} />
+                  <span className="class-actions" onClick={(event) => event.stopPropagation()}>
+                    <ActionMenu actions={[
+                      { label: 'Ouvrir la fiche', icon: 'external', onClick: () => openClass(item) },
+                      { label: 'Modifier la classe', icon: 'edit', onClick: () => actions.classRoom(item) },
+                      { label: 'Voir les élèves', icon: 'students', onClick: () => { setClassId(item.id); window.location.hash = 'eleves'; } },
+                      { label: 'Supprimer', icon: 'trash', tone: 'danger', onClick: () => actions.deleteClass(item) },
+                    ]} />
+                  </span>
                 </div>
               </Card>
             );

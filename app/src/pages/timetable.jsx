@@ -1,67 +1,69 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Btn, Card, Pill, Tabs,
+  Btn, Card, IconBtn, Pill, Tabs,
 } from '../ui.jsx';
 import {
-  useApi, useData, DAYS, time, fullName,
+  useApi, useData, DAYS, time, fullName, number,
 } from '../data.jsx';
 import { useActions } from '../actions.jsx';
-import {
-  ActionMenu, exportCsv, ListState, SelectFilter,
-} from '../forms.jsx';
+import { errorMessage } from '../api.js';
+import { exportTimetableWorkbook } from '../exports.js';
+import { ListState } from '../forms.jsx';
 import { PageHead } from './common.jsx';
-
-const slotTone = (subjectId) => ['a', 'b', 'c'][Number(subjectId || 0) % 3];
-const duration = (slot) => {
-  const [sh, sm] = String(slot.starts_at || '0:0').split(':').map(Number);
-  const [eh, em] = String(slot.ends_at || '0:0').split(':').map(Number);
-  return Math.max(0, (eh * 60 + em - sh * 60 - sm)) / 60;
-};
+import { WeekGrid, isSlotLive, slotDuration } from './timetable-grid.jsx';
+import {
+  addDays, dayIndex, sameWeek, startOfWeek, weekRangeLabel,
+} from '../week.js';
 
 export function EmploiDuTemps() {
-  const { meta } = useData();
+  const {
+    meta, classId: storedClassId, setClassId, notify,
+  } = useData();
   const actions = useActions();
   const classes = meta?.classes || [];
-  const storedClass = Number(window.localStorage.getItem('arena.class'));
-  const [classId, setClassId] = useState(() => (
-    classes.some((item) => item.id === storedClass) ? storedClass : (classes[0]?.id || '')
-  ));
+  const classId = classes.some((item) => Number(item.id) === Number(storedClassId))
+    ? Number(storedClassId)
+    : (classes[0]?.id || '');
+  const [viewDay, setViewDay] = useState(null);
+  const [now, setNow] = useState(() => new Date());
+  const [weekOffset, setWeekOffset] = useState(() => (dayIndex(new Date()) >= 6 ? 1 : 0));
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
-    if (!classId && classes.length) setClassId(classes[0].id);
-  }, [classes.length]);
+    if (classes.length && !classes.some((item) => Number(item.id) === Number(storedClassId))) {
+      setClassId(classes[0].id);
+    }
+  }, [classes.length, storedClassId, setClassId]);
 
-  const { data, loading, error, reload } = useApi('/timetable', { class_id: classId || undefined });
-  const slots = data?.slots || [];
-  const currentClass = classes.find((item) => item.id === Number(classId));
-  const todayIndex = new Date().getDay() === 0 ? 7 : new Date().getDay();
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30000);
+    return () => window.clearInterval(timer);
+  }, []);
 
-  const activeDays = useMemo(() => {
-    const days = Array.from(new Set(slots.map((slot) => Number(slot.day_of_week)))).filter(Boolean).sort();
-    return days.length ? Array.from({ length: Math.max(5, Math.max(...days)) }, (_, index) => index + 1) : [1, 2, 3, 4, 5];
-  }, [slots]);
+  const { data, loading, error, reload } = useApi('/timetable');
+  const allSlots = data?.slots || [];
+  const slots = allSlots.filter((slot) => Number(slot.school_class_id) === Number(classId));
+  const currentClass = classes.find((item) => Number(item.id) === Number(classId));
+  const today = dayIndex(now);
+  const todayLabel = DAYS[today - 1] || '';
+  const baseWeekOffset = dayIndex(now) >= 6 ? 1 : 0;
+  const weekStart = addDays(startOfWeek(now), weekOffset * 7);
+  const weekLabel = weekRangeLabel(weekStart);
+  const isCurrentWeek = sameWeek(weekStart, now);
+  const liveSlot = isCurrentWeek ? slots.find((slot) => isSlotLive(slot, now)) : null;
 
-  const hours = useMemo(() => {
-    const values = Array.from(new Set(slots.map((slot) => String(slot.starts_at).slice(0, 5)))).sort();
-    return values.length ? values : ['08:00', '10:00', '12:00', '14:00', '16:00'];
-  }, [slots]);
-
-  const totalHours = slots.reduce((sum, slot) => sum + duration(slot), 0);
+  const totalHours = slots.reduce((sum, slot) => sum + slotDuration(slot), 0);
   const teacherCount = new Set(slots.map((slot) => slot.staff_id).filter(Boolean)).size;
+  const todaySlots = slots.filter((slot) => Number(slot.day_of_week) === today);
+  const visibleDays = viewDay ? [viewDay] : undefined;
+  const weekPosition = weekOffset === baseWeekOffset
+    ? (baseWeekOffset === 1 ? 'Semaine à venir' : 'Semaine en cours')
+    : (weekOffset > baseWeekOffset ? 'Semaine suivante' : 'Semaine précédente');
 
-  const slotAt = (day, hour) => slots.find(
-    (slot) => Number(slot.day_of_week) === day && String(slot.starts_at || '').slice(0, 5) === hour,
-  );
-
-  const exportRows = () => exportCsv(`diallo-emploi-du-temps-${currentClass?.name || 'classe'}`, [
-    { label: 'Jour', value: (row) => DAYS[(row.day_of_week || 1) - 1] },
-    { label: 'Début', value: (row) => time(row.starts_at) },
-    { label: 'Fin', value: (row) => time(row.ends_at) },
-    { label: 'Matière', value: (row) => row.subject?.name || '' },
-    { label: 'Enseignant', value: (row) => (row.staff ? fullName(row.staff) : '') },
-    { label: 'Salle', value: (row) => row.room || row.school_class?.room || '' },
-    { label: 'Classe', value: (row) => row.school_class?.name || '' },
-  ], slots);
+  const changeWeek = (delta) => {
+    setWeekOffset((value) => value + delta);
+    setViewDay(null);
+  };
 
   const addSlot = (day, hour) => actions.slot(null, {
     school_class_id: classId,
@@ -71,12 +73,38 @@ export function EmploiDuTemps() {
     term_id: meta?.term?.id,
   });
 
+  const exportRows = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      if (!allSlots.length) {
+        notify('Aucun emploi du temps à exporter.', { tone: 'danger' });
+        return;
+      }
+      await exportTimetableWorkbook(allSlots, classes, {
+        schoolName: meta?.school?.name,
+        termName: meta?.term?.name,
+        weekStart,
+        weekLabel: `Semaine ${weekLabel}`,
+      });
+      notify(`Emplois du temps de la semaine ${weekLabel} exportés : ${classes.length} classe${classes.length > 1 ? 's' : ''}, ${allSlots.length} cours.`, { tone: 'success' });
+    } catch (exportError) {
+      notify(errorMessage(exportError, 'Export impossible.'), { tone: 'danger' });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <>
       <PageHead
         id="emploi-du-temps"
-        sub={`${currentClass?.name || 'Classe'} · ${slots.length} cours · ${totalHours} h / semaine · ${teacherCount} enseignants`}
-        onPrimary={() => actions.slot(null, { school_class_id: classId, day_of_week: todayIndex > 5 ? 1 : todayIndex, term_id: meta?.term?.id })}
+        sub={`${currentClass?.name || 'Classe'} · ${slots.length} cours · ${number(totalHours, 1)} h / semaine · ${teacherCount} enseignant${teacherCount > 1 ? 's' : ''} · ${liveSlot ? 'cours en cours' : 'aucun cours en cours'}`}
+        onPrimary={() => actions.slot(null, {
+          school_class_id: classId,
+          day_of_week: viewDay || (today > 5 ? 1 : today),
+          term_id: meta?.term?.id,
+        })}
         onSecondary={exportRows}
       />
 
@@ -84,80 +112,102 @@ export function EmploiDuTemps() {
         {classes.length > 0 && (
           <Tabs
             items={classes.map((item) => item.name)}
-            active={Math.max(0, classes.findIndex((item) => item.id === Number(classId)))}
+            active={Math.max(0, classes.findIndex((item) => Number(item.id) === Number(classId)))}
             onChange={(index) => {
               const next = classes[index]?.id;
               setClassId(next);
-              window.localStorage.setItem('arena.class', String(next));
+              setViewDay(null);
+              setWeekOffset(baseWeekOffset);
             }}
           />
         )}
         <div className="toolbar-right">
-          <Pill tone="accent" dot>{meta?.term?.name || 'Semestre 1'}</Pill>
-          <Btn icon="calendar" onClick={() => setClassId(classes[0]?.id || '')}>Aujourd’hui</Btn>
+          <Pill tone="accent" dot>{meta?.term?.name || 'Année en cours'}</Pill>
+          <Tabs
+            items={['Semaine', "Aujourd’hui"]}
+            active={viewDay ? 1 : 0}
+            onChange={(index) => {
+              if (index === 1) {
+                setWeekOffset(0);
+                setViewDay(today);
+              } else {
+                setWeekOffset(baseWeekOffset);
+                setViewDay(null);
+              }
+            }}
+          />
+          <Btn icon="classes" onClick={() => { setClassId(classId); window.location.hash = 'classe'; }}>
+            Fiche classe
+          </Btn>
         </div>
       </div>
 
+      <Card className={`tt-live-banner rise ${liveSlot ? 'is-live' : ''}`} style={{ animationDelay: '40ms' }}>
+        <span className="tt-live-dot" />
+        <div className="tt-live-main">
+          <b>{liveSlot ? liveSlot.subject?.name || 'Cours' : 'Aucun cours en cours'}</b>
+          <em>
+            {liveSlot
+              ? `${fullName(liveSlot.staff)} · ${liveSlot.room || liveSlot.school_class?.room || '—'} · ${time(liveSlot.starts_at)}–${time(liveSlot.ends_at)}`
+              : `${currentClass?.name || 'Classe'} · ${todayLabel} ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`}
+          </em>
+        </div>
+        <span className="tt-live-side">
+          {liveSlot
+            ? <Pill tone="accent">En direct</Pill>
+            : <Pill tone="muted">{todaySlots.length} cours aujourd’hui</Pill>}
+        </span>
+      </Card>
+
       <Card className="rise timetable-card" pad={false} style={{ animationDelay: '80ms' }}>
+        {!viewDay && (
+          <div className="tt-week-bar">
+            <div className="tt-week-nav">
+              <IconBtn icon="chevronL" title="Semaine précédente" onClick={() => changeWeek(-1)} />
+              <div className="tt-week-label">
+                <b>Semaine {weekLabel}</b>
+                <span>{weekPosition}</span>
+              </div>
+              <IconBtn icon="chevronR" title="Semaine suivante" onClick={() => changeWeek(1)} />
+            </div>
+            <div className="tt-week-right">
+              {weekOffset !== baseWeekOffset && (
+                <Btn icon="calendar" onClick={() => { setWeekOffset(baseWeekOffset); setViewDay(null); }}>
+                  {baseWeekOffset === 1 ? 'Semaine à venir' : 'Cette semaine'}
+                </Btn>
+              )}
+            </div>
+          </div>
+        )}
         <ListState
           loading={loading && !data}
           error={error}
-          empty={!loading && !error && !slots.length}
-          emptyTitle="Aucun cours cette semaine"
-          emptySub="Cliquez sur une case du planning pour ajouter un créneau."
+          empty={!loading && !error && !slots.length && !viewDay}
+          emptyTitle={viewDay ? `Aucun cours ${viewDay === today ? 'aujourd’hui' : `le ${DAYS[viewDay - 1]?.toLowerCase()}`}` : 'Aucun cours cette semaine'}
+          emptySub={viewDay ? 'Passez en vue semaine ou ajoutez un créneau.' : 'Cliquez sur une case du planning pour ajouter un créneau.'}
           onRetry={reload}
         >
-          <div className="tt-grid" style={{ gridTemplateColumns: `74px repeat(${activeDays.length}, minmax(0, 1fr))` }}>
-            <div className="tt-corner" />
-            {activeDays.map((day) => (
-              <div key={day} className={`tt-day ${day === todayIndex ? 'today' : ''}`}>
-                {DAYS[day - 1].slice(0, 3)}
-                {day === todayIndex && <i className="tt-today-dot" />}
+          {viewDay && !todaySlots.length ? (
+            <div className="tt-day-empty">
+              <b>{viewDay === today ? 'Aucun cours programmé aujourd’hui' : `Aucun cours le ${DAYS[viewDay - 1]?.toLowerCase()}`}</b>
+              <span>{currentClass?.name || 'Classe'} · {viewDay === today ? todayLabel : DAYS[viewDay - 1]}</span>
+              <div className="tt-day-actions">
+                <Btn icon="calendar" onClick={() => { setWeekOffset(baseWeekOffset); setViewDay(null); }}>Voir la semaine</Btn>
+                <Btn icon="plus" solid onClick={() => addSlot(viewDay, '08:00')}>Ajouter un cours</Btn>
               </div>
-            ))}
-
-            {hours.map((hour) => (
-              <React.Fragment key={hour}>
-                <div className="tt-hour mono">{hour}</div>
-                {activeDays.map((day) => {
-                  const slot = slotAt(day, hour);
-                  return (
-                    <div className="tt-cell" key={`${day}-${hour}`}>
-                      {slot ? (
-                        <div
-                          role="button"
-                          tabIndex={0}
-                          className={`tt-slot slot-${slotTone(slot.subject_id)} ${slot.is_live ? 'live' : ''}`}
-                          onClick={() => actions.slot(slot)}
-                          onKeyDown={(event) => { if (event.key === 'Enter') actions.slot(slot); }}
-                          title={`${slot.subject?.name || 'Cours'} · ${fullName(slot.staff)}`}
-                        >
-                          <b>{slot.subject?.name || 'Cours'}</b>
-                          <span className="mono">{slot.room || slot.school_class?.room || '—'} · {time(slot.starts_at)}</span>
-                          <span className="tt-teacher">{slot.staff ? fullName(slot.staff) : 'Enseignant à définir'}</span>
-                          <span className="tt-actions">
-                            <ActionMenu actions={[
-                              { label: 'Modifier le cours', icon: 'edit', onClick: () => actions.slot(slot) },
-                              { label: 'Supprimer le cours', icon: 'trash', tone: 'danger', onClick: () => actions.deleteSlot(slot) },
-                            ]} />
-                          </span>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          className="tt-empty-add"
-                          onClick={() => addSlot(day, hour)}
-                          aria-label={`Ajouter un cours ${DAYS[day - 1]} à ${hour}`}
-                        >
-                          <span>+</span>
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </React.Fragment>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <WeekGrid
+              slots={slots}
+              days={visibleDays}
+              weekStart={weekStart}
+              today={today}
+              now={now}
+              onSlot={(slot) => actions.slot(slot)}
+              onAdd={addSlot}
+              onDelete={(slot) => actions.deleteSlot(slot)}
+            />
+          )}
         </ListState>
       </Card>
 
@@ -165,7 +215,7 @@ export function EmploiDuTemps() {
         <span><i className="lg-a" />Sciences</span>
         <span><i className="lg-b" />Lettres</span>
         <span><i className="lg-c" />Autres</span>
-        <span className="legend-now"><i />Cours en cours</span>
+        <span className="legend-now"><i />Cours en cours (calculé sur l’heure actuelle)</span>
         <span className="legend-hint">Cliquez sur une case vide pour ajouter un cours.</span>
       </div>
     </>

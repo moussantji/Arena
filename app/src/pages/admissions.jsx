@@ -6,11 +6,12 @@ import {
   useApi, useData, useDebounced, number, date, fullName, initials, ADMISSION_STATUS,
 } from '../data.jsx';
 import { useActions } from '../actions.jsx';
+import { api, errorMessage } from '../api.js';
+import { exportAdmissionsWorkbook, fetchAllAdmissions } from '../exports.js';
 import {
-  ActionMenu, exportCsv, ListState, SearchInput,
+  ActionMenu, ListState, SearchInput, SelectFilter,
 } from '../forms.jsx';
 import { PageHead, AdmissionPill } from './common.jsx';
-import { api } from '../api.js';
 
 const COLUMNS = ['nouveau', 'entretien', 'valide', 'inscrit', 'refuse'];
 const NEXT_STEP = {
@@ -22,11 +23,14 @@ const NEXT_STEP = {
 };
 
 export function Admissions() {
-  const { meta, refresh, notify } = useData();
+  const {
+    meta, refresh, notify, setAdmissionId,
+  } = useData();
   const actions = useActions();
   const [view, setView] = useState(0);
   const [q, setQ] = useState('');
   const [classId, setClassId] = useState('');
+  const [exporting, setExporting] = useState(false);
   const search = useDebounced(q);
   const { data, loading, error, reload } = useApi('/admissions', { per_page: 300 });
   const stats = useApi('/admissions/stats');
@@ -53,16 +57,40 @@ export function Admissions() {
   const enrolled = rows.filter((admission) => admission.status === 'inscrit').length;
   const waiting = rows.filter((admission) => ['nouveau', 'entretien', 'valide'].includes(admission.status)).length;
 
-  const exportRows = () => exportCsv('diallo-admissions', [
-    { label: 'Référence', value: 'reference' },
-    { label: 'Candidat', value: (row) => fullName(row) },
-    { label: 'Classe demandée', value: (row) => row.desired_class?.name || '' },
-    { label: 'Responsable', value: 'guardian_name' },
-    { label: 'Téléphone', value: 'guardian_phone' },
-    { label: 'Statut', value: (row) => ADMISSION_STATUS[row.status]?.label || row.status },
-    { label: 'Candidature', value: (row) => date(row.applied_on) },
-    { label: 'Décision', value: (row) => (row.decision_on ? date(row.decision_on) : '') },
-  ], filtered);
+  const openAdmission = (admission) => {
+    setAdmissionId(admission.id);
+    window.location.hash = 'fiche-admission';
+  };
+
+  const exportRows = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const all = await fetchAllAdmissions({
+        q: search.trim() || undefined,
+        class_id: classId || undefined,
+      });
+      if (!all.length) {
+        notify('Aucun dossier à exporter.');
+        return;
+      }
+      const className = classes.find((item) => String(item.id) === String(classId))?.name;
+      const filterLabel = [
+        search.trim() ? `recherche « ${search.trim()} »` : '',
+        className ? `classe ${className}` : '',
+      ].filter(Boolean).join(' · ');
+      await exportAdmissionsWorkbook(all, {
+        schoolName: meta?.school?.name,
+        termName: meta?.term?.name,
+        filterLabel,
+      });
+      notify(`${all.length} dossier${all.length > 1 ? 's' : ''} exporté${all.length > 1 ? 's' : ''}.`, { tone: 'success' });
+    } catch (error) {
+      notify(errorMessage(error, 'Export impossible.'), { tone: 'danger' });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const move = async (admission, status) => {
     try {
@@ -109,10 +137,12 @@ export function Admissions() {
         <Tabs items={['Pipeline', 'Liste']} active={view} onChange={setView} />
         <div className="toolbar-right">
           <SearchInput value={q} onChange={setQ} placeholder="Candidat, référence, responsable…" />
-          <select className="input select-inline" value={classId} onChange={(event) => setClassId(event.target.value)} aria-label="Classe demandée">
-            <option value="">Toutes les classes</option>
-            {classes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-          </select>
+          <SelectFilter
+            label="Classe demandée"
+            value={classId}
+            onChange={setClassId}
+            options={[{ value: '', label: 'Toutes les classes' }, ...classes.map((item) => ({ value: item.id, label: item.name }))]}
+          />
           <Btn icon="plus" solid onClick={() => actions.admission()}>Nouveau dossier</Btn>
         </div>
       </div>
@@ -141,7 +171,12 @@ export function Admissions() {
                   </header>
                   <div className="kb-body">
                     {items.map((admission) => (
-                      <Card key={admission.id} className="kb-card rise">
+                      <Card
+                        key={admission.id}
+                        className="kb-card rise"
+                        onClick={() => openAdmission(admission)}
+                        title={`Ouvrir le dossier de ${fullName(admission)}`}
+                      >
                         <div className="kb-top">
                           <Avatar initials={initials(fullName(admission))} size={30} tone={status === 'refuse' ? 'muted' : 'accent'} />
                           <span>
@@ -159,9 +194,12 @@ export function Admissions() {
                             <span>{admission.guardian_name}</span>
                           </div>
                         )}
-                        <div className="kb-foot">
+                        <div className="kb-foot" onClick={(event) => event.stopPropagation()}>
                           <span>{admission.notes ? admission.notes.slice(0, 28) : 'Dossier de candidature'}</span>
-                          <ActionMenu actions={actionsFor(admission)} />
+                          <ActionMenu actions={[
+                            { label: 'Voir le dossier', icon: 'external', onClick: () => openAdmission(admission) },
+                            ...actionsFor(admission),
+                          ]} />
                         </div>
                       </Card>
                     ))}
@@ -181,7 +219,12 @@ export function Admissions() {
               foot={<><span className="tf-l">{filtered.length} dossiers affichés</span><span className="tf-r">{number(total)} au total</span></>}
             >
               {filtered.map((admission) => (
-                <Tr key={admission.id} template="1.5fr 1fr 1.2fr .8fr .8fr .8fr 34px">
+                <Tr
+                  key={admission.id}
+                  template="1.5fr 1fr 1.2fr .8fr .8fr .8fr 34px"
+                  onClick={() => openAdmission(admission)}
+                  title={`Ouvrir le dossier de ${fullName(admission)}`}
+                >
                   <span className="cell-who">
                     <Avatar initials={initials(fullName(admission))} size={28} tone={admission.status === 'refuse' ? 'muted' : 'accent'} />
                     <span>
@@ -197,7 +240,12 @@ export function Admissions() {
                   <span className="cell"><AdmissionPill status={admission.status} /></span>
                   <span className="cell mono">{date(admission.applied_on)}</span>
                   <span className="cell mono">{admission.decision_on ? date(admission.decision_on) : '—'}</span>
-                  <span className="cell right cell-actions"><ActionMenu actions={actionsFor(admission)} /></span>
+                  <span className="cell right cell-actions" onClick={(event) => event.stopPropagation()}>
+                    <ActionMenu actions={[
+                      { label: 'Voir le dossier', icon: 'external', onClick: () => openAdmission(admission) },
+                      ...actionsFor(admission),
+                    ]} />
+                  </span>
                 </Tr>
               ))}
             </Table>

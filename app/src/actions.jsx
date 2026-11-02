@@ -495,7 +495,6 @@ export function useActions() {
       starts_at: String(slot.starts_at || '').slice(0, 5),
       ends_at: String(slot.ends_at || '').slice(0, 5),
       day_of_week: slot.day_of_week || 1,
-      is_live: Boolean(slot.is_live),
     } : {
       school_class_id: defaults.school_class_id || classes[0]?.id || '',
       subject_id: defaults.subject_id || '',
@@ -505,7 +504,6 @@ export function useActions() {
       starts_at: defaults.starts_at || '08:00',
       ends_at: defaults.ends_at || plusHours(defaults.starts_at || '08:00', 2),
       room: '',
-      is_live: false,
     };
     openResourceForm(modal, {
       title: editing ? 'Modifier le cours' : 'Ajouter un cours',
@@ -523,7 +521,6 @@ export function useActions() {
         { name: 'room', label: 'Salle', half: true, placeholder: 'S204' },
         { name: 'starts_at', label: 'Début', type: 'time', required: true, half: true },
         { name: 'ends_at', label: 'Fin', type: 'time', required: true, half: true },
-        { name: 'is_live', label: 'Cours en cours', type: 'checkbox', half: true, switchLabel: 'Afficher comme en direct' },
       ],
       initial,
       submit: (payload) => (editing

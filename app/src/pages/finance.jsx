@@ -3,12 +3,17 @@ import {
   Btn, Card, CardHead, Pill, Progress, Table, Tr, Tabs, Icon, AreaChart,
 } from '../ui.jsx';
 import {
-  useApi, useData, useDebounced, number, money, compactMoney, date, fullName,
+  useApi, useData, useDebounced, number, money, compactMoney, date,
   INVOICE_STATUS, PAYMENT_STATUS, PAYMENT_METHODS,
 } from '../data.jsx';
 import { useActions } from '../actions.jsx';
+import { errorMessage } from '../api.js';
 import {
-  ActionMenu, exportCsv, ListState, Pager, SearchInput, SelectFilter,
+  exportFinanceInvoicesWorkbook, exportFinancePaymentsWorkbook, exportFinanceSummaryWorkbook,
+  fetchAllInvoices, fetchAllPayments,
+} from '../exports.js';
+import {
+  ActionMenu, ListState, Pager, SearchInput, SelectFilter,
 } from '../forms.jsx';
 import { PageHead, StudentCell, InvoicePill, PaymentPill } from './common.jsx';
 
@@ -35,7 +40,7 @@ function MoneyBars({ items = [], currency }) {
 }
 
 export function Finances() {
-  const { meta } = useData();
+  const { meta, notify } = useData();
   const actions = useActions();
   const [tab, setTab] = useState(() => {
     if (typeof window === 'undefined') return 0;
@@ -56,6 +61,7 @@ export function Finances() {
   const [overdue, setOverdue] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [exporting, setExporting] = useState(false);
   const invoiceSearch = useDebounced(invoiceQ);
   const paymentSearch = useDebounced(paymentQ);
   const currency = meta?.school?.currency || 'FCFA';
@@ -146,28 +152,84 @@ export function Finances() {
   const pageCollected = invoiceRows.reduce((sum, row) => sum + Number(row.paid_amount || 0), 0);
   const pageBalance = invoiceRows.reduce((sum, row) => sum + balanceOf(row), 0);
 
-  const exportInvoices = () => exportCsv('diallo-factures', [
-    { label: 'Référence', value: 'reference' },
-    { label: 'Élève', value: (row) => fullName(row.student) },
-    { label: 'Matricule', value: (row) => row.student?.matricule || '' },
-    { label: 'Classe', value: (row) => row.student?.school_class?.name || '' },
-    { label: 'Frais', value: (row) => row.fee_type?.name || '' },
-    { label: 'Montant', value: (row) => Number(row.amount || 0) },
-    { label: 'Payé', value: (row) => Number(row.paid_amount || 0) },
-    { label: 'Solde', value: balanceOf },
-    { label: 'Statut', value: (row) => INVOICE_STATUS[row.status]?.label || row.status },
-    { label: 'Échéance', value: (row) => date(row.due_on) },
-  ], invoiceRows);
+  const exportBase = {
+    schoolName: meta?.school?.name,
+    termName: meta?.term?.name,
+    currency,
+  };
 
-  const exportPayments = () => exportCsv('diallo-paiements', [
-    { label: 'Référence', value: 'reference' },
-    { label: 'Élève', value: (row) => fullName(row.student) },
-    { label: 'Facture', value: (row) => row.invoice?.reference || '' },
-    { label: 'Montant', value: (row) => Number(row.amount || 0) },
-    { label: 'Moyen', value: (row) => PAYMENT_METHODS[row.method] || row.method },
-    { label: 'Date', value: (row) => date(row.paid_on) },
-    { label: 'Statut', value: (row) => PAYMENT_STATUS[row.status]?.label || row.status },
-  ], paymentRows);
+  const exportSummary = async () => {
+    if (!summary.data || exporting) return;
+    setExporting(true);
+    try {
+      await exportFinanceSummaryWorkbook(summary.data, {
+        ...exportBase,
+        yearName: meta?.academic_year?.label,
+      });
+      notify('Synthèse financière exportée.', { tone: 'success' });
+    } catch (error) {
+      notify(errorMessage(error, 'Export impossible.'), { tone: 'danger' });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const exportInvoices = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const all = await fetchAllInvoices({
+        q: invoiceSearch || undefined,
+        status: invoiceStatus || undefined,
+        class_id: invoiceClass || undefined,
+        overdue: overdue ? 1 : undefined,
+      });
+      if (!all.length) {
+        notify('Aucune facture à exporter.');
+        return;
+      }
+      const className = classes.find((item) => String(item.id) === String(invoiceClass))?.name;
+      const filterLabel = [
+        invoiceSearch ? `recherche « ${invoiceSearch} »` : '',
+        invoiceStatus ? INVOICE_STATUS[invoiceStatus]?.label : '',
+        className ? `classe ${className}` : '',
+        overdue ? 'en retard' : '',
+      ].filter(Boolean).join(' · ');
+      await exportFinanceInvoicesWorkbook(all, { ...exportBase, filterLabel });
+      notify(`${all.length} facture${all.length > 1 ? 's' : ''} exportée${all.length > 1 ? 's' : ''}.`, { tone: 'success' });
+    } catch (error) {
+      notify(errorMessage(error, 'Export impossible.'), { tone: 'danger' });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const exportPayments = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const all = await fetchAllPayments({
+        q: paymentSearch || undefined,
+        status: paymentStatus || undefined,
+        method: paymentMethod || undefined,
+      });
+      if (!all.length) {
+        notify('Aucun paiement à exporter.');
+        return;
+      }
+      const filterLabel = [
+        paymentSearch ? `recherche « ${paymentSearch} »` : '',
+        paymentStatus ? PAYMENT_STATUS[paymentStatus]?.label : '',
+        paymentMethod ? PAYMENT_METHODS[paymentMethod] : '',
+      ].filter(Boolean).join(' · ');
+      await exportFinancePaymentsWorkbook(all, { ...exportBase, filterLabel });
+      notify(`${all.length} paiement${all.length > 1 ? 's' : ''} exporté${all.length > 1 ? 's' : ''}.`, { tone: 'success' });
+    } catch (error) {
+      notify(errorMessage(error, 'Export impossible.'), { tone: 'danger' });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const openInvoice = () => actions.invoice();
   const openPayment = () => actions.payment();
@@ -180,12 +242,17 @@ export function Finances() {
         primary="Créer une facture"
         onPrimary={openInvoice}
         secondary="Exporter"
-        onSecondary={() => (tab === 2 ? exportPayments() : exportInvoices())}
+        onSecondary={() => {
+          if (tab === 2) exportPayments();
+          else if (tab === 1) exportInvoices();
+          else exportSummary();
+        }}
       />
 
       <div className="toolbar rise">
         <Tabs items={['Synthèse', 'Factures', 'Paiements']} active={tab} onChange={setTab} />
         <div className="toolbar-right">
+          {tab === 0 && <Btn icon="download" onClick={exportSummary}>Exporter la synthèse</Btn>}
           <Btn icon="finance" solid onClick={openPayment}>Encaisser un paiement</Btn>
         </div>
       </div>

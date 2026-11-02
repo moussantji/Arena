@@ -7,8 +7,10 @@ import {
   INVOICE_STATUS, PAYMENT_STATUS, PAYMENT_METHODS, EVALUATIONS,
 } from '../data.jsx';
 import { useActions } from '../actions.jsx';
+import { errorMessage } from '../api.js';
+import { exportStudentReportWorkbook } from '../exports.js';
 import {
-  ActionMenu, exportCsv, ListState, SelectFilter,
+  ActionMenu, ListState, SelectFilter,
 } from '../forms.jsx';
 import {
   PageHead, StudentCell, StatusPill, InvoicePill, PaymentPill, average,
@@ -35,10 +37,11 @@ const evaluationScore = (subject, key) => {
 
 export function Fiche() {
   const {
-    meta, studentId, setStudentId, version,
+    meta, studentId, setStudentId, version, notify,
   } = useData();
   const actions = useActions();
   const [tab, setTab] = useState(0);
+  const [exportingReport, setExportingReport] = useState(false);
   const students = meta?.students || [];
   const currency = meta?.school?.currency || 'FCFA';
 
@@ -93,14 +96,27 @@ export function Fiche() {
       .slice(0, 5);
   }, [paymentRows, invoiceRows]);
 
-  const exportReport = () => exportCsv(`diallo-bulletin-${student?.matricule || studentId}`, [
-    { label: 'Matière', value: (row) => row.subject },
-    { label: 'Coefficient', value: (row) => row.coefficient },
-    { label: 'Devoir 1', value: (row) => evaluationScore(row, 'devoir_1') ?? '' },
-    { label: 'Devoir 2', value: (row) => evaluationScore(row, 'devoir_2') ?? '' },
-    { label: 'Composition', value: (row) => evaluationScore(row, 'composition') ?? '' },
-    { label: 'Moyenne', value: (row) => row.average },
-  ], subjectRows);
+  const exportReport = async () => {
+    if (!student || exportingReport) return;
+    setExportingReport(true);
+    try {
+      const stats = absences.data?.stats || {};
+      await exportStudentReportWorkbook(student, reportData, {
+        schoolName: meta?.school?.name,
+        yearName: meta?.academic_year?.label,
+        termName: meta?.term?.name,
+        absences: {
+          total: Number(stats.total ?? absenceRows.length),
+          unjustified: Number(stats.unjustified ?? pendingAbsences.length),
+        },
+      });
+      notify(`Bulletin de ${fullName(student)} exporté.`, { tone: 'success' });
+    } catch (error) {
+      notify(errorMessage(error, 'Export du bulletin impossible.'), { tone: 'danger' });
+    } finally {
+      setExportingReport(false);
+    }
+  };
 
   const studentOptions = students.map((item) => ({
     value: item.id,

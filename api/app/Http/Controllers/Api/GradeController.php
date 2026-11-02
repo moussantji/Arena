@@ -8,6 +8,7 @@ use App\Models\Student;
 use App\Models\Term;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class GradeController extends Controller
@@ -34,6 +35,18 @@ class GradeController extends Controller
                     ->orWhere('matricule', 'like', $term));
             });
 
+        $latestExam = null;
+        if ($request->boolean('latest_exam')) {
+            $latestDate = (clone $query)->max('evaluated_on');
+            if ($latestDate) {
+                $latestDate = Carbon::parse($latestDate)->toDateString();
+                $query->whereDate('evaluated_on', $latestDate);
+                $latestExam = (clone $query)->with('term:id,name')->first();
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        }
+
         $stats = (clone $query)
             ->reorder()
             ->selectRaw('COUNT(*) as total')
@@ -41,7 +54,6 @@ class GradeController extends Controller
             ->selectRaw('ROUND(MAX(score / max_score * 20), 2) as best')
             ->selectRaw('SUM(CASE WHEN score / max_score * 20 < 10 THEN 1 ELSE 0 END) as below_ten')
             ->first();
-
         $grades = $query
             ->orderBy('evaluated_on')
             ->orderBy('id')
@@ -50,6 +62,11 @@ class GradeController extends Controller
 
         return response()->json([
             ...$grades->toArray(),
+            'latest_exam' => $latestExam ? [
+                'date' => $latestExam->evaluated_on?->toDateString(),
+                'evaluation' => $latestExam->evaluation,
+                'term' => $latestExam->term?->name,
+            ] : null,
             'stats' => [
                 'total' => (int) ($stats->total ?? 0),
                 'average' => $stats?->average !== null ? (float) $stats->average : null,

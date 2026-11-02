@@ -1,7 +1,7 @@
-# DIALLO — école premium
+# DIALLO — gestion d'école
 
-Direction artistique et maquettes d'une application de gestion d'école.
-Palette retenue : **Indigo Minuit** (`#070B1F` · `#5B7CFA` · `#E0A86F`).
+Application desktop de gestion d'école : interface React, API Laravel et coquille Electron.
+Palette **Indigo Minuit** (`#070B1F` · `#5B7CFA` · `#E0A86F`).
 
 ## Contenu
 
@@ -70,6 +70,19 @@ tableau de bord et formulaires de création, modification et suppression pour
 chaque domaine. Le compte de démonstration est utilisé automatiquement pour
 obtenir le token Sanctum nécessaire aux écritures.
 
+## Tests
+
+```bash
+# tests API (SQLite en mémoire, la base de démonstration n'est pas modifiée)
+cd api && php artisan test
+```
+
+Les tests nécessitent l'extension PHP `pdo_sqlite`. Le build front se vérifie avec :
+
+```bash
+cd app && npm run build
+```
+
 ## Application desktop Ubuntu
 
 L'application Electron intègre le build React et démarre automatiquement l'API
@@ -115,9 +128,10 @@ de développement, puis **Plugins → Development → DIALLO — Indigo Minuit**
 
 ## Écrans
 
-Écrans React (composants) : tableau de bord, élèves, classes, emploi du temps,
-finances, personnel, messagerie, matières, notes, absences, fiche élève, admissions, paramètres,
-plus une page **Modales** de démonstration.
+Écrans React (composants) : tableau de bord, élèves, classes, fiche classe,
+emploi du temps, finances, personnel, fiche personnel, messagerie, matières,
+notes, absences, fiche élève, admissions, fiche admission, paramètres, plus une
+page **Modales** de démonstration.
 
 Modales personnalisées : formulaire, paiement, confirmation destructive, justificatif,
 export, rédaction, succès et panneau latéral — pile, focus piégé, animations.

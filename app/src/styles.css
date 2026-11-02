@@ -25,6 +25,7 @@
   --sidebar: 238px;
   --titlebar: 54px;
   --r: 14px;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -470,6 +471,17 @@ button { font: inherit; cursor: pointer; }
 }
 .tr:last-child { border-bottom: 0; }
 .tr:hover { background: rgba(91, 124, 250, 0.07); }
+.tr.is-clickable { cursor: pointer; }
+.tr.is-clickable:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+  background: rgba(91, 124, 250, 0.09);
+}
+.card.is-clickable { cursor: pointer; }
+.card.is-clickable:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
 .cell { font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cell-who { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .cell-who span { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
@@ -549,6 +561,9 @@ button { font: inherit; cursor: pointer; }
 .avatars .avatar:first-child { margin-left: 0; }
 .class-teacher { flex: 1; min-width: 0; font-size: 11px; line-height: 1.35; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .class-foot .icon-btn { margin-left: auto; }
+.class-actions { margin-left: auto; display: flex; align-items: center; }
+.class-tab-head { padding: 16px 18px 0; }
+.class-tab-head .card-head { margin-bottom: 0; }
 
 /* ---------------- emploi du temps ---------------- */
 .timetable-card { padding: 0; overflow: hidden; }
@@ -559,17 +574,37 @@ button { font: inherit; cursor: pointer; }
 }
 .tt-corner { }
 .tt-day {
-  height: 30px; display: flex; align-items: center; justify-content: center; gap: 6px;
+  height: 32px; display: flex; align-items: center; justify-content: center; gap: 6px;
   font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint);
   border-bottom: 1px solid var(--line); position: relative;
 }
 .tt-day.today { color: var(--accent2); }
+.tt-day-date {
+  font-style: normal; font-size: 9px; letter-spacing: 0.06em; color: var(--dim);
+  background: rgba(167, 182, 255, 0.08); border-radius: 3px; padding: 1px 4px;
+}
+.tt-day.today .tt-day-date { color: var(--accent2); background: rgba(91, 124, 250, 0.16); }
 .tt-today-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.tt-week-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, rgba(27, 42, 107, 0.22), rgba(11, 16, 48, 0.08));
+}
+.tt-week-nav { display: flex; align-items: center; gap: 8px; }
+.tt-week-label { display: flex; flex-direction: column; gap: 2px; line-height: 1.25; min-width: 0; }
+.tt-week-label b { font-size: 12px; font-weight: 600; letter-spacing: -0.01em; }
+.tt-week-label span {
+  font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent2);
+}
+.tt-week-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 .tt-hour {
   display: flex; align-items: flex-start; justify-content: flex-end; padding: 8px 8px 0 0;
   font-size: 9.5px; color: var(--faint); letter-spacing: 0.06em;
 }
 .tt-cell { min-height: 62px; border-radius: 9px; background: rgba(167, 182, 255, 0.035); position: relative; }
+.tt-cell.is-today { background: rgba(91, 124, 250, 0.075); box-shadow: inset 0 0 0 1px rgba(91, 124, 250, 0.13); }
+.tt-empty { display: block; width: 100%; min-height: 62px; }
 .tt-slot {
   height: 100%; min-height: 62px; border-radius: 9px; padding: 9px 10px;
   display: flex; flex-direction: column; justify-content: space-between; gap: 4px;
@@ -583,6 +618,28 @@ button { font: inherit; cursor: pointer; }
 .tt-slot.slot-b { background: rgba(126, 155, 255, 0.16); border-color: rgba(126, 155, 255, 0.3); color: #dfe6ff; }
 .tt-slot.slot-c { background: rgba(224, 168, 111, 0.14); border-color: rgba(224, 168, 111, 0.3); color: #ffe6cb; }
 .tt-slot.live { background: rgba(91, 124, 250, 0.42); border-color: var(--accent2); box-shadow: 0 0 26px -8px var(--glow); }
+.tt-live-tag {
+  align-self: flex-start; font-family: var(--mono); font-size: 7.5px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: #071229; background: var(--accent2);
+  padding: 2px 5px; border-radius: 4px; line-height: 1.3;
+}
+.tt-more {
+  position: absolute; right: 5px; bottom: 5px; font-family: var(--mono); font-size: 8px;
+  color: var(--faint); background: rgba(7, 11, 31, 0.55); border-radius: 4px; padding: 1px 4px;
+}
+.tt-live-banner { display: flex; align-items: center; gap: 12px; padding: 11px 15px; }
+.tt-live-banner.is-live { border-color: rgba(91, 124, 250, 0.45); background: linear-gradient(100deg, rgba(91, 124, 250, 0.17), rgba(27, 42, 107, 0.2)); }
+.tt-live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); flex: none; }
+.tt-live-banner.is-live .tt-live-dot { background: var(--accent2); box-shadow: 0 0 10px var(--accent2); animation: pulse 1.8s infinite; }
+.tt-live-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tt-live-main b { font-size: 12.5px; font-weight: 600; }
+.tt-live-main em { font-style: normal; font-size: 10.5px; color: var(--faint); }
+.tt-live-side { margin-left: auto; flex: none; }
+.tt-day-empty { min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 30px 16px; text-align: center; }
+.tt-day-empty b { font-size: 13px; }
+.tt-day-empty span { font-size: 11px; color: var(--faint); }
+.tt-day-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 .tt-now {
   position: absolute; left: 6px; right: 6px; bottom: -4px; height: 1px;
   background: var(--copper); box-shadow: 0 0 10px var(--copper); opacity: 0.85;
@@ -690,6 +747,28 @@ button { font: inherit; cursor: pointer; }
 .kb-top em { font-style: normal; font-size: 10px; color: var(--faint); }
 .kb-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 9px; }
 .kb-foot > span { font-family: var(--mono); font-size: 9px; color: var(--faint); letter-spacing: 0.08em; }
+
+/* fiche admission : parcours */
+.admission-step-list { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.admission-step {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
+  padding: 11px 12px; border-radius: 10px; text-align: left;
+  border: 1px solid var(--line); background: rgba(167, 182, 255, 0.04);
+  color: var(--dim); transition: 0.18s var(--ease);
+}
+.admission-step:not(:disabled):hover { border-color: var(--line-strong); background: rgba(167, 182, 255, 0.08); transform: translateY(-1px); }
+.admission-step.reached { border-color: rgba(91, 124, 250, 0.36); background: rgba(91, 124, 250, 0.1); }
+.admission-step.current {
+  border-color: rgba(91, 124, 250, 0.62); background: rgba(91, 124, 250, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(91, 124, 250, 0.22), 0 16px 34px -26px var(--glow);
+}
+.admission-step:disabled { cursor: default; }
+.admission-step b { font-size: 12px; font-weight: 600; color: var(--ink); }
+.admission-step em { font-style: normal; font-size: 9.5px; color: var(--faint); }
+.admission-step.current em { color: var(--accent2); }
+@media (max-width: 900px) {
+  .admission-step-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 /* ---------------- messagerie ---------------- */
 .messenger { display: grid; grid-template-columns: 300px 1fr; padding: 0; overflow: hidden; min-height: 520px; }
@@ -982,10 +1061,24 @@ body.modal-open { overflow: hidden; }
 .mrow:has(> .mfield:only-child) { grid-template-columns: 1fr; }
 
 .input.textarea { height: auto; padding: 9px 11px; line-height: 1.55; resize: vertical; font-family: inherit; min-height: 64px; }
+select.input {
+  color-scheme: dark;
+  background-color: #0b1030;
+}
+select.input option,
+.mselect option {
+  background-color: #0b1030;
+  color: var(--ink);
+}
+select.input option:checked,
+select.input option:hover,
+.mselect option:checked {
+  background-color: var(--accent);
+  color: #fff;
+}
 .mselect { position: relative; display: block; }
 .mselect .input { appearance: none; padding-right: 28px; cursor: pointer; }
 .mselect-caret { position: absolute; right: 10px; top: 50%; transform: translateY(-50%) rotate(90deg); color: var(--faint); pointer-events: none; }
-.mselect option { background: #0b1030; color: var(--ink); }
 
 .mcard {
   display: flex; flex-direction: column; gap: 11px;

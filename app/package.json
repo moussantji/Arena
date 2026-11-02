@@ -9,6 +9,7 @@
     "preview": "vite preview --host 0.0.0.0 --port 5179"
   },
   "dependencies": {
+    "jszip": "^3.10.2",
     "pptxgenjs": "^3.12.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

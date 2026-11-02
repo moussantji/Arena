@@ -10,7 +10,8 @@ import { Btn, Icon } from './ui.jsx';
    Navigation, transitions et état de connexion à l'API.
    ============================================================ */
 
-const ORDER = NAV_PAGES.map((p) => p.id);
+const ALL_PAGE_IDS = NAV_PAGES.map((p) => p.id);
+const ORDER = NAV_PAGES.filter((p) => !p.hidden).map((p) => p.id);
 
 export default function App() {
   const {
@@ -19,7 +20,7 @@ export default function App() {
   const actions = useActions();
   const [pageId, setPageId] = useState(() => {
     const h = typeof window !== 'undefined' ? window.location.hash.replace('#', '') : '';
-    return ORDER.includes(h) ? h : 'dashboard';
+    return ALL_PAGE_IDS.includes(h) ? h : 'dashboard';
   });
   const [query, setQuery] = useState('');
   const [sidebar, setSidebar] = useState(false);
@@ -34,13 +35,15 @@ export default function App() {
     const q = query.trim().toLowerCase();
     if (!q) return [];
     return NAV_PAGES.filter(
-      (p) => p.label.toLowerCase().includes(q)
-        || (META[p.id]?.crumb.join(' ').toLowerCase() || '').includes(q),
+      (p) => !p.hidden && (
+        p.label.toLowerCase().includes(q)
+        || (META[p.id]?.crumb.join(' ').toLowerCase() || '').includes(q)
+      ),
     );
   }, [query]);
 
   const go = (id, opts = {}) => {
-    if (!ORDER.includes(id)) return;
+    if (!ALL_PAGE_IDS.includes(id)) return;
     setDir(opts.dir ?? (ORDER.indexOf(id) > ORDER.indexOf(pageId) ? 1 : -1));
     setPageId(id);
     setSidebar(false);
@@ -57,7 +60,7 @@ export default function App() {
   useEffect(() => {
     const onHash = () => {
       const next = window.location.hash.replace('#', '');
-      if (ORDER.includes(next) && next !== pageId) {
+      if (ALL_PAGE_IDS.includes(next) && next !== pageId) {
         setDir(ORDER.indexOf(next) > ORDER.indexOf(pageId) ? 1 : -1);
         setPageId(next);
         bodyRef.current?.scrollTo?.({ top: 0 });
@@ -153,6 +156,7 @@ export default function App() {
           results={results}
           onSearch={setQuery}
           onPick={(id) => { go(id); setQuery(''); }}
+          onNavigate={go}
         />
 
         <div className="page" ref={bodyRef}>

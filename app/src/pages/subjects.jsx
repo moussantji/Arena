@@ -4,18 +4,21 @@ import {
 } from '../ui.jsx';
 import { useApi, useData, number, useDebounced } from '../data.jsx';
 import { useActions } from '../actions.jsx';
+import { errorMessage } from '../api.js';
+import { exportSubjectsWorkbook } from '../exports.js';
 import {
-  ActionMenu, exportCsv, ListState, SearchInput,
+  ActionMenu, ListState, SearchInput,
 } from '../forms.jsx';
 import { PageHead, average } from './common.jsx';
 
 const toneFor = (id) => ['accent', 'success', 'copper'][Number(id || 0) % 3];
 
 export function Matieres() {
-  const { meta } = useData();
+  const { meta, notify } = useData();
   const actions = useActions();
   const [q, setQ] = useState('');
   const [department, setDepartment] = useState('');
+  const [exporting, setExporting] = useState(false);
   const search = useDebounced(q);
   const { data, loading, error, reload } = useApi('/subjects', { q: search || undefined });
   const rows = data?.subjects || [];
@@ -53,16 +56,21 @@ export function Matieres() {
     .sort((a, b) => Number(b.average) - Number(a.average))
     .slice(0, 3);
 
-  const exportRows = () => exportCsv('diallo-matieres', [
-    { label: 'Matière', value: 'name' },
-    { label: 'Code', value: 'code' },
-    { label: 'Département', value: (row) => row.department?.name || '' },
-    { label: 'Coefficient', value: 'coefficient' },
-    { label: 'Heures / semaine', value: 'weekly_hours' },
-    { label: 'Enseignants', value: 'teachers_count' },
-    { label: 'Classes', value: 'classes_count' },
-    { label: 'Moyenne', value: (row) => (row.average == null ? '' : Number(row.average)) },
-  ], filtered);
+  const exportRows = async () => {
+    if (!filtered.length || exporting) return;
+    setExporting(true);
+    try {
+      await exportSubjectsWorkbook(filtered, {
+        schoolName: meta?.school?.name,
+        termName: meta?.term?.name,
+      });
+      notify(`${filtered.length} matière${filtered.length > 1 ? 's' : ''} exportée${filtered.length > 1 ? 's' : ''}.`, { tone: 'success' });
+    } catch (error) {
+      notify(errorMessage(error, 'Export impossible.'), { tone: 'danger' });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <>

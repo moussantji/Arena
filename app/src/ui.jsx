@@ -118,9 +118,26 @@ export function IconBtn({ icon, onClick, title, badge = false, className = '' })
   );
 }
 
-export function Card({ children, className = '', pad = true, style }) {
+export function Card({
+  children, className = '', pad = true, style, onClick, title,
+}) {
+  const clickable = typeof onClick === 'function';
   return (
-    <div className={`card ${pad ? 'pad' : ''} ${className}`} style={style}>
+    <div
+      className={`card ${pad ? 'pad' : ''} ${className}${clickable ? ' is-clickable' : ''}`}
+      style={style}
+      onClick={onClick}
+      title={title}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onKeyDown={clickable ? (event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick(event);
+        }
+      } : undefined}
+    >
       {children}
     </div>
   );
@@ -415,9 +432,26 @@ export function Table({ columns = [], template, children, foot }) {
   );
 }
 
-export function Tr({ children, template }) {
+export function Tr({
+  children, template, onClick, title, className = '',
+}) {
+  const clickable = typeof onClick === 'function';
   return (
-    <div className="tr" style={{ gridTemplateColumns: template }}>
+    <div
+      className={`tr${clickable ? ' is-clickable' : ''}${className ? ` ${className}` : ''}`}
+      style={{ gridTemplateColumns: template }}
+      onClick={onClick}
+      title={title}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onKeyDown={clickable ? (event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick(event);
+        }
+      } : undefined}
+    >
       {children}
     </div>
   );

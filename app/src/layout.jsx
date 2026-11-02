@@ -12,11 +12,13 @@ export const NAV = {
     { id: 'dashboard', label: 'Tableau de bord', icon: 'dashboard' },
     { id: 'eleves', label: 'Élèves', icon: 'students' },
     { id: 'classes', label: 'Classes', icon: 'classes' },
+    { id: 'classe', label: 'Fiche classe', icon: 'classes' },
     { id: 'emploi-du-temps', label: 'Emploi du temps', icon: 'calendar' },
   ],
   Gestion: [
     { id: 'finances', label: 'Finances', icon: 'finance' },
     { id: 'personnel', label: 'Personnel', icon: 'staff' },
+    { id: 'fiche-personnel', label: 'Fiche personnel', icon: 'staff', hidden: true },
     { id: 'messagerie', label: 'Messagerie', icon: 'messages', dynamicBadge: 'threads' },
   ],
   Pédagogie: [
@@ -25,6 +27,7 @@ export const NAV = {
     { id: 'absences', label: 'Absences', icon: 'absences' },
     { id: 'fiche', label: 'Fiche élève', icon: 'profile' },
     { id: 'admissions', label: 'Admissions', icon: 'admissions' },
+    { id: 'fiche-admission', label: 'Fiche admission', icon: 'admissions', hidden: true },
   ],
   Système: [
     { id: 'modales', label: 'Modales', icon: 'external' },
@@ -136,7 +139,7 @@ export function Sidebar({ pageId, onSelect, open }) {
         {Object.entries(NAV).map(([group, items]) => (
           <React.Fragment key={group}>
             <div className="nav-label">{group}</div>
-            {items.map((it) => {
+            {items.filter((it) => !it.hidden).map((it) => {
               const badge = it.dynamicBadge === 'threads' ? unreadThreads : it.badge;
               return (
                 <button
@@ -168,7 +171,24 @@ export function Sidebar({ pageId, onSelect, open }) {
   );
 }
 
-export function TopBar({ page, onSearch, query, results, onPick }) {
+const NOTIFICATION_PAGES = {
+  admission: 'admissions',
+  inscription: 'admissions',
+  enrollment: 'eleves',
+  payment: 'finances',
+  invoice: 'finances',
+  finance: 'finances',
+  absence: 'absences',
+  message: 'messagerie',
+  thread: 'messagerie',
+  staff: 'personnel',
+  student: 'eleves',
+  grade: 'notes',
+};
+
+export function TopBar({
+  page, onSearch, query, results, onPick, onNavigate,
+}) {
   const {
     notifications, unread, markNotification, markAllNotifications, deleteNotification, user,
   } = useData();
@@ -184,6 +204,25 @@ export function TopBar({ page, onSearch, query, results, onPick }) {
     document.addEventListener('pointerdown', onPointer);
     return () => document.removeEventListener('pointerdown', onPointer);
   }, [openNotif]);
+
+  const openNotification = (notification) => {
+    markNotification(notification);
+    const target = NOTIFICATION_PAGES[notification.type];
+    if (!target) return;
+    if (target === 'finances') {
+      const financeTab = notification.type === 'payment' ? 2 : 1;
+      try {
+        window.sessionStorage.setItem('arena.finance.tab', String(financeTab));
+      } catch {
+        /* stockage indisponible */
+      }
+      window.setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('diallo:finance-tab', { detail: { tab: financeTab } }));
+      }, 150);
+    }
+    setOpenNotif(false);
+    onNavigate?.(target);
+  };
 
   return (
     <div className="topbar">
@@ -247,8 +286,8 @@ export function TopBar({ page, onSearch, query, results, onPick }) {
               <button
                 type="button"
                 className="notif-main"
-                onClick={() => markNotification(n)}
-                title={n.read_at ? 'Déjà lue' : 'Marquer comme lue'}
+                onClick={() => openNotification(n)}
+                title={NOTIFICATION_PAGES[n.type] ? 'Ouvrir la page concernée' : 'Marquer comme lue'}
               >
                 <b>{n.title}</b>
                 <span>{n.body}</span>

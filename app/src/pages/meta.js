@@ -15,12 +15,17 @@ export const META = {
   classes: {
     label: 'Classes', group: 'Pilotage', crumb: ['Pilotage', 'Classes'],
     title: 'Classes', sub: 'Organisation pédagogique',
-    primary: 'Créer une classe', secondary: 'Exporter',
+    primary: 'Créer une classe', secondary: 'Exporter les notes',
+  },
+  classe: {
+    label: 'Fiche classe', group: 'Pilotage', crumb: ['Pilotage', 'Fiche classe'],
+    title: 'Fiche classe', sub: 'Détail de la classe',
+    primary: 'Modifier la classe', secondary: 'Exporter les notes',
   },
   'emploi-du-temps': {
     label: 'Emploi du temps', group: 'Pilotage', crumb: ['Pilotage', 'Emploi du temps'],
     title: 'Emploi du temps', sub: 'Planning hebdomadaire',
-    primary: 'Ajouter un cours', secondary: 'Exporter',
+    primary: 'Ajouter un cours', secondary: 'Exporter tout',
   },
   finances: {
     label: 'Finances', group: 'Gestion', crumb: ['Gestion', 'Finances'],
@@ -31,6 +36,11 @@ export const META = {
     label: 'Personnel', group: 'Gestion', crumb: ['Gestion', 'Personnel'],
     title: 'Personnel', sub: 'Équipe de l’établissement',
     primary: 'Ajouter un membre', secondary: 'Exporter',
+  },
+  'fiche-personnel': {
+    label: 'Fiche personnel', group: 'Gestion', crumb: ['Gestion', 'Fiche personnel'],
+    title: 'Fiche personnel', sub: 'Dossier du membre de l’équipe',
+    primary: 'Modifier le membre', secondary: 'Exporter la fiche',
   },
   messagerie: {
     label: 'Messagerie', group: 'Gestion', crumb: ['Gestion', 'Messagerie'],
@@ -60,6 +70,11 @@ export const META = {
     label: 'Admissions', group: 'Pédagogie', crumb: ['Pédagogie', 'Admissions'],
     title: 'Admissions', sub: 'Pipeline des candidatures',
     primary: 'Nouveau dossier', secondary: 'Exporter',
+  },
+  'fiche-admission': {
+    label: 'Fiche admission', group: 'Pédagogie', crumb: ['Pédagogie', 'Fiche admission'],
+    title: 'Fiche admission', sub: 'Dossier de candidature',
+    primary: 'Modifier le dossier', secondary: 'Exporter le dossier',
   },
   modales: {
     label: 'Modales', group: 'Système', crumb: ['Système', 'Modales'],
