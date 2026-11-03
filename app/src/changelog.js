@@ -4,9 +4,20 @@
    entrée en tête de CHANGELOG, puis reconstruire les paquets.
    ============================================================ */
 
-export const APP_VERSION = '1.2.0';
+export const APP_VERSION = '1.3.0';
 
 export const CHANGELOG = [
+  {
+    version: '1.3.0',
+    date: '3 novembre 2026',
+    title: 'Mises à jour intégrées',
+    items: [
+      'Nouvelle section Paramètres → Préférences → Mises à jour.',
+      'Vérification des mises à jour directement dans l’application.',
+      'Téléchargement avec barre de progression.',
+      'Installation et redémarrage en un clic, sans passer par un terminal.',
+    ],
+  },
   {
     version: '1.2.0',
     date: '3 novembre 2026',

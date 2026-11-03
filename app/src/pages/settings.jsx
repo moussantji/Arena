@@ -16,6 +16,7 @@ import {
 } from '../auth.js';
 import { useModal } from '../modal.jsx';
 import { whatsNewModal } from '../whats-new.jsx';
+import { updateModal } from '../update.jsx';
 import { APP_VERSION } from '../changelog.js';
 import kalansoIcon from '../assets/kalanso-icon.png';
 
@@ -161,6 +162,10 @@ export function Parametres() {
       /* stockage indisponible */
     }
     modal.open(whatsNewModal(modal));
+  };
+
+  const openUpdate = () => {
+    modal.open(updateModal(modal));
   };
 
   const feesTotal = useMemo(
@@ -535,6 +540,22 @@ export function Parametres() {
 
           {tab === 5 && (
             <div className="stack">
+              <Card>
+                <CardHead
+                  title="Mises à jour"
+                  sub="Recherchez et installez la dernière version de Kalanso."
+                  right={<Pill tone="muted">v{APP_VERSION}</Pill>}
+                />
+                <div className="update-brief">
+                  <span className="update-brief-ic"><Icon name="download" size={16} /></span>
+                  <div>
+                    <b>Version installée : {APP_VERSION}</b>
+                    <span>Le téléchargement et l’installation se font directement dans l’application.</span>
+                  </div>
+                  <Btn icon="refresh" solid onClick={openUpdate}>Vérifier les mises à jour</Btn>
+                </div>
+              </Card>
+
               <Card>
                 <CardHead title="Confort d’affichage" sub="Préférences enregistrées sur cet appareil" />
                 <div className="pref-list">

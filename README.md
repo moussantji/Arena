@@ -165,32 +165,54 @@ l'icône par défaut partout dans l'application.
 
 ## Mises à jour et nouveautés
 
-Pour publier une mise à jour :
+**Dans l'application** : **Paramètres → Préférences → Mises à jour**.
+Le bouton « Vérifier les mises à jour » recherche une nouvelle version, la
+télécharge dans l'application avec une barre de progression, puis propose de
+redémarrer pour l'installer :
+
+- **AppImage** : le fichier est remplacé automatiquement puis l'application
+  redémarre ;
+- **.deb** : l'installation passe par le gestionnaire de paquets du système,
+  un mot de passe peut être demandé.
+
+**Canal de mise à jour** : renseignez l'adresse qui héberge les paquets.
+
+```dotenv
+KALANSO_UPDATE_URL=https://mon-serveur.exemple.com/kalanso
+```
+
+Cette valeur se place dans `api/.env` (ou dans
+`~/.config/kalanso-desktop/backend/.env` pour la version installée) ou dans la
+variable d'environnement du même nom. Le dossier ou serveur doit contenir les
+fichiers générés par `npm run dist:linux` :
+
+- `latest-linux.yml`
+- `Kalanso-x.y.z-x86_64.AppImage`
+- `Kalanso-x.y.z-amd64.deb`
+
+Pour un essai local : `cd release && python3 -m http.server 8099` puis lancez
+l'application avec `KALANSO_UPDATE_URL=http://127.0.0.1:8099`.
+
+**Publier une version :**
 
 1. Incrémenter `version` dans `gallery/electron/package.json`.
-2. Ajouter l'entrée correspondante dans `app/src/changelog.js` et `CHANGELOG.md`.
+2. Ajouter l'entrée correspondante dans `app/src/changelog.js` et
+   `CHANGELOG.md`.
 3. Reconstruire les paquets :
 
 ```bash
 cd gallery/electron && npm run dist:linux
 ```
 
-4. Installer la nouvelle version :
-   - **AppImage** : remplacer le fichier utilisé (par exemple
-     `~/.local/opt/kalanso/Kalanso.AppImage`) puis relancer l'application.
-   - **.deb** : `sudo apt install ./release/Kalanso-x.y.z-amd64.deb`.
+4. Copier le contenu de `release/` (au minimum `latest-linux.yml` et les
+   paquets) vers le canal de mise à jour.
 
-À la première ouverture après une mise à jour, Kalanso affiche la fenêtre
-**Nouveautés**, une seule fois par version. Elle reste consultable dans
-**Paramètres → Préférences → Nouveautés**, et la version courante apparaît
-dans **Paramètres → Préférences → API Kalanso**.
+À la première ouverture après une mise à jour, la fenêtre **Nouveautés**
+s'affiche une fois par version ; elle reste consultable dans
+**Paramètres → Préférences → Nouveautés**.
 
 Les données (base MySQL, photos, documents) et la configuration `.env` du
 poste — identifiants Google compris — sont conservées d'une version à l'autre.
-
-Mise à jour automatique : elle peut être ajoutée avec `electron-updater` et un
-canal de publication (GitHub Releases ou serveur statique). L'AppImage peut
-alors se mettre à jour seule ; les installations `.deb` passent par `apt`.
 
 ## Figma
 

@@ -4,6 +4,7 @@
 const {
   app, BrowserWindow, Menu, dialog, ipcMain, shell,
 } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const { execFileSync, spawn } = require('node:child_process');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
@@ -560,6 +561,90 @@ async function googleSignInFlow() {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Mises à jour                                                      */
+/* ------------------------------------------------------------------ */
+
+// Canal de mise à jour : variable d'environnement KALANSO_UPDATE_URL ou,
+// sinon, la même clé lue dans le .env du backend installé. Il doit pointer
+// vers un dossier ou un serveur contenant latest-linux.yml et les paquets.
+function updateFeedUrl() {
+  const fromEnv = String(process.env.KALANSO_UPDATE_URL || '').trim();
+  if (fromEnv) return fromEnv;
+
+  try {
+    const envPath = path.join(app.isPackaged ? apiCacheDir() : apiSourceDir(), '.env');
+    const content = fs.readFileSync(envPath, 'utf8');
+    const match = content.match(/^\s*KALANSO_UPDATE_URL\s*=\s*"?([^"\n\r]+?)"?\s*$/m);
+    if (match && match[1].trim()) return match[1].trim();
+  } catch {
+    /* fichier .env absent */
+  }
+
+  return null;
+}
+
+function sendUpdateStatus(status) {
+  if (win && !win.isDestroyed()) win.webContents.send('update:status', status);
+  logMain(
+    `mise à jour : ${status.state}`
+    + `${status.version ? ` ${status.version}` : ''}`
+    + `${status.percent != null ? ` ${status.percent}%` : ''}`
+    + `${status.message ? ` — ${status.message}` : ''}`,
+  );
+}
+
+let updaterReady = false;
+
+function setupUpdater() {
+  if (updaterReady) return;
+  updaterReady = true;
+
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.logger = {
+    info: (message) => logMain(`updater: ${message}`),
+    warn: (message) => logMain(`updater warn: ${message}`),
+    error: (message) => logMain(`updater error: ${message}`),
+    debug: () => {},
+  };
+
+  const feed = updateFeedUrl();
+  if (feed) {
+    autoUpdater.setFeedURL({ provider: 'generic', url: feed });
+    logMain(`canal de mise à jour : ${feed}`);
+  }
+
+  autoUpdater.on('checking-for-update', () => {
+    sendUpdateStatus({ state: 'checking', version: app.getVersion() });
+  });
+  autoUpdater.on('update-available', (info) => {
+    sendUpdateStatus({
+      state: 'available',
+      version: info?.version,
+      notes: info?.releaseNotes || '',
+      date: info?.releaseDate || '',
+    });
+  });
+  autoUpdater.on('update-not-available', (info) => {
+    sendUpdateStatus({ state: 'not-available', version: app.getVersion(), latest: info?.version });
+  });
+  autoUpdater.on('download-progress', (progress) => {
+    sendUpdateStatus({
+      state: 'downloading',
+      percent: Math.round(progress?.percent || 0),
+      transferred: progress?.transferred,
+      total: progress?.total,
+    });
+  });
+  autoUpdater.on('update-downloaded', (info) => {
+    sendUpdateStatus({ state: 'downloaded', version: info?.version });
+  });
+  autoUpdater.on('error', (error) => {
+    sendUpdateStatus({ state: 'error', message: error?.message || String(error) });
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /*  Fenêtre                                                           */
 /* ------------------------------------------------------------------ */
 
@@ -758,6 +843,65 @@ ipcMain.handle('google:signIn', async () => {
     };
   } catch (error) {
     logMain(`connexion Google impossible : ${error.message}`);
+    return { ok: false, message: error.message };
+  }
+});
+
+ipcMain.handle('update:version', () => app.getVersion());
+
+ipcMain.handle('update:check', async () => {
+  if (!app.isPackaged) {
+    return {
+      ok: false,
+      message: 'Les mises à jour sont disponibles dans l’application installée.',
+    };
+  }
+
+  setupUpdater();
+  try {
+    const result = await autoUpdater.checkForUpdates();
+    const info = result?.updateInfo;
+    const available = Boolean(info?.version && info.version !== app.getVersion());
+
+    return {
+      ok: true,
+      available,
+      version: app.getVersion(),
+      latest: info?.version || app.getVersion(),
+      notes: info?.releaseNotes || '',
+    };
+  } catch (error) {
+    logMain(`vérification de mise à jour impossible : ${error.message}`);
+    return { ok: false, message: error.message };
+  }
+});
+
+ipcMain.handle('update:download', async () => {
+  if (!app.isPackaged) {
+    return { ok: false, message: 'Les mises à jour sont disponibles dans l’application installée.' };
+  }
+
+  setupUpdater();
+  try {
+    await autoUpdater.downloadUpdate();
+    return { ok: true };
+  } catch (error) {
+    logMain(`téléchargement de mise à jour impossible : ${error.message}`);
+    return { ok: false, message: error.message };
+  }
+});
+
+ipcMain.handle('update:install', () => {
+  if (!app.isPackaged) {
+    return { ok: false, message: 'Les mises à jour sont disponibles dans l’application installée.' };
+  }
+
+  try {
+    quitting = true;
+    autoUpdater.quitAndInstall(false, true);
+    return { ok: true };
+  } catch (error) {
+    logMain(`installation de mise à jour impossible : ${error.message}`);
     return { ok: false, message: error.message };
   }
 });

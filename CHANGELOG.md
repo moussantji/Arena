@@ -4,6 +4,13 @@ Ce fichier documente les nouveautés visibles pour les utilisateurs. La même
 liste est embarquée dans l'application (`app/src/changelog.js`) et affichée
 une fois par version dans la fenêtre **Nouveautés**.
 
+## 1.3.0 — 3 novembre 2026
+
+- Nouvelle section Paramètres → Préférences → Mises à jour.
+- Vérification des mises à jour directement dans l'application.
+- Téléchargement avec barre de progression.
+- Installation et redémarrage en un clic, sans passer par un terminal.
+
 ## 1.2.0 — 3 novembre 2026
 
 - Fiche de profil accessible depuis l'avatar et la barre latérale.

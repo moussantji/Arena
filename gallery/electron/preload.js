@@ -13,4 +13,15 @@ contextBridge.exposeInMainWorld('desktopAPI', {
     return () => ipcRenderer.removeListener('window:state', handler);
   },
   googleSignIn: () => ipcRenderer.invoke('google:signIn'),
+  updates: {
+    version: () => ipcRenderer.invoke('update:version'),
+    check: () => ipcRenderer.invoke('update:check'),
+    download: () => ipcRenderer.invoke('update:download'),
+    install: () => ipcRenderer.invoke('update:install'),
+    onStatus: (cb) => {
+      const handler = (_event, status) => cb(status);
+      ipcRenderer.on('update:status', handler);
+      return () => ipcRenderer.removeListener('update:status', handler);
+    },
+  },
 });
