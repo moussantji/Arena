@@ -27,6 +27,59 @@ class GoogleAuthTest extends TestCase
             ->assertJsonPath('client_id', 'client-test');
     }
 
+    public function test_first_google_login_creates_the_direction_account_and_defaults(): void
+    {
+        Http::fake([
+            'https://oauth2.googleapis.com/*' => Http::response(['access_token' => 'google-access-token']),
+            'https://openidconnect.googleapis.com/*' => Http::response([
+                'sub' => 'google-premier',
+                'email' => 'direction@exemple.test',
+                'email_verified' => true,
+                'name' => 'Aïssata Traoré',
+            ]),
+        ]);
+
+        $this->postJson('/api/auth/google/exchange', $this->payload())
+            ->assertOk()
+            ->assertJsonPath('user.role', User::ROLE_DIRECTION)
+            ->assertJsonPath('user.name', 'Aïssata Traoré')
+            ->assertJsonPath('first_account', true);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'direction@exemple.test',
+            'role' => User::ROLE_DIRECTION,
+            'google_id' => 'google-premier',
+        ]);
+        $this->assertDatabaseCount('schools', 1);
+        $this->assertDatabaseCount('academic_years', 1);
+        $this->assertDatabaseCount('terms', 3);
+
+        $this->getJson('/api/setup/status')
+            ->assertOk()
+            ->assertJsonPath('needs_setup', false);
+    }
+
+    public function test_first_google_login_defaults_the_school_name_to_be_edited(): void
+    {
+        Http::fake([
+            'https://oauth2.googleapis.com/*' => Http::response(['access_token' => 'google-access-token']),
+            'https://openidconnect.googleapis.com/*' => Http::response([
+                'sub' => 'google-premier',
+                'email' => 'direction@exemple.test',
+                'email_verified' => true,
+            ]),
+        ]);
+
+        $token = $this->postJson('/api/auth/google/exchange', $this->payload())
+            ->assertOk()
+            ->json('token');
+
+        $this->withToken($token)->patchJson('/api/school', [
+            'name' => 'École Kalanso',
+            'full_name' => 'École Kalanso de Bamako',
+        ])->assertOk()->assertJsonPath('school.name', 'École Kalanso');
+    }
+
     public function test_existing_user_is_linked_and_receives_a_sanctum_token(): void
     {
         $user = User::factory()->create([
@@ -62,6 +115,8 @@ class GoogleAuthTest extends TestCase
 
     public function test_unknown_google_email_does_not_create_an_account(): void
     {
+        User::factory()->create(['email' => 'direction@exemple.test']);
+
         Http::fake([
             'https://oauth2.googleapis.com/*' => Http::response(['access_token' => 'token']),
             'https://openidconnect.googleapis.com/*' => Http::response([
@@ -75,7 +130,7 @@ class GoogleAuthTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
 
-        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('users', 1);
     }
 
     public function test_unverified_google_email_is_rejected(): void

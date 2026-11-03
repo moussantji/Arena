@@ -19,9 +19,9 @@ function GoogleMark() {
   );
 }
 
-export function Login() {
+export function Login({ onFirstSetup }) {
   const {
-    signIn, signInWithToken, bootError, setBootError,
+    signIn, signInWithToken, bootError, setBootError, notify,
   } = useData();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -57,12 +57,17 @@ export function Login() {
       const result = await window.desktopAPI.googleSignIn();
       if (!result?.ok) throw new Error(result?.message || 'La connexion Google a échoué.');
       await signInWithToken(result.token, result.user);
+      if (result.first_account) {
+        notify('Compte Direction créé. Complétez le nom de votre établissement dans Paramètres.', {
+          tone: 'success',
+        });
+      }
     } catch (error) {
       setBootError(error?.message || 'La connexion Google a échoué.');
     } finally {
       setLoading(false);
     }
-  }, [loading, setBootError, signInWithToken]);
+  }, [loading, notify, setBootError, signInWithToken]);
 
   return (
     <div className="login-screen">
@@ -197,6 +202,17 @@ export function Login() {
               <GoogleMark />
               <span>Continuer avec Google</span>
             </button>
+
+            {onFirstSetup && (
+              <button
+                type="button"
+                className="login-first-run"
+                onClick={onFirstSetup}
+                disabled={loading}
+              >
+                Première installation · créer le compte Direction
+              </button>
+            )}
           </form>
         </div>
 

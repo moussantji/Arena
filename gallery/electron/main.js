@@ -731,7 +731,12 @@ ipcMain.on('window:close', () => win?.close());
 ipcMain.handle('google:signIn', async () => {
   try {
     const session = await googleSignInFlow();
-    return { ok: true, token: session.token, user: session.user };
+    return {
+      ok: true,
+      token: session.token,
+      user: session.user,
+      first_account: Boolean(session.first_account),
+    };
   } catch (error) {
     logMain(`connexion Google impossible : ${error.message}`);
     return { ok: false, message: error.message };

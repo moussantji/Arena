@@ -2110,6 +2110,23 @@ select.input option:hover,
 .login-google:hover:not(:disabled) { border-color: var(--accent); background: rgba(91, 124, 250, 0.12); }
 .login-google:disabled { opacity: 0.65; cursor: default; }
 
+.login-first-run {
+  margin-top: 2px; padding: 8px 10px; border: 0; border-radius: 9px;
+  background: transparent; color: var(--faint); font-size: 10.5px; text-align: center;
+  transition: 0.18s;
+}
+.login-first-run:hover:not(:disabled) { color: var(--accent2); background: rgba(91, 124, 250, 0.08); }
+.login-first-run:disabled { opacity: 0.6; cursor: default; }
+
+.setup-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin: -6px 0 14px; padding: 6px 9px; border: 0; border-radius: 8px;
+  background: transparent; color: var(--faint); font-size: 10.5px;
+  transition: 0.18s;
+}
+.setup-back:hover:not(:disabled) { color: var(--ink); background: rgba(167, 182, 255, 0.06); }
+.setup-back:disabled { opacity: 0.6; cursor: default; }
+
 /* ---------------- première configuration ---------------- */
 .setup-panel { justify-content: flex-start; overflow-y: auto; }
 .setup-card { width: min(560px, 100%); }

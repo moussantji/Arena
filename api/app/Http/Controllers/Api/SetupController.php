@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
 use App\Models\School;
-use App\Models\Term;
 use App\Models\User;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -83,14 +81,11 @@ class SetupController extends Controller
 
             AcademicYear::query()->update(['is_current' => false]);
 
-            $year = AcademicYear::create([
-                'label' => trim($data['year_label']),
-                'starts_on' => $data['year_starts_on'],
-                'ends_on' => $data['year_ends_on'],
-                'is_current' => true,
-            ]);
-
-            $this->createTerms($year, $data['year_starts_on'], $data['year_ends_on']);
+            $year = AcademicYear::createWithTerms(
+                trim($data['year_label']),
+                $data['year_starts_on'],
+                $data['year_ends_on'],
+            );
 
             $user = User::create([
                 'name' => trim($data['name']),
@@ -102,7 +97,7 @@ class SetupController extends Controller
 
             return [
                 'school' => $school->fresh(),
-                'year' => $year->fresh()->load('terms'),
+                'year' => $year,
                 'user' => $user,
                 'token' => $user->createToken('premier-compte')->plainTextToken,
             ];
@@ -126,33 +121,5 @@ class SetupController extends Controller
     {
         return filled(config('services.google.client_id'))
             && filled(config('services.google.client_secret'));
-    }
-
-    /**
-     * Découpe l'année scolaire en trois trimestres équilibrés.
-     */
-    private function createTerms(AcademicYear $year, string $startsOn, string $endsOn): void
-    {
-        $start = CarbonImmutable::parse($startsOn)->startOfDay();
-        $end = CarbonImmutable::parse($endsOn)->startOfDay();
-        $totalDays = (int) $start->diffInDays($end) + 1;
-        $baseLength = intdiv($totalDays, 3);
-        $remainder = $totalDays % 3;
-        $cursor = $start;
-
-        for ($index = 1; $index <= 3; $index++) {
-            $length = $baseLength + ($index <= $remainder ? 1 : 0);
-            $termEnd = $index === 3 ? $end : $cursor->addDays(max($length - 1, 0));
-
-            Term::create([
-                'academic_year_id' => $year->id,
-                'name' => "Trimestre {$index}",
-                'starts_on' => $cursor->toDateString(),
-                'ends_on' => $termEnd->toDateString(),
-                'is_current' => $index === 1,
-            ]);
-
-            $cursor = $termEnd->addDay();
-        }
     }
 }

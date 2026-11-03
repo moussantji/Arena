@@ -21,7 +21,7 @@ function schoolYearDefaults() {
   };
 }
 
-export function Setup() {
+export function Setup({ onCancel }) {
   const {
     completeSetup, bootError, setBootError, setupStatus,
   } = useData();
@@ -151,6 +151,18 @@ export function Setup() {
 
       <section className="login-panel setup-panel">
         <div className="login-card setup-card">
+          {onCancel && (
+            <button
+              type="button"
+              className="setup-back"
+              onClick={onCancel}
+              disabled={loading}
+            >
+              <Icon name="chevronL" size={13} />
+              Retour à la connexion
+            </button>
+          )}
+
           <div className="login-card-head">
             <span className="login-eyebrow">Mise en route</span>
             <h2>Créer votre espace.</h2>

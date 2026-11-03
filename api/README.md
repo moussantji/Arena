@@ -71,7 +71,13 @@ port 8001.
 
 ## Première configuration
 
-Sur une base vide, l'application affiche l'écran de mise en route. Elle appelle :
+L'application s'ouvre sur l'écran de connexion. Sur une base vide, la
+**première connexion Google** crée le compte Direction et des valeurs par
+défaut (établissement « Mon établissement », année scolaire courante avec ses
+trois trimestres), à personnaliser ensuite dans les paramètres.
+
+Le formulaire de première installation (lien discret de l'écran de connexion)
+reste disponible, notamment sans Google. Il appelle :
 
 ```bash
 # état de la base (public)
@@ -101,9 +107,10 @@ La route `POST /api/setup` se ferme automatiquement dès qu'un compte existe
 
 ## Connexion Google
 
-La connexion Google est réservée aux **comptes Kalanso existants** : à la
-première connexion, le compte est lié automatiquement si l'adresse e-mail
-Google est vérifiée et correspond à un utilisateur.
+Sur une base vide, la première connexion Google devient le **compte Direction**.
+Ensuite, la connexion est réservée aux comptes Kalanso existants : le compte
+est lié automatiquement si l'adresse e-mail Google est vérifiée et correspond
+à un utilisateur.
 
 1. Créez un identifiant OAuth dans **Google Cloud Console → API et services →
    Identifiants**. Le type *Application de bureau* est recommandé (la boucle

@@ -46,13 +46,18 @@ cd gallery/electron && npm install
 npm run dist:linux                                 # → release/
 ```
 
-## Première configuration
+## Première connexion
 
-Sur une base vide, Kalanso affiche l'écran de mise en route :
-**établissement + année scolaire (3 trimestres créés automatiquement) +
-compte Direction**. La route `POST /api/setup` se ferme ensuite définitivement
-dès qu'un compte existe. Il n'y a plus de connexion rapide par compte de
-démonstration.
+Kalanso s'ouvre **directement sur l'écran de connexion**.
+
+- Si la base est vide et que Google est configuré, la **première connexion
+  Google** crée automatiquement le compte Direction (établissement et année
+  scolaire par défaut, à personnaliser dans **Paramètres**).
+- Sans Google, un lien discret **Première installation** ouvre le formulaire
+  de création du premier compte Direction : établissement, année scolaire
+  (3 trimestres) et mot de passe.
+- La route `POST /api/setup` se ferme ensuite définitivement dès qu'un compte
+  existe. Il n'y a aucun compte de démonstration.
 
 ## Connexion Google
 

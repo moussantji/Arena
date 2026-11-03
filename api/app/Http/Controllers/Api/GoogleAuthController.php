@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AcademicYear;
+use App\Models\School;
 use App\Models\User;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -131,21 +134,15 @@ class GoogleAuthController extends Controller
         }
 
         $user = User::query()->where('google_id', $googleId)->first();
+        $firstAccount = false;
 
         if (! $user) {
             $user = User::query()
                 ->whereRaw('LOWER(email) = ?', [$email])
                 ->first();
+        }
 
-            if (! $user) {
-                throw ValidationException::withMessages([
-                    'email' => [
-                        'Aucun compte Kalanso n’est associé à cette adresse Google. '
-                        .'Demandez à la direction de créer votre compte.',
-                    ],
-                ]);
-            }
-
+        if ($user) {
             if (filled($user->google_id) && $user->google_id !== $googleId) {
                 throw ValidationException::withMessages([
                     'email' => ['Ce compte Kalanso est déjà lié à un autre compte Google.'],
@@ -156,6 +153,45 @@ class GoogleAuthController extends Controller
                 'google_id' => $googleId,
                 'email_verified_at' => $user->email_verified_at ?? now(),
             ])->save();
+        } else {
+            if (User::query()->exists()) {
+                throw ValidationException::withMessages([
+                    'email' => [
+                        'Aucun compte Kalanso n’est associé à cette adresse Google. '
+                        .'Demandez à la direction de créer votre compte.',
+                    ],
+                ]);
+            }
+
+            // Base vide : la première connexion Google crée le compte Direction
+            // ainsi qu'un établissement et une année scolaire à personnaliser.
+            $user = DB::transaction(function () use ($googleId, $email, $userInfoResponse) {
+                if (User::query()->exists()) {
+                    return null;
+                }
+
+                $this->createInitialWorkspace();
+
+                $user = User::create([
+                    'name' => $this->displayName($userInfoResponse->json('name'), $email),
+                    'email' => $email,
+                    'password' => Str::password(40),
+                    'role' => User::ROLE_DIRECTION,
+                    'google_id' => $googleId,
+                ]);
+
+                $user->forceFill(['email_verified_at' => now()])->save();
+
+                return $user;
+            });
+
+            if (! $user) {
+                throw ValidationException::withMessages([
+                    'email' => ['Un compte existe déjà. Connectez-vous avec ce compte.'],
+                ]);
+            }
+
+            $firstAccount = true;
         }
 
         $token = $user->createToken('google-desktop')->plainTextToken;
@@ -163,7 +199,40 @@ class GoogleAuthController extends Controller
         return response()->json([
             'token' => $token,
             'user' => $user->fresh()->load('photos:id,user_id,filename'),
+            'first_account' => $firstAccount,
         ]);
+    }
+
+    /**
+     * Prépare un établissement et une année scolaire par défaut pour que la
+     * première connexion Google donne immédiatement une application utilisable.
+     */
+    private function createInitialWorkspace(): void
+    {
+        if (! School::query()->exists()) {
+            School::create([
+                'name' => 'Mon établissement',
+                'full_name' => 'Mon établissement',
+                'currency' => 'FCFA',
+            ]);
+        }
+
+        if (! AcademicYear::query()->exists()) {
+            $startYear = (int) now()->year - (now()->month >= 9 ? 0 : 1);
+
+            AcademicYear::createWithTerms(
+                "{$startYear} — ".($startYear + 1),
+                "{$startYear}-09-01",
+                ($startYear + 1).'-06-30',
+            );
+        }
+    }
+
+    private function displayName(mixed $name, string $email): string
+    {
+        $display = trim((string) $name);
+
+        return $display !== '' ? Str::limit($display, 120, '') : Str::before($email, '@');
     }
 
     private function isConfigured(): bool

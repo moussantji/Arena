@@ -28,6 +28,7 @@ export default function App() {
   const [query, setQuery] = useState('');
   const [sidebar, setSidebar] = useState(false);
   const [tour, setTour] = useState(false);
+  const [setupOpen, setSetupOpen] = useState(false);
   const [dir, setDir] = useState(1);
   const bodyRef = useRef(null);
 
@@ -136,14 +137,14 @@ export default function App() {
   }, [tour, order]);
 
   useEffect(() => {
-    if (!user && setupStatus?.needs_setup) {
+    if (!user && setupOpen && setupStatus?.needs_setup) {
       document.title = 'Première configuration — Kalanso';
     } else if (!user) {
       document.title = 'Connexion — Kalanso';
     } else {
       document.title = `${page.label} — Kalanso`;
     }
-  }, [page.label, user, setupStatus?.needs_setup]);
+  }, [page.label, user, setupOpen, setupStatus?.needs_setup]);
 
   if ((booting || checkingSetup) && !meta) {
     return (
@@ -159,12 +160,16 @@ export default function App() {
     );
   }
 
-  if (!user && setupStatus?.needs_setup) {
-    return <Setup />;
+  if (!user && setupOpen && setupStatus?.needs_setup) {
+    return <Setup onCancel={() => setSetupOpen(false)} />;
   }
 
   if (!user) {
-    return <Login />;
+    return (
+      <Login
+        onFirstSetup={setupStatus?.needs_setup ? () => setSetupOpen(true) : undefined}
+      />
+    );
   }
 
   if (!meta) {

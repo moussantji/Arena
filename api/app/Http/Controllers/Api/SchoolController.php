@@ -27,7 +27,7 @@ class SchoolController extends Controller
 
     public function update(Request $request): JsonResponse
     {
-        $school = School::firstOrFail();
+        $school = School::query()->first() ?? new School;
         $data = $request->validate([
             'name' => ['sometimes', 'string', 'max:120'],
             'full_name' => ['sometimes', 'string', 'max:180'],
