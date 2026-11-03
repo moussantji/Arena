@@ -224,6 +224,20 @@ async function prepareBackend() {
       /* première installation ou storage absent */
     }
 
+    // La configuration installée (.env : base de données, identifiants
+    // Google…) est propre au poste : une mise à jour du paquet ne doit pas
+    // la remplacer par celle, vierge, embarquée dans le bundle.
+    const targetEnv = path.join(target, '.env');
+    const backupEnv = path.join(app.getPath('userData'), 'backend-env-backup');
+    let hasEnvBackup = false;
+
+    try {
+      await fs.promises.copyFile(targetEnv, backupEnv);
+      hasEnvBackup = true;
+    } catch {
+      /* première installation : le .env du bundle sera utilisé */
+    }
+
     await fs.promises.rm(target, { recursive: true, force: true });
     await fs.promises.mkdir(target, { recursive: true });
     await copyBackendTree(source, target);
@@ -236,6 +250,11 @@ async function prepareBackend() {
         errorOnExist: false,
       });
       await fs.promises.rm(backupStorage, { recursive: true, force: true });
+    }
+
+    if (hasEnvBackup) {
+      await fs.promises.copyFile(backupEnv, targetEnv);
+      await fs.promises.rm(backupEnv, { force: true });
     }
 
     await fs.promises.writeFile(marker, version);
