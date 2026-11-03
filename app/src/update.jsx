@@ -99,8 +99,15 @@ export function UpdatePanel() {
 
     const result = await api.check?.();
     if (!result?.ok) {
-      setState('error');
-      setMessage(friendlyError(result?.message));
+      // En développement, la vérification n'est possible que dans
+      // l'application installée : c'est une information, pas une erreur.
+      if (/application installée/i.test(result?.message || '')) {
+        setState('unavailable');
+        setMessage('');
+      } else {
+        setState('error');
+        setMessage(friendlyError(result?.message));
+      }
       return;
     }
     if (result.available) {
