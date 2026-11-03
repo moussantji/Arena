@@ -1927,9 +1927,11 @@ select.input option:hover,
 /* ---------------- écran de connexion ---------------- */
 .login-screen {
   position: relative;
-  min-height: 100vh;
+  height: 100dvh;
+  min-height: 0;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+  grid-template-rows: minmax(0, 1fr);
   overflow: hidden;
   background:
     radial-gradient(720px 520px at 12% 18%, rgba(91, 124, 250, 0.16), transparent 66%),
@@ -1965,6 +1967,7 @@ select.input option:hover,
   position: relative; z-index: 1;
   display: flex; flex-direction: column;
   padding: 76px 58px 38px;
+  min-height: 0; overflow-y: auto;
   border-right: 1px solid var(--line);
   background: linear-gradient(160deg, rgba(27, 42, 107, 0.2), transparent 62%);
 }
@@ -2017,9 +2020,19 @@ select.input option:hover,
 
 .login-panel {
   position: relative; z-index: 1;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  display: flex; flex-direction: column; align-items: center;
   gap: 18px; padding: 64px 44px 32px;
+  min-height: 0; overflow-y: auto;
 }
+/* Centré quand la fenêtre est haute, défilable dès que le contenu dépasse. */
+.login-panel > .login-card { margin-top: auto; }
+.login-panel > .login-legal { margin-bottom: auto; }
+.login-panel::-webkit-scrollbar,
+.login-story::-webkit-scrollbar { width: 8px; }
+.login-panel::-webkit-scrollbar-track,
+.login-story::-webkit-scrollbar-track { background: transparent; }
+.login-panel::-webkit-scrollbar-thumb,
+.login-story::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; }
 .login-card {
   width: min(424px, 100%);
   border: 1px solid var(--line-strong); border-radius: 20px;
@@ -2043,20 +2056,21 @@ select.input option:hover,
   background: rgba(240, 138, 138, 0.08); color: #ffb9b9; font-size: 11.5px; line-height: 1.45;
 }
 .login-alert .ic { flex: none; margin-top: 1px; }
-.login-field { display: flex; flex-direction: column; gap: 6px; }
+.login-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .login-field > span:first-child {
   font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--faint);
 }
 .login-input {
   display: flex; align-items: center; gap: 9px; height: 42px; padding: 0 12px;
+  min-width: 0;
   border: 1px solid var(--line); border-radius: 11px;
   background: rgba(7, 11, 31, 0.55); color: var(--faint);
   transition: border-color 0.18s, box-shadow 0.18s;
 }
 .login-input:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(91, 124, 250, 0.12); }
 .login-input input {
-  flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent;
+  flex: 1; width: 100%; min-width: 0; height: 100%; border: 0; outline: none; background: transparent;
   color: var(--ink); font-size: 13px;
 }
 .login-input input::placeholder { color: var(--faint); opacity: 0.75; }
@@ -2113,10 +2127,10 @@ select.input option:hover,
 .setup-section > span:last-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .setup-section b { font-size: 12.5px; }
 .setup-section em { font-style: normal; font-size: 10.5px; color: var(--faint); }
-.setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.setup-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
 .setup-grid .span-2 { grid-column: span 2; }
 .setup-grid select {
-  flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent;
+  flex: 1; width: 100%; min-width: 0; height: 100%; border: 0; outline: none; background: transparent;
   color: var(--ink); font-size: 13px;
 }
 .setup-grid select option { background: #0B1030; color: var(--ink); }
