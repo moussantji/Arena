@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DIALLO — génère un fichier .sketch importable dans Figma.
+Kalanso — génère un fichier .sketch importable dans Figma.
 
 Figma importe nativement les fichiers Sketch (File → Import). Le format .fig
 étant propriétaire et non générable hors de Figma, c'est le format pivot retenu :
@@ -13,7 +13,7 @@ Contenu produit :
 Usage :
     python3 tools/make-figma-sketch.py
 Sortie :
-    figma/DIALLO-Indigo-Minuit.sketch
+    figma/Kalanso-Indigo-Minuit.sketch
 """
 
 import io
@@ -26,7 +26,7 @@ from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PALETTES = os.path.join(ROOT, "gallery", "palettes")
-OUT = os.path.join(ROOT, "figma", "DIALLO-Indigo-Minuit.sketch")
+OUT = os.path.join(ROOT, "figma", "Kalanso-Indigo-Minuit.sketch")
 
 W, H = 1440, 900
 GAP = 80
@@ -697,7 +697,7 @@ def build_design_page():
     layers.append(shape_rect("Fond", 0, 0, 1440, 1180, "#070B1F", radius=0))
     layers.append(text_layer("INDIGO MINUIT", 64, 52, 40, "bold", C["ink"], tracking=-1))
     layers.append(
-        text_layer("DIALLO · ÉCOLE PREMIUM · DESKTOP ELECTRON · 1440 × 900", 64, 108, 11, "medium", C["faint"], tracking=2.2)
+        text_layer("Kalanso · ÉCOLE PREMIUM · DESKTOP ELECTRON · 1440 × 900", 64, 108, 11, "medium", C["faint"], tracking=2.2)
     )
 
     # ---- palette
@@ -737,7 +737,7 @@ def build_design_page():
     for i, (label, size, weight, hex_color) in enumerate(type_scale):
         y = 552 + i * 34
         layers.append(text_layer(label.upper(), 64, y + 4, 9, "medium", C["faint"], tracking=1.2))
-        layers.append(text_layer("École Internationale Diallo", 340, y, size, weight, hex_color))
+        layers.append(text_layer("École Internationale Kalanso", 340, y, size, weight, hex_color))
 
     # ---- composants
     layers.append(text_layer("COMPOSANTS", 64, 846, 10, "medium", C["faint"], tracking=2))
@@ -837,13 +837,13 @@ def main():
         "app": "com.bohemiancoding.sketch3",
         "appVersion": "121",
         "build": 202000,
-        "commit": "generated-by-diallo-tools",
+        "commit": "generated-by-kalanso-tools",
         "compatibilityVersion": 99,
         "created": {
             "app": "com.bohemiancoding.sketch3",
             "appVersion": "121",
             "build": 202000,
-            "commit": "generated-by-diallo-tools",
+            "commit": "generated-by-kalanso-tools",
             "compatibilityVersion": 99,
             "version": 121,
             "variant": "NONAPPSTORE",

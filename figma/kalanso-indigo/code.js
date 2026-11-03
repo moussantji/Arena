@@ -1,5 +1,5 @@
 /* ============================================================
-   DIALLO — Indigo Minuit · générateur Figma
+   Kalanso — Indigo Minuit · générateur Figma
    Crée les styles, les composants et les écrans desktop.
    Aucune donnée externe : tout est défini ci-dessous.
    ============================================================ */
@@ -216,7 +216,7 @@ const TYPE = [
 async function buildStyles() {
   const colors = TOKENS.map(([name, hex]) => {
     const s = figma.createPaintStyle();
-    s.name = `DIALLO/${name}`;
+    s.name = `Kalanso/${name}`;
     s.paints = [solid(hex)];
     s.description = `Indigo Minuit · ${hex}`;
     return s;
@@ -224,7 +224,7 @@ async function buildStyles() {
 
   for (const [name, size, style, hex] of TYPE) {
     const ts = figma.createTextStyle();
-    ts.name = `DIALLO/${name}`;
+    ts.name = `Kalanso/${name}`;
     ts.fontName = { family: 'Inter', style };
     ts.fontSize = size;
     ts.fills = [solid(hex)];
@@ -233,13 +233,13 @@ async function buildStyles() {
   }
 
   const glow = figma.createEffectStyle();
-  glow.name = 'DIALLO/Glow accent';
+  glow.name = 'Kalanso/Glow accent';
   glow.effects = [
     { type: 'DROP_SHADOW', color: rgba(C.accent, 0.42), offset: { x: 0, y: 0 }, radius: 40, spread: -14, visible: true, blendMode: 'NORMAL' },
   ];
 
   const shadow = figma.createEffectStyle();
-  shadow.name = 'DIALLO/Card shadow';
+  shadow.name = 'Kalanso/Card shadow';
   shadow.effects = [
     { type: 'DROP_SHADOW', color: rgba('#000000', 0.55), offset: { x: 0, y: 24 }, radius: 60, spread: -46, visible: true, blendMode: 'NORMAL' },
   ];
@@ -388,7 +388,7 @@ function sidebar(parent, active = 'Tableau de bord') {
 
   rect(f, 16, 20, 30, 30, { fill: grad(C.accent2, C.accent), radius: 9 });
   rect(f, 24, 28, 15, 14, { fill: solid(C.bg), radius: 3 });
-  label(f, 'DIALLO', 58, 20, 14, 'Bold', C.ink, { letterSpacing: 0.7 });
+  label(f, 'Kalanso', 58, 20, 14, 'Bold', C.ink, { letterSpacing: 0.7 });
   label(f, 'ÉCOLE INTERNATIONALE', 58, 38, 7.5, 'Medium', C.faint, { letterSpacing: 1.2 });
 
   const groups = [
@@ -417,7 +417,7 @@ function sidebar(parent, active = 'Tableau de bord') {
 
   rect(f, 12, H - TOPBAR - 66, 214, 50, { fill: solid(C.ink, 0.06), radius: 12, stroke: C.line, strokeOpacity: 0.3 });
   avatar(f, 'MD', 24, H - TOPBAR - 54, 26);
-  label(f, 'M. Diallo', 60, H - TOPBAR - 56, 11.5, 'Medium', C.ink);
+  label(f, 'M. Kalanso', 60, H - TOPBAR - 56, 11.5, 'Medium', C.ink);
   label(f, 'Direction', 60, H - TOPBAR - 40, 8.5, 'Regular', C.faint);
 
   return f;
@@ -581,7 +581,7 @@ function screenDashboard(dsPage) {
   tableCard(s, SIDEBAR + 22, 552, W - SIDEBAR - 372, 326, 'Élèves récents', '1 284 élèves inscrits', [
     { initials: 'AT', name: 'Aminata Traoré', sub: '2026-0142', cls: 'Terminale S', pill: 'À jour', avg: '12,80', solde: '8,45 M FCFA' },
     { initials: 'IK', name: 'Ibrahim Konaté', sub: '2026-0143', cls: 'Terminale S', pill: 'En retard', avg: '11,20', solde: '47 000 FCFA' },
-    { initials: 'FD', name: 'Fatoumata Diallo', sub: '2026-0151', cls: 'Première S', pill: 'À jour', avg: '14,60', solde: '0 FCFA' },
+    { initials: 'FD', name: 'Fatoumata Kalanso', sub: '2026-0151', cls: 'Première S', pill: 'À jour', avg: '14,60', solde: '0 FCFA' },
     { initials: 'MC', name: 'Moussa Camara', sub: '2026-0164', cls: 'Seconde A', pill: 'Boursier', avg: '13,10', solde: '0 FCFA' },
     { initials: 'AS', name: 'Awa Sow', sub: '2026-0177', cls: 'Terminale L', pill: 'À jour', avg: '15,40', solde: '120 000 FCFA' },
   ], [
@@ -616,7 +616,7 @@ function screenEleves(dsPage) {
   tableCard(s, SIDEBAR + 22, 200, W - SIDEBAR - 44, 660, '', '', [
     { initials: 'AT', name: 'Aminata Traoré', sub: 'Terminale S · 2026-0142', cls: 'Terminale S', pill: 'À jour', avg: '12,80', solde: '8,45 M FCFA' },
     { initials: 'IK', name: 'Ibrahim Konaté', sub: 'Terminale S · 2026-0143', cls: 'Terminale S', pill: 'En retard', avg: '11,20', solde: '47 000 FCFA' },
-    { initials: 'FD', name: 'Fatoumata Diallo', sub: 'Première S · 2026-0151', cls: 'Première S', pill: 'À jour', avg: '14,60', solde: '0 FCFA' },
+    { initials: 'FD', name: 'Fatoumata Kalanso', sub: 'Première S · 2026-0151', cls: 'Première S', pill: 'À jour', avg: '14,60', solde: '0 FCFA' },
     { initials: 'MC', name: 'Moussa Camara', sub: 'Seconde A · 2026-0164', cls: 'Seconde A', pill: 'Boursier', avg: '13,10', solde: '0 FCFA' },
     { initials: 'AS', name: 'Awa Sow', sub: 'Terminale L · 2026-0177', cls: 'Terminale L', pill: 'À jour', avg: '15,40', solde: '120 000 FCFA' },
     { initials: 'SK', name: 'Seydou Keïta', sub: 'Première ES · 2026-0188', cls: 'Première ES', pill: 'En retard', avg: '9,80', solde: '30 000 FCFA' },
@@ -668,7 +668,7 @@ function screenFinances(dsPage) {
   tableCard(s, SIDEBAR + 22, 534, W - SIDEBAR - 44, 344, 'Derniers paiements', 'Octobre 2026', [
     { initials: 'AT', name: 'Aminata Traoré', sub: '28/02/2026', cls: 'Frais de scolarité', pill: 'Payé', avg: '8,45 M', solde: 'Payé' },
     { initials: 'IK', name: 'Ibrahim Konaté', sub: '20/02/2026', cls: 'Cantine', pill: 'En retard', avg: '47 000 F', solde: 'En attente' },
-    { initials: 'FD', name: 'Fatoumata Diallo', sub: '23/02/2026', cls: 'Transport', pill: 'Payé', avg: '20 000 F', solde: 'Payé' },
+    { initials: 'FD', name: 'Fatoumata Kalanso', sub: '23/02/2026', cls: 'Transport', pill: 'Payé', avg: '20 000 F', solde: 'Payé' },
     { initials: 'MC', name: 'Moussa Camara', sub: '23/02/2026', cls: 'Scolarité', pill: 'Payé', avg: '30 100 F', solde: 'Payé' },
     { initials: 'AS', name: 'Awa Sow', sub: '23/02/2026', cls: 'Cantine', pill: 'En retard', avg: '10 000 F', solde: 'En attente' },
   ], [
@@ -770,10 +770,10 @@ function screenSettings(dsPage) {
     sub: 'Informations publiques',
   });
   const fields = [
-    ['Nom de l’établissement', 'École Internationale Diallo'],
+    ['Nom de l’établissement', 'École Internationale Kalanso'],
     ['Adresse', 'Hamdallaye ACI 2000, Bamako'],
     ['Téléphone', '+223 20 00 00 00'],
-    ['E-mail', 'contact@diallo.ml'],
+    ['E-mail', 'contact@kalanso.ml'],
     ['Devise', 'FCFA'],
     ['Langue', 'Français'],
   ];
@@ -832,7 +832,7 @@ function screenClasses(dsPage) {
   });
 
   const names = ['Terminale S', 'Terminale L', 'Première S', 'Première ES', 'Seconde A', 'Seconde B'];
-  const teachers = ['M. Martior', 'Mme Diallo', 'M. Hilorma', 'Mme Traoré', 'M. Framiéma', 'Mme Rifa'];
+  const teachers = ['M. Martior', 'Mme Kalanso', 'M. Hilorma', 'Mme Traoré', 'M. Framiéma', 'Mme Rifa'];
   const cw = (W - SIDEBAR - 44 - 24) / 3;
 
   names.forEach((n, i) => {
@@ -891,7 +891,7 @@ function screenNotes(dsPage) {
   const grades = [
     ['Aminata Traoré', '16,0', '14,5', '15,0', '15,20', 'Excellent'],
     ['Ibrahim Konaté', '11,0', '9,5', '12,0', '10,85', 'Passable'],
-    ['Fatoumata Diallo', '18,0', '17,0', '16,5', '17,15', 'Excellent'],
+    ['Fatoumata Kalanso', '18,0', '17,0', '16,5', '17,15', 'Excellent'],
     ['Moussa Camara', '13,0', '12,0', '11,5', '12,15', 'Bien'],
     ['Awa Sow', '9,0', '8,0', '7,5', '8,15', 'Insuffisant'],
     ['Seydou Keïta', '12,0', '13,5', '12,0', '12,50', 'Bien'],
@@ -935,7 +935,7 @@ function screenAdmissions(dsPage) {
   });
 
   const cols = [
-    ['NOUVEAU', '34', ['Aminata Cissé', 'Ibrahim Traoré', 'Fatou Diallo']],
+    ['NOUVEAU', '34', ['Aminata Cissé', 'Ibrahim Traoré', 'Fatou Kalanso']],
     ['ENTRETIEN', '41', ['Moussa Bâ', 'Awa Konaté', 'Seydou Sow']],
     ['VALIDÉ', '41', ['Nafissatou Sy', 'Oumar Barry', 'Kadidia Camara']],
     ['INSCRIT', '12', ['Mariam Traoré', 'Jean Cissé', 'Aminata Sow']],
@@ -1181,7 +1181,7 @@ function screenPersonnel(dsPage) {
   ], 148);
 
   tableCard(s, SIDEBAR + 22, 270, W - SIDEBAR - 44, 420, 'Équipe', '86 collaborateurs · tri par ancienneté', [
-    { initials: 'MD', name: 'Mariam Diallo', sub: 'Mathématiques · 2021', poste: 'Professeure', pill: 'Titulaire', charge: '18 h', classe: 'Terminale S' },
+    { initials: 'MD', name: 'Mariam Kalanso', sub: 'Mathématiques · 2021', poste: 'Professeure', pill: 'Titulaire', charge: '18 h', classe: 'Terminale S' },
     { initials: 'OM', name: 'Oumar Martior', sub: 'Physique-Chimie · 2018', poste: 'Professeur', pill: 'Titulaire', charge: '16 h', classe: 'Première S' },
     { initials: 'TD', name: 'Tata Hilorma', sub: 'Français · 2022', poste: 'Professeure', pill: 'Contractuel', charge: '14 h', classe: 'Seconde A' },
     { initials: 'FR', name: 'Fatou Rifa', sub: 'Anglais · 2019', poste: 'Professeure', pill: 'Titulaire', charge: '17 h', classe: 'Terminale L' },
@@ -1209,10 +1209,10 @@ function screenMessagerie(dsPage) {
   const listW = 420;
   const list = card(s, SIDEBAR + 22, 148, listW, 730, { title: 'Conversations', sub: 'Récentes' });
   const threads = [
-    ['MD', 'Mariam Diallo', 'Les notes du trimestre sont prêtes.', '09:42', true],
+    ['MD', 'Mariam Kalanso', 'Les notes du trimestre sont prêtes.', '09:42', true],
     ['OM', 'Oumar Martior', 'Peut-on décaler le cours de 14 h ?', '08:15', true],
     ['AT', 'Aminata Traoré', 'Merci pour le rendez-vous de lundi.', 'Hier', false],
-    ['PD', 'Parent · M. Diallo', 'Justificatif d’absence en pièce jointe.', 'Hier', true],
+    ['PD', 'Parent · M. Kalanso', 'Justificatif d’absence en pièce jointe.', 'Hier', true],
     ['AD', 'Administration', 'Conseil de classe · 4 novembre.', 'Lun.', false],
     ['SK', 'Seydou Keïta', 'Emploi du temps de la semaine 45.', 'Lun.', false],
   ];
@@ -1232,7 +1232,7 @@ function screenMessagerie(dsPage) {
 
   const conv = card(s, SIDEBAR + 22 + listW + 14, 148, W - SIDEBAR - 44 - listW - 14, 730);
   avatar(conv, 'MD', 20, 20, 38);
-  label(conv, 'Mariam Diallo', 68, 20, 13.5, 'Semi Bold', C.ink);
+  label(conv, 'Mariam Kalanso', 68, 20, 13.5, 'Semi Bold', C.ink);
   label(conv, 'Professeure · Mathématiques', 68, 38, 10.5, 'Regular', C.faint);
   badge(conv, 'En ligne', conv.width - 92, 28, { fg: '#BFF0DA', bg: C.success });
   rect(conv, 0, 76, conv.width, 1, { fill: solid(C.line, 0.16) });
@@ -1300,7 +1300,7 @@ function screenAbsences(dsPage) {
 
   tableCard(s, SIDEBAR + 22, 590, W - SIDEBAR - 44, 288, 'Registre', 'Lundi 27 octobre', [
     { initials: 'IK', name: 'Ibrahim Konaté', sub: 'Terminale S · 2026-0143', statut: 'Non justifiée', duree: '2 h', periode: 'Matin' },
-    { initials: 'FD', name: 'Fatoumata Diallo', sub: 'Première S · 2026-0151', statut: 'Justifiée', duree: '1 h', periode: 'Après-midi' },
+    { initials: 'FD', name: 'Fatoumata Kalanso', sub: 'Première S · 2026-0151', statut: 'Justifiée', duree: '1 h', periode: 'Après-midi' },
     { initials: 'SK', name: 'Seydou Keïta', sub: 'Seconde B · 2026-0188', statut: 'Retard', duree: '15 min', periode: 'Matin' },
   ], [
     { label: 'Élève', x: 16 },
@@ -1342,12 +1342,12 @@ async function main(cmd) {
       figma.notify('Composants : ' + e.message, { error: true });
     }
 
-    dsPage.name = '01 · Design system · DIALLO';
+    dsPage.name = '01 · Design system · Kalanso';
     const board = frame('Indigo Minuit · palette & échelle', 1240, 660, solid(C.bg));
     dsPage.appendChild(board);
 
     label(board, 'INDIGO MINUIT', 48, 40, 30, 'Bold', C.ink, { letterSpacing: -0.6 });
-    label(board, 'DIALLO · ÉCOLE PREMIUM · DESKTOP ELECTRON · 1440 × 900', 48, 80, 9.5, 'Medium', C.faint, { letterSpacing: 1.8 });
+    label(board, 'Kalanso · ÉCOLE PREMIUM · DESKTOP ELECTRON · 1440 × 900', 48, 80, 9.5, 'Medium', C.faint, { letterSpacing: 1.8 });
 
     TOKENS.forEach(([name, hex], i) => {
       const x = 48 + (i % 6) * 190;
@@ -1361,7 +1361,7 @@ async function main(cmd) {
     TYPE.forEach(([name, size, style, hex], i) => {
       const y = 466 + i * 22;
       label(board, name, 48, y + (14 - size / 2), 9, 'Regular', C.faint);
-      const t = label(board, 'École Internationale Diallo', 300, y - Math.max(0, size - 14) / 2, size, style, hex);
+      const t = label(board, 'École Internationale Kalanso', 300, y - Math.max(0, size - 14) / 2, size, style, hex);
       t.y = y + (14 - size / 2);
     });
 

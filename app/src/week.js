@@ -1,5 +1,5 @@
 /* ============================================================
-   DIALLO — repères de semaine
+   Kalanso — repères de semaine
    Fonctions pures partagées par l'emploi du temps, la fiche
    classe et les exports Excel.
    ============================================================ */

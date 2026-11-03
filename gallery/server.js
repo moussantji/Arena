@@ -23,12 +23,12 @@ const MIME = {
 };
 
 // Le fichier Figma vit dans figma/ : ces deux chemins l'exposent sans dupliquer 2,2 Mo.
-const SKETCH = path.join(__dirname, '..', 'figma', 'DIALLO-Indigo-Minuit.sketch');
+const SKETCH = path.join(__dirname, '..', 'figma', 'Kalanso-Indigo-Minuit.sketch');
 const ALIASES = {
   // servi exactement comme un fichier statique de gallery/ (mêmes en-têtes, même streaming)
-  '/DIALLO-Indigo-Minuit.sketch': SKETCH,
+  '/Kalanso-Indigo-Minuit.sketch': SKETCH,
   // variante « téléchargement » avec Content-Disposition
-  '/download/DIALLO-Indigo-Minuit.sketch': SKETCH,
+  '/download/Kalanso-Indigo-Minuit.sketch': SKETCH,
 };
 
 const server = http.createServer((req, res) => {
@@ -57,7 +57,7 @@ const server = http.createServer((req, res) => {
       res.writeHead(200, {
         'Content-Type': 'application/octet-stream',
         'Content-Length': stat.size,
-        'Content-Disposition': 'attachment; filename="DIALLO-Indigo-Minuit.sketch"',
+        'Content-Disposition': 'attachment; filename="Kalanso-Indigo-Minuit.sketch"',
         'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff',
       });

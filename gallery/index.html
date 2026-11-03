@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#070B1F" />
-<title>DIALLO — École premium · Electron</title>
+<title>Kalanso — École premium · Electron</title>
 <meta name="description" content="Application desktop Electron de gestion d'école — direction Indigo Minuit. Toutes les pages, cliquables et animées." />
 <style>
   :root{
@@ -397,7 +397,7 @@ a.pill-ghost{text-decoration:none}
 <div class="boot" id="boot">
   <div class="bwrap">
     <div class="bmark"></div>
-    <div class="bt">DIALLO · École premium</div>
+    <div class="bt">Kalanso · École premium</div>
     <div class="bline"><i></i></div>
   </div>
 </div>
@@ -410,7 +410,7 @@ a.pill-ghost{text-decoration:none}
       <button class="l2" data-win="min" aria-label="Réduire"></button>
       <button class="l3" data-win="max" aria-label="Agrandir"></button>
     </div>
-    <div class="win-title">DIALLO — <b id="winPage">Tableau de bord</b> · Electron 1440 × 900</div>
+    <div class="win-title">Kalanso — <b id="winPage">Tableau de bord</b> · Electron 1440 × 900</div>
     <div class="titlebar-right">
       <button class="pill-ghost" id="tourBtn" title="Lancer la visite animée">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
@@ -430,7 +430,7 @@ a.pill-ghost{text-decoration:none}
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="mark"></div>
-      <div><b>DIALLO</b><span>École internationale</span></div>
+      <div><b>Kalanso</b><span>École internationale</span></div>
     </div>
 
     <nav class="nav" id="nav">
@@ -441,7 +441,7 @@ a.pill-ghost{text-decoration:none}
 
     <div class="user">
       <div class="avatar"></div>
-      <div><b>M. Diallo</b><span>Direction</span></div>
+      <div><b>M. Kalanso</b><span>Direction</span></div>
     </div>
   </aside>
 
@@ -469,7 +469,7 @@ a.pill-ghost{text-decoration:none}
         <i class="dot-badge"></i>
       </button>
 
-      <div class="avatar" title="M. Diallo · Direction"></div>
+      <div class="avatar" title="M. Kalanso · Direction"></div>
 
       <div class="palette" id="palette">
         <div class="ph">Aller à une page</div>
@@ -737,7 +737,7 @@ function go(next, opts = {}){
   $('#dockIndex').textContent = pad2(index + 1);
   $('#progress').style.width = ((index + 1) / PAGES.length * 100).toFixed(1) + '%';
   $('#chromeLabel').textContent = `Page ${pad2(index + 1)} / ${PAGES.length}`;
-  document.title = `${p.title} — DIALLO · Electron`;
+  document.title = `${p.title} — Kalanso · Electron`;
 
   /* title micro-animation */
   anim($('#pageTitle'),

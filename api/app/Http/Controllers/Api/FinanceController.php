@@ -27,18 +27,18 @@ class FinanceController extends Controller
             ->sum(fn ($invoice) => max(0, (float) $invoice->amount - (float) $invoice->paid_amount));
 
         $monthly = Payment::query()
-            ->selectRaw("DATE_FORMAT(paid_on, '%Y-%m') as month, SUM(amount) as total, COUNT(*) as payments")
             ->where('status', 'completed')
             ->whereYear('paid_on', $year)
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get()
-            ->map(fn ($row) => [
-                'month' => $row->month,
-                'label' => Carbon::createFromFormat('Y-m', $row->month)->translatedFormat('M'),
-                'total' => (float) $row->total,
-                'payments' => (int) $row->payments,
-            ]);
+            ->get(['paid_on', 'amount'])
+            ->groupBy(fn (Payment $payment) => $payment->paid_on->format('Y-m'))
+            ->sortKeys()
+            ->map(fn ($payments, $month) => [
+                'month' => $month,
+                'label' => Carbon::createFromFormat('Y-m', $month)->translatedFormat('M'),
+                'total' => (float) $payments->sum('amount'),
+                'payments' => $payments->count(),
+            ])
+            ->values();
 
         $byMethod = Payment::query()
             ->selectRaw('method, SUM(amount) as total, COUNT(*) as payments')

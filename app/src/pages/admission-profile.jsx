@@ -12,7 +12,7 @@ import { ListState } from '../forms.jsx';
 import { PageHead, AdmissionPill } from './common.jsx';
 
 /* ============================================================
-   DIALLO — fiche admission
+   Kalanso — fiche admission
    Dossier complet du candidat, parcours et décisions.
    ============================================================ */
 

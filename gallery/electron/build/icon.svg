@@ -1,11 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#6d8bff"/>
-      <stop offset="1" stop-color="#4059d8"/>
+      <stop offset="0" stop-color="#1E2E6E"/>
+      <stop offset="1" stop-color="#070B1F"/>
     </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.24" r="0.78">
+      <stop offset="0" stop-color="#5B7CFA" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#5B7CFA" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="warm" cx="0.86" cy="0.92" r="0.7">
+      <stop offset="0" stop-color="#E0A86F" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#E0A86F" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="copper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F4CD98"/>
+      <stop offset="0.72" stop-color="#E0A86F"/>
+      <stop offset="1" stop-color="#BA7C42"/>
+    </linearGradient>
+    <clipPath id="round">
+      <rect width="1024" height="1024" rx="230"/>
+    </clipPath>
   </defs>
-  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
-  <path d="M340 166c-27-25-62-39-101-39-80 0-145 60-145 129s65 129 145 129c39 0 74-14 101-39l-44-53c-15 13-35 21-57 21-40 0-73-26-73-58s33-58 73-58c22 0 42 8 57 21z" fill="#fff"/>
-  <circle cx="356" cy="256" r="26" fill="#E0A86F"/>
+  <g clip-path="url(#round)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#glow)"/>
+    <rect width="1024" height="1024" fill="url(#warm)"/>
+    <g stroke="url(#copper)" stroke-width="96" stroke-linecap="round" fill="none">
+      <path d="M372 286v452"/>
+      <path d="M372 512 628 292"/>
+      <path d="M372 512 652 732"/>
+    </g>
+  </g>
+  <rect x="3" y="3" width="1018" height="1018" rx="227" fill="none" stroke="#A7B6FF" stroke-opacity="0.18" stroke-width="3"/>
 </svg>

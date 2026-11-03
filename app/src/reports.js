@@ -3,7 +3,7 @@ import {
 } from './data.jsx';
 
 /* ============================================================
-   DIALLO — rapports imprimables
+   Kalanso — rapports imprimables
    Le tableau de bord s'exporte en PDF via la boîte d'impression
    du navigateur, avec ses indicateurs et ses graphiques.
    ============================================================ */
@@ -179,7 +179,7 @@ export function exportDashboardReport({
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>DIALLO — Tableau de bord</title>
+<title>Kalanso — Tableau de bord</title>
 <style>
   :root {
     --ink: #141a36;
@@ -269,9 +269,9 @@ export function exportDashboardReport({
   <main class="page">
     <header class="hero">
       <div class="hero-brand">
-        <div class="hero-mark">${escapeHtml((school.name || 'DIALLO').slice(0, 2).toUpperCase())}</div>
+        <div class="hero-mark">${escapeHtml((school.name || 'Kalanso').slice(0, 2).toUpperCase())}</div>
         <div>
-          <h1>${escapeHtml(school.full_name || school.name || 'École Internationale Diallo')}</h1>
+          <h1>${escapeHtml(school.full_name || school.name || 'École Internationale Kalanso')}</h1>
           <p>${escapeHtml(school.address || '')}${school.phone ? ` · ${escapeHtml(school.phone)}` : ''}</p>
         </div>
       </div>
@@ -336,7 +336,7 @@ export function exportDashboardReport({
     </div>
 
     <footer class="footer">
-      <span>${escapeHtml(school.name || 'DIALLO')} · ${escapeHtml(school.email || '')}</span>
+      <span>${escapeHtml(school.name || 'Kalanso')} · ${escapeHtml(school.email || '')}</span>
       <span>Rapport généré automatiquement le ${escapeHtml(date(new Date()))} — ${escapeHtml(money(recovery, currency))} recouvrés</span>
     </footer>
   </main>
@@ -396,7 +396,7 @@ export function exportInvoiceReport({
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>DIALLO — Facture ${escapeHtml(reference)}</title>
+<title>Kalanso — Facture ${escapeHtml(reference)}</title>
 <style>
   :root {
     --ink: #141a36;
@@ -490,9 +490,9 @@ export function exportInvoiceReport({
   <main class="page">
     <header class="top">
       <div class="brand">
-        <div class="mark">${escapeHtml((school.name || 'DIALLO').slice(0, 2).toUpperCase())}</div>
+        <div class="mark">${escapeHtml((school.name || 'Kalanso').slice(0, 2).toUpperCase())}</div>
         <div>
-          <h1>${escapeHtml(school.full_name || school.name || 'École Internationale Diallo')}</h1>
+          <h1>${escapeHtml(school.full_name || school.name || 'École Internationale Kalanso')}</h1>
           <p>
             ${escapeHtml(school.address || '')}<br>
             ${escapeHtml([school.phone, school.email].filter(Boolean).join(' · '))}
@@ -576,7 +576,7 @@ export function exportInvoiceReport({
     </section>
 
     <footer class="footer">
-      <span>${escapeHtml(school.name || 'DIALLO')} · ${escapeHtml(school.email || '')}</span>
+      <span>${escapeHtml(school.name || 'Kalanso')} · ${escapeHtml(school.email || '')}</span>
       <span>Facture générée le ${escapeHtml(reportDate)}</span>
     </footer>
   </main>

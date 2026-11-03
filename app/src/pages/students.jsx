@@ -15,7 +15,7 @@ import { PageHead, StudentCell, StatusPill, average } from './common.jsx';
 
 export function Eleves() {
   const {
-    meta, setStudentId, notify, classId, setClassId,
+    meta, setStudentId, notify, classId, setClassId, can,
   } = useData();
   const actions = useActions();
   const [q, setQ] = useState('');
@@ -28,6 +28,9 @@ export function Eleves() {
 
   const classes = meta?.classes || [];
   const levels = Array.from(new Set(classes.map((item) => item.level))).sort();
+  const showFinance = can('finances.view');
+  const columns = ['Élève', 'Classe', 'Statut', 'Moyenne', ...(showFinance ? ['Solde'] : []), ''];
+  const template = showFinance ? '1.8fr .9fr .9fr .7fr 1fr 34px' : '1.8fr .9fr .9fr .7fr 34px';
   const tabs = ['Tous', ...levels, 'Boursiers'];
 
   useEffect(() => {
@@ -123,8 +126,8 @@ export function Eleves() {
           onRetry={reload}
         >
           <Table
-            columns={['Élève', 'Classe', 'Statut', 'Moyenne', 'Solde', '']}
-            template="1.8fr .9fr .9fr .7fr 1fr 34px"
+            columns={columns}
+            template={template}
             foot={(
               <>
                 <span className="tf-l">{data?.from || 0}–{data?.to || 0} sur {number(total)}</span>
@@ -135,7 +138,7 @@ export function Eleves() {
             {rows.map((student) => (
               <Tr
                 key={student.id}
-                template="1.8fr .9fr .9fr .7fr 1fr 34px"
+                template={template}
                 onClick={() => openStudent(student)}
                 title={`Ouvrir la fiche de ${fullName(student)}`}
               >
@@ -143,14 +146,16 @@ export function Eleves() {
                 <span className="cell">{student.school_class?.name || '—'}</span>
                 <span className="cell"><StatusPill status={student.status} /></span>
                 <span className="cell mono">{average(student.average)}</span>
-                <span className={`cell mono right ${Number(student.balance) > 0 ? 'is-debt' : ''}`}>{money(student.balance ?? 0, currency)}</span>
+                {showFinance && (
+                  <span className={`cell mono right ${Number(student.balance) > 0 ? 'is-debt' : ''}`}>{money(student.balance ?? 0, currency)}</span>
+                )}
                 <span className="cell right cell-actions" onClick={(event) => event.stopPropagation()}>
                   <ActionMenu actions={[
                     { label: 'Ouvrir la fiche', icon: 'external', onClick: () => openStudent(student) },
                     { label: 'Aperçu rapide', icon: 'profile', onClick: () => actions.studentDrawer(student) },
-                    { label: 'Modifier le dossier', icon: 'edit', onClick: () => actions.student(student) },
-                    { label: 'Créer une facture', icon: 'finance', onClick: () => actions.invoice(null, { student_id: student.id }) },
-                    { label: 'Supprimer', icon: 'trash', tone: 'danger', onClick: () => actions.deleteStudent(student) },
+                    { label: 'Modifier le dossier', icon: 'edit', permission: 'students.manage', onClick: () => actions.student(student) },
+                    { label: 'Créer une facture', icon: 'finance', permission: 'finances.manage', onClick: () => actions.invoice(null, { student_id: student.id }) },
+                    { label: 'Supprimer', icon: 'trash', tone: 'danger', permission: 'students.manage', onClick: () => actions.deleteStudent(student) },
                   ]} />
                 </span>
               </Tr>
@@ -160,7 +165,7 @@ export function Eleves() {
         {loading && data && (
           <div className="table-loading"><span className="spinner" /> Actualisation…</div>
         )}
-        {!loading && !error && !rows.length && data && (
+        {!loading && !error && !rows.length && data && can('students.manage') && (
           <div className="empty-action">
             <Btn icon="plus" solid onClick={() => actions.student()}>Nouvel élève</Btn>
           </div>

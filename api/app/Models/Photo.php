@@ -24,7 +24,7 @@ class Photo extends Model
     /**
      * URL publique de la photo.
      *
-     * DIALLO n'embarque ni GD/Imagick, ni Glide/Intervention : le
+     * Kalanso n'embarque ni GD/Imagick, ni Glide/Intervention : le
      * redimensionnement n'est pas disponible. On renvoie donc toujours le
      * fichier d'origine, comme le fait le projet e-commerce en l'absence de
      * moteur d'image.

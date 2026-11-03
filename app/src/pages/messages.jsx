@@ -89,7 +89,7 @@ export function Messagerie() {
       await api.post(`/threads/${selectedId}/messages`, {
         body: text,
         sender_type: 'staff',
-        sender_name: user?.name || 'M. Diallo',
+        sender_name: user?.name || 'Direction',
       });
       setBody('');
       thread.reload();

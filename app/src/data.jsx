@@ -3,17 +3,21 @@ import React, {
 } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  api, ApiError, errorMessage, getUser, setSession,
+  api, ApiError, errorMessage, clearSession, getToken, getUser, setSession,
 } from './api.js';
 import { Icon } from './ui.jsx';
+import { hasPermission, canAccessPage as userCanAccessPage } from './auth.js';
 
 /* ============================================================
-   DIALLO — état partagé de l'application
+   Kalanso — état partagé de l'application
    Chargement des référentiels, version de rafraîchissement,
    notifications, toasts, élève sélectionné et hook de lecture.
    ============================================================ */
 
 const DataCtx = createContext(null);
+
+/* ---------- fonctions de vérification des permissions ---------- */
+
 
 export const STUDENT_STATUS = {
   a_jour: { label: 'À jour', tone: 'accent' },
@@ -139,26 +143,28 @@ export const useDebounced = (value, delay = 320) => {
 export function DataProvider({ children }) {
   const [meta, setMeta] = useState(null);
   const [bootError, setBootError] = useState(null);
-  const [booting, setBooting] = useState(true);
+  const [booting, setBooting] = useState(() => Boolean(getToken()));
+  const [checkingSetup, setCheckingSetup] = useState(() => !getToken());
+  const [setupStatus, setSetupStatus] = useState(null);
   const [version, setVersion] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [unreadThreads, setUnreadThreads] = useState(0);
   const [toasts, setToasts] = useState([]);
   const [user, setUser] = useState(() => getUser());
   const [studentId, setStudentIdState] = useState(() => {
-    const stored = Number(window.localStorage.getItem('arena.student'));
+    const stored = Number(window.localStorage.getItem('kalanso.student'));
     return Number.isFinite(stored) && stored > 0 ? stored : null;
   });
   const [classId, setClassIdState] = useState(() => {
-    const stored = Number(window.localStorage.getItem('arena.class'));
+    const stored = Number(window.localStorage.getItem('kalanso.class'));
     return Number.isFinite(stored) && stored > 0 ? stored : null;
   });
   const [staffId, setStaffIdState] = useState(() => {
-    const stored = Number(window.localStorage.getItem('arena.staff'));
+    const stored = Number(window.localStorage.getItem('kalanso.staff'));
     return Number.isFinite(stored) && stored > 0 ? stored : null;
   });
   const [admissionId, setAdmissionIdState] = useState(() => {
-    const stored = Number(window.localStorage.getItem('arena.admission'));
+    const stored = Number(window.localStorage.getItem('kalanso.admission'));
     return Number.isFinite(stored) && stored > 0 ? stored : null;
   });
   const toastSeq = useRef(0);
@@ -207,36 +213,96 @@ export function DataProvider({ children }) {
     }
   }, []);
 
+  const loadWorkspace = useCallback(async () => {
+    await loadMeta();
+    await Promise.all([loadNotifications(), loadThreads()]);
+  }, [loadMeta, loadNotifications, loadThreads]);
+
+  const checkSetup = useCallback(async () => {
+    setCheckingSetup(true);
+    try {
+      const status = await api.setupStatus();
+      setSetupStatus(status);
+      return status;
+    } catch (error) {
+      setBootError(errorMessage(error, 'Impossible de préparer Kalanso.'));
+      return null;
+    } finally {
+      setCheckingSetup(false);
+    }
+  }, []);
+
   const bootstrap = useCallback(async () => {
+    if (!getToken()) {
+      setBooting(false);
+      setUser(null);
+      await checkSetup();
+      return;
+    }
+
     setBooting(true);
     setBootError(null);
     try {
-      await loadMeta();
-      await Promise.all([loadNotifications(), loadThreads()]);
-      try {
-        const session = await api.ensureSession();
-        if (session) {
-          try {
-            const me = await api.me();
-            if (me?.user) {
-              setSession(session, me.user);
-              setUser(me.user);
-            } else {
-              setUser(getUser());
-            }
-          } catch {
-            setUser(getUser());
-          }
-        }
-      } catch {
-        /* lecture publique : l'application reste utilisable */
-      }
+      const me = await api.me();
+      setSession(getToken(), me.user);
+      setUser(me.user);
+      await loadWorkspace();
     } catch (error) {
-      setBootError(errorMessage(error, 'Impossible de joindre l’API.'));
+      if (error instanceof ApiError && error.status === 401) {
+        clearSession();
+        setUser(null);
+        setMeta(null);
+        setBootError('Votre session a expiré. Reconnectez-vous.');
+        await checkSetup();
+      } else {
+        setBootError(errorMessage(error, 'Impossible de joindre l’API.'));
+      }
     } finally {
       setBooting(false);
     }
-  }, [loadMeta, loadNotifications, loadThreads]);
+  }, [loadWorkspace, checkSetup]);
+
+  const signIn = useCallback(async (email, password) => {
+    setBootError(null);
+    try {
+      const session = await api.login(email, password);
+      await loadWorkspace();
+      setUser(session.user);
+      return session.user;
+    } catch (error) {
+      clearSession();
+      setUser(null);
+      setBootError(errorMessage(error, 'Connexion impossible.'));
+      throw error;
+    }
+  }, [loadWorkspace]);
+
+  const signInWithToken = useCallback(async (token, nextUser) => {
+    setBootError(null);
+    setSession(token, nextUser);
+    setUser(nextUser);
+    setSetupStatus((current) => ({ ...(current || {}), needs_setup: false }));
+    await loadWorkspace();
+    return nextUser;
+  }, [loadWorkspace]);
+
+  const completeSetup = useCallback(async (payload) => {
+    setBootError(null);
+    try {
+      const result = await api.setup(payload);
+      setUser(result.user);
+      setSetupStatus((current) => ({
+        ...(current || {}),
+        needs_setup: false,
+        google_enabled: current?.google_enabled ?? false,
+      }));
+      await loadWorkspace();
+      return result;
+    } catch (error) {
+      setBootError(errorMessage(error, 'La configuration a échoué.'));
+      throw error;
+    }
+  }, [loadWorkspace]);
 
   useEffect(() => {
     bootstrap();
@@ -283,30 +349,81 @@ export function DataProvider({ children }) {
   const setStudentId = useCallback((id) => {
     const next = id == null ? null : Number(id);
     setStudentIdState(next);
-    if (next) window.localStorage.setItem('arena.student', String(next));
-    else window.localStorage.removeItem('arena.student');
+    if (next) window.localStorage.setItem('kalanso.student', String(next));
+    else window.localStorage.removeItem('kalanso.student');
   }, []);
 
   const setClassId = useCallback((id) => {
     const next = id == null ? null : Number(id);
     setClassIdState(next);
-    if (next) window.localStorage.setItem('arena.class', String(next));
-    else window.localStorage.removeItem('arena.class');
+    if (next) window.localStorage.setItem('kalanso.class', String(next));
+    else window.localStorage.removeItem('kalanso.class');
   }, []);
 
   const setStaffId = useCallback((id) => {
     const next = id == null ? null : Number(id);
     setStaffIdState(next);
-    if (next) window.localStorage.setItem('arena.staff', String(next));
-    else window.localStorage.removeItem('arena.staff');
+    if (next) window.localStorage.setItem('kalanso.staff', String(next));
+    else window.localStorage.removeItem('kalanso.staff');
   }, []);
 
   const setAdmissionId = useCallback((id) => {
     const next = id == null ? null : Number(id);
     setAdmissionIdState(next);
-    if (next) window.localStorage.setItem('arena.admission', String(next));
-    else window.localStorage.removeItem('arena.admission');
+    if (next) window.localStorage.setItem('kalanso.admission', String(next));
+    else window.localStorage.removeItem('kalanso.admission');
   }, []);
+
+  const resetSelections = useCallback(() => {
+    setStudentIdState(null);
+    setClassIdState(null);
+    setStaffIdState(null);
+    setAdmissionIdState(null);
+    ['kalanso.student', 'kalanso.class', 'kalanso.staff', 'kalanso.admission'].forEach((key) => {
+      window.localStorage.removeItem(key);
+    });
+  }, []);
+
+  const signOut = useCallback(async () => {
+    const request = api.logout().catch(() => {});
+    setUser(null);
+    setMeta(null);
+    setNotifications([]);
+    setUnreadThreads(0);
+    setBootError(null);
+    setToasts([]);
+    setBooting(false);
+    resetSelections();
+    await request;
+  }, [resetSelections]);
+
+  const updateUser = useCallback((nextUser) => {
+    if (!nextUser) return;
+    setSession(getToken(), nextUser);
+    setUser(nextUser);
+  }, []);
+
+  const can = useCallback((permission) => hasPermission(user, permission), [user]);
+
+  const canAccessPage = useCallback(
+    (pageId) => userCanAccessPage(user, pageId),
+    [user],
+  );
+
+  useEffect(() => {
+    const onExpired = () => {
+      clearSession();
+      setUser(null);
+      setMeta(null);
+      setNotifications([]);
+      setUnreadThreads(0);
+      setBootError('Votre session a expiré. Reconnectez-vous.');
+      setBooting(false);
+      resetSelections();
+    };
+    window.addEventListener('kalanso:session-expired', onExpired);
+    return () => window.removeEventListener('kalanso:session-expired', onExpired);
+  }, [resetSelections]);
 
   const unread = notifications.filter((item) => !item.read_at).length;
 
@@ -314,7 +431,12 @@ export function DataProvider({ children }) {
     meta,
     booting,
     bootError,
+    setBootError,
+    checkingSetup,
+    setupStatus,
+    completeSetup,
     bootstrap,
+    checkSetup,
     version,
     refresh,
     notifications,
@@ -330,6 +452,12 @@ export function DataProvider({ children }) {
     dismissToast,
     user,
     setUser,
+    signIn,
+    signInWithToken,
+    signOut,
+    updateUser,
+    can,
+    canAccessPage,
     studentId,
     setStudentId,
     classId,
@@ -339,10 +467,11 @@ export function DataProvider({ children }) {
     admissionId,
     setAdmissionId,
   }), [
-    meta, booting, bootError, bootstrap, version, refresh, notifications, unread,
+    meta, booting, bootError, checkingSetup, setupStatus, completeSetup, bootstrap, checkSetup,
+    version, refresh, notifications, unread,
     unreadThreads, loadThreads, markNotification, markAllNotifications, deleteNotification, loadNotifications,
-    toasts, notify, dismissToast, user, studentId, setStudentId, classId, setClassId,
-    staffId, setStaffId, admissionId, setAdmissionId,
+    toasts, notify, dismissToast, user, signIn, signInWithToken, signOut, updateUser, can, canAccessPage,
+    studentId, setStudentId, classId, setClassId, staffId, setStaffId, admissionId, setAdmissionId,
   ]);
 
   return (

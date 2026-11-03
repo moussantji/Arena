@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -12,14 +13,20 @@ class StudentController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $canSeeFinance = $request->user()?->hasAnyRole(User::ROLE_DIRECTION, User::ROLE_COMPTABLE) ?? false;
+        $relations = [
+            'photos:id,student_id,filename',
+            'schoolClass:id,name,level,room',
+            'grades:id,student_id,score,max_score',
+        ];
+
+        if ($canSeeFinance) {
+            $relations[] = 'invoices:id,student_id,amount,status';
+            $relations[] = 'invoices.payments:id,invoice_id,amount,status';
+        }
+
         $students = Student::query()
-            ->with([
-                'photos:id,student_id,filename',
-                'schoolClass:id,name,level,room',
-                'grades:id,student_id,score,max_score',
-                'invoices:id,student_id,amount,status',
-                'invoices.payments:id,invoice_id,amount,status',
-            ])
+            ->with($relations)
             ->when($request->filled('q'), function ($query) use ($request) {
                 $term = '%'.$request->string('q')->toString().'%';
                 $query->where(function ($query) use ($term) {
@@ -38,7 +45,15 @@ class StudentController extends Controller
             ->paginate($request->integer('per_page', 20))
             ->withQueryString();
 
-        $students->getCollection()->transform(fn (Student $student) => $student->append(['average', 'balance']));
+        $students->getCollection()->transform(function (Student $student) use ($canSeeFinance) {
+            $student->append('average');
+
+            if ($canSeeFinance) {
+                $student->append('balance');
+            }
+
+            return $student;
+        });
 
         return response()->json($students);
     }
@@ -51,19 +66,30 @@ class StudentController extends Controller
         return response()->json(['student' => $student->load(['schoolClass:id,name,level,room', 'photos:id,student_id,filename'])], 201);
     }
 
-    public function show(Student $student): JsonResponse
+    public function show(Request $request, Student $student): JsonResponse
     {
-        $student->load([
+        $canSeeFinance = $request->user()?->hasAnyRole(User::ROLE_DIRECTION, User::ROLE_COMPTABLE) ?? false;
+        $canSeeDocuments = $request->user()?->hasAnyRole(User::ROLE_DIRECTION, User::ROLE_SECRETARIAT) ?? false;
+
+        $relations = [
             'photos:id,student_id,filename',
             'schoolClass:id,name,level,room,head_teacher_id',
             'schoolClass.headTeacher:id,first_name,last_name',
-            'documents',
             'absences' => fn ($query) => $query->latest('date')->take(10),
-            'invoices' => fn ($query) => $query->latest('issued_on')->withSum(['payments as paid_amount' => fn ($query) => $query->where('status', 'completed')], 'amount'),
-            'payments' => fn ($query) => $query->latest('paid_on'),
             'grades.subject:id,name,code,coefficient',
             'grades.term:id,name',
-        ])->loadCount([
+        ];
+
+        if ($canSeeFinance) {
+            $relations['invoices'] = fn ($query) => $query->latest('issued_on')->withSum(['payments as paid_amount' => fn ($query) => $query->where('status', 'completed')], 'amount');
+            $relations['payments'] = fn ($query) => $query->latest('paid_on');
+        }
+
+        if ($canSeeDocuments) {
+            $relations[] = 'documents';
+        }
+
+        $student->load($relations)->loadCount([
             'absences',
             'absences as unjustified_absences_count' => fn ($query) => $query->where('is_justified', false),
         ]);
@@ -72,18 +98,22 @@ class StudentController extends Controller
         $average = $grades->count() > 0
             ? round($grades->avg(fn ($grade) => ((float) $grade->score / max(1, (float) $grade->max_score)) * 20), 2)
             : null;
-        $outstanding = $student->invoices
-            ->whereIn('status', ['pending', 'partial'])
-            ->sum(fn ($invoice) => max(0, (float) $invoice->amount - (float) $invoice->paid_amount));
+
+        $summary = [
+            'average' => $average,
+            'absences' => $student->absences_count,
+            'unjustified_absences' => $student->unjustified_absences_count,
+        ];
+
+        if ($canSeeFinance) {
+            $summary['outstanding'] = $student->invoices
+                ->whereIn('status', ['pending', 'partial'])
+                ->sum(fn ($invoice) => max(0, (float) $invoice->amount - (float) $invoice->paid_amount));
+        }
 
         return response()->json([
             'student' => $student,
-            'summary' => [
-                'average' => $average,
-                'outstanding' => $outstanding,
-                'absences' => $student->absences_count,
-                'unjustified_absences' => $student->unjustified_absences_count,
-            ],
+            'summary' => $summary,
         ]);
     }
 

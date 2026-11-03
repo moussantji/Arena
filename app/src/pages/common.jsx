@@ -1,17 +1,41 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { PageHeader } from '../layout.jsx';
 import { Avatar, Pill } from '../ui.jsx';
 import { META } from './meta.js';
-import { fullName, initials, STUDENT_STATUS, INVOICE_STATUS, PAYMENT_STATUS, ADMISSION_STATUS, number } from '../data.jsx';
+import {
+  useData, fullName, initials, STUDENT_STATUS, INVOICE_STATUS, PAYMENT_STATUS, ADMISSION_STATUS, number,
+} from '../data.jsx';
+
+const PRIMARY_PERMISSIONS = {
+  dashboard: 'students.manage',
+  eleves: 'students.manage',
+  classes: 'classes.manage',
+  classe: 'classes.manage',
+  'emploi-du-temps': 'schedules.manage',
+  finances: 'finances.manage',
+  personnel: 'staff.manage',
+  'fiche-personnel': 'staff.manage',
+  messagerie: 'messages.manage',
+  matieres: 'subjects.manage',
+  notes: 'grades.manage',
+  absences: 'absences.manage',
+  fiche: 'students.manage',
+  admissions: 'admissions.manage',
+  'fiche-admission': 'admissions.manage',
+  parametres: 'settings.manage',
+};
 
 export function PageHead({
   id, sub, primary, secondary, onPrimary, onSecondary, children,
 }) {
+  const { can } = useData();
   const base = META[id] || META.dashboard;
+  const permission = PRIMARY_PERMISSIONS[id];
+  const canUsePrimary = !permission || can(permission);
   const page = {
     ...base,
     sub: sub || base.sub,
-    primary: primary === undefined ? base.primary : primary,
+    primary: canUsePrimary ? (primary === undefined ? base.primary : primary) : null,
     secondary: secondary === undefined ? base.secondary : secondary,
   };
   return (

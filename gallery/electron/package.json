@@ -1,11 +1,11 @@
 {
-  "name": "diallo-desktop",
-  "version": "1.0.0",
+  "name": "kalanso-desktop",
+  "version": "1.1.0",
   "private": true,
-  "description": "DIALLO — application desktop de gestion d'école (direction Indigo Minuit)",
-  "author": "DIALLO <direction@diallo.test>",
+  "description": "Kalanso — application desktop de gestion d'école (direction Indigo Minuit)",
+  "author": "Kalanso",
   "homepage": "https://github.com/moussantji/Arena",
-  "desktopName": "DIALLO",
+  "desktopName": "Kalanso",
   "main": "main.js",
   "scripts": {
     "build:app": "npm --prefix ../../app run build",
@@ -17,13 +17,13 @@
     "dist:dir": "npm run build:app && electron-builder --linux dir"
   },
   "devDependencies": {
-    "electron": "^33.0.0",
+    "electron": "^33.4.11",
     "electron-builder": "^26.18.0"
   },
   "build": {
-    "appId": "com.diallo.arena",
-    "productName": "DIALLO",
-    "artifactName": "DIALLO-${version}-${arch}.${ext}",
+    "appId": "com.kalanso.desktop",
+    "productName": "Kalanso",
+    "artifactName": "Kalanso-${version}-${arch}.${ext}",
     "asar": true,
     "compression": "normal",
     "npmRebuild": false,
@@ -86,17 +86,17 @@
         }
       ],
       "category": "Office",
-      "executableName": "diallo",
+      "executableName": "kalanso",
       "syncDesktopName": true,
       "desktop": {
         "entry": {
-          "StartupWMClass": "diallo-desktop"
+          "StartupWMClass": "kalanso-desktop"
         }
       },
       "icon": "build/icon.png",
-      "synopsis": "Gestion scolaire DIALLO",
+      "synopsis": "Gestion scolaire Kalanso",
       "description": "Application desktop de gestion d'école : élèves, classes, notes, finances, admissions et messagerie.",
-      "maintainer": "DIALLO <direction@diallo.test>"
+      "maintainer": "Kalanso"
     }
   }
 }

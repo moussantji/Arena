@@ -6,7 +6,7 @@ import { useData } from './data.jsx';
 import { ApiError, errorMessage } from './api.js';
 
 /* ============================================================
-   DIALLO — formulaires, confirmations et contrôles de liste
+   Kalanso — formulaires, confirmations et contrôles de liste
    Un seul moteur de formulaire alimente toutes les ressources.
    ============================================================ */
 
@@ -427,9 +427,12 @@ export function openConfirm(modal, config) {
    Menus d'actions de ligne
    ============================================================ */
 export function ActionMenu({ actions = [], label = 'Actions' }) {
+  const { can } = useData();
   const [open, setOpen] = useState(false);
   const root = useRef(null);
-  const visible = actions.filter((action) => action && !action.hidden);
+  const visible = actions.filter((action) => (
+    action && !action.hidden && (!action.permission || can(action.permission))
+  ));
 
   useEffect(() => {
     if (!open) return undefined;
@@ -518,7 +521,7 @@ export function SelectFilter({ value, onChange, options = [], label }) {
     <label className="filter-select">
       <span className="filter-label">{label}</span>
       <span className="mselect">
-        <select className="input" value={value} onChange={(event) => onChange(event.target.value)}>
+        <select className="input" value={value ?? ''} onChange={(event) => onChange(event.target.value)}>
           {normalizeOptions(options).map((option) => (
             <option key={`${option.value}`} value={option.value}>{option.label}</option>
           ))}
@@ -554,7 +557,7 @@ export function ListState({
       <div className="state-box state-loading" aria-live="polite">
         <span className="spinner large" />
         <b>Chargement des données…</b>
-        <span>Connexion à l’API DIALLO</span>
+        <span>Connexion à l’API Kalanso</span>
         <div className="skeleton-lines" aria-hidden="true">
           {Array.from({ length: rows }).map((_, index) => <i key={index} />)}
         </div>

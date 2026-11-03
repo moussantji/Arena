@@ -1,10 +1,11 @@
-// DIALLO — Electron main process
+// Kalanso — Electron main process
 // Fenêtre sans cadre, contexte isolé et service Laravel local démarré
 // automatiquement pour que l'application fonctionne comme une vraie app PC.
 const {
   app, BrowserWindow, Menu, dialog, ipcMain, shell,
 } = require('electron');
 const { execFileSync, spawn } = require('node:child_process');
+const crypto = require('node:crypto');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
@@ -15,13 +16,13 @@ const isDev = process.argv.includes('--dev');
 // même temps que l'application installée sans se heurter au verrou d'instance
 // unique d'Electron. Les deux fenêtres partagent en revanche la même API.
 if (isDev) {
-  const devProfile = process.env.DIALLO_DEV_PROFILE
-    || path.join(app.getPath('appData'), 'diallo-desktop-dev');
+  const devProfile = process.env.KALANSO_DEV_PROFILE
+    || path.join(app.getPath('appData'), 'kalanso-desktop-dev');
   app.setPath('userData', devProfile);
 }
 
 const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5179';
-const API_PORT = Number(process.env.ARENA_API_PORT || 8001);
+const API_PORT = Number(process.env.KALANSO_API_PORT || 8001);
 const API_ORIGIN = `http://127.0.0.1:${API_PORT}`;
 const SOURCE_APP_INDEX = path.join(__dirname, '..', '..', 'app', 'dist', 'index.html');
 const PACKAGED_APP_INDEX = path.join(process.resourcesPath, 'app', 'index.html');
@@ -53,8 +54,8 @@ function logMain(message) {
 
 // Sur certaines cartes graphiques Linux, la composition GPU laisse la
 // fenêtre noire. Le rendu logiciel est plus lent mais fiable pour une
-// application de bureau. DIALLO_GPU=1 permet de réactiver le GPU.
-if (process.platform === 'linux' && process.env.DIALLO_GPU !== '1') {
+// application de bureau. KALANSO_GPU=1 permet de réactiver le GPU.
+if (process.platform === 'linux' && process.env.KALANSO_GPU !== '1') {
   app.disableHardwareAcceleration();
 }
 
@@ -67,7 +68,7 @@ logMain(
 process.on('uncaughtException', (error) => {
   logMain(`uncaughtException: ${error.stack || error.message}`);
   if (app.isReady()) {
-    dialog.showErrorBox('DIALLO', `Erreur inattendue au démarrage.\n\n${error.message}`);
+    dialog.showErrorBox('Kalanso', `Erreur inattendue au démarrage.\n\n${error.message}`);
   }
 });
 
@@ -111,7 +112,7 @@ function openBackendLog() {
   fs.mkdirSync(LOG_DIR, { recursive: true });
   const logPath = path.join(LOG_DIR, 'backend.log');
   backendLog = fs.createWriteStream(logPath, { flags: 'a' });
-  backendLog.write(`\n[${new Date().toISOString()}] --- lancement DIALLO ---\n`);
+  backendLog.write(`\n[${new Date().toISOString()}] --- lancement Kalanso ---\n`);
   return logPath;
 }
 
@@ -130,7 +131,7 @@ function probeApi(timeout = 1200) {
 }
 
 function findPhp() {
-  const candidates = [process.env.ARENA_PHP_BIN, '/usr/bin/php', '/usr/local/bin/php'].filter(Boolean);
+  const candidates = [process.env.KALANSO_PHP_BIN, '/usr/bin/php', '/usr/local/bin/php'].filter(Boolean);
   for (const candidate of candidates) {
     try {
       if (!fs.existsSync(candidate)) continue;
@@ -359,6 +360,187 @@ function stopBackend() {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Connexion Google (OAuth desktop, boucle locale + PKCE)            */
+/* ------------------------------------------------------------------ */
+
+// Le secret Google reste dans l'API : Electron ouvre simplement le
+// navigateur du poste, reçoit le code sur une boucle locale puis le
+// transmet à l'API qui procède à l'échange et à la vérification.
+const GOOGLE_AUTH_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
+const GOOGLE_SCOPES = 'openid email profile';
+const GOOGLE_REDIRECT_PORT = Number(process.env.KALANSO_GOOGLE_REDIRECT_PORT || 0);
+
+function base64Url(buffer) {
+  return buffer.toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
+
+async function requestJson(url, options) {
+  const response = await fetch(url, options);
+  const text = await response.text();
+  let payload = null;
+  try {
+    payload = text ? JSON.parse(text) : null;
+  } catch {
+    payload = null;
+  }
+  return { ok: response.ok, status: response.status, payload };
+}
+
+function oauthPage(title, message, tone) {
+  const color = tone === 'danger' ? '#ffb9b9' : '#a8e6c1';
+  return `<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${title} — Kalanso</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      background: radial-gradient(720px 480px at 50% -10%, rgba(91,124,250,.22), transparent 68%), #070B1F;
+      color: #e8ecff; font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+    }
+    main { max-width: 460px; padding: 40px; text-align: center; }
+    h1 { font-size: 22px; letter-spacing: -0.02em; margin: 0 0 10px; color: ${color}; }
+    p { margin: 0; font-size: 13px; line-height: 1.6; color: #9aa6d8; }
+    .hint { margin-top: 18px; font-family: ui-monospace, Menlo, monospace; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #4f5a86; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>${title}</h1>
+    <p>${message}</p>
+    <p class="hint">Vous pouvez fermer cet onglet et revenir à Kalanso.</p>
+  </main>
+</body>
+</html>`;
+}
+
+async function googleSignInFlow() {
+  const status = await requestJson(`${API_ORIGIN}/api/auth/google/status`);
+  const clientId = status.payload?.client_id;
+
+  if (!status.ok || !status.payload?.enabled || !clientId) {
+    throw new Error(
+      'La connexion Google n’est pas configurée. '
+      + 'Renseignez GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET dans api/.env, puis redémarrez Kalanso.',
+    );
+  }
+
+  const state = base64Url(crypto.randomBytes(32));
+  const codeVerifier = base64Url(crypto.randomBytes(64));
+  const codeChallenge = base64Url(crypto.createHash('sha256').update(codeVerifier).digest());
+
+  const server = http.createServer();
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(GOOGLE_REDIRECT_PORT, '127.0.0.1', resolve);
+  });
+
+  const { port } = server.address();
+  const redirectUri = `http://127.0.0.1:${port}/oauth/callback`;
+
+  const authUrl = new URL(GOOGLE_AUTH_ENDPOINT);
+  authUrl.searchParams.set('client_id', clientId);
+  authUrl.searchParams.set('redirect_uri', redirectUri);
+  authUrl.searchParams.set('response_type', 'code');
+  authUrl.searchParams.set('scope', GOOGLE_SCOPES);
+  authUrl.searchParams.set('state', state);
+  authUrl.searchParams.set('code_challenge', codeChallenge);
+  authUrl.searchParams.set('code_challenge_method', 'S256');
+  authUrl.searchParams.set('prompt', 'select_account');
+
+  logMain(`connexion Google — attente du navigateur sur ${redirectUri}`);
+
+  let abort = () => {};
+  const codePromise = new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (error, code) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      server.close();
+      if (error) reject(error);
+      else resolve(code);
+    };
+    const timer = setTimeout(
+      () => finish(new Error('Délai dépassé : la connexion Google n’a pas abouti.')),
+      5 * 60 * 1000,
+    );
+    abort = () => finish(new Error('Ouverture du navigateur impossible.'));
+
+    server.on('request', (request, response) => {
+      const requestUrl = new URL(request.url, `http://127.0.0.1:${port}`);
+
+      if (requestUrl.pathname !== '/oauth/callback') {
+        response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        response.end('Introuvable');
+        return;
+      }
+
+      const receivedState = requestUrl.searchParams.get('state');
+      const error = requestUrl.searchParams.get('error');
+      const code = requestUrl.searchParams.get('code');
+      const send = (title, message, tone) => {
+        response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        response.end(oauthPage(title, message, tone));
+      };
+
+      if (error) {
+        send('Connexion annulée', 'Google a interrompu la connexion.', 'danger');
+        finish(new Error('Connexion Google annulée.'));
+        return;
+      }
+
+      if (!code || receivedState !== state) {
+        send('Réponse invalide', 'Kalanso n’a pas pu vérifier la réponse de Google.', 'danger');
+        finish(new Error('Réponse Google invalide.'));
+        return;
+      }
+
+      send('Connexion réussie', 'Votre compte Google est vérifié.', 'success');
+      finish(null, code);
+    });
+  });
+  // Évite un rejet non géré si l'ouverture du navigateur échoue avant l'attente.
+  codePromise.catch(() => {});
+
+  try {
+    await shell.openExternal(authUrl.toString());
+    const code = await codePromise;
+
+    const exchange = await requestJson(`${API_ORIGIN}/api/auth/google/exchange`, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code,
+        code_verifier: codeVerifier,
+        redirect_uri: redirectUri,
+        state,
+      }),
+    });
+
+    if (!exchange.ok) {
+      const firstError = exchange.payload?.errors
+        ? Object.values(exchange.payload.errors)[0]?.[0]
+        : null;
+      throw new Error(firstError || exchange.payload?.message || 'Connexion Google refusée.');
+    }
+
+    return exchange.payload;
+  } catch (error) {
+    abort();
+    throw error;
+  } finally {
+    if (server.listening) server.close();
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /*  Fenêtre                                                           */
 /* ------------------------------------------------------------------ */
 
@@ -440,8 +622,8 @@ function createWindow() {
       if (win && !win.isDestroyed()) win.setTitle(`${title} · dev`);
     });
     // Les outils de développement sont optionnels pour ne pas masquer
-    // l'interface à chaque lancement : DIALLO_DEVTOOLS=1 pour les ouvrir.
-    if (process.env.DIALLO_DEVTOOLS === '1') {
+    // l'interface à chaque lancement : KALANSO_DEVTOOLS=1 pour les ouvrir.
+    if (process.env.KALANSO_DEVTOOLS === '1') {
       win.webContents.openDevTools({ mode: 'detach' });
     }
   }
@@ -498,7 +680,7 @@ async function boot() {
     bringToFront();
   } catch (error) {
     logMain(`échec de l’interface : ${error.stack || error.message}`);
-    dialog.showErrorBox('DIALLO', `Impossible d'ouvrir l'interface.\n\n${error.message}`);
+    dialog.showErrorBox('Kalanso', `Impossible d'ouvrir l'interface.\n\n${error.message}`);
   }
 }
 
@@ -545,3 +727,13 @@ ipcMain.on('window:toggleMaximize', () => {
   win.isMaximized() ? win.unmaximize() : win.maximize();
 });
 ipcMain.on('window:close', () => win?.close());
+
+ipcMain.handle('google:signIn', async () => {
+  try {
+    const session = await googleSignInFlow();
+    return { ok: true, token: session.token, user: session.user };
+  } catch (error) {
+    logMain(`connexion Google impossible : ${error.message}`);
+    return { ok: false, message: error.message };
+  }
+});

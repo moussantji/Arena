@@ -1,6 +1,6 @@
 {
-  "name": "DIALLO — Indigo Minuit",
-  "id": "diallo-indigo-minuit-generator",
+  "name": "Kalanso — Indigo Minuit",
+  "id": "kalanso-indigo-minuit-generator",
   "api": "1.0.0",
   "main": "code.js",
   "editorType": ["figma"],

@@ -14,7 +14,7 @@ import { WeekGrid, slotDuration } from './timetable-grid.jsx';
 import { dayIndex, schoolWeekStart, weekRangeLabel } from '../week.js';
 
 /* ============================================================
-   DIALLO — fiche personnel
+   Kalanso — fiche personnel
    Identité, contrat, enseignements et emploi du temps du membre.
    ============================================================ */
 

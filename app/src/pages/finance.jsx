@@ -45,7 +45,7 @@ export function Finances() {
   const [tab, setTab] = useState(() => {
     if (typeof window === 'undefined') return 0;
     try {
-      const stored = Number(window.sessionStorage.getItem('arena.finance.tab'));
+      const stored = Number(window.sessionStorage.getItem('kalanso.finance.tab'));
       if (Number.isInteger(stored) && stored >= 0 && stored <= 2) return stored;
     } catch {
       /* stockage indisponible : on reste sur la synthèse */
@@ -69,7 +69,7 @@ export function Finances() {
 
   useEffect(() => {
     try {
-      window.sessionStorage.removeItem('arena.finance.tab');
+      window.sessionStorage.removeItem('kalanso.finance.tab');
     } catch {
       /* stockage indisponible */
     }
@@ -80,8 +80,8 @@ export function Finances() {
         setInvoicePage(1);
       }
     };
-    window.addEventListener('diallo:finance-tab', onFinanceTab);
-    return () => window.removeEventListener('diallo:finance-tab', onFinanceTab);
+    window.addEventListener('kalanso:finance-tab', onFinanceTab);
+    return () => window.removeEventListener('kalanso:finance-tab', onFinanceTab);
   }, []);
 
   useEffect(() => { setInvoicePage(1); }, [invoiceSearch, invoiceStatus, invoiceClass, overdue]);

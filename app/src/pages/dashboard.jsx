@@ -11,7 +11,7 @@ import { exportDashboardReport } from '../reports.js';
 import { PageHead, StudentCell, StatusPill } from './common.jsx';
 
 export function Dashboard() {
-  const { meta, setStudentId } = useData();
+  const { meta, setStudentId, can } = useData();
   const actions = useActions();
   const { data, loading, error, reload } = useApi('/dashboard');
   const kpis = data?.kpis || {};
@@ -58,7 +58,7 @@ export function Dashboard() {
       hint: `${number(meta?.counts?.students)} élèves au total`,
       dot: true,
     },
-  ];
+  ].filter((item) => item.key !== 'recovery' || can('finances.view'));
 
   if (!data && loading) {
     return (
@@ -86,7 +86,7 @@ export function Dashboard() {
     <>
       <PageHead
         id="dashboard"
-        sub={`${meta?.school?.full_name || 'École Internationale Diallo'} · ${meta?.term?.name || 'Semestre 1'}`}
+        sub={`${meta?.school?.full_name || 'Mon établissement'} · ${meta?.term?.name || ''}`}
         secondary="Rapport PDF"
         onPrimary={() => actions.student()}
         onSecondary={exportDashboard}
@@ -97,13 +97,15 @@ export function Dashboard() {
       </div>
 
       <div className="grid-main">
-        <Card className="rise" style={{ animationDelay: '120ms' }}>
-          <CardHead
-            title="Recouvrement mensuel"
-            sub={`Exercice ${new Date().getFullYear()} · en millions de ${currency}`}
-          />
-          {series.length ? <AreaChart data={series} /> : <div className="state-inline">Aucun encaissement enregistré.</div>}
-        </Card>
+        {can('finances.view') && (
+          <Card className="rise" style={{ animationDelay: '120ms' }}>
+            <CardHead
+              title="Recouvrement mensuel"
+              sub={`Exercice ${new Date().getFullYear()} · en millions de ${currency}`}
+            />
+            {series.length ? <AreaChart data={series} /> : <div className="state-inline">Aucun encaissement enregistré.</div>}
+          </Card>
+        )}
 
         <Card className="rise" style={{ animationDelay: '180ms' }}>
           <CardHead
@@ -159,7 +161,7 @@ export function Dashboard() {
                         window.location.hash = 'fiche';
                       },
                     },
-                    { label: 'Modifier', icon: 'edit', onClick: () => actions.student(student) },
+                    { label: 'Modifier', icon: 'edit', permission: 'students.manage', onClick: () => actions.student(student) },
                     {
                       label: 'Ouvrir la fiche',
                       icon: 'external',
@@ -168,7 +170,7 @@ export function Dashboard() {
                         window.location.hash = 'fiche';
                       },
                     },
-                    { label: 'Supprimer', icon: 'trash', tone: 'danger', onClick: () => actions.deleteStudent(student) },
+                    { label: 'Supprimer', icon: 'trash', tone: 'danger', permission: 'students.manage', onClick: () => actions.deleteStudent(student) },
                   ]} />
                 </span>
               </Tr>

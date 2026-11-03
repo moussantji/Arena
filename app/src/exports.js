@@ -7,7 +7,7 @@ import {
 import { weekDayNumber } from './week.js';
 
 /* ============================================================
-   DIALLO — exports Excel métier
+   Kalanso — exports Excel métier
    Tous les tableaux sont bordés et séparés par classe.
    ============================================================ */
 
@@ -120,7 +120,7 @@ export async function fetchAllTimetableSlots() {
 /* ---------- élèves ---------- */
 
 export async function exportStudentsWorkbook(students, options = {}) {
-  const { schoolName = 'DIALLO', termName = '' } = options;
+  const { schoolName = 'Kalanso', termName = '' } = options;
   const sorted = [...students].sort((a, b) => classSort(a, b) || studentSort(a, b));
   const groups = [];
   sorted.forEach((student) => {
@@ -187,7 +187,7 @@ export async function exportStudentsWorkbook(students, options = {}) {
     rows.push({ height: 10, cells: [] });
   });
 
-  await exportXlsx(`diallo-eleves-${dateInput(new Date())}`, [{
+  await exportXlsx(`kalanso-eleves-${dateInput(new Date())}`, [{
     name: 'Élèves',
     columns: widths,
     rows,
@@ -284,7 +284,7 @@ export function buildExamGroups(grades) {
 }
 
 export async function exportLatestExamWorkbook(grades, exam, options = {}) {
-  const { schoolName = 'DIALLO' } = options;
+  const { schoolName = 'Kalanso' } = options;
   const groups = buildExamGroups(grades);
   const maxSubjects = Math.max(1, ...groups.map((group) => group.subjects.length));
   const width = 2 + maxSubjects + 2;
@@ -368,7 +368,7 @@ export async function exportLatestExamWorkbook(grades, exam, options = {}) {
     rows.push({ height: 10, cells: [] });
   });
 
-  await exportXlsx(`diallo-notes-${exam?.date || dateInput(new Date())}`, [{
+  await exportXlsx(`kalanso-notes-${exam?.date || dateInput(new Date())}`, [{
     name: 'Dernier examen',
     columns: [13, 22, ...Array.from({ length: maxSubjects }, () => 17), 10, 8],
     rows,
@@ -385,7 +385,7 @@ const slotRoom = (slot) => slot.room || slot.school_class?.room || '—';
 
 export async function exportTimetableWorkbook(slots, classes, options = {}) {
   const {
-    schoolName = 'DIALLO', termName = '', weekStart = null, weekLabel = '',
+    schoolName = 'Kalanso', termName = '', weekStart = null, weekLabel = '',
   } = options;
   const weekSuffix = weekLabel ? ` · ${weekLabel}` : '';
   const dayTitle = (day) => {
@@ -529,7 +529,7 @@ export async function exportTimetableWorkbook(slots, classes, options = {}) {
     });
   });
 
-  await exportXlsx(`diallo-emplois-du-temps-${dateInput(new Date())}`, sheets);
+  await exportXlsx(`kalanso-emplois-du-temps-${dateInput(new Date())}`, sheets);
 }
 
 /* ============================================================
@@ -642,7 +642,7 @@ export const fetchAllAdmissions = (filters = {}) => fetchPaged('/admissions', fi
 
 export async function exportFinanceSummaryWorkbook(summary, options = {}) {
   const {
-    schoolName = 'DIALLO', termName = '', yearName = '', currency = 'FCFA',
+    schoolName = 'Kalanso', termName = '', yearName = '', currency = 'FCFA',
   } = options;
   const kpis = summary?.kpis || {};
   const monthly = summary?.monthly || [];
@@ -736,7 +736,7 @@ export async function exportFinanceSummaryWorkbook(summary, options = {}) {
     });
   }
 
-  await exportXlsx(`diallo-finances-${dateInput(new Date())}`, [
+  await exportXlsx(`kalanso-finances-${dateInput(new Date())}`, [
     tableSheet({
       name: 'Synthèse',
       title: 'Synthèse financière',
@@ -749,7 +749,7 @@ export async function exportFinanceSummaryWorkbook(summary, options = {}) {
 
 export async function exportFinanceInvoicesWorkbook(invoices, options = {}) {
   const {
-    schoolName = 'DIALLO', termName = '', currency = 'FCFA', filterLabel = '',
+    schoolName = 'Kalanso', termName = '', currency = 'FCFA', filterLabel = '',
   } = options;
   const balanceOf = (invoice) => Math.max(0, Number(invoice.amount || 0) - Number(invoice.paid_amount || 0));
   const totalAmount = invoices.reduce((sum, invoice) => sum + Number(invoice.amount || 0), 0);
@@ -804,7 +804,7 @@ export async function exportFinanceInvoicesWorkbook(invoices, options = {}) {
     };
   }).filter(Boolean);
 
-  await exportXlsx(`diallo-factures-${dateInput(new Date())}`, [
+  await exportXlsx(`kalanso-factures-${dateInput(new Date())}`, [
     tableSheet({
       name: 'Factures',
       title: 'Factures et recouvrement',
@@ -829,7 +829,7 @@ export async function exportFinanceInvoicesWorkbook(invoices, options = {}) {
 
 export async function exportFinancePaymentsWorkbook(payments, options = {}) {
   const {
-    schoolName = 'DIALLO', termName = '', currency = 'FCFA', filterLabel = '',
+    schoolName = 'Kalanso', termName = '', currency = 'FCFA', filterLabel = '',
   } = options;
   const total = payments.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
 
@@ -876,7 +876,7 @@ export async function exportFinancePaymentsWorkbook(payments, options = {}) {
     };
   }).filter(Boolean);
 
-  await exportXlsx(`diallo-paiements-${dateInput(new Date())}`, [
+  await exportXlsx(`kalanso-paiements-${dateInput(new Date())}`, [
     tableSheet({
       name: 'Paiements',
       title: 'Paiements encaissés',
@@ -901,7 +901,7 @@ export async function exportFinancePaymentsWorkbook(payments, options = {}) {
 /* ---------- personnel ---------- */
 
 export async function exportStaffWorkbook(staff, options = {}) {
-  const { schoolName = 'DIALLO', termName = '' } = options;
+  const { schoolName = 'Kalanso', termName = '' } = options;
   const collatorName = new Intl.Collator('fr', { sensitivity: 'base', numeric: true });
   const sorted = [...staff].sort((a, b) => (
     collatorName.compare(a.department?.name || '', b.department?.name || '')
@@ -948,7 +948,7 @@ export async function exportStaffWorkbook(staff, options = {}) {
     };
   });
 
-  await exportXlsx(`diallo-personnel-${dateInput(new Date())}`, [
+  await exportXlsx(`kalanso-personnel-${dateInput(new Date())}`, [
     tableSheet({
       name: 'Personnel',
       title: 'Annuaire du personnel',
@@ -974,7 +974,7 @@ export async function exportStaffWorkbook(staff, options = {}) {
 /* ---------- matières ---------- */
 
 export async function exportSubjectsWorkbook(subjects, options = {}) {
-  const { schoolName = 'DIALLO', termName = '' } = options;
+  const { schoolName = 'Kalanso', termName = '' } = options;
   const byDepartment = new Map();
   [...subjects]
     .sort((a, b) => String(a.department?.name || '').localeCompare(String(b.department?.name || ''), 'fr')
@@ -1027,7 +1027,7 @@ export async function exportSubjectsWorkbook(subjects, options = {}) {
     };
   });
 
-  await exportXlsx(`diallo-matieres-${dateInput(new Date())}`, [
+  await exportXlsx(`kalanso-matieres-${dateInput(new Date())}`, [
     tableSheet({
       name: 'Matières',
       title: 'Catalogue des matières',
@@ -1052,7 +1052,7 @@ export async function exportSubjectsWorkbook(subjects, options = {}) {
 /* ---------- absences ---------- */
 
 export async function exportAbsencesWorkbook(absences, options = {}) {
-  const { schoolName = 'DIALLO', termName = '', filterLabel = '' } = options;
+  const { schoolName = 'Kalanso', termName = '', filterLabel = '' } = options;
   const byClass = new Map();
   [...absences]
     .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
@@ -1093,7 +1093,7 @@ export async function exportAbsencesWorkbook(absences, options = {}) {
     };
   });
 
-  await exportXlsx(`diallo-absences-${dateInput(new Date())}`, [
+  await exportXlsx(`kalanso-absences-${dateInput(new Date())}`, [
     tableSheet({
       name: 'Absences',
       title: 'Suivi des absences',
@@ -1118,7 +1118,7 @@ export async function exportAbsencesWorkbook(absences, options = {}) {
 /* ---------- admissions ---------- */
 
 export async function exportAdmissionsWorkbook(admissions, options = {}) {
-  const { schoolName = 'DIALLO', termName = '', filterLabel = '' } = options;
+  const { schoolName = 'Kalanso', termName = '', filterLabel = '' } = options;
   const order = ['nouveau', 'entretien', 'valide', 'inscrit', 'refuse'];
   const columns = [
     { label: 'Référence', width: 15 },
@@ -1161,7 +1161,7 @@ export async function exportAdmissionsWorkbook(admissions, options = {}) {
   const enrolled = admissions.filter((admission) => admission.status === 'inscrit').length;
   const waiting = admissions.filter((admission) => ['nouveau', 'entretien', 'valide'].includes(admission.status)).length;
 
-  await exportXlsx(`diallo-admissions-${dateInput(new Date())}`, [
+  await exportXlsx(`kalanso-admissions-${dateInput(new Date())}`, [
     tableSheet({
       name: 'Admissions',
       title: 'Dossiers de candidature',
@@ -1190,7 +1190,7 @@ export async function exportAdmissionsWorkbook(admissions, options = {}) {
 
 export async function exportStaffProfileWorkbook(member, options = {}) {
   const {
-    schoolName = 'DIALLO', termName = '', yearName = '',
+    schoolName = 'Kalanso', termName = '', yearName = '',
   } = options;
   const classSubjects = member?.class_subjects || [];
   const slots = member?.timetable_slots || [];
@@ -1285,7 +1285,7 @@ export async function exportStaffProfileWorkbook(member, options = {}) {
     });
   }
 
-  await exportXlsx(`diallo-personnel-${filesafe(fullName(member))}`, [
+  await exportXlsx(`kalanso-personnel-${filesafe(fullName(member))}`, [
     tableSheet({
       name: 'Fiche personnel',
       title: `Fiche personnel · ${fullName(member)}`,
@@ -1298,7 +1298,7 @@ export async function exportStaffProfileWorkbook(member, options = {}) {
 
 export async function exportAdmissionWorkbook(admission, options = {}) {
   const {
-    schoolName = 'DIALLO', termName = '', yearName = '',
+    schoolName = 'Kalanso', termName = '', yearName = '',
   } = options;
   const columns = [
     { label: 'Information', width: 28 },
@@ -1310,7 +1310,7 @@ export async function exportAdmissionWorkbook(admission, options = {}) {
   ];
   const status = ADMISSION_STATUS[admission?.status] || { label: admission?.status || '—' };
 
-  await exportXlsx(`diallo-admission-${filesafe(admission?.reference || fullName(admission))}`, [
+  await exportXlsx(`kalanso-admission-${filesafe(admission?.reference || fullName(admission))}`, [
     tableSheet({
       name: 'Dossier admission',
       title: `Dossier de candidature · ${fullName(admission)}`,
@@ -1363,7 +1363,7 @@ const evaluationScore = (subject, key) => {
 
 export async function exportStudentReportWorkbook(student, report, options = {}) {
   const {
-    schoolName = 'DIALLO', yearName = '', termName = '', absences = null,
+    schoolName = 'Kalanso', yearName = '', termName = '', absences = null,
   } = options;
   const subjects = report?.subjects || [];
   const term = report?.term?.name || termName;
@@ -1540,7 +1540,7 @@ export async function exportStudentReportWorkbook(student, report, options = {})
     });
   }
 
-  await exportXlsx(`diallo-bulletin-${student?.matricule || 'eleve'}`, sheets);
+  await exportXlsx(`kalanso-bulletin-${student?.matricule || 'eleve'}`, sheets);
 }
 
 export { filesafe };

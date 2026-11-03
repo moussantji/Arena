@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
 
 /* ============================================================
-   DIALLO — générateur XLSX minimaliste
+   Kalanso — générateur XLSX minimaliste
    Produit un classeur Excel réel (ZIP + OpenXML) avec styles,
    bordures, largeurs de colonnes et fusions. Aucune dépendance
    UI : JSZip sert uniquement à empaqueter les feuilles XML.

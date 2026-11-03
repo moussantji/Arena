@@ -37,13 +37,23 @@ const evaluationScore = (subject, key) => {
 
 export function Fiche() {
   const {
-    meta, studentId, setStudentId, version, notify,
+    meta, studentId, setStudentId, version, notify, can,
   } = useData();
   const actions = useActions();
   const [tab, setTab] = useState(0);
   const [exportingReport, setExportingReport] = useState(false);
   const students = meta?.students || [];
   const currency = meta?.school?.currency || 'FCFA';
+  const showFinance = can('finances.view');
+  const showDocuments = can('documents.manage');
+  const tabs = [
+    { key: 'summary', label: 'Synthèse' },
+    { key: 'grades', label: 'Notes' },
+    { key: 'absences', label: 'Absences' },
+    ...(showFinance ? [{ key: 'finance', label: 'Finances' }] : []),
+    ...(showDocuments ? [{ key: 'documents', label: 'Documents' }] : []),
+  ];
+  const activeTab = tabs[tab]?.key || 'summary';
 
   useEffect(() => {
     if (!studentId && students.length) setStudentId(students[0].id);
@@ -53,9 +63,9 @@ export function Fiche() {
   const report = useApi(studentId ? `/students/${studentId}/report-card` : null, undefined, { enabled: Boolean(studentId) });
   const grades = useApi('/grades', { student_id: studentId || undefined, per_page: 100 }, { enabled: Boolean(studentId) });
   const absences = useApi('/absences', { student_id: studentId || undefined, per_page: 100 }, { enabled: Boolean(studentId) });
-  const invoices = useApi('/invoices', { student_id: studentId || undefined, per_page: 100 }, { enabled: Boolean(studentId) });
-  const payments = useApi('/payments', { student_id: studentId || undefined, per_page: 100 }, { enabled: Boolean(studentId) });
-  const documents = useApi('/documents', { student_id: studentId || undefined, per_page: 100 }, { enabled: Boolean(studentId) });
+  const invoices = useApi('/invoices', { student_id: studentId || undefined, per_page: 100 }, { enabled: showFinance && Boolean(studentId) });
+  const payments = useApi('/payments', { student_id: studentId || undefined, per_page: 100 }, { enabled: showFinance && Boolean(studentId) });
+  const documents = useApi('/documents', { student_id: studentId || undefined, per_page: 100 }, { enabled: showDocuments && Boolean(studentId) });
 
   const student = profile.data?.student;
   const summary = profile.data?.summary || {};
@@ -158,9 +168,15 @@ export function Fiche() {
           options={studentOptions}
         />
         <div className="toolbar-right">
-          <Btn icon="finance" onClick={() => actions.invoice(null, { student_id: studentId })}>Créer une facture</Btn>
-          <Btn icon="absences" onClick={() => actions.absence(null, { student_id: studentId, school_class_id: student?.school_class_id })}>Signaler une absence</Btn>
-          <Btn icon="grades" solid onClick={() => actions.grade(null, { student_id: studentId, school_class_id: student?.school_class_id })}>Saisir une note</Btn>
+          {showFinance && (
+            <Btn icon="finance" onClick={() => actions.invoice(null, { student_id: studentId })}>Créer une facture</Btn>
+          )}
+          {can('absences.manage') && (
+            <Btn icon="absences" onClick={() => actions.absence(null, { student_id: studentId, school_class_id: student?.school_class_id })}>Signaler une absence</Btn>
+          )}
+          {can('grades.manage') && (
+            <Btn icon="grades" solid onClick={() => actions.grade(null, { student_id: studentId, school_class_id: student?.school_class_id })}>Saisir une note</Btn>
+          )}
         </div>
       </div>
 
@@ -188,14 +204,14 @@ export function Fiche() {
               </div>
               <div className="ph-actions">
                 <Btn icon="download" onClick={exportReport}>Bulletin</Btn>
-                <Btn icon="upload" onClick={() => actions.photo(student)}>Photo</Btn>
-                <Btn icon="upload" onClick={() => actions.document(student)}>Document</Btn>
+                {can('students.manage') && <Btn icon="upload" onClick={() => actions.photo(student)}>Photo</Btn>}
+                {showDocuments && <Btn icon="upload" onClick={() => actions.document(student)}>Document</Btn>}
                 <ActionMenu actions={[
-                  { label: 'Modifier le dossier', icon: 'edit', onClick: () => actions.student(student) },
-                  { label: 'Changer la photo', icon: 'upload', onClick: () => actions.photo(student) },
-                  { label: 'Ajouter un document', icon: 'upload', onClick: () => actions.document(student) },
-                  { label: 'Créer une facture', icon: 'finance', onClick: () => actions.invoice(null, { student_id: student.id }) },
-                  { label: 'Retirer l’élève', icon: 'trash', tone: 'danger', onClick: () => actions.deleteStudent(student) },
+                  { label: 'Modifier le dossier', icon: 'edit', permission: 'students.manage', onClick: () => actions.student(student) },
+                  { label: 'Changer la photo', icon: 'upload', permission: 'students.manage', onClick: () => actions.photo(student) },
+                  { label: 'Ajouter un document', icon: 'upload', permission: 'documents.manage', onClick: () => actions.document(student) },
+                  { label: 'Créer une facture', icon: 'finance', permission: 'finances.manage', onClick: () => actions.invoice(null, { student_id: student.id }) },
+                  { label: 'Retirer l’élève', icon: 'trash', tone: 'danger', permission: 'students.manage', onClick: () => actions.deleteStudent(student) },
                 ]} />
               </div>
             </Card>
@@ -208,11 +224,13 @@ export function Fiche() {
                 <div className="kpi-foot"><span>Rang {reportData.rank || '—'} sur {reportData.class_size || '—'}</span></div>
               </Card>
 
-              <Card className="kpi rise" style={{ animationDelay: '100ms' }}>
-                <div className="kpi-top"><span className="kpi-label">Solde à régler</span>{invoiceBalance > 0 && <i className="kpi-dot" />}</div>
-                <div className="kpi-value"><b>{money(summary.outstanding ?? invoiceBalance, currency)}</b></div>
-                <div className="kpi-foot"><span>{invoiceRows.length} factures · {paymentRows.length} paiements</span></div>
-              </Card>
+              {showFinance && (
+                <Card className="kpi rise" style={{ animationDelay: '100ms' }}>
+                  <div className="kpi-top"><span className="kpi-label">Solde à régler</span>{invoiceBalance > 0 && <i className="kpi-dot" />}</div>
+                  <div className="kpi-value"><b>{money(summary.outstanding ?? invoiceBalance, currency)}</b></div>
+                  <div className="kpi-foot"><span>{invoiceRows.length} factures · {paymentRows.length} paiements</span></div>
+                </Card>
+              )}
 
               <Card className="kpi rise" style={{ animationDelay: '150ms' }}>
                 <div className="kpi-top"><span className="kpi-label">Assiduité</span><Pill tone={pendingAbsences.length ? 'copper' : 'accent'}>{pendingAbsences.length ? 'À suivre' : 'À jour'}</Pill></div>
@@ -220,21 +238,23 @@ export function Fiche() {
                 <div className="kpi-foot"><span>{pendingAbsences.length} non justifiées · {absenceRows.length - pendingAbsences.length} justifiées</span></div>
               </Card>
 
-              <Card className="kpi rise" style={{ animationDelay: '200ms' }}>
-                <div className="kpi-top"><span className="kpi-label">Documents</span></div>
-                <div className="kpi-value"><b>{documentRows.length}</b><em>fichiers</em></div>
-                <div className="kpi-foot"><span>Bulletins, attestations, justificatifs</span></div>
-              </Card>
+              {showDocuments && (
+                <Card className="kpi rise" style={{ animationDelay: '200ms' }}>
+                  <div className="kpi-top"><span className="kpi-label">Documents</span></div>
+                  <div className="kpi-value"><b>{documentRows.length}</b><em>fichiers</em></div>
+                  <div className="kpi-foot"><span>Bulletins, attestations, justificatifs</span></div>
+                </Card>
+              )}
             </div>
 
             <div className="toolbar rise">
-              <Tabs items={['Synthèse', 'Notes', 'Absences', 'Finances', 'Documents']} active={tab} onChange={setTab} />
+              <Tabs items={tabs.map((item) => item.label)} active={tab} onChange={setTab} />
               <div className="toolbar-right">
                 <span className="toolbar-count">{meta?.term?.name || 'Semestre 1'}</span>
               </div>
             </div>
 
-            {tab === 0 && (
+            {activeTab === 'summary' && (
               <>
                 <div className="grid-main">
                   <Card className="rise" style={{ animationDelay: '80ms' }}>
@@ -290,38 +310,40 @@ export function Fiche() {
                       </dl>
                     </Card>
 
-                    <Card className="rise" style={{ animationDelay: '180ms' }}>
-                      <CardHead title="Derniers mouvements" sub="Factures et paiements" />
-                      {movementRows.length ? (
-                        <ul className="movement-list">
-                          {movementRows.map((movement) => (
-                            <li key={movement.id}>
-                              <span className={`movement-ic ${movement.type}`}>
-                                <Icon name={movement.type === 'payment' ? 'check' : 'finance'} size={13} />
-                              </span>
-                              <span className="movement-main">
-                                <b>{movement.label}</b>
-                                <em>{movement.sub} · {date(movement.date)}</em>
-                              </span>
-                              <span className={`movement-amount mono ${movement.amount >= 0 ? 'positive' : ''}`}>
-                                {movement.amount >= 0 ? '+' : ''}{money(movement.amount, currency)}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : <div className="state-inline">Aucun mouvement financier.</div>}
-                    </Card>
+                    {showFinance && (
+                      <Card className="rise" style={{ animationDelay: '180ms' }}>
+                        <CardHead title="Derniers mouvements" sub="Factures et paiements" />
+                        {movementRows.length ? (
+                          <ul className="movement-list">
+                            {movementRows.map((movement) => (
+                              <li key={movement.id}>
+                                <span className={`movement-ic ${movement.type}`}>
+                                  <Icon name={movement.type === 'payment' ? 'check' : 'finance'} size={13} />
+                                </span>
+                                <span className="movement-main">
+                                  <b>{movement.label}</b>
+                                  <em>{movement.sub} · {date(movement.date)}</em>
+                                </span>
+                                <span className={`movement-amount mono ${movement.amount >= 0 ? 'positive' : ''}`}>
+                                  {movement.amount >= 0 ? '+' : ''}{money(movement.amount, currency)}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : <div className="state-inline">Aucun mouvement financier.</div>}
+                      </Card>
+                    )}
                   </div>
                 </div>
               </>
             )}
 
-            {tab === 1 && (
+            {activeTab === 'grades' && (
               <Card className="rise" style={{ animationDelay: '80ms' }}>
                 <CardHead
                   title="Toutes les évaluations"
                   sub={`${gradeRows.length} notes · ${meta?.academic_year?.label || ''}`}
-                  right={<Btn icon="plus" onClick={() => actions.grade(null, { student_id: studentId, school_class_id: student.school_class_id })}>Saisir une note</Btn>}
+                  right={can('grades.manage') ? <Btn icon="plus" onClick={() => actions.grade(null, { student_id: studentId, school_class_id: student.school_class_id })}>Saisir une note</Btn> : null}
                 />
                 <ListState
                   loading={grades.loading && !grades.data}
@@ -344,8 +366,8 @@ export function Fiche() {
                         <span className="cell mono">{date(grade.evaluated_on)}</span>
                         <span className="cell right cell-actions">
                           <ActionMenu actions={[
-                            { label: 'Modifier', icon: 'edit', onClick: () => actions.grade(grade) },
-                            { label: 'Supprimer', icon: 'trash', tone: 'danger', onClick: () => actions.deleteGrade(grade) },
+                            { label: 'Modifier', icon: 'edit', permission: 'grades.manage', onClick: () => actions.grade(grade) },
+                            { label: 'Supprimer', icon: 'trash', tone: 'danger', permission: 'grades.manage', onClick: () => actions.deleteGrade(grade) },
                           ]} />
                         </span>
                       </Tr>
@@ -355,12 +377,12 @@ export function Fiche() {
               </Card>
             )}
 
-            {tab === 2 && (
+            {activeTab === 'absences' && (
               <Card className="rise" style={{ animationDelay: '80ms' }}>
                 <CardHead
                   title="Absences et retards"
                   sub={`${absenceRows.length} absences · ${pendingAbsences.length} à justifier`}
-                  right={<Btn icon="plus" onClick={() => actions.absence(null, { student_id: studentId, school_class_id: student.school_class_id })}>Signaler une absence</Btn>}
+                  right={can('absences.manage') ? <Btn icon="plus" onClick={() => actions.absence(null, { student_id: studentId, school_class_id: student.school_class_id })}>Signaler une absence</Btn> : null}
                 />
                 <ListState
                   loading={absences.loading && !absences.data}
@@ -380,9 +402,9 @@ export function Fiche() {
                         <span className="cell">{absence.is_justified ? <Pill tone="accent">Justifiée</Pill> : <Pill tone="copper">À justifier</Pill>}</span>
                         <span className="cell right cell-actions">
                           <ActionMenu actions={[
-                            !absence.is_justified && { label: 'Justifier', icon: 'check', onClick: () => actions.justifyAbsence(absence) },
-                            { label: 'Modifier', icon: 'edit', onClick: () => actions.absence(absence) },
-                            { label: 'Supprimer', icon: 'trash', tone: 'danger', onClick: () => actions.deleteAbsence(absence) },
+                            !absence.is_justified && { label: 'Justifier', icon: 'check', permission: 'absences.manage', onClick: () => actions.justifyAbsence(absence) },
+                            { label: 'Modifier', icon: 'edit', permission: 'absences.manage', onClick: () => actions.absence(absence) },
+                            { label: 'Supprimer', icon: 'trash', tone: 'danger', permission: 'absences.manage', onClick: () => actions.deleteAbsence(absence) },
                           ]} />
                         </span>
                       </Tr>
@@ -392,7 +414,7 @@ export function Fiche() {
               </Card>
             )}
 
-            {tab === 3 && (
+            {activeTab === 'finance' && (
               <div className="stack">
                 <Card className="rise" style={{ animationDelay: '80ms' }}>
                   <CardHead
@@ -477,7 +499,7 @@ export function Fiche() {
               </div>
             )}
 
-            {tab === 4 && (
+            {activeTab === 'documents' && (
               <Card className="rise" style={{ animationDelay: '80ms' }}>
                 <CardHead
                   title="Documents du dossier"

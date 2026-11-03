@@ -11,15 +11,18 @@ use App\Models\School;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\TimetableSlot;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function __invoke(): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         $year = AcademicYear::current()->first();
+        $canSeeFinance = $request->user()?->hasAnyRole(User::ROLE_DIRECTION, User::ROLE_COMPTABLE) ?? false;
         $students = Student::where('is_active', true)->count();
         $classes = SchoolClass::when($year, fn ($q) => $q->where('academic_year_id', $year->id))->count();
 
@@ -34,17 +37,17 @@ class DashboardController extends Controller
             ->sum('amount');
 
         $series = Payment::query()
-            ->selectRaw("DATE_FORMAT(paid_on, '%Y-%m') as month, SUM(amount) as total")
             ->where('status', 'completed')
             ->where('paid_on', '>=', now()->subMonths(11)->startOfMonth()->toDateString())
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get()
-            ->map(fn ($row) => [
-                'month' => $row->month,
-                'label' => Carbon::createFromFormat('Y-m', $row->month)->translatedFormat('M'),
-                'total' => (float) $row->total,
-            ]);
+            ->get(['paid_on', 'amount'])
+            ->groupBy(fn (Payment $payment) => $payment->paid_on->format('Y-m'))
+            ->sortKeys()
+            ->map(fn ($payments, $month) => [
+                'month' => $month,
+                'label' => Carbon::createFromFormat('Y-m', $month)->translatedFormat('M'),
+                'total' => (float) $payments->sum('amount'),
+            ])
+            ->values();
 
         $distribution = SchoolClass::query()
             ->select('level', DB::raw('SUM((SELECT COUNT(*) FROM students WHERE students.school_class_id = school_classes.id)) as effectif'))
@@ -72,10 +75,10 @@ class DashboardController extends Controller
             'kpis' => [
                 'students' => $students,
                 'attendance' => $attendance,
-                'recovery' => $recovery,
+                'recovery' => $canSeeFinance ? $recovery : null,
                 'classes' => $classes,
             ],
-            'recovery_series' => $series,
+            'recovery_series' => $canSeeFinance ? $series : [],
             'class_distribution' => $distribution,
             'today' => $todaySlots,
             'recent_students' => $recentStudents,

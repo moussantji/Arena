@@ -11,13 +11,24 @@ import { PageHead } from './common.jsx';
 import {
   api, API_URL, getToken, setSession,
 } from '../api.js';
+import {
+  ROLES, ROLE_LABELS, ROLE_DESCRIPTIONS,
+} from '../auth.js';
+import kalansoIcon from '../assets/kalanso-icon.png';
 
-const TABS = ['Établissement', 'Calendrier', 'Départements', 'Frais', 'Préférences'];
+const TABS = ['Établissement', 'Calendrier', 'Départements', 'Frais', 'Utilisateurs', 'Préférences'];
+const TAB_ICONS = ['settings', 'calendar', 'classes', 'finance', 'profile', 'settings'];
+const ROLE_TONES = {
+  direction: 'accent',
+  secretariat: 'glass',
+  comptable: 'copper',
+  enseignant: 'muted',
+};
 const DEFAULT_PREFS = { reduceMotion: false, compact: false };
 
 const readPrefs = () => {
   try {
-    return { ...DEFAULT_PREFS, ...(JSON.parse(window.localStorage.getItem('arena.prefs')) || {}) };
+    return { ...DEFAULT_PREFS, ...(JSON.parse(window.localStorage.getItem('kalanso.prefs')) || {}) };
   } catch {
     return DEFAULT_PREFS;
   }
@@ -43,6 +54,7 @@ export function Parametres() {
   const years = useApi('/references/academic-years');
   const departments = useApi('/references/departments');
   const feeTypes = useApi('/references/fee-types');
+  const users = useApi('/users');
   const health = useApi('/health', undefined, { silent: true });
 
   const school = meta?.school;
@@ -51,6 +63,7 @@ export function Parametres() {
   const yearRows = years.data?.academic_years || [];
   const departmentRows = departments.data?.departments || [];
   const feeRows = feeTypes.data?.fee_types || [];
+  const userRows = users.data?.users || [];
 
   useEffect(() => {
     if (!school) return;
@@ -65,7 +78,7 @@ export function Parametres() {
   }, [school]);
 
   useEffect(() => {
-    window.localStorage.setItem('arena.prefs', JSON.stringify(prefs));
+    window.localStorage.setItem('kalanso.prefs', JSON.stringify(prefs));
     document.documentElement.classList.toggle('reduce-motion', Boolean(prefs.reduceMotion));
     document.documentElement.classList.toggle('compact-ui', Boolean(prefs.compact));
   }, [prefs]);
@@ -100,8 +113,8 @@ export function Parametres() {
   const testConnection = async () => {
     setTesting(true);
     try {
-      await api.ensureSession();
-      const result = await api.me();
+      // Utiliser l'API pour tester la connexion
+      const result = await api.get('/me');
       notify(`Connexion opérationnelle · ${result.user?.name || 'Direction'}.`);
       health.reload();
     } catch (error) {
@@ -167,7 +180,7 @@ export function Parametres() {
               className={`set-item ${tab === index ? 'active' : ''}`}
               onClick={() => setTab(index)}
             >
-              <Icon name={['settings', 'calendar', 'classes', 'finance', 'profile'][index]} size={14} />
+              <Icon name={TAB_ICONS[index]} size={14} />
               {label}
             </button>
           ))}
@@ -195,15 +208,15 @@ export function Parametres() {
                 <div className="form-grid">
                   <label className="field">
                     <span className="field-label">Nom court</span>
-                    <input className="input" value={form.name} onChange={(event) => setField('name', event.target.value)} placeholder="DIALLO" />
+                    <input className="input" value={form.name} onChange={(event) => setField('name', event.target.value)} placeholder="Mon établissement" />
                   </label>
                   <label className="field">
                     <span className="field-label">Nom complet</span>
-                    <input className="input" value={form.full_name} onChange={(event) => setField('full_name', event.target.value)} placeholder="École Internationale Diallo" />
+                    <input className="input" value={form.full_name} onChange={(event) => setField('full_name', event.target.value)} placeholder="École internationale" />
                   </label>
                   <label className="field">
                     <span className="field-label">E-mail</span>
-                    <input className="input" type="email" value={form.email} onChange={(event) => setField('email', event.target.value)} placeholder="contact@diallo.test" />
+                    <input className="input" type="email" value={form.email} onChange={(event) => setField('email', event.target.value)} placeholder="contact@mon-ecole.com" />
                   </label>
                   <label className="field">
                     <span className="field-label">Téléphone</span>
@@ -225,7 +238,7 @@ export function Parametres() {
                 <div className="form-footer">
                   <span className="form-hint">Les modifications sont appliquées immédiatement dans l’interface.</span>
                   <div className="form-actions">
-                    <Btn icon="upload" onClick={() => school && actions.photo(school, { kind: 'school' })}>Logo</Btn>
+                    <Btn icon="upload" onClick={() => school && actions.photo(school, { kind: 'school' })}>Remplacer le logo</Btn>
                     <Btn icon="check" solid onClick={saveSchool}>{saving ? 'Enregistrement…' : 'Enregistrer les informations'}</Btn>
                   </div>
                 </div>
@@ -235,11 +248,11 @@ export function Parametres() {
                 <Card className="settings-brief">
                   <span className="settings-logo">
                     {school?.photo_url
-                      ? <img src={school.photo_url} alt={`Logo ${school?.name || 'DIALLO'}`} />
-                      : <span className="mark" />}
+                      ? <img src={school.photo_url} alt={`Logo ${school?.name || 'Kalanso'}`} />
+                      : <img src={kalansoIcon} alt="Logo Kalanso par défaut" />}
                   </span>
                   <div>
-                    <b>{school?.name || 'DIALLO'}</b>
+                    <b>{school?.name || 'Kalanso'}</b>
                     <span>{school?.full_name || 'École Internationale'}</span>
                     <em className="mono">{school?.address || 'Bamako'} · {school?.phone || ''}</em>
                   </div>
@@ -427,6 +440,83 @@ export function Parametres() {
 
           {tab === 4 && (
             <div className="stack">
+              <div className="stats-row">
+                <div className="stat"><b>{userRows.length}</b><span>Comptes utilisateurs</span></div>
+                {ROLES.map((role) => (
+                  <div className="stat" key={role}>
+                    <b>{userRows.filter((account) => account.role === role).length}</b>
+                    <span>{ROLE_LABELS[role]}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Card>
+                <CardHead
+                  title="Comptes et accès"
+                  sub="Créez les accès du personnel et ajustez leurs responsabilités."
+                  right={<Btn icon="userPlus" solid onClick={() => actions.user()}>Nouveau compte</Btn>}
+                />
+                <ListState
+                  loading={users.loading && !users.data}
+                  error={users.error}
+                  empty={!users.loading && !users.error && !userRows.length}
+                  emptyTitle="Aucun compte"
+                  emptySub="Créez un premier compte pour permettre la connexion."
+                  onRetry={users.reload}
+                >
+                  <Table
+                    columns={['Utilisateur', 'Adresse e-mail', 'Rôle', 'Créé le', '']}
+                    template="1.4fr 1.7fr .8fr .8fr 34px"
+                    foot={<><span className="tf-l">{userRows.length} comptes</span><span className="tf-r">Accès protégés par token</span></>}
+                  >
+                    {userRows.map((account) => (
+                      <Tr key={account.id} template="1.4fr 1.7fr .8fr .8fr 34px">
+                        <span className="cell subject-cell">
+                          <Avatar initials={initials(account.name)} size={26} />
+                          <span>
+                            <b>{account.name}</b>
+                            <em>{account.id === user?.id ? 'Votre compte' : 'Compte actif'}</em>
+                          </span>
+                        </span>
+                        <span className="cell mono">{account.email}</span>
+                        <span className="cell">
+                          <Pill tone={ROLE_TONES[account.role] || 'muted'}>{ROLE_LABELS[account.role] || account.role}</Pill>
+                        </span>
+                        <span className="cell mono">{date(account.created_at)}</span>
+                        <span className="cell right cell-actions">
+                          <ActionMenu actions={[
+                            { label: 'Modifier le compte', icon: 'edit', onClick: () => actions.user(account) },
+                            account.id !== user?.id && {
+                              label: 'Supprimer',
+                              icon: 'trash',
+                              tone: 'danger',
+                              onClick: () => actions.deleteUser(account),
+                            },
+                          ]} />
+                        </span>
+                      </Tr>
+                    ))}
+                  </Table>
+                </ListState>
+              </Card>
+
+              <Card>
+                <CardHead title="Rôles et responsabilités" sub="Référentiel appliqué à l’interface et à l’API." />
+                <div className="role-grid">
+                  {ROLES.map((role) => (
+                    <div className={`role-card role-${role}`} key={role}>
+                      <span className="role-card-dot" />
+                      <b>{ROLE_LABELS[role]}</b>
+                      <em>{ROLE_DESCRIPTIONS[role]}</em>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {tab === 5 && (
+            <div className="stack">
               <Card>
                 <CardHead title="Confort d’affichage" sub="Préférences enregistrées sur cet appareil" />
                 <div className="pref-list">
@@ -460,14 +550,14 @@ export function Parametres() {
                   <CardHead title="Session" sub="Compte utilisé par l’application" right={apiPill} />
                   <div className="session-user">
                     <Avatar
-                      initials={initials(user?.name || 'M. Diallo')}
+                      initials={initials(user?.name || 'Utilisateur')}
                       size={44}
                       src={user?.photo_url}
                       alt={user?.name || 'Photo de profil'}
                     />
                     <div>
-                      <b>{user?.name || 'M. Diallo'}</b>
-                      <span className="mono">{user?.email || 'direction@diallo.test'}</span>
+                      <b>{user?.name || 'Utilisateur'}</b>
+                      <span className="mono">{user?.email || '—'}</span>
                     </div>
                     <button
                       type="button"
@@ -487,8 +577,8 @@ export function Parametres() {
                     />
                   </div>
                   <dl className="dl">
-                    <div><dt>Utilisateur</dt><dd>{user?.name || 'M. Diallo'}</dd></div>
-                    <div><dt>Adresse</dt><dd className="mono">{user?.email || 'direction@diallo.test'}</dd></div>
+                    <div><dt>Utilisateur</dt><dd>{user?.name || '—'}</dd></div>
+                    <div><dt>Adresse</dt><dd className="mono">{user?.email || '—'}</dd></div>
                     <div><dt>Jeton</dt><dd className="mono">{getToken() ? 'Actif' : 'Non connecté'}</dd></div>
                     <div><dt>Dernière vérification</dt><dd>{health.data?.time ? date(health.data.time) : '—'}</dd></div>
                   </dl>
@@ -498,7 +588,7 @@ export function Parametres() {
                 </Card>
 
                 <Card>
-                  <CardHead title="API DIALLO" sub="Service Laravel · Sanctum" />
+                  <CardHead title="API Kalanso" sub="Service Laravel · Sanctum" />
                   <dl className="dl">
                     <div><dt>URL</dt><dd className="mono">{API_URL}</dd></div>
                     <div><dt>État</dt><dd>{health.loading ? 'Vérification…' : health.error ? 'Indisponible' : 'Opérationnelle'}</dd></div>

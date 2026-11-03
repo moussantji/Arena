@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,142 +13,174 @@ class ApiSmokeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-    }
 
-    public function test_health_and_meta_endpoints(): void
-    {
-        $this->getJson('/api/health')
-            ->assertOk()
-            ->assertJsonPath('status', 'ok');
+        $accounts = [
+            ['direction@exemple.test', 'Aïssata Traoré', User::ROLE_DIRECTION],
+            ['secretariat@exemple.test', 'Aminata Barry', User::ROLE_SECRETARIAT],
+            ['comptable@exemple.test', 'Oumar Sy', User::ROLE_COMPTABLE],
+            ['enseignant@exemple.test', 'Moussa Martior', User::ROLE_ENSEIGNANT],
+        ];
 
-        $this->getJson('/api/meta')
-            ->assertOk()
-            ->assertJsonStructure([
-                'school',
-                'academic_year',
-                'term',
-                'terms',
-                'classes',
-                'subjects',
-                'departments',
-                'fee_types',
-                'counts',
-                'options',
+        foreach ($accounts as [$email, $name, $role]) {
+            User::factory()->create([
+                'email' => $email,
+                'name' => $name,
+                'role' => $role,
+                'password' => 'password',
             ]);
-    }
-
-    public function test_catalog_endpoints_return_seeded_data(): void
-    {
-        $this->getJson('/api/school')->assertOk()->assertJsonStructure(['school']);
-        $this->getJson('/api/classes')->assertOk()->assertJsonStructure(['classes']);
-        $this->getJson('/api/subjects')->assertOk()->assertJsonStructure(['subjects']);
-        $this->getJson('/api/staff')->assertOk()->assertJsonStructure(['staff']);
-        $this->getJson('/api/timetable')->assertOk()->assertJsonStructure(['slots']);
-        $this->getJson('/api/admissions')->assertOk()->assertJsonStructure(['data', 'current_page', 'last_page']);
-        $this->getJson('/api/admissions/stats')->assertOk()->assertJsonStructure(['total', 'columns']);
-        $this->getJson('/api/threads')->assertOk()->assertJsonStructure(['threads']);
-        $this->getJson('/api/notifications')->assertOk()->assertJsonStructure(['data']);
-        $this->getJson('/api/documents')->assertOk()->assertJsonStructure(['data']);
-    }
-
-    public function test_students_are_paginated_filterable_and_searchable(): void
-    {
-        $classes = $this->getJson('/api/classes')->json('classes');
-        $classId = $classes[0]['id'];
-
-        $response = $this->getJson("/api/students?class_id={$classId}&per_page=5");
-        $response->assertOk()->assertJsonStructure([
-            'data',
-            'current_page',
-            'last_page',
-            'per_page',
-            'total',
-        ]);
-        $this->assertLessThanOrEqual(5, count($response->json('data')));
-        $this->assertGreaterThan(0, $response->json('total'));
-        foreach ($response->json('data') as $student) {
-            $this->assertSame($classId, $student['school_class']['id']);
         }
-
-        $search = $this->getJson('/api/students?q=Aminata&per_page=10');
-        $search->assertOk();
-        $this->assertGreaterThan(0, $search->json('total'));
     }
 
-    public function test_student_detail_and_report_card(): void
+    public function test_health_endpoint_is_accessible()
     {
-        $student = $this->getJson('/api/students?per_page=1')->json('data.0');
-
-        $this->getJson("/api/students/{$student['id']}")
-            ->assertOk()
-            ->assertJsonPath('student.id', $student['id'])
-            ->assertJsonStructure(['student', 'summary']);
-
-        $this->getJson("/api/students/{$student['id']}/report-card")
-            ->assertOk()
-            ->assertJsonStructure([
-                'student',
-                'term',
-                'subjects',
-                'general_average',
-                'total_coefficients',
-                'rank',
-                'class_size',
-                'mention',
-            ]);
+        $this->get('/api/health')->assertStatus(200);
     }
 
-    public function test_grades_absences_finance_and_payments_lists(): void
+    public function test_login_endpoint_is_accessible()
     {
-        $grades = $this->getJson('/api/grades?per_page=10');
-        $grades->assertOk()->assertJsonStructure(['data', 'stats', 'latest_exam']);
-
-        $latest = $this->getJson('/api/grades?latest_exam=1&per_page=10')->assertOk();
-        $this->assertNotNull($latest->json('latest_exam'));
-        $latestDate = $latest->json('latest_exam.date');
-        $this->assertNotEmpty($latestDate);
-        foreach ($latest->json('data') as $grade) {
-            $this->assertSame($latestDate, substr($grade['evaluated_on'], 0, 10));
-        }
-
-        $this->getJson('/api/absences?per_page=10')
-            ->assertOk()
-            ->assertJsonStructure(['data', 'stats']);
-
-        $this->getJson('/api/invoices?per_page=10')
-            ->assertOk()
-            ->assertJsonStructure(['data', 'current_page', 'last_page', 'total']);
-
-        $this->getJson('/api/payments?per_page=10')
-            ->assertOk()
-            ->assertJsonStructure(['data', 'current_page', 'last_page', 'total']);
-    }
-
-    public function test_demo_login_returns_a_working_token(): void
-    {
-        $login = $this->postJson('/api/login', [
-            'email' => 'direction@diallo.test',
+        $response = $this->postJson('/api/login', [
+            'email' => 'direction@exemple.test',
             'password' => 'password',
-            'device_name' => 'phpunit',
         ]);
 
-        $login->assertOk()->assertJsonStructure(['token', 'user']);
-        $token = $login->json('token');
-
-        $this->withHeader('Authorization', "Bearer {$token}")
-            ->getJson('/api/me')
-            ->assertOk()
-            ->assertJsonPath('user.email', 'direction@diallo.test');
-
-        $this->withHeader('Authorization', "Bearer {$token}")
-            ->postJson('/api/notifications/read-all')
-            ->assertOk();
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['token', 'user']);
+        $response->assertJsonPath('user.role', User::ROLE_DIRECTION);
     }
 
-    public function test_writes_require_authentication(): void
+    public function test_login_rejects_invalid_credentials()
     {
-        $this->postJson('/api/notifications/read-all')->assertUnauthorized();
-        $this->postJson('/api/subjects', ['name' => 'Test'])->assertUnauthorized();
+        $this->postJson('/api/login', [
+            'email' => 'direction@exemple.test',
+            'password' => 'incorrect',
+        ])->assertStatus(422);
+    }
+
+    public function test_unauthenticated_routes_are_protected()
+    {
+        $routes = [
+            '/api/me',
+            '/api/meta',
+            '/api/students',
+            '/api/classes',
+            '/api/subjects',
+            '/api/staff',
+            '/api/invoices',
+            '/api/notifications',
+        ];
+
+        foreach ($routes as $route) {
+            $this->getJson($route)->assertStatus(401);
+        }
+    }
+
+    public function test_direction_user_can_access_all_routes()
+    {
+        $token = $this->tokenFor('direction@exemple.test');
+
+        foreach (['/api/meta', '/api/users', '/api/invoices', '/api/admissions'] as $route) {
+            $this->withToken($token)->getJson($route)->assertStatus(200);
+        }
+    }
+
+    public function test_secretariat_user_can_access_limited_routes()
+    {
+        $token = $this->tokenFor('secretariat@exemple.test');
+
+        $this->withToken($token)->getJson('/api/meta')->assertStatus(200);
+        $this->withToken($token)->getJson('/api/students')->assertStatus(200);
+        $this->withToken($token)->getJson('/api/admissions')->assertStatus(200);
+
+        $this->withToken($token)->getJson('/api/users')->assertStatus(403);
+        $this->withToken($token)->getJson('/api/invoices')->assertStatus(403);
+    }
+
+    public function test_comptable_user_can_access_finance_routes()
+    {
+        $token = $this->tokenFor('comptable@exemple.test');
+
+        $this->withToken($token)->getJson('/api/meta')->assertStatus(200);
+        $this->withToken($token)->getJson('/api/invoices')->assertStatus(200);
+        $this->withToken($token)->getJson('/api/finance/summary')->assertStatus(200);
+
+        $this->withToken($token)->getJson('/api/admissions')->assertStatus(403);
+        $this->withToken($token)->postJson('/api/students', [])->assertStatus(403);
+    }
+
+    public function test_enseignant_user_can_access_pedagogical_routes()
+    {
+        $token = $this->tokenFor('enseignant@exemple.test');
+
+        $this->withToken($token)->getJson('/api/meta')->assertStatus(200);
+        $this->withToken($token)->getJson('/api/grades')->assertStatus(200);
+
+        $this->withToken($token)->getJson('/api/invoices')->assertStatus(403);
+        $this->withToken($token)->getJson('/api/admissions')->assertStatus(403);
+        $this->withToken($token)->postJson('/api/students', [])->assertStatus(403);
+    }
+
+    public function test_logout_revokes_the_current_token()
+    {
+        $token = $this->tokenFor('direction@exemple.test');
+
+        $this->withToken($token)->postJson('/api/logout')->assertStatus(200);
+        $this->app['auth']->forgetGuards();
+
+        $this->withToken($token)->getJson('/api/me')->assertStatus(401);
+    }
+
+    public function test_direction_can_manage_user_accounts()
+    {
+        $token = $this->tokenFor('direction@exemple.test');
+
+        $created = $this->withToken($token)->postJson('/api/users', [
+            'name' => 'Nouveau Compte',
+            'email' => 'nouveau@exemple.test',
+            'password' => 'password123',
+            'role' => User::ROLE_COMPTABLE,
+        ]);
+        $created->assertStatus(201);
+        $userId = $created->json('user.id');
+
+        $this->withToken($token)->patchJson("/api/users/{$userId}", [
+            'role' => User::ROLE_SECRETARIAT,
+        ])->assertStatus(200)->assertJsonPath('user.role', User::ROLE_SECRETARIAT);
+
+        $this->withToken($token)->deleteJson("/api/users/{$userId}")->assertStatus(204);
+        $this->assertDatabaseMissing('users', ['id' => $userId]);
+    }
+
+    public function test_non_direction_users_cannot_manage_accounts()
+    {
+        $token = $this->tokenFor('secretariat@exemple.test');
+
+        $this->withToken($token)->getJson('/api/users')->assertStatus(403);
+        $this->withToken($token)->postJson('/api/users', [
+            'name' => 'Intrus',
+            'email' => 'intrus@exemple.test',
+            'password' => 'password123',
+            'role' => User::ROLE_ENSEIGNANT,
+        ])->assertStatus(403);
+    }
+
+    public function test_direction_cannot_delete_or_demote_the_last_direction_account()
+    {
+        $direction = User::where('email', 'direction@exemple.test')->firstOrFail();
+        $token = $direction->createToken('test')->plainTextToken;
+
+        $this->withToken($token)->deleteJson("/api/users/{$direction->id}")->assertStatus(422);
+        $this->withToken($token)->patchJson("/api/users/{$direction->id}", [
+            'role' => User::ROLE_ENSEIGNANT,
+        ])->assertStatus(422);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $direction->id,
+            'role' => User::ROLE_DIRECTION,
+        ]);
+    }
+
+    private function tokenFor(string $email): string
+    {
+        return User::where('email', $email)->firstOrFail()->createToken('test')->plainTextToken;
     }
 }

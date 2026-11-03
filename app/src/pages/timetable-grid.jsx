@@ -6,7 +6,7 @@ import {
 } from '../week.js';
 
 /* ============================================================
-   DIALLO — grille hebdomadaire partagée
+   Kalanso — grille hebdomadaire partagée
    Utilisée par la page Emploi du temps et la fiche classe.
    ============================================================ */
 

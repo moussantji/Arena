@@ -27,13 +27,18 @@ const tabs = ['Élèves', 'Matières', 'Emploi du temps', 'Dernier examen'];
 
 export function FicheClasse() {
   const {
-    meta, classId, setClassId, setStudentId, notify,
+    meta, classId, setClassId, setStudentId, notify, can,
   } = useData();
   const actions = useActions();
   const [tab, setTab] = useState(0);
   const [exporting, setExporting] = useState(false);
   const classes = meta?.classes || [];
   const currency = meta?.school?.currency || 'FCFA';
+  const showFinance = can('finances.view');
+  const canManageClass = can('classes.manage');
+  const canManageTimetable = can('schedules.manage');
+  const tableColumns = ['Élève', 'Matricule', 'Statut', 'Moyenne', ...(showFinance ? ['Solde'] : []), ''];
+  const tableTemplate = showFinance ? '1.8fr .8fr .9fr .7fr 1fr 34px' : '1.8fr .8fr .9fr .7fr 34px';
 
   useEffect(() => {
     if (!classId && classes.length) setClassId(classes[0].id);
@@ -147,7 +152,9 @@ export function FicheClasse() {
         </div>
         <div className="toolbar-right">
           <Btn icon="calendar" onClick={goTimetable}>Emploi du temps</Btn>
-          <Btn icon="grades" onClick={() => actions.grade(null, { school_class_id: classId })}>Saisir une note</Btn>
+          {can('grades.manage') && (
+            <Btn icon="grades" onClick={() => actions.grade(null, { school_class_id: classId })}>Saisir une note</Btn>
+          )}
           <Btn icon="students" onClick={() => { setClassId(classId); window.location.hash = 'eleves'; }}>Voir les élèves</Btn>
         </div>
       </div>
@@ -175,7 +182,7 @@ export function FicheClasse() {
                 </div>
               </div>
               <div className="ph-actions">
-                <Btn icon="edit" onClick={() => actions.classRoom(classInfo)}>Modifier</Btn>
+                {canManageClass && <Btn icon="edit" onClick={() => actions.classRoom(classInfo)}>Modifier</Btn>}
                 <Btn icon="download" solid onClick={exportExam}>Exporter les notes</Btn>
               </div>
             </Card>
@@ -203,14 +210,14 @@ export function FicheClasse() {
                 />
                 {students.length ? (
                   <Table
-                    columns={['Élève', 'Matricule', 'Statut', 'Moyenne', 'Solde', '']}
-                    template="1.8fr .8fr .9fr .7fr 1fr 34px"
+                    columns={tableColumns}
+                    template={tableTemplate}
                     foot={<span className="tf-l">{students.length} élèves · capacité {capacity || '—'}</span>}
                   >
                     {students.map((student) => (
                       <Tr
                         key={student.id}
-                        template="1.8fr .8fr .9fr .7fr 1fr 34px"
+                        template={tableTemplate}
                         onClick={() => openStudent(student)}
                         title={`Ouvrir la fiche de ${fullName(student)}`}
                       >
@@ -218,13 +225,15 @@ export function FicheClasse() {
                         <span className="cell mono">{student.matricule || '—'}</span>
                         <span className="cell"><StatusPill status={student.status} /></span>
                         <span className="cell mono">{average(student.average)}</span>
-                        <span className={`cell mono right ${Number(student.balance) > 0 ? 'is-debt' : ''}`}>{money(student.balance ?? 0, currency)}</span>
+                        {showFinance && (
+                          <span className={`cell mono right ${Number(student.balance) > 0 ? 'is-debt' : ''}`}>{money(student.balance ?? 0, currency)}</span>
+                        )}
                         <span className="cell right cell-actions" onClick={(event) => event.stopPropagation()}>
                           <ActionMenu actions={[
                             { label: 'Ouvrir la fiche', icon: 'external', onClick: () => openStudent(student) },
                             { label: 'Aperçu rapide', icon: 'profile', onClick: () => actions.studentDrawer(student) },
-                            { label: 'Modifier le dossier', icon: 'edit', onClick: () => actions.student(student) },
-                            { label: 'Créer une facture', icon: 'finance', onClick: () => actions.invoice(null, { student_id: student.id }) },
+                            { label: 'Modifier le dossier', icon: 'edit', permission: 'students.manage', onClick: () => actions.student(student) },
+                            { label: 'Créer une facture', icon: 'finance', permission: 'finances.manage', onClick: () => actions.invoice(null, { student_id: student.id }) },
                           ]} />
                         </span>
                       </Tr>
@@ -274,15 +283,16 @@ export function FicheClasse() {
                   weekStart={weekStart}
                   today={today}
                   now={new Date()}
-                  onSlot={(slot) => actions.slot(slot)}
-                  onAdd={(day, hour) => actions.slot(null, {
+                  readOnly={!canManageTimetable}
+                  onSlot={canManageTimetable ? (slot) => actions.slot(slot) : undefined}
+                  onAdd={canManageTimetable ? (day, hour) => actions.slot(null, {
                     school_class_id: classId,
                     day_of_week: day,
                     starts_at: hour,
                     ends_at: hour ? `${String(Math.min(23, Number(hour.slice(0, 2)) + 2)).padStart(2, '0')}:${hour.slice(3, 5)}` : '',
                     term_id: meta?.term?.id,
-                  })}
-                  onDelete={(slot) => actions.deleteSlot(slot)}
+                  }) : undefined}
+                  onDelete={canManageTimetable ? (slot) => actions.deleteSlot(slot) : undefined}
                 />
               </Card>
             )}

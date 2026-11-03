@@ -1,8 +1,9 @@
-# DIALLO — dashboard React (affichage uniquement)
+# Kalanso — interface React
 
 Interface desktop de gestion d'école, direction **Indigo Minuit**.
-**Aucune logique métier** : pas d'appel réseau, pas de base de données, pas de calcul.
-Tout le contenu vient de `src/mock.js` — les composants ne font que le mettre en page.
+L'application est branchée sur l'API Laravel (`api/`) : données réelles,
+authentification Sanctum, permissions par rôle, exports Excel et rapports
+imprimables. Aucun compte ni aucune donnée de démonstration n'est embarqué.
 
 ## Lancer
 
@@ -13,6 +14,10 @@ npm run dev      # http://localhost:5179
 npm run build    # bundle de production dans dist/
 ```
 
+L'API locale doit écouter sur `http://127.0.0.1:8001/api` (voir `api/README.md`).
+Sur une base vide, l'interface affiche l'écran de première configuration, puis
+l'écran de connexion (mot de passe ou Google dans l'application desktop).
+
 ## Structure
 
 ```
@@ -21,13 +26,20 @@ app/
 ├─ vite.config.js
 └─ src/
    ├─ main.jsx            point d'entrée
-   ├─ App.jsx             coquille : état de navigation, transitions, raccourcis
-   ├─ layout.jsx          TitleBar · Sidebar · TopBar · PageHeader (+ NAV)
+   ├─ App.jsx             coquille : configuration, connexion, navigation
+   ├─ setup.jsx           première configuration (établissement + compte Direction)
+   ├─ login.jsx           connexion mot de passe et Google
+   ├─ api.js              client HTTP (token Sanctum, session, setup, Google)
+   ├─ data.jsx            contexte partagé : méta, permissions, notifications, toasts
+   ├─ auth.js             rôles, permissions et pages autorisées
+   ├─ layout.jsx          TitleBar · Sidebar · TopBar (+ NAV)
    ├─ ui.jsx              atomes et molécules d'affichage
-   ├─ pages.jsx           les 13 écrans
-   ├─ modals-page.jsx     vitrine des modales
+   ├─ pages.jsx / pages/  écrans métier
+   ├─ forms.jsx           formulaires, listes et confirmations
+   ├─ actions.jsx         actions métier partagées
+   ├─ reports.js          rapports imprimables
+   ├─ exports.js          exports Excel métier
    ├─ modal.jsx           système de modales (pile, focus, animations)
-   ├─ mock.js             tokens + données statiques
    └─ styles.css          feuille de style unique (CSS variables)
 ```
 
@@ -42,90 +54,35 @@ app/
 | `Progress` | jauge fine animée |
 | `Sparkline`, `AreaChart`, `BarChart`, `Donut`, `HBarList` | graphiques SVG animés en CSS |
 | `Table`, `Tr` | tableau en CSS grid |
-| `Field`, `Toggle` | champs et interrupteurs (présentation) |
+| `Field`, `Toggle` | champs et interrupteurs |
 
 ### `modal.jsx` — modales
 
-Provision et primitives :
+`ModalProvider`, `useModal()` (`open`, `close`, `closeAll`, `stack`) et
+`useModals()` (ouvreurs prêts : `student()`, `payment()`, `confirm()`,
+`absence()`, `exportData()`, `drawer()`, `message()`, `success()`).
 
-| Export | Rôle |
-|---|---|
-| `ModalProvider` | contexte + rendu de la pile dans un portail |
-| `useModal()` | `open(config)`, `close(id)`, `closeAll()`, `stack` |
-| `useModals()` | ouvreurs prêts : `student()`, `payment()`, `confirm()`, `absence()`, `exportData()`, `drawer()`, `message()`, `success()` |
-| `MField`, `MInput`, `MSelect`, `MTextarea`, `MRow`, `MOptions`, `MSummary` | champs et blocs de formulaire |
-
-Config acceptée par `open()` :
-
-```js
-open({
-  title, sub, eyebrow, icon,     // entête
-  variant: 'center' | 'wide' | 'drawer',
-  tone: 'danger' | 'success',    // liseré coloré
-  size: 460,                     // largeur personnalisée
-  body, side,                    // contenu (+ colonne latérale)
-  actions: [{ label, kind, icon, onClick }],
-  dismissible: false,            // bloque Échap et le clic sur le fond
-});
-```
-
-Comportement :
-
-- **pile** : chaque modale s'empile (`z-index` +10), la dernière capte le focus ;
-- **focus piégé** : `Tab` / `Maj+Tab` bouclent, focus rendu au déclencheur à la fermeture ;
-- **Échap** ferme la modale du dessus, clic sur le voile idem (si `dismissible`) ;
-- **animations** : entrée `modalIn` (420 ms : opacité + échelle + flou), sortie `modalOut` (220 ms),
-  contenu en cascade (`partIn`), drawer qui glisse depuis la droite ;
-- **verrou de scroll** via `body.modal-open`, sans saut de mise en page ;
-- **accessibilité** : `role="dialog"`, `aria-modal`, `aria-labelledby`, `aria-describedby`.
-
-Les fabriques (`StudentModal(api, params)`, …) sont des fonctions pures : elles
-n'appellent jamais de hook, ce qui autorise leur ouverture depuis n'importe quel
-gestionnaire d'événement.
-
-### `pages.jsx` — écrans
-
-`Dashboard`, `Eleves`, `Classes`, `EmploiDuTemps`, `Finances`, `Personnel`,
-`Messagerie`, `Notes`, `Absences`, `Fiche`, `Admissions`, `Modales`, `Parametres`.
-
-Chaque page exporte aussi ses métadonnées dans `META` (titre, sous-titre, fil d'Ariane, actions).
+Comportement : pile, focus piégé, fermeture par `Échap` ou clic sur le voile,
+animations d'entrée/sortie, verrou de scroll et attributs d'accessibilité.
 
 ### `App.jsx` — navigation
 
-- état local `pageId`, transitions directionnelles (`slide-next` / `slide-prev`)
-- recherche de page + notifications (affichage)
-- visite guidée automatique (`T`), dock précédent/suivant
-- raccourcis : `←/→`, `1…9`, `0`, `⌘K`, `T`, `⌘⇧M` (modale de démonstration)
-- deep-link par hash : `#finances`, `#emploi-du-temps`, …
+- Écran de première configuration quand la base est vide
+- Connexion mot de passe ou Google (desktop)
+- État local `pageId`, transitions directionnelles
+- Recherche de page, notifications et visite guidée
+- Filtrage des pages et actions selon le rôle de l'utilisateur
+- Deep-link par hash : `#finances`, `#emploi-du-temps`, …
 
-## Modale rapide
+## Icône et logo
 
-```jsx
-const modals = useModals();
-
-<Btn onClick={() => modals.confirm({
-  title: 'Supprimer ce dossier ?',
-  confirmLabel: 'Supprimer',
-})}>
-  Supprimer
-</Btn>
-```
+L'icône par défaut est `src/assets/kalanso-icon.png` (source vectorielle
+`../gallery/electron/build/icon.svg`). Le logo de l'établissement, téléversé
+depuis **Paramètres → Établissement**, remplace automatiquement l'icône par
+défaut dans la barre latérale, l'écran de connexion et les paramètres.
 
 ## Ajouter une page
 
-1. Écrire le composant dans `pages.jsx` et l'ajouter à `META` + `PAGES`.
+1. Écrire le composant dans `src/pages/` et l'ajouter à `META` + `PAGES`.
 2. Ajouter une entrée dans `NAV` (`layout.jsx`) avec une icône de `ui.jsx`.
-
-Aucune autre modification : la navigation, le dock et le compteur se mettent à jour seuls.
-
-## Design tokens
-
-| Token | Valeur |
-|---|---|
-| Fond | `#070B1F` |
-| Surface élevée | `#0B1030` |
-| Panneau verre | `#1B2A6B` (28–42 %) |
-| Texte | `#F0F2FF` / `#A7B6FF` / `#6B78A8` |
-| Accent | `#5B7CFA` · clair `#7E9BFF` |
-| Cuivre | `#E0A86F` |
-| Rayons | 7 · 10 · 14 · 18 px · pilule |
+3. Déclarer la page dans `ROLE_PAGES` (`auth.js`) pour les rôles autorisés.

@@ -12,4 +12,5 @@ contextBridge.exposeInMainWorld('desktopAPI', {
     ipcRenderer.on('window:state', handler);
     return () => ipcRenderer.removeListener('window:state', handler);
   },
+  googleSignIn: () => ipcRenderer.invoke('google:signIn'),
 });

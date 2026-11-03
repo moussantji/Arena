@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Exécute figma/diallo-indigo/code.js dans un faux contexte Figma, puis écrit
+ * Exécute figma/kalanso-indigo/code.js dans un faux contexte Figma, puis écrit
  * tools/scene.json : l'arbre de calques réel (frames, rectangles, ellipses, textes)
  * avec les positions calculées par l'auto-layout.
  *
@@ -17,7 +17,7 @@ const path = require('path');
 const vm = require('vm');
 
 const ROOT = path.dirname(__dirname);
-const CODE = path.join(ROOT, 'figma', 'diallo-indigo', 'code.js');
+const CODE = path.join(ROOT, 'figma', 'kalanso-indigo', 'code.js');
 const OUT = path.join(__dirname, 'scene.json');
 
 /* ------------------------------------------------------------ mesure du texte */

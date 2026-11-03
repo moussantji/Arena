@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Icon, Avatar, IconBtn, Btn } from './ui.jsx';
 import { useData, dateTime, initials } from './data.jsx';
+import { ROLE_LABELS } from './auth.js';
+import kalansoIcon from './assets/kalanso-icon.png';
 
 /* ============================================================
-   DIALLO — chrome de l'application
+   Kalanso — chrome de l'application
    Navigation, établissement et notifications branchés sur l'API.
    ============================================================ */
 
@@ -38,7 +40,7 @@ export const NAV = {
 export const PAGES = Object.values(NAV).flat();
 
 /* Contrôles de fenêtre façon Windows : réduire, agrandir/restaurer, fermer. */
-function WindowControls() {
+export function WindowControls() {
   const api = typeof window !== 'undefined' ? window.desktopAPI : null;
   const [maximized, setMaximized] = useState(false);
 
@@ -101,7 +103,7 @@ export function TitleBar({ page, onMenu }) {
       <IconBtn icon="menu" className="menu-btn" onClick={onMenu} title="Menu" />
 
       <div className="win-title">
-        {school?.name || 'DIALLO'} — <b>{page.label}</b>
+        {school?.name || 'Kalanso'} — <b>{page.label}</b>
         {year ? ` · ${year}` : ''} · Electron 1440 × 900
       </div>
 
@@ -111,35 +113,49 @@ export function TitleBar({ page, onMenu }) {
 }
 
 export function Sidebar({ pageId, onSelect, open }) {
-  const { meta, user, unreadThreads } = useData();
+  const {
+    meta, user, unreadThreads, canAccessPage, signOut,
+  } = useData();
   const school = meta?.school;
-  const displayUser = user?.name ? {
-    name: user.name,
-    role: user.role || 'Direction',
-    initials: initials(user.name),
-  } : {
-    name: 'M. Diallo',
-    role: 'Direction',
-    initials: 'MD',
+  const roleLabel = ROLE_LABELS[user?.role] || 'Invité';
+  const [signingOut, setSigningOut] = useState(false);
+
+  const logout = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOut();
+    } finally {
+      setSigningOut(false);
+    }
   };
+
+  // Filtrage des pages par rôle
+  const filteredNav = Object.entries(NAV).reduce((acc, [group, items]) => {
+    const visible = items.filter((it) => !it.hidden && canAccessPage(it.id));
+    if (visible.length) {
+      acc[group] = visible;
+    }
+    return acc;
+  }, {});
 
   return (
     <aside className={`sidebar ${open ? 'open' : ''}`}>
       <div className="brand">
         {school?.photo_url
-          ? <img className="brand-photo" src={school.photo_url} alt={`Logo ${school?.name || 'DIALLO'}`} />
-          : <span className="mark" />}
+          ? <img className="brand-photo" src={school.photo_url} alt={`Logo ${school?.name || 'Kalanso'}`} />
+          : <img className="brand-icon" src={kalansoIcon} alt="Kalanso" />}
         <span className="brand-txt">
-          <b>{school?.name || 'DIALLO'}</b>
-          <em>École internationale</em>
+          <b>{school?.name || 'Kalanso'}</b>
+          <em>Gestion scolaire</em>
         </span>
       </div>
 
       <nav className="nav">
-        {Object.entries(NAV).map(([group, items]) => (
+        {Object.entries(filteredNav).map(([group, items]) => (
           <React.Fragment key={group}>
             <div className="nav-label">{group}</div>
-            {items.filter((it) => !it.hidden).map((it) => {
+            {items.map((it) => {
               const badge = it.dynamicBadge === 'threads' ? unreadThreads : it.badge;
               return (
                 <button
@@ -160,11 +176,21 @@ export function Sidebar({ pageId, onSelect, open }) {
 
       <div className="sidebar-foot">
         <div className="user">
-          <Avatar initials={displayUser.initials} size={30} src={user?.photo_url} />
+          <Avatar initials={initials(user?.name || 'Kalanso')} size={30} src={user?.photo_url} />
           <span>
-            <b>{displayUser.name}</b>
-            <em>{displayUser.role}</em>
+            <b>{user?.name || 'Utilisateur'}</b>
+            <em className={`role-tag role-${user?.role || 'enseignant'}`}>{roleLabel}</em>
           </span>
+          <button
+            type="button"
+            className="logout-btn"
+            onClick={logout}
+            disabled={signingOut}
+            title="Se déconnecter"
+            aria-label="Se déconnecter"
+          >
+            <Icon name="logout" size={15} />
+          </button>
         </div>
       </div>
     </aside>
@@ -191,10 +217,17 @@ export function TopBar({
 }) {
   const {
     notifications, unread, markNotification, markAllNotifications, deleteNotification, user,
+    canAccessPage,
   } = useData();
   const [openNotif, setOpenNotif] = useState(false);
   const notifRef = useRef(null);
-  const displayInitials = user?.name ? initials(user.name) : 'MD';
+  const displayInitials = user?.name ? initials(user.name) : 'DI';
+  const roleLabel = ROLE_LABELS[user?.role] || 'Invité';
+
+  const notificationTarget = (notification) => {
+    const target = NOTIFICATION_PAGES[notification.type];
+    return target && canAccessPage(target) ? target : null;
+  };
 
   useEffect(() => {
     if (!openNotif) return undefined;
@@ -207,17 +240,20 @@ export function TopBar({
 
   const openNotification = (notification) => {
     markNotification(notification);
-    const target = NOTIFICATION_PAGES[notification.type];
-    if (!target) return;
+    const target = notificationTarget(notification);
+    if (!target) {
+      setOpenNotif(false);
+      return;
+    }
     if (target === 'finances') {
       const financeTab = notification.type === 'payment' ? 2 : 1;
       try {
-        window.sessionStorage.setItem('arena.finance.tab', String(financeTab));
+        window.sessionStorage.setItem('kalanso.finance.tab', String(financeTab));
       } catch {
         /* stockage indisponible */
       }
       window.setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('diallo:finance-tab', { detail: { tab: financeTab } }));
+        window.dispatchEvent(new CustomEvent('kalanso:finance-tab', { detail: { tab: financeTab } }));
       }, 150);
     }
     setOpenNotif(false);
@@ -287,7 +323,7 @@ export function TopBar({
                 type="button"
                 className="notif-main"
                 onClick={() => openNotification(n)}
-                title={NOTIFICATION_PAGES[n.type] ? 'Ouvrir la page concernée' : 'Marquer comme lue'}
+                title={notificationTarget(n) ? 'Ouvrir la page concernée' : 'Marquer comme lue'}
               >
                 <b>{n.title}</b>
                 <span>{n.body}</span>

@@ -1,15 +1,21 @@
-# DIALLO — gestion d'école
+# Kalanso — gestion d'école
 
-Application desktop de gestion d'école : interface React, API Laravel et coquille Electron.
-Palette **Indigo Minuit** (`#070B1F` · `#5B7CFA` · `#E0A86F`).
+Application desktop de gestion d'école : interface React, API Laravel, coquille
+Electron et connexion Google. Palette **Indigo Minuit** (`#070B1F` · `#5B7CFA` ·
+`#E0A86F`).
+
+L'application ne contient **aucun compte ni aucune donnée de démonstration** :
+au premier lancement, un écran de configuration crée l'établissement, l'année
+scolaire et le premier compte Direction. Les vraies données sont ensuite saisies
+directement dans Kalanso.
 
 ## Contenu
 
 | Dossier | Contenu |
 |---|---|
 | `app/` | **Application React** — interface desktop branchée sur l'API, composants et modales personnalisées |
-| `api/` | **API REST Laravel 13 + MySQL/MariaDB** — élèves, classes, notes, finances, admissions, messagerie |
-| `figma/` | **Plugin Figma** qui génère les styles, composants, 14 écrans et la modale + tokens |
+| `api/` | **API REST Laravel 13 + MySQL/MariaDB** — élèves, classes, notes, finances, admissions, messagerie, configuration initiale et connexion Google |
+| `figma/` | **Plugin Figma** qui génère les styles, composants, écrans et la modale + tokens |
 | `gallery/` | Écrans d'accueil (exports PNG) et coquille Electron |
 
 ## Démarrer
@@ -31,14 +37,43 @@ node gallery/server.js 4173
 # API Laravel + MySQL (mode développement web / HMR)
 cd api && composer install
 cp .env.example .env && php artisan key:generate   # renseigner DB_* dans .env
-php artisan migrate:fresh --seed
+php artisan migrate                                # base vide, sans données de test
 php artisan storage:link
-php artisan serve --host=127.0.0.1 --port=8001   # http://127.0.0.1:8001/api
+php artisan serve --host=127.0.0.1 --port=8001     # http://127.0.0.1:8001/api
 
 # paquet Ubuntu : AppImage + .deb
 cd gallery/electron && npm install
-npm run dist:linux                                # → release/
+npm run dist:linux                                 # → release/
 ```
+
+## Première configuration
+
+Sur une base vide, Kalanso affiche l'écran de mise en route :
+**établissement + année scolaire (3 trimestres créés automatiquement) +
+compte Direction**. La route `POST /api/setup` se ferme ensuite définitivement
+dès qu'un compte existe. Il n'y a plus de connexion rapide par compte de
+démonstration.
+
+## Connexion Google
+
+1. Dans **Google Cloud Console → API et services → Identifiants**, créez un
+   identifiant OAuth de type **Application de bureau**.
+2. Renseignez `api/.env` puis redémarrez l'application :
+
+```dotenv
+GOOGLE_CLIENT_ID=votre-identifiant.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=votre-secret
+```
+
+Le bouton **Continuer avec Google** ouvre le navigateur du poste, reçoit le
+code sur une boucle locale Electron avec **PKCE**, puis l'API échange le code
+contre un token Sanctum. Le secret reste côté API. La connexion est réservée
+aux comptes Kalanso existants : le compte est lié automatiquement lorsque
+l'adresse e-mail Google vérifiée correspond à un utilisateur.
+
+> Application déjà installée : l'API copiée se trouve dans
+> `~/.config/kalanso-desktop/backend/.env`. Renseignez-y les mêmes variables si
+> vous n'avez pas modifié `api/.env` avant le premier lancement.
 
 ## API
 
@@ -48,32 +83,29 @@ emploi du temps, notes, absences, factures, paiements, admissions, messagerie,
 documents, photos de profil et notifications.
 
 - Documentation complète : [`api/README.md`](api/README.md)
-- Base locale : `arena` (MariaDB/MySQL)
-- Compte de démonstration : `direction@diallo.test` / `password`
-- Authentification : **Sanctum** (token Bearer) ; lectures publiques, écritures protégées
-- Photos : table `photos`, méthodes `attachfiles()` / `getPhoto()` / `getImageUrl()`, endpoints protégés et URLs `photo_url` dans les réponses
-- Jeu de données : 186 élèves, 6 classes, 14 matières, 2 790 notes, 253 factures
+- Base locale : `arena` (nom technique conservé pour les postes déjà installés)
+- Configuration : `POST /api/setup`, état : `GET /api/setup/status`
+- Connexion Google : `GET /api/auth/google/status` et `POST /api/auth/google/exchange`
+- Authentification : **Sanctum** (token Bearer) ; toutes les routes métier sont protégées
+- Photos : table `photos`, méthodes `attachfiles()` / `getImageUrl()`, endpoints protégés et URLs `photo_url` dans les réponses
 
 ```bash
-# se connecter et récupérer un token
+# vérifier l'API
+curl http://127.0.0.1:8001/api/health
+
+# savoir si la première configuration est requise
+curl http://127.0.0.1:8001/api/setup/status
+
+# se connecter (après la configuration)
 curl -X POST http://127.0.0.1:8001/api/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"direction@diallo.test","password":"password"}'
-
-# vérifier l'API
-curl http://127.0.0.1:8001/api/dashboard
+  -d '{"email":"direction@mon-ecole.com","password":"motdepasse123"}'
 ```
-
-L'interface React consomme directement cette API via `app/src/api.js` et le
-contexte `app/src/data.jsx` : listes paginées, filtres serveur, agrégats du
-tableau de bord et formulaires de création, modification et suppression pour
-chaque domaine. Le compte de démonstration est utilisé automatiquement pour
-obtenir le token Sanctum nécessaire aux écritures.
 
 ## Tests
 
 ```bash
-# tests API (SQLite en mémoire, la base de démonstration n'est pas modifiée)
+# tests API (SQLite en mémoire, la base réelle n'est pas modifiée)
 cd api && php artisan test
 ```
 
@@ -92,55 +124,64 @@ Laravel locale : aucun terminal n'est nécessaire après installation.
 # paquets générés dans release/
 cd gallery/electron && npm run dist:linux
 
-# installation du .deb (menu Applications → DIALLO)
-sudo apt install ./release/DIALLO-1.0.0-amd64.deb
+# installation du .deb (menu Applications → Kalanso)
+sudo apt install ./release/Kalanso-1.1.0-amd64.deb
 
 # ou exécution directe de l'AppImage
-chmod +x release/DIALLO-1.0.0-x86_64.AppImage
-./release/DIALLO-1.0.0-x86_64.AppImage
+chmod +x release/Kalanso-1.1.0-x86_64.AppImage
+./release/Kalanso-1.1.0-x86_64.AppImage
 ```
 
 Prérequis sur la machine : **PHP 8.2+ CLI** et **MariaDB/MySQL** actifs, avec la
 base et les identifiants renseignés dans `api/.env`. Au premier lancement,
-Electron copie l'API dans `~/.config/diallo-desktop/backend`, applique les
+Electron copie l'API dans `~/.config/kalanso-desktop/backend`, applique les
 migrations puis démarre le service sur `127.0.0.1:8001`. Les journaux sont dans
-`~/.config/diallo-desktop/logs/` (`main.log` pour le démarrage de la fenêtre,
+`~/.config/kalanso-desktop/logs/` (`main.log` pour le démarrage de la fenêtre,
 `backend.log` pour l'API).
 
 Sur Linux, le rendu GPU est désactivé par défaut pour éviter les fenêtres
-noires sur certaines cartes graphiques. `DIALLO_GPU=1 diallo` réactive
+noires sur certaines cartes graphiques. `KALANSO_GPU=1 kalanso` réactive
 l'accélération matérielle.
 
 Pour développer avec HMR : `cd gallery/electron && npm run dev`. La commande
 démarre Vite si nécessaire, puis ouvre Electron sur `http://127.0.0.1:5179` en
 réutilisant l'API locale du port 8001. Les modifications React/CSS sont
 appliquées à chaud ; `main.js` et `preload.js` nécessitent un redémarrage. Le
-mode développement utilise le profil `~/.config/diallo-desktop-dev` et peut donc
-tourner en même temps que l'application installée. Le lanceur `diallo-dev`
-(installé dans `~/.local/bin`) fait la même chose depuis n'importe quel dossier.
-Pour ouvrir les DevTools : `DIALLO_DEVTOOLS=1 diallo-dev`. Pour lancer la
-version desktop locale sans paquet : `npm start`.
+mode développement utilise le profil `~/.config/kalanso-desktop-dev` et peut donc
+tourner en même temps que l'application installée. Pour ouvrir les DevTools :
+`KALANSO_DEVTOOLS=1 npm run dev`. Pour lancer la version desktop locale sans
+paquet : `npm start` dans `gallery/electron`.
+
+L'icône Kalanso par défaut est générée dans
+`gallery/electron/build/icon.png` (source vectorielle `icon.svg`) et reprise
+dans l'interface. Elle est remplaçable à tout moment depuis **Paramètres →
+Établissement → Remplacer le logo** : le logo de l'établissement remplace
+l'icône par défaut partout dans l'application.
 
 ## Figma
 
-Voir `figma/README.md` : importer `figma/diallo-indigo/manifest.json` comme plugin
-de développement, puis **Plugins → Development → DIALLO — Indigo Minuit**.
+Voir `figma/README.md` : importer `figma/kalanso-indigo/manifest.json` comme
+plugin de développement, puis **Plugins → Development → Kalanso — Indigo
+Minuit**. Le fichier `figma/Kalanso-Indigo-Minuit.sketch` reste disponible pour
+un import direct.
 
 ## Écrans
 
 Écrans React (composants) : tableau de bord, élèves, classes, fiche classe,
 emploi du temps, finances, personnel, fiche personnel, messagerie, matières,
 notes, absences, fiche élève, admissions, fiche admission, paramètres, plus une
-page **Modales** de démonstration.
+page **Modales** de vitrine des composants.
 
-Modales personnalisées : formulaire, paiement, confirmation destructive, justificatif,
-export, rédaction, succès et panneau latéral — pile, focus piégé, animations.
+Modales personnalisées : formulaire, paiement, confirmation destructive,
+justificatif, export, rédaction, succès et panneau latéral — pile, focus piégé,
+animations.
 
-Écrans exportés (PNG, 1312 × 816) : `gallery/palettes/indigo-page-*.png` (12 fichiers)
+Écrans exportés (PNG, 1312 × 816) : `gallery/palettes/indigo-page-*.png`
 + bannière `hero-06-indigo-minuit.png` et planche `palette-3-indigo-minuit.png`.
 
 ## Conventions
 
 - Une seule direction visuelle : **Indigo Minuit**, un accent unique.
 - Aucune donnée métier en dur dans les écrans : tout passe par l'API Laravel.
-- Tokens centralisés dans `app/src/styles.css` (variables CSS) et `figma/diallo-indigo/tokens.json`.
+- Tokens centralisés dans `app/src/styles.css` (variables CSS) et
+  `figma/kalanso-indigo/tokens.json`.

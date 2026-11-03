@@ -14,7 +14,7 @@ import {
 import { PageHead } from './common.jsx';
 
 export function Classes() {
-  const { meta, setClassId, notify } = useData();
+  const { meta, setClassId, notify, can } = useData();
   const actions = useActions();
   const [q, setQ] = useState('');
   const [level, setLevel] = useState('');
@@ -131,9 +131,9 @@ export function Classes() {
                   <span className="class-actions" onClick={(event) => event.stopPropagation()}>
                     <ActionMenu actions={[
                       { label: 'Ouvrir la fiche', icon: 'external', onClick: () => openClass(item) },
-                      { label: 'Modifier la classe', icon: 'edit', onClick: () => actions.classRoom(item) },
+                      { label: 'Modifier la classe', icon: 'edit', permission: 'classes.manage', onClick: () => actions.classRoom(item) },
                       { label: 'Voir les élèves', icon: 'students', onClick: () => { setClassId(item.id); window.location.hash = 'eleves'; } },
-                      { label: 'Supprimer', icon: 'trash', tone: 'danger', onClick: () => actions.deleteClass(item) },
+                      { label: 'Supprimer', icon: 'trash', tone: 'danger', permission: 'classes.manage', onClick: () => actions.deleteClass(item) },
                     ]} />
                   </span>
                 </div>
@@ -148,7 +148,7 @@ export function Classes() {
           <Btn icon="close" onClick={() => { setQ(''); setLevel(''); }}>Réinitialiser les filtres</Btn>
         </div>
       )}
-      {!loading && !error && !rows.length && (
+      {!loading && !error && !rows.length && can('classes.manage') && (
         <div className="empty-action">
           <Btn icon="plus" solid onClick={() => actions.classRoom()}>Créer une classe</Btn>
         </div>

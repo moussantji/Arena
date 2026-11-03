@@ -14,7 +14,7 @@ import { PageHead, average } from './common.jsx';
 const toneFor = (id) => ['accent', 'success', 'copper'][Number(id || 0) % 3];
 
 export function Matieres() {
-  const { meta, notify } = useData();
+  const { meta, notify, can } = useData();
   const actions = useActions();
   const [q, setQ] = useState('');
   const [department, setDepartment] = useState('');
@@ -132,8 +132,8 @@ export function Matieres() {
                   </span>
                   <span className="cell right cell-actions">
                     <ActionMenu actions={[
-                      { label: 'Modifier', icon: 'edit', onClick: () => actions.subject(subject) },
-                      { label: 'Supprimer', icon: 'trash', tone: 'danger', onClick: () => actions.deleteSubject(subject) },
+                      { label: 'Modifier', icon: 'edit', permission: 'subjects.manage', onClick: () => actions.subject(subject) },
+                      { label: 'Supprimer', icon: 'trash', tone: 'danger', permission: 'subjects.manage', onClick: () => actions.deleteSubject(subject) },
                     ]} />
                   </span>
                 </Tr>

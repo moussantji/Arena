@@ -1,9 +1,14 @@
-# DIALLO API — Laravel 13 + MySQL
+# Kalanso API — Laravel 13 + MySQL
 
-API REST de l'application de gestion scolaire **DIALLO**. Elle expose les données
-de démonstration utilisées par l'interface React : élèves, classes, matières,
-personnel, emploi du temps, notes, absences, finances, admissions, messagerie,
-documents et notifications.
+API REST de l'application de gestion scolaire **Kalanso**. Elle expose les
+données réelles de l'établissement : élèves, classes, matières, personnel,
+emploi du temps, notes, absences, finances, admissions, messagerie, documents
+et notifications.
+
+La base démarre **vide** : aucun compte ni aucune donnée de démonstration n'est
+injecté par les seeders. Le premier compte Direction et l'établissement sont
+créés par le formulaire de première configuration de l'application
+(`POST /api/setup`).
 
 ## Stack
 
@@ -36,21 +41,24 @@ GRANT ALL PRIVILEGES ON arena.* TO 'arena'@'localhost';
 FLUSH PRIVILEGES;"
 
 # renseigner DB_DATABASE=arena, DB_USERNAME=arena, DB_PASSWORD=... dans .env
-php artisan migrate:fresh --seed
+# (le nom technique de la base reste `arena` pour ne pas casser les postes existants)
+php artisan migrate
 php artisan storage:link
 php artisan serve --host=127.0.0.1 --port=8001
 ```
 
-L'API répond alors sur `http://127.0.0.1:8001/api`.
+L'API répond alors sur `http://127.0.0.1:8001/api`. Au premier lancement de
+l'interface, Kalanso propose de créer l'établissement et le premier compte
+Direction : il n'y a plus aucun compte de démonstration.
 
 ## Application desktop Ubuntu
 
 Le paquet Electron (`gallery/electron`) embarque cette API et la démarre
 automatiquement sur `127.0.0.1:8001` : inutile de lancer `php artisan serve`
 manuellement. Au premier démarrage, l'API est copiée dans
-`~/.config/diallo-desktop/backend`, les migrations sont appliquées, puis le
+`~/.config/kalanso-desktop/backend`, les migrations sont appliquées, puis le
 service est arrêté avec l'application. Journaux :
-`~/.config/diallo-desktop/logs/backend.log`.
+`~/.config/kalanso-desktop/logs/backend.log`.
 
 ```bash
 cd gallery/electron
@@ -61,14 +69,55 @@ La base MariaDB/MySQL et le fichier `api/.env` doivent être configurés au
 préalable. En développement, l'application réutilise une API déjà lancée sur le
 port 8001.
 
-## Compte de démonstration
+## Première configuration
 
-| Champ | Valeur |
-|---|---|
-| E-mail | `direction@diallo.test` |
-| Mot de passe | `password` |
+Sur une base vide, l'application affiche l'écran de mise en route. Elle appelle :
 
-> Compte de démonstration uniquement. Modifier le mot de passe avant tout usage réel.
+```bash
+# état de la base (public)
+curl http://127.0.0.1:8001/api/setup/status
+# → {"needs_setup":true,"google_enabled":false,"app_name":"Kalanso"}
+
+# création atomique de l'établissement, de l'année (3 trimestres) et du compte Direction
+curl -X POST http://127.0.0.1:8001/api/setup \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "school_name":"Mon établissement",
+    "school_full_name":"École internationale",
+    "currency":"FCFA",
+    "year_label":"2026 — 2027",
+    "year_starts_on":"2026-09-01",
+    "year_ends_on":"2027-06-30",
+    "name":"Prénom Nom",
+    "email":"direction@mon-ecole.com",
+    "password":"motdepasse123",
+    "password_confirmation":"motdepasse123"
+  }'
+```
+
+La route `POST /api/setup` se ferme automatiquement dès qu'un compte existe
+(réponse `403`).
+
+## Connexion Google
+
+La connexion Google est réservée aux **comptes Kalanso existants** : à la
+première connexion, le compte est lié automatiquement si l'adresse e-mail
+Google est vérifiée et correspond à un utilisateur.
+
+1. Créez un identifiant OAuth dans **Google Cloud Console → API et services →
+   Identifiants**. Le type *Application de bureau* est recommandé (la boucle
+   locale `http://127.0.0.1:port/oauth/callback` est acceptée sans port fixe).
+2. Renseignez les variables dans `api/.env` puis redémarrez l'application :
+
+```dotenv
+GOOGLE_CLIENT_ID=votre-identifiant.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=votre-secret
+```
+
+Le flux desktop utilise PKCE et une boucle locale dans Electron ; le **secret
+reste dans l'API**, qui échange le code contre un token Sanctum après
+vérification du compte Google.
 
 ## Authentification
 
@@ -77,7 +126,7 @@ port 8001.
 curl -X POST http://127.0.0.1:8001/api/login \
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
-  -d '{"email":"direction@diallo.test","password":"password","device_name":"desktop"}'
+  -d '{"email":"direction@mon-ecole.com","password":"motdepasse123","device_name":"desktop"}'
 
 # 2. appeler une route protégée
 curl http://127.0.0.1:8001/api/me \
@@ -90,9 +139,10 @@ curl -X POST http://127.0.0.1:8001/api/logout \
   -H "Authorization: Bearer <token>"
 ```
 
-Les **lectures sont publiques** dans cette version de démonstration ; toutes les
-**écritures** exigent un token Sanctum. Pour un déploiement réel, protéger également
-les données personnelles (élèves, messages, documents) derrière `auth:sanctum`.
+Toutes les routes métier (élèves, classes, notes, finances, messagerie,
+documents, notifications…) exigent un token Sanctum. Seuls `/api/health`,
+`/api/setup*`, `/api/auth/google/status`, `/api/auth/google/exchange` et
+`/api/login` sont publics.
 
 ## Endpoints
 
@@ -101,6 +151,10 @@ les données personnelles (élèves, messages, documents) derrière `auth:sanctu
 | Méthode | Route | Auth | Description |
 |---|---|---|---|
 | `GET` | `/api/health` | — | État de l'API |
+| `GET` | `/api/setup/status` | — | Indique si la première configuration est requise |
+| `POST` | `/api/setup` | — | Crée l'établissement, l'année et le compte Direction (une seule fois) |
+| `GET` | `/api/auth/google/status` | — | Connexion Google activée + identifiant public |
+| `POST` | `/api/auth/google/exchange` | — | Échange le code Google (PKCE) contre un token Sanctum |
 | `POST` | `/api/login` | — | Connexion, retourne un token |
 | `GET` | `/api/me` | token | Utilisateur courant |
 | `POST` | `/api/logout` | token | Révoque le token courant |
@@ -235,30 +289,21 @@ les données personnelles (élèves, messages, documents) derrière `auth:sanctu
 | `GET` | `/api/references/terms` | — | Trimestres (`academic_year_id`) |
 | `POST` | `/api/references/terms` | token | Créer un trimestre |
 
-## Données de démonstration
+## Base vide
 
-`php artisan migrate:fresh --seed` génère :
-
-- 1 établissement, 1 année scolaire, 2 semestres ;
-- 6 départements, 14 matières, 11 membres du personnel ;
-- 6 classes et 186 élèves ;
-- 14 matières affectées aux 6 classes, 90 créneaux d'emploi du temps ;
-- 2 790 notes sur 5 matières ;
-- 29 absences ;
-- 253 factures et 189 paiements ;
-- 12 dossiers d'admission, 5 conversations, 3 notifications.
-
-Les seeders sont dans `database/seeders/` (`Core`, `Student`, `Academic`, `Finance`, `Engagement`).
+`php artisan migrate` prépare les tables, **sans aucun compte ni donnée de
+démonstration**. `DatabaseSeeder` est volontairement vide : la première
+configuration se fait depuis l'application via `POST /api/setup`.
 
 ## Structure utile
 
 ```
 api/
-├── app/Http/Controllers/Api/   # contrôleurs REST
+├── app/Http/Controllers/Api/   # contrôleurs REST + Setup + Google
 ├── app/Models/                 # 22 modèles Eloquent
 ├── app/Models/Concerns/        # traits partagés (photos)
-├── database/migrations/        # 21 migrations métier + tables Laravel
-├── database/seeders/           # jeu de données de démonstration
+├── database/migrations/        # 22 migrations métier + tables Laravel
+├── database/seeders/           # DatabaseSeeder vide (base neuve)
 ├── routes/api.php              # routes publiques et protégées
 └── config/cors.php             # CORS ouvert pour l'app Electron / Vite local
 ```
@@ -270,4 +315,4 @@ api/
 - Les listes paginées renvoient la structure Laravel standard (`data`, `current_page`, `last_page`, `total`).
 - Les erreurs de validation renvoient `422` avec `errors`.
 - Sans token sur une écriture, l'API renvoie `401`.
-- Les photos sont stockées sur le disque public (`storage/app/public`) et exposées via `photo_url` et l'objet `photos` (`url`). `Photo::getImageUrl()` renvoie l'original : DIALLO n'embarque pas GD/Imagick ni Glide, donc aucun redimensionnement serveur n'est effectué.
+- Les photos sont stockées sur le disque public (`storage/app/public`) et exposées via `photo_url` et l'objet `photos` (`url`). `Photo::getImageUrl()` renvoie l'original : Kalanso n'embarque pas GD/Imagick ni Glide, donc aucun redimensionnement serveur n'est effectué.

@@ -17,14 +17,39 @@ use App\Models\Staff;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Term;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class MetaController extends Controller
 {
-    public function __invoke(): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         $year = AcademicYear::current()->first();
         $term = Term::current()->first();
+        $user = $request->user();
+        $canSeeFinance = $user?->hasAnyRole(User::ROLE_DIRECTION, User::ROLE_COMPTABLE) ?? false;
+        $canSeeAdmissions = $user?->hasAnyRole(User::ROLE_DIRECTION, User::ROLE_SECRETARIAT) ?? false;
+
+        $counts = [
+            'students' => Student::where('is_active', true)->count(),
+            'classes' => SchoolClass::count(),
+            'subjects' => Subject::count(),
+            'staff' => Staff::where('is_active', true)->count(),
+            'admissions' => $canSeeAdmissions
+                ? Admission::whereNotIn('status', ['inscrit', 'refuse'])->count()
+                : 0,
+            'unread_notifications' => AppNotification::whereNull('read_at')->count(),
+            'absences_this_month' => Absence::whereMonth('date', now()->month)->whereYear('date', now()->year)->count(),
+        ];
+
+        if ($canSeeFinance) {
+            $counts['pending_invoices'] = Invoice::whereIn('status', ['pending', 'partial'])->count();
+            $counts['payments_this_month'] = (float) Payment::where('status', 'completed')
+                ->whereMonth('paid_on', now()->month)
+                ->whereYear('paid_on', now()->year)
+                ->sum('amount');
+        }
 
         return response()->json([
             'school' => School::with('photos:id,school_id,filename')->first(),
@@ -50,18 +75,10 @@ class MetaController extends Controller
                 ->orderBy('first_name')
                 ->get(['id', 'first_name', 'last_name', 'role', 'department_id']),
             'terms' => Term::orderBy('starts_on')->get(['id', 'academic_year_id', 'name', 'starts_on', 'ends_on', 'is_current']),
-            'fee_types' => FeeType::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code', 'default_amount']),
-            'counts' => [
-                'students' => Student::where('is_active', true)->count(),
-                'classes' => SchoolClass::count(),
-                'subjects' => Subject::count(),
-                'staff' => Staff::where('is_active', true)->count(),
-                'admissions' => Admission::whereNotIn('status', ['inscrit', 'refuse'])->count(),
-                'unread_notifications' => AppNotification::whereNull('read_at')->count(),
-                'pending_invoices' => Invoice::whereIn('status', ['pending', 'partial'])->count(),
-                'absences_this_month' => Absence::whereMonth('date', now()->month)->whereYear('date', now()->year)->count(),
-                'payments_this_month' => (float) Payment::where('status', 'completed')->whereMonth('paid_on', now()->month)->whereYear('paid_on', now()->year)->sum('amount'),
-            ],
+            'fee_types' => $canSeeFinance
+                ? FeeType::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code', 'default_amount'])
+                : [],
+            'counts' => $counts,
             'options' => [
                 'student_status' => ['a_jour', 'en_retard', 'boursier'],
                 'admission_status' => ['nouveau', 'entretien', 'valide', 'inscrit', 'refuse'],

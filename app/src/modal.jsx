@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { Icon, Btn, Avatar, Pill } from './ui.jsx';
 
 /* ============================================================
-   DIALLO — modales personnalisées
+   Kalanso — modales personnalisées
    Pile de modales, animations d'entrée/sortie, focus piégé,
    fermeture par Échap, clic sur le fond, ou action.
    ============================================================ */

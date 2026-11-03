@@ -17,9 +17,10 @@ import {
 
 export function EmploiDuTemps() {
   const {
-    meta, classId: storedClassId, setClassId, notify,
+    meta, classId: storedClassId, setClassId, notify, can,
   } = useData();
   const actions = useActions();
+  const canManage = can('schedules.manage');
   const classes = meta?.classes || [];
   const classId = classes.some((item) => Number(item.id) === Number(storedClassId))
     ? Number(storedClassId)
@@ -193,7 +194,9 @@ export function EmploiDuTemps() {
               <span>{currentClass?.name || 'Classe'} · {viewDay === today ? todayLabel : DAYS[viewDay - 1]}</span>
               <div className="tt-day-actions">
                 <Btn icon="calendar" onClick={() => { setWeekOffset(baseWeekOffset); setViewDay(null); }}>Voir la semaine</Btn>
-                <Btn icon="plus" solid onClick={() => addSlot(viewDay, '08:00')}>Ajouter un cours</Btn>
+                {canManage && (
+                  <Btn icon="plus" solid onClick={() => addSlot(viewDay, '08:00')}>Ajouter un cours</Btn>
+                )}
               </div>
             </div>
           ) : (
@@ -203,9 +206,10 @@ export function EmploiDuTemps() {
               weekStart={weekStart}
               today={today}
               now={now}
-              onSlot={(slot) => actions.slot(slot)}
-              onAdd={addSlot}
-              onDelete={(slot) => actions.deleteSlot(slot)}
+              readOnly={!canManage}
+              onSlot={canManage ? (slot) => actions.slot(slot) : undefined}
+              onAdd={canManage ? addSlot : undefined}
+              onDelete={canManage ? (slot) => actions.deleteSlot(slot) : undefined}
             />
           )}
         </ListState>
@@ -216,7 +220,7 @@ export function EmploiDuTemps() {
         <span><i className="lg-b" />Lettres</span>
         <span><i className="lg-c" />Autres</span>
         <span className="legend-now"><i />Cours en cours (calculé sur l’heure actuelle)</span>
-        <span className="legend-hint">Cliquez sur une case vide pour ajouter un cours.</span>
+        {canManage && <span className="legend-hint">Cliquez sur une case vide pour ajouter un cours.</span>}
       </div>
     </>
   );

@@ -1,7 +1,7 @@
 /* ============================================================
-   DIALLO — client HTTP de l'API
+   Kalanso — client HTTP de l'API
    Gère le token Sanctum, la sérialisation des filtres et
-   l'ouverture automatique de la session de démonstration.
+   l'expiration de la session.
    ============================================================ */
 
 function defaultApiUrl() {
@@ -21,8 +21,8 @@ function defaultApiUrl() {
 }
 
 const DEFAULT_URL = defaultApiUrl();
-const TOKEN_KEY = 'arena.token';
-const USER_KEY = 'arena.user';
+const TOKEN_KEY = 'kalanso.token';
+const USER_KEY = 'kalanso.user';
 
 export const API_URL = (import.meta.env.VITE_API_URL || DEFAULT_URL).replace(/\/$/, '');
 
@@ -110,8 +110,6 @@ let currentUser = (() => {
   }
 })();
 
-let loginPromise = null;
-
 export function getToken() {
   return token;
 }
@@ -160,50 +158,21 @@ async function parseResponse(response) {
   return response.text();
 }
 
-async function ensureSession() {
-  if (token) return token;
-  if (!loginPromise) {
-    loginPromise = (async () => {
-      const response = await fetch(buildUrl('/login'), {
-        method: 'POST',
-        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'direction@diallo.test',
-          password: 'password',
-          device_name: 'arena-desktop',
-        }),
-      });
-      const payload = await parseResponse(response);
-      if (!response.ok) {
-        throw new ApiError(response.status, payload, 'Connexion de démonstration indisponible.');
-      }
-      setSession(payload.token, payload.user);
-      return payload.token;
-    })().finally(() => {
-      loginPromise = null;
-    });
-  }
-  return loginPromise;
+function notifySessionExpired() {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent('kalanso:session-expired'));
 }
 
-async function send(path, options = {}, retried = false) {
+async function send(path, options = {}) {
   const {
     method = 'GET',
     query,
     body,
     headers = {},
-    auth = false,
+    auth = true,
     signal,
     raw = false,
   } = options;
-
-  if (auth) {
-    try {
-      await ensureSession();
-    } catch (error) {
-      if (!retried) throw error;
-    }
-  }
 
   const isForm = typeof FormData !== 'undefined' && body instanceof FormData;
   const requestHeaders = { Accept: 'application/json', ...headers };
@@ -219,9 +188,9 @@ async function send(path, options = {}, retried = false) {
     signal,
   });
 
-  if (response.status === 401 && auth && !retried) {
+  if (response.status === 401 && auth) {
     clearSession();
-    return send(path, options, true);
+    notifySessionExpired();
   }
 
   const payload = await parseResponse(response);
@@ -251,22 +220,44 @@ export const api = {
   upload(path, formData, options = {}) {
     return send(path, { ...options, method: 'POST', body: formData, auth: true });
   },
-  login(email, password, deviceName = 'arena-desktop') {
+  login(email, password, deviceName = 'kalanso-desktop') {
     return send('/login', {
       method: 'POST',
+      auth: false,
       body: { email, password, device_name: deviceName },
     }).then((payload) => {
       setSession(payload.token, payload.user);
       return payload;
     });
   },
-  logout() {
-    return send('/logout', { method: 'POST', auth: true }).finally(clearSession);
+  setupStatus() {
+    return send('/setup/status', { method: 'GET', auth: false });
+  },
+  setup(body) {
+    return send('/setup', { method: 'POST', auth: false, body }).then((payload) => {
+      setSession(payload.token, payload.user);
+      return payload;
+    });
+  },
+  googleStatus() {
+    return send('/auth/google/status', { method: 'GET', auth: false });
+  },
+  googleExchange(body) {
+    return send('/auth/google/exchange', { method: 'POST', auth: false, body }).then((payload) => {
+      setSession(payload.token, payload.user);
+      return payload;
+    });
+  },
+  async logout() {
+    try {
+      if (token) await send('/logout', { method: 'POST' });
+    } finally {
+      clearSession();
+    }
   },
   me() {
-    return send('/me', { method: 'GET', auth: true });
+    return send('/me', { method: 'GET' });
   },
-  ensureSession,
 };
 
 export function errorMessage(error, fallback = 'Une erreur est survenue.') {

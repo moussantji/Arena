@@ -5,10 +5,10 @@ Valide un fichier .sketch contre le schéma JSON **officiel** de Sketch
 l'écosystème Sketch — et donc le meilleur garde-fou avant un import Figma.
 
 Le schéma n'est pas versionné dans le dépôt : il est récupéré une fois depuis
-le registre npm, puis mis en cache (~/.cache/diallo-sketch-schemas).
+le registre npm, puis mis en cache (~/.cache/kalanso-sketch-schemas).
 
 Usage :
-    python3 tools/validate-sketch.py figma/DIALLO-Indigo-Minuit.sketch
+    python3 tools/validate-sketch.py figma/Kalanso-Indigo-Minuit.sketch
     SKETCH_SCHEMAS=/chemin/vers/dist python3 tools/validate-sketch.py fichier.sketch
 
 Dépendance : jsonschema (`pip install jsonschema`, ou via un venv).
@@ -26,7 +26,7 @@ import zipfile
 PKG = "@sketch-hq/sketch-file-format"
 VERSION = "6.5.0"
 TARBALL = f"https://registry.npmjs.org/{PKG}/-/sketch-file-format-{VERSION}.tgz"
-CACHE = os.path.join(os.path.expanduser("~"), ".cache", "diallo-sketch-schemas")
+CACHE = os.path.join(os.path.expanduser("~"), ".cache", "kalanso-sketch-schemas")
 PARTS = ("document", "page", "meta", "user", "file-format")
 
 

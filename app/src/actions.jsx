@@ -7,11 +7,13 @@ import {
   DAYS, initials,
 } from './data.jsx';
 import { openResourceForm, openConfirm } from './forms.jsx';
+import { useCan } from './common.jsx';
+import { ROLES, ROLE_LABELS } from './auth.js';
 import { exportInvoiceReport } from './reports.js';
 import { Avatar, Btn, Icon, Pill } from './ui.jsx';
 
 /* ============================================================
-   DIALLO — actions métier partagées
+   Kalanso — actions métier partagées
    Chaque fonction ouvre un formulaire relié à l'API, gère les
    erreurs de validation, rafraîchit les listes et notifie.
    ============================================================ */
@@ -36,11 +38,11 @@ const focusInvoices = () => {
   if (typeof window === 'undefined') return;
   const current = window.location.hash.replace('#', '');
   if (current === 'finances') {
-    window.dispatchEvent(new CustomEvent('diallo:finance-tab', { detail: { tab: 1 } }));
+    window.dispatchEvent(new CustomEvent('kalanso:finance-tab', { detail: { tab: 1 } }));
     return;
   }
   try {
-    window.sessionStorage.setItem('arena.finance.tab', '1');
+    window.sessionStorage.setItem('kalanso.finance.tab', '1');
   } catch {
     /* stockage indisponible : la navigation reste fonctionnelle */
   }
@@ -49,6 +51,7 @@ const focusInvoices = () => {
 
 export function useActions() {
   const modal = useModal();
+  const can = useCan();
   const {
     meta, notify, refresh, studentId, setStudentId,
   } = useData();
@@ -114,6 +117,7 @@ export function useActions() {
 
   /* ------------------------------------------------ élèves */
   function studentForm(student) {
+    if (!can('students.manage')) return;
     const editing = Boolean(student?.id);
     openResourceForm(modal, {
       title: editing ? 'Modifier l’élève' : 'Nouvel élève',
@@ -242,6 +246,7 @@ export function useActions() {
   }
 
   function studentDrawer(student) {
+    if (!can('students.view')) return;
     if (!student) return;
     const status = STUDENT_STATUS[student.status] || STUDENT_STATUS.a_jour;
     modal.open({
@@ -341,6 +346,7 @@ export function useActions() {
   }
 
   function deleteStudent(student) {
+    if (!can('students.manage')) return;
     openConfirm(modal, {
       title: `Retirer ${fullName(student)} ?`,
       message: `Le dossier de ${fullName(student)} sera supprimé, avec ses notes, absences, factures et documents.`,
@@ -355,6 +361,7 @@ export function useActions() {
 
   /* ------------------------------------------------ classes */
   function classForm(item) {
+    if (!can('classes.manage')) return;
     const editing = Boolean(item?.id);
     openResourceForm(modal, {
       title: editing ? 'Modifier la classe' : 'Créer une classe',
@@ -387,6 +394,7 @@ export function useActions() {
   }
 
   function deleteClass(item) {
+    if (!can('classes.manage')) return;
     openConfirm(modal, {
       title: `Supprimer la classe ${item.name} ?`,
       message: 'Les élèves rattachés à cette classe resteront dans la base mais n’auront plus de classe. Les créneaux et matières liés seront retirés.',
@@ -398,6 +406,7 @@ export function useActions() {
 
   /* ------------------------------------------------ matières */
   function subjectForm(item) {
+    if (!can('subjects.manage')) return;
     const editing = Boolean(item?.id);
     openResourceForm(modal, {
       title: editing ? 'Modifier la matière' : 'Nouvelle matière',
@@ -430,6 +439,7 @@ export function useActions() {
   }
 
   function deleteSubject(item) {
+    if (!can('subjects.manage')) return;
     openConfirm(modal, {
       title: `Supprimer ${item.name} ?`,
       message: 'Les notes, créneaux et affectations liés à cette matière seront également supprimés.',
@@ -441,6 +451,7 @@ export function useActions() {
 
   /* ------------------------------------------------ personnel */
   function staffForm(item) {
+    if (!can('staff.manage')) return;
     const editing = Boolean(item?.id);
     openResourceForm(modal, {
       title: editing ? 'Modifier le membre' : 'Ajouter un membre',
@@ -478,6 +489,7 @@ export function useActions() {
   }
 
   function deleteStaff(item) {
+    if (!can('staff.manage')) return;
     openConfirm(modal, {
       title: `Supprimer ${fullName(item)} ?`,
       message: 'Le membre sera retiré de l’annuaire. Ses affectations de cours seront détachées.',
@@ -489,6 +501,7 @@ export function useActions() {
 
   /* ------------------------------------------------ emploi du temps */
   function slotForm(slot, defaults = {}) {
+    if (!can('schedules.manage')) return;
     const editing = Boolean(slot?.id);
     const initial = editing ? {
       ...slot,
@@ -532,6 +545,7 @@ export function useActions() {
   }
 
   function deleteSlot(slot) {
+    if (!can('schedules.manage')) return;
     openConfirm(modal, {
       title: 'Supprimer ce créneau ?',
       message: `${slot.subject?.name || 'Cours'} · ${slot.school_class?.name || 'Classe'} · ${DAYS[(slot.day_of_week || 1) - 1]} ${String(slot.starts_at || '').slice(0, 5)}`,
@@ -543,6 +557,7 @@ export function useActions() {
 
   /* ------------------------------------------------ notes */
   function gradeForm(grade, defaults = {}) {
+    if (!can('grades.manage')) return;
     const editing = Boolean(grade?.id);
     openResourceForm(modal, {
       title: editing ? 'Modifier la note' : 'Saisir une note',
@@ -596,6 +611,7 @@ export function useActions() {
   }
 
   function deleteGrade(grade) {
+    if (!can('grades.manage')) return;
     openConfirm(modal, {
       title: 'Supprimer cette note ?',
       message: `${grade.student?.full_name || 'Élève'} · ${grade.subject?.name || 'Matière'} · ${EVALUATIONS[grade.evaluation] || grade.evaluation}`,
@@ -607,6 +623,7 @@ export function useActions() {
 
   /* ------------------------------------------------ absences */
   function absenceForm(absence, defaults = {}) {
+    if (!can('absences.manage')) return;
     const editing = Boolean(absence?.id);
     openResourceForm(modal, {
       title: editing ? 'Modifier l’absence' : 'Enregistrer une absence',
@@ -659,6 +676,7 @@ export function useActions() {
   }
 
   function justifyAbsence(absence) {
+    if (!can('absences.manage')) return;
     openResourceForm(modal, {
       title: 'Justifier une absence',
       sub: `${absence.student?.full_name || 'Élève'} · ${dateInput(absence.date)}`,
@@ -681,6 +699,7 @@ export function useActions() {
   }
 
   function deleteAbsence(absence) {
+    if (!can('absences.manage')) return;
     openConfirm(modal, {
       title: 'Supprimer cette absence ?',
       message: `${absence.student?.full_name || 'Élève'} · ${dateInput(absence.date)} · ${absence.reason || 'sans motif'}`,
@@ -692,6 +711,7 @@ export function useActions() {
 
   /* ------------------------------------------------ finances */
   function invoiceForm(invoice, defaults = {}) {
+    if (!can('finances.manage')) return;
     const editing = Boolean(invoice?.id);
     openResourceForm(modal, {
       title: editing ? 'Modifier la facture' : 'Créer une facture',
@@ -744,6 +764,7 @@ export function useActions() {
   }
 
   function deleteInvoice(invoice) {
+    if (!can('finances.manage')) return;
     openConfirm(modal, {
       title: 'Supprimer cette facture ?',
       message: `${invoice.reference} · ${invoice.student?.full_name || 'Élève'} · ${money(invoice.amount, currency)}. Les paiements associés seront supprimés.`,
@@ -772,6 +793,7 @@ export function useActions() {
   }
 
   async function invoiceDetail(source) {
+    if (!can('finances.view')) return;
     const data = await loadInvoice(source);
     if (!data) return;
 
@@ -882,6 +904,7 @@ export function useActions() {
   }
 
   async function invoicePdf(source) {
+    if (!can('finances.view')) return;
     const data = await loadInvoice(source);
     if (!data) return;
     exportInvoiceReport({
@@ -894,6 +917,7 @@ export function useActions() {
   }
 
   async function paymentForm(payment, defaults = {}) {
+    if (!can('finances.manage')) return;
     const editing = Boolean(payment?.id);
     let invoices = defaults.invoices;
     if (!invoices) {
@@ -958,6 +982,7 @@ export function useActions() {
   }
 
   function deletePayment(payment) {
+    if (!can('finances.manage')) return;
     openConfirm(modal, {
       title: 'Supprimer ce paiement ?',
       message: `${payment.student?.full_name || 'Élève'} · ${money(payment.amount, currency)} · ${dateInput(payment.paid_on)}. La facture sera recalculée.`,
@@ -969,6 +994,7 @@ export function useActions() {
 
   /* ------------------------------------------------ admissions */
   function admissionForm(admission) {
+    if (!can('admissions.manage')) return;
     const editing = Boolean(admission?.id);
     openResourceForm(modal, {
       title: editing ? 'Modifier le dossier' : 'Nouveau dossier',
@@ -1026,6 +1052,7 @@ export function useActions() {
   }
 
   function enrollAdmission(admission) {
+    if (!can('admissions.manage')) return;
     openConfirm(modal, {
       title: `Inscrire ${fullName(admission)} ?`,
       message: `Un dossier élève sera créé dans la classe ${admission.desired_class?.name || 'choisie'} avec un matricule automatique. La candidature passera au statut « Inscrit ».`,
@@ -1039,6 +1066,7 @@ export function useActions() {
   }
 
   function deleteAdmission(admission) {
+    if (!can('admissions.manage')) return;
     openConfirm(modal, {
       title: 'Supprimer ce dossier ?',
       message: `${fullName(admission)} · ${admission.reference}. Le dossier de candidature sera définitivement supprimé.`,
@@ -1050,6 +1078,7 @@ export function useActions() {
 
   /* ------------------------------------------------ documents */
   function documentForm(student, options = {}) {
+    if (!can('documents.manage')) return;
     const target = student || students.find((item) => item.id === studentId);
     if (!target) {
       notify('Sélectionnez d’abord un élève.', { tone: 'danger' });
@@ -1092,6 +1121,7 @@ export function useActions() {
   }
 
   function deleteDocument(document) {
+    if (!can('documents.manage')) return;
     openConfirm(modal, {
       title: 'Supprimer ce document ?',
       message: `${document.name} sera retiré du dossier et le fichier sera supprimé du stockage.`,
@@ -1106,6 +1136,10 @@ export function useActions() {
     const kind = options.kind || 'student';
     const isUser = kind === 'user';
     const isSchool = kind === 'school';
+
+    if (kind === 'student' && !can('students.manage')) return;
+    if (kind === 'staff' && !can('staff.manage')) return;
+    if (isSchool && !can('establishment.manage')) return;
 
     if (!isUser && !isSchool && !target?.id) {
       notify('Sélectionnez d’abord une fiche.', { tone: 'danger' });
@@ -1173,6 +1207,7 @@ export function useActions() {
 
   /* ------------------------------------------------ messagerie */
   function threadForm() {
+    if (!can('messages.manage')) return;
     openResourceForm(modal, {
       title: 'Nouveau message',
       sub: 'Aux familles ou à l’équipe',
@@ -1189,10 +1224,10 @@ export function useActions() {
             { value: 'internal', label: 'Équipe interne' },
           ],
         },
-        { name: 'sender_name', label: 'Expéditeur', half: true, default: 'M. Diallo' },
+        { name: 'sender_name', label: 'Expéditeur', half: true, default: 'Direction' },
         { name: 'body', label: 'Message', type: 'textarea', required: true, rows: 6, placeholder: 'Bonjour, …' },
       ],
-      initial: { type: 'parent', sender_name: 'M. Diallo' },
+      initial: { type: 'parent', sender_name: 'Direction' },
       submit: (payload) => api.post('/threads', payload),
       success: 'Message envoyé.',
       submitLabel: 'Envoyer le message',
@@ -1200,6 +1235,7 @@ export function useActions() {
   }
 
   function threadEditForm(thread) {
+    if (!can('messages.manage')) return;
     openResourceForm(modal, {
       title: 'Modifier la conversation',
       sub: thread.subject,
@@ -1226,6 +1262,7 @@ export function useActions() {
   }
 
   function deleteThread(thread) {
+    if (!can('messages.manage')) return;
     openConfirm(modal, {
       title: 'Supprimer cette conversation ?',
       message: `« ${thread.subject} » et tous ses messages seront définitivement supprimés.`,
@@ -1237,6 +1274,7 @@ export function useActions() {
 
   /* ------------------------------------------------ départements et frais */
   function departmentForm(department) {
+    if (!can('referentiels.manage')) return;
     const editing = Boolean(department?.id);
     openResourceForm(modal, {
       title: editing ? 'Modifier le département' : 'Nouveau département',
@@ -1259,6 +1297,7 @@ export function useActions() {
   }
 
   function deleteDepartment(department) {
+    if (!can('referentiels.manage')) return;
     openConfirm(modal, {
       title: `Supprimer ${department.name} ?`,
       message: 'Les matières et membres rattachés à ce département seront détachés. Cette action ne supprime pas les personnes.',
@@ -1269,6 +1308,7 @@ export function useActions() {
   }
 
   function feeTypeForm(feeType) {
+    if (!can('referentiels.manage')) return;
     const editing = Boolean(feeType?.id);
     openResourceForm(modal, {
       title: editing ? 'Modifier les frais' : 'Nouveau type de frais',
@@ -1304,6 +1344,7 @@ export function useActions() {
   }
 
   function deleteFeeType(feeType) {
+    if (!can('referentiels.manage')) return;
     openConfirm(modal, {
       title: `Supprimer ${feeType.name} ?`,
       message: 'Ce type de frais ne sera plus proposé lors de la création d’une facture. Les factures existantes restent inchangées.',
@@ -1315,6 +1356,7 @@ export function useActions() {
 
   /* ------------------------------------------------ années et trimestres */
   function yearForm(year) {
+    if (!can('referentiels.manage')) return;
     const editing = Boolean(year?.id);
     openResourceForm(modal, {
       title: editing ? 'Modifier l’année scolaire' : 'Nouvelle année scolaire',
@@ -1344,6 +1386,7 @@ export function useActions() {
   }
 
   async function termForm(term) {
+    if (!can('referentiels.manage')) return;
     const editing = Boolean(term?.id);
     let years = [];
     try {
@@ -1391,6 +1434,7 @@ export function useActions() {
   }
 
   function deleteYear(year) {
+    if (!can('referentiels.manage')) return;
     openConfirm(modal, {
       title: `Supprimer l’année ${year.label} ?`,
       message: 'Les classes, trimestres et factures rattachés à cette année peuvent être supprimés en cascade.',
@@ -1401,12 +1445,72 @@ export function useActions() {
   }
 
   function deleteTerm(term) {
+    if (!can('referentiels.manage')) return;
     openConfirm(modal, {
       title: `Supprimer ${term.name} ?`,
       message: 'Les notes et factures rattachées à cette période ne seront plus associées à un trimestre.',
       confirmLabel: 'Supprimer le trimestre',
       onConfirm: () => api.del(`/references/terms/${term.id}`),
       success: 'Trimestre supprimé.',
+    });
+  }
+
+  /* ------------------------------------------------ comptes */
+  function userForm(account) {
+    if (!can('users.manage')) return;
+
+    const editing = Boolean(account?.id);
+
+    openResourceForm(modal, {
+      title: editing ? 'Modifier le compte' : 'Nouveau compte',
+      sub: editing ? account.email : 'Créer un accès pour un membre de l’équipe',
+      eyebrow: 'Comptes et accès',
+      icon: 'profile',
+      variant: 'center',
+      size: 580,
+      fields: [
+        { name: 'name', label: 'Nom complet', required: true, placeholder: 'Aminata Barry' },
+        { name: 'email', label: 'Adresse e-mail', type: 'email', required: true, placeholder: 'prenom@mon-ecole.com' },
+        {
+          name: 'role',
+          label: 'Rôle',
+          type: 'select',
+          required: true,
+          options: ROLES.map((role) => ({ value: role, label: ROLE_LABELS[role] })),
+          help: 'Le rôle détermine les pages et les actions autorisées.',
+        },
+        {
+          name: 'password',
+          label: editing ? 'Nouveau mot de passe (facultatif)' : 'Mot de passe',
+          type: 'password',
+          required: !editing,
+          placeholder: '8 caractères minimum',
+          help: editing ? 'Laisser vide pour conserver le mot de passe actuel.' : undefined,
+        },
+      ],
+      initial: {
+        name: account?.name || '',
+        email: account?.email || '',
+        role: account?.role || 'enseignant',
+        password: '',
+      },
+      submit: (payload) => (editing
+        ? api.patch(`/users/${account.id}`, payload)
+        : api.post('/users', payload)),
+      success: editing ? 'Compte mis à jour.' : 'Compte créé.',
+      submitLabel: editing ? 'Enregistrer' : 'Créer le compte',
+    });
+  }
+
+  function deleteUser(account) {
+    if (!can('users.manage')) return;
+
+    openConfirm(modal, {
+      title: `Supprimer ${account.name} ?`,
+      message: 'Ce compte ne pourra plus se connecter à l’application.',
+      confirmLabel: 'Supprimer le compte',
+      onConfirm: () => api.del(`/users/${account.id}`),
+      success: 'Compte supprimé.',
     });
   }
 
@@ -1450,6 +1554,8 @@ export function useActions() {
     deleteDepartment,
     feeType: feeTypeForm,
     deleteFeeType,
+    user: userForm,
+    deleteUser,
     nextMatricule,
     money: (value) => money(value, currency),
     compactMoney: (value) => compactMoney(value, currency),

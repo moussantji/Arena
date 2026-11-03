@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 
-// DIALLO — lancement en mode développement.
+// Kalanso — lancement en mode développement.
 //
 // Réutilise le serveur Vite s'il tourne déjà sur le port 5179, sinon le
-// démarre. Electron est ensuite ouvert avec le profil « diallo-desktop-dev » :
+// démarre. Electron est ensuite ouvert avec le profil « kalanso-desktop-dev » :
 // la version de développement peut donc tourner en même temps que
 // l'application installée, sans conflit de verrou Electron.
 //
@@ -17,8 +17,8 @@ const path = require('node:path');
 
 const ELECTRON_DIR = __dirname;
 const APP_DIR = path.join(ELECTRON_DIR, '..', '..', 'app');
-const HOST = process.env.DIALLO_DEV_HOST || '127.0.0.1';
-const PORT = Number(process.env.DIALLO_DEV_PORT || 5179);
+const HOST = process.env.KALANSO_DEV_HOST || '127.0.0.1';
+const PORT = Number(process.env.KALANSO_DEV_PORT || 5179);
 const URL = `http://${HOST}:${PORT}`;
 
 let vite = null;
@@ -66,7 +66,7 @@ function shutdown(code = 0) {
 }
 
 async function main() {
-  console.log(`DIALLO — mode développement (${URL})`);
+  console.log(`Kalanso — mode développement (${URL})`);
 
   if (await probe()) {
     console.log('• serveur Vite déjà actif, réutilisation.');

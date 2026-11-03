@@ -19,7 +19,7 @@ const scoreTone = (score, max = 20) => {
 };
 
 export function Notes() {
-  const { meta } = useData();
+  const { meta, can } = useData();
   const actions = useActions();
   const [q, setQ] = useState('');
   const [classId, setClassId] = useState('');
@@ -82,7 +82,7 @@ export function Notes() {
     setEvaluation('');
   };
 
-  const exportRows = () => exportCsv('diallo-notes', [
+  const exportRows = () => exportCsv('kalanso-notes', [
     { label: 'Élève', value: (row) => fullName(row.student) },
     { label: 'Matricule', value: (row) => row.student?.matricule || '' },
     { label: 'Classe', value: (row) => row.school_class?.name || '' },
@@ -140,7 +140,9 @@ export function Notes() {
         </div>
         <div className="toolbar-right">
           {(q || classId || subjectId || termId || evaluation) && <Btn icon="close" onClick={reset}>Effacer</Btn>}
-          <Btn icon="plus" solid onClick={() => actions.grade(null, { school_class_id: classId || undefined, subject_id: subjectId || undefined, term_id: termId || undefined })}>Saisir une note</Btn>
+          {can('grades.manage') && (
+            <Btn icon="plus" solid onClick={() => actions.grade(null, { school_class_id: classId || undefined, subject_id: subjectId || undefined, term_id: termId || undefined })}>Saisir une note</Btn>
+          )}
         </div>
       </div>
 
@@ -184,8 +186,8 @@ export function Notes() {
                   <span className="cell mono">{date(grade.evaluated_on)}</span>
                   <span className="cell right cell-actions">
                     <ActionMenu actions={[
-                      { label: 'Modifier la note', icon: 'edit', onClick: () => actions.grade(grade) },
-                      { label: 'Supprimer', icon: 'trash', tone: 'danger', onClick: () => actions.deleteGrade(grade) },
+                      { label: 'Modifier la note', icon: 'edit', permission: 'grades.manage', onClick: () => actions.grade(grade) },
+                      { label: 'Supprimer', icon: 'trash', tone: 'danger', permission: 'grades.manage', onClick: () => actions.deleteGrade(grade) },
                     ]} />
                   </span>
                 </Tr>

@@ -3,19 +3,22 @@ import { TitleBar, Sidebar, TopBar, PAGES as NAV_PAGES } from './layout.jsx';
 import { META, PAGES } from './pages.jsx';
 import { useData } from './data.jsx';
 import { useActions } from './actions.jsx';
+import { Login } from './login.jsx';
+import { Setup } from './setup.jsx';
 import { Btn, Icon } from './ui.jsx';
+import kalansoIcon from './assets/kalanso-icon.png';
 
 /* ============================================================
-   DIALLO — coquille de l'application
+   Kalanso — coquille de l'application
    Navigation, transitions et état de connexion à l'API.
    ============================================================ */
 
 const ALL_PAGE_IDS = NAV_PAGES.map((p) => p.id);
-const ORDER = NAV_PAGES.filter((p) => !p.hidden).map((p) => p.id);
 
 export default function App() {
   const {
-    meta, booting, bootError, bootstrap,
+    meta, booting, bootError, bootstrap, user, can, canAccessPage,
+    checkingSetup, setupStatus,
   } = useData();
   const actions = useActions();
   const [pageId, setPageId] = useState(() => {
@@ -28,23 +31,42 @@ export default function App() {
   const [dir, setDir] = useState(1);
   const bodyRef = useRef(null);
 
+  // Tous les hooks doivent être appelés avant les retours conditionnels :
+  // l'écran de connexion et l'application partagent le même composant.
+
+  const allowedIds = useMemo(
+    () => ALL_PAGE_IDS.filter((id) => canAccessPage(id)),
+    [canAccessPage],
+  );
+  const order = useMemo(
+    () => NAV_PAGES.filter((p) => !p.hidden && canAccessPage(p.id)).map((p) => p.id),
+    [canAccessPage],
+  );
+
   const page = META[pageId] || META.dashboard;
   const Page = PAGES[pageId] || PAGES.dashboard;
+
+  useEffect(() => {
+    if (!user || canAccessPage(pageId)) return;
+    const fallback = canAccessPage('dashboard') ? 'dashboard' : (order[0] || 'dashboard');
+    setPageId(fallback);
+    window.history.replaceState(null, '', `#${fallback}`);
+  }, [user, pageId, canAccessPage, order]);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
     return NAV_PAGES.filter(
-      (p) => !p.hidden && (
+      (p) => !p.hidden && canAccessPage(p.id) && (
         p.label.toLowerCase().includes(q)
         || (META[p.id]?.crumb.join(' ').toLowerCase() || '').includes(q)
       ),
     );
-  }, [query]);
+  }, [query, canAccessPage]);
 
   const go = (id, opts = {}) => {
-    if (!ALL_PAGE_IDS.includes(id)) return;
-    setDir(opts.dir ?? (ORDER.indexOf(id) > ORDER.indexOf(pageId) ? 1 : -1));
+    if (!ALL_PAGE_IDS.includes(id) || !canAccessPage(id)) return;
+    setDir(opts.dir ?? (order.indexOf(id) > order.indexOf(pageId) ? 1 : -1));
     setPageId(id);
     setSidebar(false);
     window.history.replaceState(null, '', `#${id}`);
@@ -60,15 +82,15 @@ export default function App() {
   useEffect(() => {
     const onHash = () => {
       const next = window.location.hash.replace('#', '');
-      if (ALL_PAGE_IDS.includes(next) && next !== pageId) {
-        setDir(ORDER.indexOf(next) > ORDER.indexOf(pageId) ? 1 : -1);
+      if (allowedIds.includes(next) && next !== pageId) {
+        setDir(order.indexOf(next) > order.indexOf(pageId) ? 1 : -1);
         setPageId(next);
         bodyRef.current?.scrollTo?.({ top: 0 });
       }
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
-  }, [pageId]);
+  }, [pageId, allowedIds, order]);
 
   /* raccourcis clavier — confort d'affichage */
   useEffect(() => {
@@ -83,61 +105,91 @@ export default function App() {
         document.querySelector('.search input')?.focus();
         return;
       }
-      if (e.key === 'ArrowRight') go(ORDER[Math.min(ORDER.indexOf(pageId) + 1, ORDER.length - 1)]);
-      if (e.key === 'ArrowLeft') go(ORDER[Math.max(ORDER.indexOf(pageId) - 1, 0)]);
+      const index = order.indexOf(pageId);
+      if (e.key === 'ArrowRight') go(order[Math.min(index + 1, order.length - 1)]);
+      if (e.key === 'ArrowLeft') go(order[Math.max(index - 1, 0)]);
       if (e.key.toLowerCase() === 't') setTour((v) => !v);
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'm') {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'm' && can('students.manage')) {
         e.preventDefault();
         actions.student();
       }
       const n = Number(e.key);
-      if (!Number.isNaN(n) && n >= 1 && n <= 9) go(ORDER[n - 1]);
-      if (e.key === '0') go(ORDER[9]);
+      if (!Number.isNaN(n) && n >= 1 && n <= 9 && order[n - 1]) go(order[n - 1]);
+      if (e.key === '0' && order[9]) go(order[9]);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [pageId]);
+  }, [pageId, order, can, actions]);
 
-  /* visite guidée */
+  /* visite guidée — uniquement parmi les pages autorisées */
   useEffect(() => {
-    if (!tour) return undefined;
+    if (!tour || !order.length) return undefined;
     const id = setInterval(() => {
       setPageId((cur) => {
-        const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+        const next = order[(order.indexOf(cur) + 1) % order.length];
         window.history.replaceState(null, '', `#${next}`);
         return next;
       });
       setDir(1);
     }, 4000);
     return () => clearInterval(id);
-  }, [tour]);
+  }, [tour, order]);
 
   useEffect(() => {
-    document.title = `${page.label} — DIALLO`;
-  }, [page.label]);
+    if (!user && setupStatus?.needs_setup) {
+      document.title = 'Première configuration — Kalanso';
+    } else if (!user) {
+      document.title = 'Connexion — Kalanso';
+    } else {
+      document.title = `${page.label} — Kalanso`;
+    }
+  }, [page.label, user, setupStatus?.needs_setup]);
 
-  if (!meta && (booting || bootError)) {
+  if ((booting || checkingSetup) && !meta) {
     return (
       <div className="boot-screen">
-        <div className="boot-mark"><span className="mark" /></div>
-        <h1>DIALLO</h1>
-        <p>École internationale · espace de direction</p>
-        {booting ? (
-          <div className="boot-loading">
-            <span className="spinner large" />
-            <span>Connexion à l’API…</span>
-          </div>
-        ) : (
-          <div className="boot-error">
-            <span className="state-ic"><Icon name="close" size={18} /></span>
-            <b>API indisponible</b>
-            <em>{bootError}</em>
-            <code>cd api &amp;&amp; php artisan serve --host=127.0.0.1 --port=8001</code>
-            <Btn icon="refresh" solid onClick={bootstrap}>Réessayer</Btn>
-          </div>
-        )}
+        <div className="boot-mark"><img className="brand-icon" src={kalansoIcon} alt="Kalanso" /></div>
+        <h1>KALANSO</h1>
+        <p>Gestion scolaire · espace sécurisé</p>
+        <div className="boot-loading">
+          <span className="spinner large" />
+          <span>{checkingSetup ? 'Préparation de Kalanso…' : 'Connexion à l’API…'}</span>
+        </div>
       </div>
     );
+  }
+
+  if (!user && setupStatus?.needs_setup) {
+    return <Setup />;
+  }
+
+  if (!user) {
+    return <Login />;
+  }
+
+  if (!meta) {
+    return (
+      <div className="boot-screen">
+        <div className="boot-mark"><img className="brand-icon" src={kalansoIcon} alt="Kalanso" /></div>
+        <h1>KALANSO</h1>
+        <p>Gestion scolaire · espace sécurisé</p>
+        <div className="boot-error">
+          <span className="state-ic"><Icon name="close" size={18} /></span>
+          <b>API indisponible</b>
+          <em>{bootError || 'Impossible de charger les données de l’établissement.'}</em>
+          <code>cd api &amp;&amp; php8.4 artisan serve --host=127.0.0.1 --port=8001</code>
+          <Btn icon="refresh" solid onClick={bootstrap}>Réessayer</Btn>
+        </div>
+      </div>
+    );
+  }
+
+  if (!canAccessPage(pageId)) {
+    // L'utilisateur n'a pas accès à la page actuelle, on le redirige
+    // vers une page qu'il peut voir
+    const fallback = canAccessPage('dashboard') ? 'dashboard' : (order[0] || 'dashboard');
+    window.location.hash = fallback;
+    return null;
   }
 
   return (

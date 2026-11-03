@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import defaultAvatar from './assets/avatar-default.svg';
 
 /* ============================================================
-   DIALLO — composants d'affichage (présentation pure)
+   Kalanso — composants d'affichage (présentation pure)
    Aucun composant ne contient de logique métier.
    ============================================================ */
 
@@ -40,9 +40,11 @@ const P = {
   send: 'M4 12l16-8-6 16-3-6-7-2z',
   archive: 'M4 8h16v12H4zM3 4h18v4H3zM9 12h6',
   eye: 'M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12zM12 15a3 3 0 100-6 3 3 0 000 6z',
+  eyeOff: 'M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.9 5.2A10.4 10.4 0 0112 5c6 0 9.5 7 9.5 7a17 17 0 01-3.3 4.1M6.6 6.6C4.1 8.2 2.5 12 2.5 12S6 19 12 19c1.4 0 2.7-.4 3.9-1',
   upload: 'M12 21V9M8 13l4-4 4 4M4 4h16',
   userPlus: 'M10 12.4a3.4 3.4 0 100-6.8 3.4 3.4 0 000 6.8zM4 20c0-3.6 3-6 6-6 1.4 0 2.6.3 3.6 1M18 11v8M14 15h8',
   clock: 'M12 21a9 9 0 100-18 9 9 0 000 18zM12 7v5l3 2',
+  logout: 'M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10',
 };
 
 export function Icon({ name, size = 16, className = '' }) {
@@ -258,11 +260,14 @@ export function Kpi({ item, index = 0 }) {
 
 /* ---------- graphiques (SVG, animés en CSS) ---------- */
 export function Sparkline({ data = [], width = 92, height = 26 }) {
-  const max = Math.max(...data);
-  const min = Math.min(...data);
+  // Une base neuve n'a encore aucune donnée : on affiche une ligne plate
+  // plutôt que de laisser un graphique vide casser la page.
+  const values = data.length ? data : [0, 0];
+  const max = Math.max(...values);
+  const min = Math.min(...values);
   const span = max - min || 1;
-  const pts = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * width;
+  const pts = values.map((v, i) => {
+    const x = values.length > 1 ? (i / (values.length - 1)) * width : width / 2;
     const y = height - ((v - min) / span) * (height - 3) - 1.5;
     return [x, y];
   });
@@ -276,13 +281,15 @@ export function Sparkline({ data = [], width = 92, height = 26 }) {
 }
 
 export function AreaChart({ data = [], height = 210 }) {
+  if (!data.length) return null;
   const w = 700;
   const h = height;
   const padB = 24;
-  const max = Math.max(...data.map((d) => d.v)) * 1.12;
-  const stepX = w / (data.length - 1);
+  const points = data.length === 1 ? [data[0], data[0]] : data;
+  const max = Math.max(...points.map((d) => d.v)) * 1.12 || 1.12;
+  const stepX = w / (points.length - 1);
   const y = (v) => h - padB - (v / max) * (h - padB - 12);
-  const pts = data.map((d, i) => [i * stepX, y(d.v)]);
+  const pts = points.map((d, i) => [i * stepX, y(d.v)]);
   const line = pts.map(([x, yy], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${yy.toFixed(1)}`).join(' ');
   const area = `${line} L${w} ${h - padB} L0 ${h - padB} Z`;
 
@@ -337,7 +344,7 @@ export function AreaChart({ data = [], height = 210 }) {
 }
 
 export function BarChart({ data = [], height = 190 }) {
-  const max = Math.max(...data.map((d) => d.v));
+  const max = Math.max(...data.map((d) => d.v)) || 1;
   return (
     <div className="bars" style={{ height }}>
       {data.map((d, i) => (
@@ -398,7 +405,7 @@ export function Donut({ parts = [], size = 150 }) {
 }
 
 export function HBarList({ items = [] }) {
-  const max = Math.max(...items.map((i) => i.v));
+  const max = Math.max(...items.map((i) => i.v)) || 1;
   return (
     <div className="hlist">
       {items.map((it, k) => (
