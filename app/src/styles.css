@@ -82,19 +82,11 @@
   padding-right: 2.5rem;
 }
 
-.icon-btn {
+.input-with-icon .icon-btn {
   position: absolute;
   right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: var(--dim);
-  cursor: pointer;
-}
-
-.icon-btn:hover {
-  color: var(--accent2);
 }
 
 .error-message {
