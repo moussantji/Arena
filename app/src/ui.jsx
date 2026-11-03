@@ -102,9 +102,11 @@ export function Pill({ children, tone = 'glass', dot = false }) {
   );
 }
 
-export function Btn({ children, icon, solid = false, onClick, title }) {
+export function Btn({
+  children, icon, solid = false, onClick, title, disabled = false,
+}) {
   return (
-    <button type="button" className={`btn ${solid ? 'solid' : ''}`} onClick={onClick} title={title}>
+    <button type="button" className={`btn ${solid ? 'solid' : ''}`} onClick={onClick} title={title} disabled={disabled}>
       {icon && <Icon name={icon} size={14} />}
       {children}
     </button>

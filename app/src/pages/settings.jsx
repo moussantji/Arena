@@ -470,7 +470,12 @@ export function Parametres() {
                     foot={<><span className="tf-l">{userRows.length} comptes</span><span className="tf-r">Accès protégés par token</span></>}
                   >
                     {userRows.map((account) => (
-                      <Tr key={account.id} template="1.4fr 1.7fr .8fr .8fr 34px">
+                      <Tr
+                        key={account.id}
+                        template="1.4fr 1.7fr .8fr .8fr 34px"
+                        onClick={() => actions.profile(account)}
+                        title="Voir la fiche de ce compte"
+                      >
                         <span className="cell subject-cell">
                           <Avatar initials={initials(account.name)} size={26} />
                           <span>

@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { api, errorMessage } from './api.js';
+import React, { useMemo, useRef, useState } from 'react';
+import { api, errorMessage, getToken, setSession } from './api.js';
 import { useModal } from './modal.jsx';
 import {
   useData, dateInput, date, fullName, money, compactMoney, number, STUDENT_STATUS,
@@ -8,7 +8,7 @@ import {
 } from './data.jsx';
 import { openResourceForm, openConfirm } from './forms.jsx';
 import { useCan } from './common.jsx';
-import { ROLES, ROLE_LABELS } from './auth.js';
+import { ROLES, ROLE_LABELS, ROLE_DESCRIPTIONS } from './auth.js';
 import { exportInvoiceReport } from './reports.js';
 import { Avatar, Btn, Icon, Pill } from './ui.jsx';
 
@@ -34,6 +34,13 @@ const plusHours = (hour, amount) => {
   return `${pad(Math.min(23, (h || 0) + amount))}:${pad(m || 0)}`;
 };
 
+const ROLE_TONES = {
+  direction: 'accent',
+  secretariat: 'glass',
+  comptable: 'copper',
+  enseignant: 'muted',
+};
+
 const focusInvoices = () => {
   if (typeof window === 'undefined') return;
   const current = window.location.hash.replace('#', '');
@@ -49,11 +56,103 @@ const focusInvoices = () => {
   window.location.hash = 'finances';
 };
 
+/* Fiche du compte : informations, photo et accès rapides. */
+function UserProfileBody({
+  account, self, canManage, canOpenSettings, onEdit, onOpenSettings,
+}) {
+  const modal = useModal();
+  const { updateUser, notify, refresh } = useData();
+  const [uploading, setUploading] = useState(false);
+  const inputRef = useRef(null);
+  const roleLabel = ROLE_LABELS[account.role] || account.role || '—';
+
+  const uploadAvatar = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append('avatar', file);
+      const result = await api.upload('/me/avatar', form);
+      setSession(getToken(), result.user);
+      updateUser(result.user);
+      notify('Photo de profil mise à jour.');
+      refresh();
+      modal.close();
+    } catch (error) {
+      notify(errorMessage(error, 'Téléversement impossible.'), { tone: 'danger' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="profile-view">
+      <div className="profile-hero">
+        <Avatar
+          initials={initials(account.name || '')}
+          size={64}
+          src={account.photo_url}
+          alt={account.name || 'Photo de profil'}
+        />
+        <div className="profile-id">
+          <b>{account.name || '—'}</b>
+          <span className="mono">{account.email || '—'}</span>
+          <div className="profile-chips">
+            <Pill tone={ROLE_TONES[account.role] || 'muted'}>{roleLabel}</Pill>
+            {self && <Pill tone="accent" dot>Connecté</Pill>}
+          </div>
+        </div>
+      </div>
+
+      {ROLE_DESCRIPTIONS[account.role] && (
+        <p className="profile-desc">{ROLE_DESCRIPTIONS[account.role]}</p>
+      )}
+
+      <dl className="dl">
+        <div><dt>Rôle</dt><dd>{roleLabel}</dd></div>
+        <div><dt>Adresse e-mail</dt><dd className="mono">{account.email || '—'}</dd></div>
+        <div><dt>Compte créé le</dt><dd>{account.created_at ? date(account.created_at) : '—'}</dd></div>
+        <div>
+          <dt>Accès</dt>
+          <dd>{self ? (getToken() ? 'Session active' : 'Hors ligne') : (canManage ? 'Gérable par la direction' : 'Lecture seule')}</dd>
+        </div>
+      </dl>
+
+      <div className="profile-actions">
+        {self && (
+          <Btn icon="upload" onClick={() => inputRef.current?.click()} disabled={uploading}>
+            {uploading ? 'Envoi…' : 'Changer la photo'}
+          </Btn>
+        )}
+        {self && canOpenSettings && (
+          <Btn icon="settings" onClick={onOpenSettings}>Paramètres</Btn>
+        )}
+        {canManage && (
+          <Btn icon="edit" solid onClick={onEdit}>Modifier le compte</Btn>
+        )}
+      </div>
+
+      {self && (
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          hidden
+          onChange={uploadAvatar}
+        />
+      )}
+    </div>
+  );
+}
+
 export function useActions() {
   const modal = useModal();
   const can = useCan();
   const {
-    meta, notify, refresh, studentId, setStudentId,
+    meta, notify, refresh, studentId, setStudentId, user,
   } = useData();
 
   const currency = meta?.school?.currency || 'FCFA';
@@ -1456,6 +1555,38 @@ export function useActions() {
   }
 
   /* ------------------------------------------------ comptes */
+  function profile(account) {
+    const target = account || user;
+    if (!target?.id) return;
+
+    const self = target.id === user?.id;
+
+    modal.open({
+      title: target.name || 'Profil',
+      sub: self ? 'Votre compte' : (target.email || 'Compte utilisateur'),
+      eyebrow: 'Profil',
+      icon: 'profile',
+      size: 540,
+      body: (
+        <UserProfileBody
+          account={target}
+          self={self}
+          canManage={can('users.manage')}
+          canOpenSettings={can('settings.view')}
+          onEdit={() => {
+            modal.close();
+            userForm(target);
+          }}
+          onOpenSettings={() => {
+            modal.close();
+            window.location.hash = 'parametres';
+          }}
+        />
+      ),
+      actions: [{ label: 'Fermer', onClick: () => modal.close() }],
+    });
+  }
+
   function userForm(account) {
     if (!can('users.manage')) return;
 
@@ -1555,6 +1686,7 @@ export function useActions() {
     feeType: feeTypeForm,
     deleteFeeType,
     user: userForm,
+    profile,
     deleteUser,
     nextMatricule,
     money: (value) => money(value, currency),

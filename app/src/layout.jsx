@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Icon, Avatar, IconBtn, Btn } from './ui.jsx';
 import { useData, dateTime, initials } from './data.jsx';
 import { ROLE_LABELS } from './auth.js';
+import { useActions } from './actions.jsx';
 import kalansoIcon from './assets/kalanso-icon.png';
 
 /* ============================================================
@@ -118,6 +119,7 @@ export function Sidebar({ pageId, onSelect, open }) {
   } = useData();
   const school = meta?.school;
   const roleLabel = ROLE_LABELS[user?.role] || 'Invité';
+  const actions = useActions();
   const [signingOut, setSigningOut] = useState(false);
 
   const logout = async () => {
@@ -176,11 +178,19 @@ export function Sidebar({ pageId, onSelect, open }) {
 
       <div className="sidebar-foot">
         <div className="user">
-          <Avatar initials={initials(user?.name || 'Kalanso')} size={30} src={user?.photo_url} />
-          <span>
-            <b>{user?.name || 'Utilisateur'}</b>
-            <em className={`role-tag role-${user?.role || 'enseignant'}`}>{roleLabel}</em>
-          </span>
+          <button
+            type="button"
+            className="user-id"
+            onClick={() => actions.profile(user)}
+            title="Voir mon profil"
+            aria-label="Voir mon profil"
+          >
+            <Avatar initials={initials(user?.name || 'Kalanso')} size={30} src={user?.photo_url} />
+            <span>
+              <b>{user?.name || 'Utilisateur'}</b>
+              <em className={`role-tag role-${user?.role || 'enseignant'}`}>{roleLabel}</em>
+            </span>
+          </button>
           <button
             type="button"
             className="logout-btn"
@@ -221,6 +231,7 @@ export function TopBar({
   } = useData();
   const [openNotif, setOpenNotif] = useState(false);
   const notifRef = useRef(null);
+  const actions = useActions();
   const displayInitials = user?.name ? initials(user.name) : 'DI';
   const roleLabel = ROLE_LABELS[user?.role] || 'Invité';
 
@@ -339,7 +350,15 @@ export function TopBar({
         </div>
       </div>
 
-      <Avatar initials={displayInitials} size={32} src={user?.photo_url} />
+      <button
+        type="button"
+        className="topbar-user"
+        onClick={() => actions.profile(user)}
+        title={`Profil · ${user?.name || 'utilisateur'} (${roleLabel})`}
+        aria-label="Ouvrir mon profil"
+      >
+        <Avatar initials={displayInitials} size={32} src={user?.photo_url} />
+      </button>
     </div>
   );
 }
