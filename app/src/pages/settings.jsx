@@ -14,6 +14,9 @@ import {
 import {
   ROLES, ROLE_LABELS, ROLE_DESCRIPTIONS,
 } from '../auth.js';
+import { useModal } from '../modal.jsx';
+import { whatsNewModal } from '../whats-new.jsx';
+import { APP_VERSION } from '../changelog.js';
 import kalansoIcon from '../assets/kalanso-icon.png';
 
 const TABS = ['Établissement', 'Calendrier', 'Départements', 'Frais', 'Utilisateurs', 'Préférences'];
@@ -39,6 +42,7 @@ export function Parametres() {
     meta, refresh, notify, user, booting, setUser,
   } = useData();
   const actions = useActions();
+  const modal = useModal();
   const [tab, setTab] = useState(0);
   const [form, setForm] = useState({
     name: '', full_name: '', email: '', phone: '', address: '', currency: 'FCFA',
@@ -148,6 +152,15 @@ export function Parametres() {
   const resetPrefs = () => {
     setPrefs(DEFAULT_PREFS);
     notify('Préférences d’affichage réinitialisées.');
+  };
+
+  const openWhatsNew = () => {
+    try {
+      window.localStorage.setItem('kalanso.seen_version', APP_VERSION);
+    } catch {
+      /* stockage indisponible */
+    }
+    modal.open(whatsNewModal(modal));
   };
 
   const feesTotal = useMemo(
@@ -545,6 +558,7 @@ export function Parametres() {
                 <div className="form-footer">
                   <span className="form-hint">Ces préférences restent locales à cet appareil.</span>
                   <div className="form-actions">
+                    <Btn icon="bell" onClick={openWhatsNew}>Nouveautés</Btn>
                     <Btn icon="refresh" onClick={resetPrefs}>Réinitialiser</Btn>
                   </div>
                 </div>
@@ -596,6 +610,7 @@ export function Parametres() {
                   <CardHead title="API Kalanso" sub="Service Laravel · Sanctum" />
                   <dl className="dl">
                     <div><dt>URL</dt><dd className="mono">{API_URL}</dd></div>
+                    <div><dt>Version</dt><dd className="mono">{APP_VERSION}</dd></div>
                     <div><dt>État</dt><dd>{health.loading ? 'Vérification…' : health.error ? 'Indisponible' : 'Opérationnelle'}</dd></div>
                     <div><dt>Démarrage</dt><dd>{booting ? 'En cours' : 'Terminé'}</dd></div>
                     <div><dt>Écritures</dt><dd>Protégées par token</dd></div>

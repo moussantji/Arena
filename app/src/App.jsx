@@ -6,6 +6,9 @@ import { useActions } from './actions.jsx';
 import { Login } from './login.jsx';
 import { Setup } from './setup.jsx';
 import { Btn, Icon } from './ui.jsx';
+import { useModal } from './modal.jsx';
+import { whatsNewModal } from './whats-new.jsx';
+import { APP_VERSION } from './changelog.js';
 import kalansoIcon from './assets/kalanso-icon.png';
 
 /* ============================================================
@@ -21,6 +24,8 @@ export default function App() {
     checkingSetup, setupStatus,
   } = useData();
   const actions = useActions();
+  const modal = useModal();
+  const whatsNewShown = useRef(false);
   const [pageId, setPageId] = useState(() => {
     const h = typeof window !== 'undefined' ? window.location.hash.replace('#', '') : '';
     return ALL_PAGE_IDS.includes(h) ? h : 'dashboard';
@@ -53,6 +58,27 @@ export default function App() {
     setPageId(fallback);
     window.history.replaceState(null, '', `#${fallback}`);
   }, [user, pageId, canAccessPage, order]);
+
+  /* Fenêtre « Nouveautés » : une fois par version, après connexion. */
+  useEffect(() => {
+    if (!user || !meta || whatsNewShown.current) return;
+    whatsNewShown.current = true;
+
+    let seen = null;
+    try {
+      seen = window.localStorage.getItem('kalanso.seen_version');
+    } catch {
+      /* stockage indisponible */
+    }
+    if (seen === APP_VERSION) return;
+
+    try {
+      window.localStorage.setItem('kalanso.seen_version', APP_VERSION);
+    } catch {
+      /* stockage indisponible */
+    }
+    modal.open(whatsNewModal(modal));
+  }, [user, meta, modal]);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();

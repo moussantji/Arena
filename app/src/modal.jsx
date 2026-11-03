@@ -42,7 +42,12 @@ export function useModals() {
 
 export function ModalProvider({ children }) {
   const [stack, setStack] = useState([]);
+  const stackRef = useRef([]);
   const lastFocus = useRef(null);
+
+  useEffect(() => {
+    stackRef.current = stack;
+  }, [stack]);
 
   const open = useCallback((config) => {
     const id = `m${++seq}`;
@@ -52,16 +57,16 @@ export function ModalProvider({ children }) {
   }, []);
 
   const close = useCallback((id) => {
-    setStack((s) => {
-      const target = id ?? s[s.length - 1]?.id;
-      return s.map((m) => (m.id === target ? { ...m, closing: true } : m));
-    });
+    // L'identifiant est fixé dès l'appel : si une autre modale s'ouvre
+    // pendant l'animation, la fermeture ne doit viser que celle-ci.
+    const current = stackRef.current;
+    const target = id ?? current[current.length - 1]?.id;
+    if (!target) return;
+
+    setStack((s) => s.map((m) => (m.id === target ? { ...m, closing: true } : m)));
     /* retire du DOM après l'animation de sortie */
     window.setTimeout(() => {
-      setStack((s) => {
-        const target = id ?? s[s.length - 1]?.id;
-        return s.filter((m) => m.id !== target);
-      });
+      setStack((s) => s.filter((m) => m.id !== target));
     }, 220);
   }, []);
 

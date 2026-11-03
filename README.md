@@ -163,6 +163,35 @@ dans l'interface. Elle est remplaçable à tout moment depuis **Paramètres →
 Établissement → Remplacer le logo** : le logo de l'établissement remplace
 l'icône par défaut partout dans l'application.
 
+## Mises à jour et nouveautés
+
+Pour publier une mise à jour :
+
+1. Incrémenter `version` dans `gallery/electron/package.json`.
+2. Ajouter l'entrée correspondante dans `app/src/changelog.js` et `CHANGELOG.md`.
+3. Reconstruire les paquets :
+
+```bash
+cd gallery/electron && npm run dist:linux
+```
+
+4. Installer la nouvelle version :
+   - **AppImage** : remplacer le fichier utilisé (par exemple
+     `~/.local/opt/kalanso/Kalanso.AppImage`) puis relancer l'application.
+   - **.deb** : `sudo apt install ./release/Kalanso-x.y.z-amd64.deb`.
+
+À la première ouverture après une mise à jour, Kalanso affiche la fenêtre
+**Nouveautés**, une seule fois par version. Elle reste consultable dans
+**Paramètres → Préférences → Nouveautés**, et la version courante apparaît
+dans **Paramètres → Préférences → API Kalanso**.
+
+Les données (base MySQL, photos, documents) et la configuration `.env` du
+poste — identifiants Google compris — sont conservées d'une version à l'autre.
+
+Mise à jour automatique : elle peut être ajoutée avec `electron-updater` et un
+canal de publication (GitHub Releases ou serveur statique). L'AppImage peut
+alors se mettre à jour seule ; les installations `.deb` passent par `apt`.
+
 ## Figma
 
 Voir `figma/README.md` : importer `figma/kalanso-indigo/manifest.json` comme
