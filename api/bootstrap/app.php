@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Hébergement mutualisé : l'HTTPS est souvent terminé par un proxy.
+        $middleware->trustProxies(at: '*');
         $middleware->alias([
             'role' => EnsureRole::class,
         ]);

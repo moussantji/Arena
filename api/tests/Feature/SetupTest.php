@@ -12,6 +12,10 @@ class SetupTest extends TestCase
 
     public function test_status_requests_setup_on_an_empty_database(): void
     {
+        // Sans identifiants Google configurés (ils existent dans le .env local).
+        config()->set('services.google.client_id', null);
+        config()->set('services.google.client_secret', null);
+
         $this->getJson('/api/setup/status')
             ->assertOk()
             ->assertJsonPath('needs_setup', true)

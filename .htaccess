@@ -1,0 +1,16 @@
+# Déploiement mutualisé (LWS, cPanel…) : le sous-domaine peut pointer
+# vers ce dossier. Toutes les requêtes sont alors servies par l'application
+# Laravel (api/public). Si votre panneau permet de choisir le dossier
+# api/public comme racine du sous-domaine, ce fichier est simplement ignoré.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Fichiers sensibles jamais servis, même en cas de mauvaise configuration.
+    <FilesMatch "(^\.|\.(env|env\..*|lock|json|md|yml|yaml|xml|dist|sh|phar)$)">
+        Require all denied
+    </FilesMatch>
+
+    RewriteRule ^$ api/public/ [L]
+    RewriteRule (.*) api/public/$1 [L]
+</IfModule>
