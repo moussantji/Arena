@@ -7,8 +7,8 @@ pourra s'y connecter depuis n'importe quel poste.
 
 **Ce qui a déjà été préparé dans le dépôt :**
 
-- `api/public/install.php` — installateur web protégé par un secret (crée les
-  tables, la clé d'application et le lien de stockage, sans ligne de commande) ;
+- `api/database/schema/kalanso-mysql-schema.sql` — schéma complet de la base
+  (31 tables, **sans aucune donnée**) à importer via phpMyAdmin ;
 - `.htaccess` à la racine — si le sous-domaine pointe vers le dossier du dépôt,
   toutes les requêtes sont servies par `api/public` et les fichiers sensibles
   (`.env`, `composer.*`…) ne sont jamais exposés ;
@@ -54,32 +54,42 @@ pourra s'y connecter depuis n'importe quel poste.
 Via **Gestionnaire de fichiers** de LWS :
 
 1. Copiez `api/.env.production.example` vers `api/.env`.
-2. Renseignez :
-   - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (étape 1) ;
-   - `KALANSO_SETUP_TOKEN=un-long-secret-aleatoire` (servira à l'installation).
+2. Renseignez `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (étape 1).
 3. Enregistrez.
 
-## 5. Installer l'API (une fois)
+## 5. Créer les tables (une fois)
 
-Ouvrez dans le navigateur :
+**Via phpMyAdmin (LWS Panel → Bases de données → phpMyAdmin) :**
 
-```text
-https://kalanso.mandenbaoubab.com/install.php?token=UN-LONG-SECRET-ALEATOIRE
+1. Sélectionnez la base `…kalanso` à gauche.
+2. Onglet **Importer** → choisissez le fichier
+   `api/database/schema/kalanso-mysql-schema.sql` (téléchargez-le depuis
+   GitHub : branche `deploy/lws`) → **Exécuter**.
+3. « L'import s'est terminé avec succès » : les 31 tables sont créées,
+   la base reste vide (aucune donnée de démonstration).
+
+**Ou, si vous avez un accès SSH/Terminal :**
+
+```bash
+cd api && php artisan migrate --force
 ```
 
-Chaque étape doit afficher ✔ (clé d'application, MySQL, migrations, stockage).
-En cas d'erreur, le message indique exactement quoi corriger dans le `.env`.
+## 6. Clé d'application
 
-Vérifiez ensuite : <https://kalanso.mandenbaoubab.com/api/health> doit
-répondre `{"status":"ok",…}`.
+Le `.env` doit contenir une `APP_KEY`. Deux options :
 
-## 6. Désactiver l'installateur
+- **SSH** : `cd api && php artisan key:generate --force` ;
+- **Sans SSH** : générez-en une (par exemple avec
+  [Laravel Key Generator](https://laravel-key-generator.com) ou toute autre
+  source fiable — 32 octets en base64, préfixe `base64:`) et collez-la dans
+  `APP_KEY=` du `.env`.
 
-Dans le `.env`, **videz** la ligne `KALANSO_SETUP_TOKEN=`. La page
-`install.php` refuse alors toute exécution. (Pour une mise à jour, remettez
-temporairement un secret.)
+## 7. Vérifier
 
-## 7. Mises à jour de l'API
+<https://kalanso.mandenbaoubab.com/api/health> doit répondre
+`{"status":"ok",…}`.
+
+## 8. Mises à jour de l'API
 
 Sur votre PC :
 
@@ -89,11 +99,13 @@ bash scripts/api-deploy-branch.sh
 git push origin deploy/lws --force
 ```
 
-Puis dans **LWS Panel → Git → Déployer** à nouveau. Enfin, rouvrez
-`install.php?token=…` pour appliquer d'éventuelles nouvelles migrations
-(les données sont conservées), puis re-videz `KALANSO_SETUP_TOKEN`.
+Puis dans **LWS Panel → Git → Déployer** à nouveau. Pour appliquer
+d'éventuelles nouvelles migrations : réimportez le schéma mis à jour
+**uniquement si de nouvelles tables manquent** (sinon, préférez `php artisan
+migrate --force` en SSH — les données sont conservées) ou demandez le SQL des
+migrations manquantes.
 
-## 8. Brancher l'application Kalanso
+## 9. Brancher l'application Kalanso
 
 L'application desktop saura utiliser cette API via son adresse
 `https://kalanso.mandenbaoubab.com` (option « API distante » à activer dans
