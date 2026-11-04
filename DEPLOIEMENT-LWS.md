@@ -113,18 +113,22 @@ migrations manquantes.
 
 ## 9. Brancher l'application Kalanso (multi-postes)
 
-Sur chaque poste, à l'écran de connexion de Kalanso, cliquez sur la ligne
-**« Données… »** (en bas de la carte de connexion) et renseignez :
+Sur chaque poste, après connexion avec un compte **Direction**, ouvrez
+**Paramètres → Préférences → Serveur de données → Modifier**, renseignez :
 
 ```text
 https://kalanso.mandenbaoubab.com
 ```
 
-puis **« Enregistrer et redémarrer »**. L'application se connecte alors à
-l'API en ligne : les comptes et les données de tous les postes sont
-centralisés dans la base MySQL de l'hébergeur. La ligne d'état sous la carte
-affiche « Données sur le serveur de l'école », et Paramètres montre l'adresse
-connectée.
+puis **« Enregistrer et redémarrer »**. À l'écran de connexion suivant,
+connectez-vous avec le compte de l'établissement : les données de tous les
+postes sont centralisées dans la base MySQL de l'hébergeur.
+
+L'écran de connexion n'affiche jamais l'adresse du serveur — le réglage est
+réservé aux comptes Direction, dans les Paramètres. Sur un poste tout neuf
+(base locale vide), la première installation crée un compte local qui sert
+uniquement à atteindre les Paramètres ; il devient inutile après le
+basculement vers le serveur.
 
 Pour revenir au mode local (données stockées uniquement sur le poste), videz
 l'adresse dans le même écran. Cette fonctionnalité est incluse à partir de la
