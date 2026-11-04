@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld('desktopAPI', {
     return () => ipcRenderer.removeListener('window:state', handler);
   },
   googleSignIn: () => ipcRenderer.invoke('google:signIn'),
+  googleCancel: () => ipcRenderer.invoke('google:cancel'),
   updates: {
     version: () => ipcRenderer.invoke('update:version'),
     check: () => ipcRenderer.invoke('update:check'),

@@ -493,6 +493,8 @@ function oauthPage(title, message, tone) {
 </html>`;
 }
 
+let cancelGoogleFlow = null;
+
 async function googleSignInFlow() {
   const status = await requestJson(`${API_ORIGIN}/api/auth/google/status`);
   const clientId = status.payload?.client_id;
@@ -581,6 +583,7 @@ async function googleSignInFlow() {
   });
   // Évite un rejet non géré si l'ouverture du navigateur échoue avant l'attente.
   codePromise.catch(() => {});
+  cancelGoogleFlow = abort;
 
   try {
     await shell.openExternal(authUrl.toString());
@@ -609,6 +612,7 @@ async function googleSignInFlow() {
     abort();
     throw error;
   } finally {
+    cancelGoogleFlow = null;
     if (server.listening) server.close();
   }
 }
@@ -903,6 +907,15 @@ ipcMain.handle('google:signIn', async () => {
     logMain(`connexion Google impossible : ${error.message}`);
     return { ok: false, message: error.message };
   }
+});
+
+ipcMain.handle('google:cancel', () => {
+  if (!cancelGoogleFlow) {
+    return { ok: false, message: 'Aucune connexion Google en cours.' };
+  }
+  cancelGoogleFlow();
+  cancelGoogleFlow = null;
+  return { ok: true };
 });
 
 ipcMain.handle('update:version', () => app.getVersion());

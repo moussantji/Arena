@@ -15,9 +15,9 @@
     "dev:electron": "electron . --dev",
     "dist:linux": "npm run build:app && electron-builder --linux AppImage deb",
     "dist:linux:publish": "npm run build:app && electron-builder --linux AppImage deb --publish always",
-    "dist:win": "npm run build:app && electron-builder --win nsis",
-    "dist:win:publish": "npm run build:app && electron-builder --win nsis --publish always",
-    "dist:all:publish": "npm run build:app && electron-builder --linux AppImage deb --win nsis --publish always",
+    "dist:win": "npm run build:app && WINEPREFIX=\"$HOME/.cache/electron-builder/wine-home\" electron-builder --win nsis",
+    "dist:win:publish": "npm run build:app && WINEPREFIX=\"$HOME/.cache/electron-builder/wine-home\" electron-builder --win nsis --publish always",
+    "dist:all:publish": "npm run build:app && WINEPREFIX=\"$HOME/.cache/electron-builder/wine-home\" electron-builder --linux AppImage deb --win nsis --publish always",
     "dist:dir": "npm run build:app && electron-builder --linux dir"
   },
   "devDependencies": {

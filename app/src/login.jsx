@@ -2,7 +2,7 @@
    Kalanso — écran de connexion
    ============================================================ */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useData } from './data.jsx';
 import { Icon } from './ui.jsx';
 import { WindowControls } from './layout.jsx';
@@ -27,6 +27,9 @@ export function Login({ onFirstSetup }) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleWaiting, setGoogleWaiting] = useState(false);
+  const googleBusyRef = useRef(false);
+  const googleCancelRequestedRef = useRef(false);
 
   const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
@@ -44,6 +47,17 @@ export function Login({ onFirstSetup }) {
   }, [email, password, signIn, setBootError, loading]);
 
   const handleGoogle = useCallback(async () => {
+    // Un second clic pendant l'attente annule la tentative en cours ;
+    // un nouveau clic relance immédiatement la connexion.
+    if (googleBusyRef.current) {
+      googleCancelRequestedRef.current = true;
+      try {
+        await window.desktopAPI?.googleCancel?.();
+      } catch {
+        /* annulation sans effet si rien n’est en cours */
+      }
+      return;
+    }
     if (loading) return;
 
     if (!window.desktopAPI?.googleSignIn) {
@@ -51,7 +65,10 @@ export function Login({ onFirstSetup }) {
       return;
     }
 
+    googleCancelRequestedRef.current = false;
+    googleBusyRef.current = true;
     setLoading(true);
+    setGoogleWaiting(true);
     setBootError(null);
     try {
       const result = await window.desktopAPI.googleSignIn();
@@ -63,9 +80,19 @@ export function Login({ onFirstSetup }) {
         });
       }
     } catch (error) {
-      setBootError(error?.message || 'La connexion Google a échoué.');
+      const message = error?.message || 'La connexion Google a échoué.';
+      if (/annulée/i.test(message)) {
+        // Annulation volontaire (nouveau clic) : aucun message.
+        if (!googleCancelRequestedRef.current) {
+          setBootError('Connexion Google annulée.');
+        }
+      } else {
+        setBootError(message);
+      }
     } finally {
+      googleBusyRef.current = false;
       setLoading(false);
+      setGoogleWaiting(false);
     }
   }, [loading, notify, setBootError, signInWithToken]);
 
@@ -197,10 +224,14 @@ export function Login({ onFirstSetup }) {
               type="button"
               className="login-google"
               onClick={handleGoogle}
-              disabled={loading}
+              disabled={loading && !googleWaiting}
+              title={googleWaiting ? 'Annule l’attente en cours ; recliquez pour relancer.' : undefined}
             >
               <GoogleMark />
-              <span>Continuer avec Google</span>
+              <span>
+                {googleWaiting ? 'En attente de Google — cliquez pour annuler'
+                  : loading ? 'Connexion…' : 'Continuer avec Google'}
+              </span>
             </button>
 
             {onFirstSetup && (
