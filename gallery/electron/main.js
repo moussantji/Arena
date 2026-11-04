@@ -132,7 +132,18 @@ function probeApi(timeout = 1200) {
 }
 
 function findPhp() {
-  const candidates = [process.env.KALANSO_PHP_BIN, '/usr/bin/php', '/usr/local/bin/php'].filter(Boolean);
+  const exe = process.platform === 'win32' ? 'php.exe' : 'php';
+  const candidates = [
+    process.env.KALANSO_PHP_BIN,
+    '/usr/bin/php',
+    '/usr/local/bin/php',
+    ...String(process.env.PATH || '')
+      .split(process.platform === 'win32' ? ';' : ':')
+      .filter(Boolean)
+      .map((dir) => path.join(dir, exe)),
+    'C:\\php\\php.exe',
+    'C:\\xampp\\php\\php.exe',
+  ].filter(Boolean);
   for (const candidate of candidates) {
     try {
       if (!fs.existsSync(candidate)) continue;
@@ -803,9 +814,13 @@ async function boot() {
       type: 'error',
       title: 'Service local indisponible',
       message: "L'API locale n'a pas pu démarrer.",
-      detail: `${error.message}\n\nVérifiez que PHP et MariaDB sont installés et démarrés :\n`
-        + 'sudo apt install php-cli mariadb-server\nsudo systemctl start mariadb\n\n'
-        + `Configuration et accès à la base : ${path.join(apiCacheDir(), '.env')}`,
+      detail: process.platform === 'win32'
+        ? `${error.message}\n\nSur Windows, installez PHP 8.2+ et MySQL/MariaDB `
+          + '(par exemple avec XAMPP), puis démarrez MySQL.\n\n'
+          + `Configuration et accès à la base : ${path.join(apiCacheDir(), '.env')}`
+        : `${error.message}\n\nVérifiez que PHP et MariaDB sont installés et démarrés :\n`
+          + 'sudo apt install php-cli mariadb-server\nsudo systemctl start mariadb\n\n'
+          + `Configuration et accès à la base : ${path.join(apiCacheDir(), '.env')}`,
       buttons: ['Continuer', 'Quitter'],
       defaultId: 0,
       cancelId: 1,

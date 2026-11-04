@@ -15,6 +15,9 @@
     "dev:electron": "electron . --dev",
     "dist:linux": "npm run build:app && electron-builder --linux AppImage deb",
     "dist:linux:publish": "npm run build:app && electron-builder --linux AppImage deb --publish always",
+    "dist:win": "npm run build:app && electron-builder --win nsis",
+    "dist:win:publish": "npm run build:app && electron-builder --win nsis --publish always",
+    "dist:all:publish": "npm run build:app && electron-builder --linux AppImage deb --win nsis --publish always",
     "dist:dir": "npm run build:app && electron-builder --linux dir"
   },
   "devDependencies": {
@@ -106,6 +109,25 @@
       "synopsis": "Gestion scolaire Kalanso",
       "description": "Application desktop de gestion d'école : élèves, classes, notes, finances, admissions et messagerie.",
       "maintainer": "Kalanso"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "artifactName": "Kalanso-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Kalanso"
     }
   },
   "dependencies": {

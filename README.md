@@ -44,6 +44,9 @@ php artisan serve --host=127.0.0.1 --port=8001     # http://127.0.0.1:8001/api
 # paquet Ubuntu : AppImage + .deb
 cd gallery/electron && npm install
 npm run dist:linux                                 # → release/
+
+# installateur Windows (.exe, construit via Wine)
+npm run dist:win                                   # → release/Kalanso-Setup-x.y.z.exe
 ```
 
 ## Première connexion
@@ -173,28 +176,43 @@ redémarrer pour l'installer :
 - **AppImage** : le fichier est remplacé automatiquement puis l'application
   redémarre ;
 - **.deb** : l'installation passe par le gestionnaire de paquets du système,
-  un mot de passe peut être demandé.
+  un mot de passe peut être demandé ;
+- **Windows (.exe)** : l'installateur NSIS se met à jour automatiquement
+  (dans l'application ou au redémarrage).
 
 **Canal GitHub Releases** : les mises à jour sont publiées dans les releases du
 dépôt public `moussantji/Arena`. L'application lit automatiquement
-`latest-linux.yml` de la dernière release — aucune URL à renseigner.
+`latest.yml` (Windows) ou `latest-linux.yml` (Linux) de la dernière release —
+aucune URL à renseigner.
 
 Publier une version, au choix :
 
 ```bash
-# publication automatique (jeton GitHub avec Contents: read and write)
+# publication automatique de tous les paquets (jeton GitHub avec Contents: read and write)
 cd gallery/electron
-GH_TOKEN=ghp_votre_jeton npm run dist:linux:publish
+GH_TOKEN=ghp_votre_jeton npm run dist:all:publish
 ```
+
+Ceci construit `Kalanso-Setup-x.y.z.exe` (installateur Windows), les paquets
+Linux AppImage et .deb, puis les joint toutes à la release `vX.Y.Z` avec
+`latest.yml` et `latest-linux.yml`. Pour ne builder qu'une seule plateforme :
+`npm run dist:win:publish` ou `npm run dist:linux:publish`.
 
 ou manuellement :
 
 1. Incrémenter `version` dans `gallery/electron/package.json` et ajouter
    l'entrée dans `app/src/changelog.js` et `CHANGELOG.md` ;
-2. `cd gallery/electron && npm run dist:linux` ;
+2. `cd gallery/electron && npm run dist:win && npm run dist:linux` ;
 3. Sur GitHub, créer une **release** et y joindre les fichiers de `release/` :
-   `latest-linux.yml`, `Kalanso-x.y.z-x86_64.AppImage`,
-   `Kalanso-x.y.z-amd64.deb`.
+   `latest.yml`, `latest-linux.yml`, `Kalanso-Setup-x.y.z.exe`,
+   `Kalanso-x.y.z-x86_64.AppImage`, `Kalanso-x.y.z-amd64.deb`.
+
+Les paquets Windows sont construits sur Linux via Wine et ne sont **pas
+signés** : au premier lancement, Windows SmartScreen affichera une
+avertissement (« Informations complémentaires » → « Exécuter quand même »).
+Pour supprimer cet avertissement, il faut un certificat de signature Windows
+(achat auprès d'une autorité de certification) ; `electron-builder` le prend
+en charge automatiquement dès qu'un certificat est fourni.
 
 Un canal privé ou local reste possible : renseignez `KALANSO_UPDATE_URL`
 (dossier ou serveur contenant `latest-linux.yml`) dans
@@ -212,6 +230,11 @@ identifiant. Au premier lancement, Kalanso crée
 renseignez les accès MySQL (et les identifiants Google si besoin), puis
 relancez. Lors des mises à jour, ce fichier est conservé, tout comme les
 données (base MySQL, photos, documents).
+
+**Sous Windows** : comme sous Linux, la machine doit disposer de **PHP 8.2+**
+et **MySQL/MariaDB** démarrés (par exemple via [XAMPP](https://www.apachefriends.org)),
+et de la variable `KALANSO_PHP_BIN` pointant vers `php.exe` si PHP n'est pas
+dans le `PATH`. Les données sont les mêmes que sous Linux (base `arena`).
 
 ## Figma
 
