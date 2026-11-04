@@ -33,7 +33,6 @@ export const NAV = {
     { id: 'fiche-admission', label: 'Fiche admission', icon: 'admissions', hidden: true },
   ],
   Système: [
-    { id: 'modales', label: 'Modales', icon: 'external' },
     { id: 'parametres', label: 'Paramètres', icon: 'settings' },
   ],
 };

@@ -125,7 +125,6 @@ export const ROLE_PAGES = {
     'fiche',
     'admissions',
     'fiche-admission',
-    'modales',
     'parametres',
   ],
   [ROLE_SECRETARIAT]: [
