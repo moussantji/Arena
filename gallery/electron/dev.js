@@ -76,7 +76,10 @@ async function main() {
       cwd: APP_DIR,
       env: {
         ...process.env,
-        VITE_API_URL: process.env.VITE_API_URL || 'http://127.0.0.1:8001/api',
+        // L'adresse de l'API n'est plus imposée au renderer : dans Electron,
+        // elle vient du process principal (API distante KALANSO_REMOTE_API_URL
+        // ou API locale du poste). Définissez VITE_API_URL uniquement pour
+        // tester l'interface dans un simple navigateur.
       },
       stdio: 'inherit',
       detached: process.platform !== 'win32',
