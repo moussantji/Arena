@@ -2,7 +2,7 @@
    Kalanso — écran de connexion
    ============================================================ */
 
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useData } from './data.jsx';
 import { Icon } from './ui.jsx';
 import { WindowControls } from './layout.jsx';
@@ -30,6 +30,13 @@ export function Login({ onFirstSetup }) {
   const [googleWaiting, setGoogleWaiting] = useState(false);
   const googleBusyRef = useRef(false);
   const googleCancelRequestedRef = useRef(false);
+
+  // Mode de stockage (affiché en bas de l'écran, sans révéler l'adresse).
+  const [serverInfo, setServerInfo] = useState(null);
+
+  useEffect(() => {
+    window.desktopAPI?.apiInfo?.().then(setServerInfo).catch(() => {});
+  }, []);
 
   const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
@@ -247,7 +254,11 @@ export function Login({ onFirstSetup }) {
           </form>
         </div>
 
-        <p className="login-legal">Application locale · Données hébergées sur cet appareil</p>
+        <p className="login-legal">
+          {serverInfo?.remote
+            ? "Données hébergées sur le serveur de l'établissement"
+            : 'Application locale · Données hébergées sur cet appareil'}
+        </p>
       </section>
     </div>
   );
