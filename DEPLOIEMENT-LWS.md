@@ -55,7 +55,13 @@ Via **Gestionnaire de fichiers** de LWS :
 
 1. Copiez `api/.env.production.example` vers `api/.env`.
 2. Renseignez `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (étape 1).
-3. Enregistrez.
+3. Connexion Google : recopiez les deux lignes `GOOGLE_CLIENT_ID` et
+   `GOOGLE_CLIENT_SECRET` depuis le `.env` de votre PC (`api/.env`).
+   Sans le secret, le bouton « Se connecter avec Google » reste masqué.
+   Aucun réglage à changer dans Google Cloud Console : l'application
+   utilise toujours l'adresse de retour locale (127.0.0.1), seul l'échange
+   du code se fait désormais sur le serveur.
+4. Enregistrez.
 
 ## 5. Créer les tables (une fois)
 
