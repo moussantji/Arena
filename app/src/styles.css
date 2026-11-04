@@ -2187,6 +2187,42 @@ select.input option:hover,
 .login-first-run:hover:not(:disabled) { color: var(--accent2); background: rgba(91, 124, 250, 0.08); }
 .login-first-run:disabled { opacity: 0.6; cursor: default; }
 
+/* ---------------- serveur de données (API distante) ---------------- */
+.login-server { margin-top: 6px; }
+.login-server-toggle {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 7px 10px; border: 0; border-radius: 9px;
+  background: transparent; color: var(--faint); font-size: 10.5px;
+  transition: 0.18s;
+}
+.login-server-toggle:hover { color: var(--accent2); background: rgba(91, 124, 250, 0.08); }
+.login-server-editor {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 11px; border: 1px solid var(--line-strong); border-radius: 11px;
+  background: rgba(167, 182, 255, 0.04);
+}
+.login-server-editor label {
+  font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--faint);
+}
+.login-server-editor input {
+  height: 36px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 9px;
+  background: rgba(7, 11, 31, 0.6); color: var(--ink); font-size: 12.5px; outline: none;
+}
+.login-server-editor input:focus { border-color: var(--accent); }
+.login-server-hint { margin: 0; font-size: 10px; line-height: 1.5; color: var(--faint); }
+.login-server-error { margin: 0; font-size: 10.5px; color: #ff9d9d; }
+.login-server-actions { display: flex; gap: 8px; }
+.login-server-actions button {
+  flex: 1; height: 32px; border-radius: 8px; border: 1px solid var(--line-strong);
+  background: transparent; color: var(--ink); font-size: 11px; font-weight: 600;
+  transition: 0.18s;
+}
+.login-server-actions .login-server-save { background: rgba(91, 124, 250, 0.16); border-color: rgba(91, 124, 250, 0.4); }
+.login-server-actions .login-server-save:hover:not(:disabled) { background: rgba(91, 124, 250, 0.26); }
+.login-server-actions .login-server-cancel:hover:not(:disabled) { background: rgba(167, 182, 255, 0.07); }
+.login-server-actions button:disabled { opacity: 0.6; cursor: default; }
+
 .setup-back {
   display: inline-flex; align-items: center; gap: 6px;
   margin: -6px 0 14px; padding: 6px 9px; border: 0; border-radius: 8px;

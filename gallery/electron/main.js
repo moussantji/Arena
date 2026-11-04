@@ -9,6 +9,7 @@ const { execFileSync, spawn } = require('node:child_process');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const http = require('node:http');
+const https = require('node:https');
 const path = require('node:path');
 
 const isDev = process.argv.includes('--dev');
@@ -24,7 +25,38 @@ if (isDev) {
 
 const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5179';
 const API_PORT = Number(process.env.KALANSO_API_PORT || 8001);
-const API_ORIGIN = `http://127.0.0.1:${API_PORT}`;
+const LOCAL_API_ORIGIN = `http://127.0.0.1:${API_PORT}`;
+
+/**
+ * API distante : KALANSO_REMOTE_API_URL, définie en variable d'environnement
+ * ou dans le .env du backend. Quand elle est renseignée — par exemple
+ * https://kalanso.mandenbaoubab.com — l'application ne démarre aucun serveur
+ * local et dialogue directement avec le serveur de l'établissement
+ * (données centralisées, multi-postes).
+ */
+function normalizeRemoteUrl(value) {
+  return String(value || '').trim().replace(/\/+$/, '').replace(/\/api$/i, '');
+}
+
+function remoteApiUrl() {
+  const fromEnv = normalizeRemoteUrl(process.env.KALANSO_REMOTE_API_URL);
+  if (fromEnv) return fromEnv;
+
+  try {
+    const envPath = path.join(app.isPackaged ? apiCacheDir() : apiSourceDir(), '.env');
+    const content = fs.readFileSync(envPath, 'utf8');
+    const match = content.match(/^\s*KALANSO_REMOTE_API_URL\s*=\s*"?([^"\n\r]+?)"?\s*$/m);
+    if (match && match[1].trim()) return normalizeRemoteUrl(match[1]);
+  } catch {
+    /* fichier .env absent */
+  }
+
+  return null;
+}
+
+const REMOTE_API_URL = remoteApiUrl();
+const API_ORIGIN = REMOTE_API_URL || LOCAL_API_ORIGIN;
+const REMOTE_MODE = Boolean(REMOTE_API_URL);
 const SOURCE_APP_INDEX = path.join(__dirname, '..', '..', 'app', 'dist', 'index.html');
 const PACKAGED_APP_INDEX = path.join(process.resourcesPath, 'app', 'index.html');
 const GALLERY_INDEX = path.join(__dirname, '..', 'index.html');
@@ -65,6 +97,7 @@ logMain(
   + `display=${process.env.DISPLAY || '?'} · session=${process.env.XDG_SESSION_TYPE || '?'}`
   + `${isDev ? ` · mode=dev · profil=${app.getPath('userData')}` : ''} ---`,
 );
+if (REMOTE_MODE) logMain(`API distante : ${REMOTE_API_URL}`);
 
 process.on('uncaughtException', (error) => {
   logMain(`uncaughtException: ${error.stack || error.message}`);
@@ -119,7 +152,8 @@ function openBackendLog() {
 
 function probeApi(timeout = 1200) {
   return new Promise((resolve) => {
-    const request = http.get(`${API_ORIGIN}/api/health`, { timeout }, (response) => {
+    const client = API_ORIGIN.startsWith('https:') ? https : http;
+    const request = client.get(`${API_ORIGIN}/api/health`, { timeout }, (response) => {
       let body = '';
       response.on('data', (chunk) => { body += chunk; });
       response.on('end', () => {
@@ -211,6 +245,10 @@ function ensureEnvFile(target) {
       '# Canal de mise à jour (laisser vide pour GitHub Releases)',
       'KALANSO_UPDATE_URL=',
       '',
+      "# API distante (laisser vide pour utiliser l'API de cet ordinateur)",
+      '# Exemple : https://kalanso.mandenbaoubab.com',
+      'KALANSO_REMOTE_API_URL=',
+      '',
     ].join('\n'));
   }
 
@@ -221,6 +259,9 @@ function ensureEnvFile(target) {
   }
   if (!/^KALANSO_UPDATE_URL=/m.test(content)) {
     content = `${content.replace(/\s*$/, '')}\n\n# Canal de mise à jour (laisser vide pour GitHub Releases)\nKALANSO_UPDATE_URL=\n`;
+  }
+  if (!/^KALANSO_REMOTE_API_URL=/m.test(content)) {
+    content = `${content.replace(/\s*$/, '')}\n\n# API distante (laisser vide pour utiliser l'API de cet ordinateur)\nKALANSO_REMOTE_API_URL=\n`;
   }
   fs.writeFileSync(envPath, content);
   logMain(`fichier .env créé pour le backend installé : ${envPath}`);
@@ -344,6 +385,18 @@ async function runMigrations(dir) {
 }
 
 async function startBackend() {
+  if (REMOTE_MODE) {
+    // API distante : aucun serveur local à démarrer. On vérifie simplement
+    // que le serveur de l'établissement répond, sans bloquer l'ouverture de
+    // l'application si le réseau est lent — les erreurs s'afficheront dans
+    // l'interface au moment de la connexion.
+    const reachable = await probeApi(6000);
+    logMain(reachable
+      ? `API distante joignable : ${API_ORIGIN}`
+      : `API distante injoignable pour l'instant : ${API_ORIGIN}`);
+    return { reused: true, remote: true };
+  }
+
   if (await probeApi()) {
     logMain('API locale déjà active — réutilisation.');
     return { reused: true };
@@ -501,8 +554,8 @@ async function googleSignInFlow() {
 
   if (!status.ok || !status.payload?.enabled || !clientId) {
     throw new Error(
-      'La connexion Google n’est pas configurée. '
-      + 'Renseignez GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET dans api/.env, puis redémarrez Kalanso.',
+      'La connexion Google n’est pas activée sur l’API. '
+      + 'Renseignez GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET dans le fichier .env de l’API, puis réessayez.',
     );
   }
 
@@ -915,6 +968,49 @@ ipcMain.handle('google:cancel', () => {
   }
   cancelGoogleFlow();
   cancelGoogleFlow = null;
+  return { ok: true };
+});
+
+/* Adresse de l'API effective, lue une fois par le preload (sendSync). */
+ipcMain.on('api:url', (event) => {
+  event.returnValue = `${API_ORIGIN}/api`;
+});
+
+ipcMain.handle('api:info', () => ({
+  remote: REMOTE_MODE,
+  origin: API_ORIGIN,
+  apiUrl: `${API_ORIGIN}/api`,
+}));
+
+/* Change le serveur de données (API distante ou locale) puis redémarre. */
+ipcMain.handle('api:setUrl', (_event, value) => {
+  const normalized = normalizeRemoteUrl(value);
+  if (normalized && !/^https?:\/\//i.test(normalized)) {
+    return { ok: false, message: "L'adresse doit commencer par http:// ou https://" };
+  }
+
+  const dir = app.isPackaged ? apiCacheDir() : apiSourceDir();
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+    ensureEnvFile(dir);
+    const envPath = path.join(dir, '.env');
+    let content = fs.readFileSync(envPath, 'utf8');
+    const line = `KALANSO_REMOTE_API_URL=${normalized}`;
+    if (/^KALANSO_REMOTE_API_URL=.*$/m.test(content)) {
+      content = content.replace(/^KALANSO_REMOTE_API_URL=.*$/m, line);
+    } else {
+      content = `${content.replace(/\s*$/, '')}\n\n# API distante (laisser vide pour utiliser l'API de cet ordinateur)\n${line}\n`;
+    }
+    fs.writeFileSync(envPath, content);
+  } catch (error) {
+    logMain(`enregistrement du serveur impossible : ${error.message}`);
+    return { ok: false, message: "Impossible d'enregistrer la configuration." };
+  }
+
+  logMain(`serveur de données : ${normalized || 'API locale'} — redémarrage.`);
+  app.relaunch();
+  quitting = true;
+  app.quit();
   return { ok: true };
 });
 

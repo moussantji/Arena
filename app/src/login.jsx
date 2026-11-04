@@ -2,7 +2,7 @@
    Kalanso — écran de connexion
    ============================================================ */
 
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useData } from './data.jsx';
 import { Icon } from './ui.jsx';
 import { WindowControls } from './layout.jsx';
@@ -30,6 +30,48 @@ export function Login({ onFirstSetup }) {
   const [googleWaiting, setGoogleWaiting] = useState(false);
   const googleBusyRef = useRef(false);
   const googleCancelRequestedRef = useRef(false);
+
+  const [serverInfo, setServerInfo] = useState(null);
+  const [serverOpen, setServerOpen] = useState(false);
+  const [serverDraft, setServerDraft] = useState('');
+  const [serverBusy, setServerBusy] = useState(false);
+  const [serverError, setServerError] = useState('');
+
+  useEffect(() => {
+    window.desktopAPI?.apiInfo?.().then(setServerInfo).catch(() => {});
+  }, []);
+
+  const serverHost = (() => {
+    try {
+      return serverInfo ? new URL(serverInfo.origin).host : '';
+    } catch {
+      return serverInfo?.origin || '';
+    }
+  })();
+
+  const openServerEditor = () => {
+    setServerDraft(serverInfo?.remote ? serverInfo.origin : '');
+    setServerError('');
+    setServerOpen(true);
+  };
+
+  const saveServer = useCallback(async () => {
+    if (serverBusy) return;
+    setServerBusy(true);
+    setServerError('');
+    try {
+      const result = await window.desktopAPI?.setApiUrl?.(serverDraft.trim());
+      if (result && !result.ok) {
+        setServerError(result.message || 'Enregistrement impossible.');
+        setServerBusy(false);
+      }
+      // Sinon : le process principal redémarre l'application pour appliquer
+      // le changement — la promesse peut ne jamais se résoudre.
+    } catch (error) {
+      setServerError(error?.message || 'Enregistrement impossible.');
+      setServerBusy(false);
+    }
+  }, [serverBusy, serverDraft]);
 
   const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
@@ -245,9 +287,68 @@ export function Login({ onFirstSetup }) {
               </button>
             )}
           </form>
+
+          <div className="login-server">
+            {serverOpen ? (
+              <div className="login-server-editor">
+                <label htmlFor="login-server-url">Serveur de données</label>
+                <input
+                  id="login-server-url"
+                  type="url"
+                  value={serverDraft}
+                  onChange={(event) => setServerDraft(event.target.value)}
+                  placeholder="https://kalanso.mandenbaoubab.com"
+                  disabled={serverBusy}
+                />
+                {serverError && <p className="login-server-error" role="alert">{serverError}</p>}
+                <p className="login-server-hint">
+                  Adresse de l’API de l’établissement (données partagées entre
+                  les postes). Laissez vide pour utiliser uniquement cet ordinateur.
+                </p>
+                <div className="login-server-actions">
+                  <button
+                    type="button"
+                    className="login-server-save"
+                    onClick={saveServer}
+                    disabled={serverBusy}
+                  >
+                    {serverBusy ? 'Enregistrement…' : 'Enregistrer et redémarrer'}
+                  </button>
+                  <button
+                    type="button"
+                    className="login-server-cancel"
+                    onClick={() => setServerOpen(false)}
+                    disabled={serverBusy}
+                  >
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="login-server-toggle"
+                onClick={openServerEditor}
+                title="Choisir où sont enregistrées les données"
+              >
+                <Icon name="settings" size={13} />
+                <span>
+                  {serverInfo
+                    ? (serverInfo.remote
+                      ? `Données sur le serveur de l’école · ${serverHost}`
+                      : 'Données sur cet ordinateur')
+                    : 'Serveur de données…'}
+                </span>
+              </button>
+            )}
+          </div>
         </div>
 
-        <p className="login-legal">Application locale · Données hébergées sur cet appareil</p>
+        <p className="login-legal">
+          {serverInfo?.remote
+            ? "Données centralisées · Serveur de l'établissement"
+            : 'Application locale · Données hébergées sur cet appareil'}
+        </p>
       </section>
     </div>
   );

@@ -111,12 +111,24 @@ d'éventuelles nouvelles migrations : réimportez le schéma mis à jour
 migrate --force` en SSH — les données sont conservées) ou demandez le SQL des
 migrations manquantes.
 
-## 9. Brancher l'application Kalanso
+## 9. Brancher l'application Kalanso (multi-postes)
 
-L'application desktop saura utiliser cette API via son adresse
-`https://kalanso.mandenbaoubab.com` (option « API distante » à activer dans
-l'application). Les données de tous les postes seront alors centralisées
-dans la base MySQL de l'hébergeur.
+Sur chaque poste, à l'écran de connexion de Kalanso, cliquez sur la ligne
+**« Données… »** (en bas de la carte de connexion) et renseignez :
+
+```text
+https://kalanso.mandenbaoubab.com
+```
+
+puis **« Enregistrer et redémarrer »**. L'application se connecte alors à
+l'API en ligne : les comptes et les données de tous les postes sont
+centralisés dans la base MySQL de l'hébergeur. La ligne d'état sous la carte
+affiche « Données sur le serveur de l'école », et Paramètres montre l'adresse
+connectée.
+
+Pour revenir au mode local (données stockées uniquement sur le poste), videz
+l'adresse dans le même écran. Cette fonctionnalité est incluse à partir de la
+version **1.3.2** de l'application.
 
 **Sécurité** : le `.env` en ligne contient les accès MySQL et le secret
 Google — il n'est jamais servi par le serveur web et n'est pas dans Git.
