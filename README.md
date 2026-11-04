@@ -175,44 +175,43 @@ redémarrer pour l'installer :
 - **.deb** : l'installation passe par le gestionnaire de paquets du système,
   un mot de passe peut être demandé.
 
-**Canal de mise à jour** : renseignez l'adresse qui héberge les paquets.
+**Canal GitHub Releases** : les mises à jour sont publiées dans les releases du
+dépôt public `moussantji/Arena`. L'application lit automatiquement
+`latest-linux.yml` de la dernière release — aucune URL à renseigner.
 
-```dotenv
-KALANSO_UPDATE_URL=https://mon-serveur.exemple.com/kalanso
-```
-
-Cette valeur se place dans `api/.env` (ou dans
-`~/.config/kalanso-desktop/backend/.env` pour la version installée) ou dans la
-variable d'environnement du même nom. Le dossier ou serveur doit contenir les
-fichiers générés par `npm run dist:linux` :
-
-- `latest-linux.yml`
-- `Kalanso-x.y.z-x86_64.AppImage`
-- `Kalanso-x.y.z-amd64.deb`
-
-Pour un essai local : `cd release && python3 -m http.server 8099` puis lancez
-l'application avec `KALANSO_UPDATE_URL=http://127.0.0.1:8099`.
-
-**Publier une version :**
-
-1. Incrémenter `version` dans `gallery/electron/package.json`.
-2. Ajouter l'entrée correspondante dans `app/src/changelog.js` et
-   `CHANGELOG.md`.
-3. Reconstruire les paquets :
+Publier une version, au choix :
 
 ```bash
-cd gallery/electron && npm run dist:linux
+# publication automatique (jeton GitHub avec Contents: read and write)
+cd gallery/electron
+GH_TOKEN=ghp_votre_jeton npm run dist:linux:publish
 ```
 
-4. Copier le contenu de `release/` (au minimum `latest-linux.yml` et les
-   paquets) vers le canal de mise à jour.
+ou manuellement :
+
+1. Incrémenter `version` dans `gallery/electron/package.json` et ajouter
+   l'entrée dans `app/src/changelog.js` et `CHANGELOG.md` ;
+2. `cd gallery/electron && npm run dist:linux` ;
+3. Sur GitHub, créer une **release** et y joindre les fichiers de `release/` :
+   `latest-linux.yml`, `Kalanso-x.y.z-x86_64.AppImage`,
+   `Kalanso-x.y.z-amd64.deb`.
+
+Un canal privé ou local reste possible : renseignez `KALANSO_UPDATE_URL`
+(dossier ou serveur contenant `latest-linux.yml`) dans
+`~/.config/kalanso-desktop/backend/.env`. Pour un essai :
+`cd release && python3 -m http.server 8099` puis lancer avec
+`KALANSO_UPDATE_URL=http://127.0.0.1:8099`.
 
 À la première ouverture après une mise à jour, la fenêtre **Nouveautés**
 s'affiche une fois par version ; elle reste consultable dans
 **Paramètres → Préférences → Nouveautés**.
 
-Les données (base MySQL, photos, documents) et la configuration `.env` du
-poste — identifiants Google compris — sont conservées d'une version à l'autre.
+**Configuration de chaque poste** : les paquets ne contiennent aucun
+identifiant. Au premier lancement, Kalanso crée
+`~/.config/kalanso-desktop/backend/.env` avec une clé d'application générée ;
+renseignez les accès MySQL (et les identifiants Google si besoin), puis
+relancez. Lors des mises à jour, ce fichier est conservé, tout comme les
+données (base MySQL, photos, documents).
 
 ## Figma
 

@@ -4,6 +4,13 @@ Ce fichier documente les nouveautés visibles pour les utilisateurs. La même
 liste est embarquée dans l'application (`app/src/changelog.js`) et affichée
 une fois par version dans la fenêtre **Nouveautés**.
 
+## 1.3.1 — 3 novembre 2026
+
+- Les mises à jour sont publiées et téléchargées depuis GitHub Releases.
+- Les paquets ne contiennent plus aucun identifiant : la configuration reste
+  sur chaque poste.
+- La configuration (.env) est créée automatiquement au premier lancement.
+
 ## 1.3.0 — 3 novembre 2026
 
 - Nouvelle section Paramètres → Préférences → Mises à jour.

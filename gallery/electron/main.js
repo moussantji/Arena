@@ -168,9 +168,51 @@ function ensureWritableBackend(target) {
   }
   fs.symlinkSync(path.join('..', 'storage', 'app', 'public'), link, 'dir');
 
-  if (!fs.existsSync(path.join(target, '.env'))) {
-    throw new Error('Configuration .env absente du paquet API.');
+  ensureEnvFile(target);
+}
+
+/**
+ * Crée le .env du backend installé s'il est absent (les paquets ne
+ * contiennent volontairement aucun identifiant). Une clé d'application
+ * est générée automatiquement ; les accès à la base restent à compléter.
+ */
+function ensureEnvFile(target) {
+  const envPath = path.join(target, '.env');
+  if (fs.existsSync(envPath)) return;
+
+  const examplePath = path.join(target, '.env.example');
+  if (fs.existsSync(examplePath)) {
+    fs.copyFileSync(examplePath, envPath);
+  } else {
+    fs.writeFileSync(envPath, [
+      'APP_NAME="Kalanso"',
+      'APP_ENV=local',
+      'APP_KEY=',
+      'APP_DEBUG=false',
+      'APP_URL=http://127.0.0.1:8001',
+      'DB_CONNECTION=mysql',
+      'DB_HOST=127.0.0.1',
+      'DB_PORT=3306',
+      'DB_DATABASE=arena',
+      'DB_USERNAME=arena',
+      'DB_PASSWORD=',
+      '',
+      '# Canal de mise à jour (laisser vide pour GitHub Releases)',
+      'KALANSO_UPDATE_URL=',
+      '',
+    ].join('\n'));
   }
+
+  let content = fs.readFileSync(envPath, 'utf8');
+  if (/^APP_KEY=\s*$/m.test(content)) {
+    const key = `base64:${crypto.randomBytes(32).toString('base64')}`;
+    content = content.replace(/^APP_KEY=.*$/m, `APP_KEY=${key}`);
+  }
+  if (!/^KALANSO_UPDATE_URL=/m.test(content)) {
+    content = `${content.replace(/\s*$/, '')}\n\n# Canal de mise à jour (laisser vide pour GitHub Releases)\nKALANSO_UPDATE_URL=\n`;
+  }
+  fs.writeFileSync(envPath, content);
+  logMain(`fichier .env créé pour le backend installé : ${envPath}`);
 }
 
 function copyBackendTree(source, target) {
@@ -762,7 +804,8 @@ async function boot() {
       title: 'Service local indisponible',
       message: "L'API locale n'a pas pu démarrer.",
       detail: `${error.message}\n\nVérifiez que PHP et MariaDB sont installés et démarrés :\n`
-        + 'sudo apt install php-cli mariadb-server\nsudo systemctl start mariadb',
+        + 'sudo apt install php-cli mariadb-server\nsudo systemctl start mariadb\n\n'
+        + `Configuration et accès à la base : ${path.join(apiCacheDir(), '.env')}`,
       buttons: ['Continuer', 'Quitter'],
       defaultId: 0,
       cancelId: 1,

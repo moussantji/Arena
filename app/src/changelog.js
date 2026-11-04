@@ -4,9 +4,19 @@
    entrée en tête de CHANGELOG, puis reconstruire les paquets.
    ============================================================ */
 
-export const APP_VERSION = '1.3.0';
+export const APP_VERSION = '1.3.1';
 
 export const CHANGELOG = [
+  {
+    version: '1.3.1',
+    date: '3 novembre 2026',
+    title: 'Mises à jour via GitHub',
+    items: [
+      'Les mises à jour sont publiées et téléchargées depuis GitHub Releases.',
+      'Les paquets ne contiennent plus aucun identifiant : la configuration reste sur chaque poste.',
+      'La configuration (.env) est créée automatiquement au premier lancement.',
+    ],
+  },
   {
     version: '1.3.0',
     date: '3 novembre 2026',
