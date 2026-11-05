@@ -70,7 +70,7 @@ jobs:
         run: npm run build
 
   mobile:
-    name: Mobile — vérification TypeScript
+    name: Mobile — vérification TypeScript et lint
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -90,6 +90,9 @@ jobs:
 
       - name: Types TypeScript
         run: npm run typecheck
+
+      - name: Lint ESLint
+        run: npm run lint
 
   desktop:
     name: Desktop — paquet Linux (sans publication)

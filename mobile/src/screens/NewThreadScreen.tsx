@@ -15,7 +15,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { api, ApiError } from '../api';
 import { theme } from '../theme';
-import { Button, Card, SectionHeader } from '../ui';
+import { Button, SectionHeader } from '../ui';
 import { useAuth, isStaff } from '../auth';
 import type { Thread } from '../types';
 

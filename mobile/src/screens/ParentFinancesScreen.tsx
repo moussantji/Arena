@@ -114,7 +114,6 @@ function InvoiceRow({ invoice, expanded, onToggle }: {
   expanded: boolean;
   onToggle: () => void;
 }) {
-  const done = invoice.remaining <= 0.004 && invoice.status !== 'pending' && invoice.status !== 'partial';
   const statusTone = invoice.status === 'paid' ? 'ok'
     : invoice.status === 'cancelled' ? 'muted'
     : invoice.status === 'partial' ? 'copper' : 'danger';

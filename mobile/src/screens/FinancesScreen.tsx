@@ -3,7 +3,7 @@ import React from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { api } from '../api';
 import { theme } from '../theme';
-import { Card, Empty, ErrorState, Loading, SectionHeader, Pill } from '../ui';
+import { Card, ErrorState, Loading, SectionHeader } from '../ui';
 import { money, paymentMethodLabel } from '../format';
 import type { FinanceSummary } from '../types';
 import { useApiQuery } from '../useApiQuery';

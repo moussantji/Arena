@@ -4,9 +4,9 @@ import { ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
 import { useChildren, ChildSelector } from '../children';
 import { api } from '../api';
 import { theme } from '../theme';
-import { Card, CardTitle, Empty, ErrorState, Loading, SectionHeader, Pill } from '../ui';
+import { Card, Empty, ErrorState, Loading, SectionHeader, Pill } from '../ui';
 import { evaluationLabel, fullName } from '../format';
-import type { Bulletin, ParentMeta, Term } from '../types';
+import type { Bulletin, ParentMeta } from '../types';
 import { useApiQuery } from '../useApiQuery';
 
 export default function ReportCardScreen() {
