@@ -53,14 +53,21 @@ npx expo export --platform android    # bundle Metro de production (sans apparei
 
 ## Build Play Store
 
-1. Créer un **keystore** d'upload (à conserver précieusement par l'établissement) :
-   `keytool -genkeypair -v -keystore kalanso-upload.keystore -alias kalanso -keyalg RSA -keysize 2048 -validity 10000`
+La politique de confidentialité publique exigée par la fiche Play est en ligne :
+**https://kalanso.mandenbaoubab.com/confidentialite**
+
+1. La **clé d'upload** est générée et conservée hors du dépôt :
+   `/home/pone/kalanso-clefs/kalanso-upload.keystore` (alias `kalanso`,
+   mot de passe dans `MOTS-DE-PASSE.txt` — ne jamais committer ni partager).
+   Lors de la création de l'app sur la Play Console, activer **Play App Signing** :
+   Google ré-signe l'application ; cette clé sert uniquement de *clé de téléversement*.
+   Emprunte SHA-256 : `6C:1D:50:F6:D9:FB:A7:49:93:C9:E4:8F:D7:2A:40:71:75:01:3C:F6:54:2A:B0:82:45:99:77:F4:F3:43:C8:42`
 2. `npx expo prebuild --platform android`
 3. `cd android && ./gradlew bundleRelease` → `app/build/outputs/bundle/release/app-release.aab`
+   (configurer la signature release dans `android/app/build.gradle` avec le keystore ci-dessus).
 4. Compte développeur Google Play (25 $, paiement unique) + fiche Play Console :
-   politiques de confidentialité obligatoires (données : comptes, notes, absences,
-   finances — public mineur, hébergement UE/Sénégal/France à préciser), classification
-   de contenu IARC, captures d'écran 16:9 / 9:16, icône 512×512.
+   politique de confidentialité = l'URL ci-dessus ; classification de contenu (IARC) ;
+   captures d'écran téléphone ; icône 512×512 ; description courte/complète FR.
 5. Uploader l'AAB sur la piste **Tests internes** d'abord.
 
 `applicationId` : `com.kalanso.mobile` — `versionCode` : incrémenter à chaque release.
