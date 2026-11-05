@@ -124,6 +124,55 @@ déployez d'abord la branche `deploy/lws`, puis dans phpMyAdmin
 danger pour les données : il crée la table `audit_logs` et ajoute la colonne
 `terms.locked_at`.
 
+## 8 bis. Sauvegardes et restauration
+
+Trois choses sont à sauvegarder régulièrement (avant chaque mise à jour du
+serveur, idéalement chaque semaine) :
+
+1. **La base MySQL** — phpMyAdmin (LWS Panel → Bases de données →
+   phpMyAdmin) → sélectionnez la base → onglet **Exporter** → format SQL,
+   méthode rapide → **Exécuter**. Le fichier `kalanso-aaaa-mm-jj.sql` contient
+   toutes les données (élèves, notes, finances, comptes…). Stockez-le hors
+   du serveur (PC, clé USB, disque externe) et **vérifiez de temps en temps
+   que le fichier s'ouvre** (`head -20` ou un éditeur).
+2. **Les fichiers envoyés** — via le Gestionnaire de fichiers de LWS,
+   compressez puis téléchargez le dossier `api/storage/app/public`
+   (photos d'élèves et de personnel, documents). Ce dossier n'est pas dans
+   Git : sans cette sauvegarde, les photos sont perdues en cas de
+   restauration du serveur.
+3. **Le fichier `api/.env`** — il contient les accès MySQL, la clé Google et
+   la clé applicative. Conservez-en une copie privée hors du serveur (gestionnaire
+   de mots de passe). Sans lui, il faut tout reconfigurer à la main.
+
+**Restauration complète** (serveur vierge ou sinistre) :
+
+1. Déployez `deploy/lws` via Git (étape 3) puis recréez `api/.env` (étape 4).
+2. phpMyAdmin → onglet **SQL** → collez le contenu de
+   `kalanso-mysql-schema.sql` (structure) **ou** directement l'export du
+   point 1 ci-dessus (structure + données — inutile de rejouer le schéma).
+3. Ré-importez `api/storage/app/public` depuis la sauvegarde (étape 2).
+4. Recréez le lien `api/public/storage` → `../storage/app/public` si vous
+   utilisez le mode local (`php artisan storage:link` en SSH).
+5. Vérifiez `https://kalanso.mandenbaoubab.com/api/health`, puis connectez
+   un poste — les données doivent être là.
+
+**Test de restauration** : une sauvegarde non testée n'est pas une
+sauvegarde. Une fois par trimestre, restaurez l'export sur une base
+jetable locale (phpMyAdmin local) et vérifiez que l'application s'ouvre
+sur ces données.
+
+**En-têtes de sécurité** : depuis la mise à jour du 5 novembre 2026, les
+`.htaccess` (racine et `api/public`) ajoutent des en-têtes de protection
+(HSTS, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`,
+`Permissions-Policy`) — sans aucun risque si `mod_headers` est absent
+(les directives sont ignorées proprement).
+
+**Journal d'audit** : les connexions (réussies et échouées), les connexions
+Google et les modifications de comptes sont désormais journalisées dans
+`audit_logs` (visible par la Direction dans **Menu Système → Journal**).
+Un changement de mot de passe révoque immédiatement toutes les sessions du
+compte concerné.
+
 ## 9. Brancher l'application Kalanso (multi-postes)
 
 Sur chaque poste, après connexion avec un compte **Direction**, ouvrez

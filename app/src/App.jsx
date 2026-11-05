@@ -3,6 +3,7 @@ import { TitleBar, Sidebar, TopBar, PAGES as NAV_PAGES } from './layout.jsx';
 import { META, PAGES } from './pages.jsx';
 import { useData } from './data.jsx';
 import { useActions } from './actions.jsx';
+import { OfflineBanner } from './offline-banner.jsx';
 import { Login } from './login.jsx';
 import { Setup } from './setup.jsx';
 import { Btn, Icon } from './ui.jsx';
@@ -180,7 +181,7 @@ export default function App() {
         <p>Gestion scolaire · espace sécurisé</p>
         <div className="boot-loading">
           <span className="spinner large" />
-          <span>{checkingSetup ? 'Préparation de Kalanso…' : 'Connexion à l’API…'}</span>
+          <span>{checkingSetup ? 'Préparation de Kalanso…' : 'Connexion au serveur…'}</span>
         </div>
       </div>
     );
@@ -205,10 +206,9 @@ export default function App() {
         <h1>KALANSO</h1>
         <p>Gestion scolaire · espace sécurisé</p>
         <div className="boot-error">
-          <span className="state-ic"><Icon name="close" size={18} /></span>
-          <b>API indisponible</b>
-          <em>{bootError || 'Impossible de charger les données de l’établissement.'}</em>
-          <code>cd api &amp;&amp; php8.4 artisan serve --host=127.0.0.1 --port=8001</code>
+          <span className="state-ic"><Icon name="wifiOff" size={18} /></span>
+          <b>Serveur injoignable</b>
+          <em>{bootError || 'Le serveur de données ne répond pas.'} Vérifiez la connexion réseau de ce poste, puis réessayez.</em>
           <Btn icon="refresh" solid onClick={bootstrap}>Réessayer</Btn>
         </div>
       </div>
@@ -233,6 +233,7 @@ export default function App() {
       <Sidebar pageId={pageId} onSelect={go} open={sidebar} />
 
       <main className="main">
+        <OfflineBanner />
         <TopBar
           page={page}
           query={query}

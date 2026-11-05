@@ -56,12 +56,16 @@ class AuditLog extends Model
     /**
      * Écrit une ligne de journal. Ne lève jamais d'exception : une panne de
      * traçabilité ne doit pas casser l'action métier.
+     *
+     * Le paramètre $actor permet de journaliser des actions qui n'ont pas
+     * encore d'utilisateur authentifié sur la requête (connexion par
+     * mot de passe ou Google) : l'auteur connu est alors passé explicitement.
      */
-    public static function record(string $action, ?Model $subject, string $description, array $properties = []): void
+    public static function record(string $action, ?Model $subject, string $description, array $properties = [], ?User $actor = null): void
     {
         try {
             $request = Request::instance();
-            $user = $request?->user();
+            $user = $request?->user() ?? $actor;
 
             static::query()->create([
                 'user_id' => $user?->id,

@@ -4,6 +4,33 @@ Ce fichier documente les nouveautés visibles pour les utilisateurs. La même
 liste est embarquée dans l'application (`app/src/changelog.js`) et affichée
 une fois par version dans la fenêtre **Nouveautés**.
 
+## 1.3.2 — à paraître
+
+- Nouveau bandeau « hors-ligne » : quand le serveur ne répond plus, un
+  bandeau le signale et la reconnexion est tentée automatiquement toutes
+  les 10 secondes (bouton « Réessayer » pour forcer une sonde).
+- Écran « Serveur injoignable » épuré et bouton Réessayer.
+- Paquets plus légers : les dépendances de développement de l'API Laravel
+  (phpunit, faker…) ne sont plus embarquées — environ 30 Mo de moins par
+  paquet. La liste est dérivée automatiquement de `api/composer.lock`.
+- Sécurité : `api/storage/**` (photos et documents saisis sur le poste de
+  build) ne peut plus être embarqué dans l'installateur — les dossiers
+  nécessaires sont recréés à l'installation.
+- Intégration continue GitHub Actions : tests API (SQLite en mémoire),
+  build React et construction du paquet Linux (sans publication) à chaque
+  push et pull request.
+- Sécurité : connexions (réussies et échouées) et connexions Google
+  journalisées dans le journal d'audit ; un changement de mot de passe
+  révoque immédiatement toutes les sessions du compte.
+- Mots de passe : longueur minimale portée à 10 caractères pour les nouveaux
+  comptes et les changements de mot de passe.
+- Dépendances serveur mises à jour : les 8 alertes de sécurité Symfony
+  connues (http-foundation, http-kernel, mime, routing, yaml) sont corrigées.
+- En-têtes de sécurité HTTP ajoutés (HSTS, nosniff, anti-cadrage,
+  Referrer-Policy) — sans effet si le serveur ne les supporte pas.
+- Nouvelle section « Sauvegardes et restauration » dans le guide de
+  déploiement LWS (base, photos/documents, .env + test de restauration).
+
 ## 1.3.1 — 3 novembre 2026
 
 - Les mises à jour sont publiées et téléchargées depuis GitHub Releases.

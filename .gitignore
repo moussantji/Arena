@@ -7,3 +7,14 @@ dist/
 # Paquets desktop
 gallery/electron/release/
 release/
+
+# Outils générés automatiquement — jamais dans le dépôt
+api/.agents/
+api/.claude/
+api/.mcp.json
+api/.pi/
+api/boost.json
+api/opencode.json
+
+# Archives de secours
+kalanso-lws.zip

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
+use App\Models\AuditLog;
 use App\Models\School;
 use App\Models\User;
 use Illuminate\Http\Client\ConnectionException;
@@ -195,6 +196,15 @@ class GoogleAuthController extends Controller
         }
 
         $token = $user->createToken('google-desktop')->plainTextToken;
+        AuditLog::record(
+            $firstAccount ? 'auth.first_account_created' : 'auth.google_login',
+            $user,
+            $firstAccount
+                ? "Premier compte (Direction) créé via Google : {$user->name}"
+                : "Connexion Google : {$user->name}",
+            $firstAccount ? ['role' => 'direction'] : [],
+            $user,
+        );
 
         return response()->json([
             'token' => $token,

@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  api, ApiError, errorMessage, clearSession, getToken, getUser, setSession,
+  api, ApiError, errorMessage, clearSession, getToken, getUser, setSession, pingApi,
 } from './api.js';
 import { Icon } from './ui.jsx';
 import { hasPermission, canAccessPage as userCanAccessPage } from './auth.js';
@@ -150,6 +150,8 @@ export function DataProvider({ children }) {
   const [notifications, setNotifications] = useState([]);
   const [unreadThreads, setUnreadThreads] = useState(0);
   const [toasts, setToasts] = useState([]);
+  const [apiOnline, setApiOnline] = useState(true);
+  const [retrying, setRetrying] = useState(false);
   const [user, setUser] = useState(() => getUser());
   const [studentId, setStudentIdState] = useState(() => {
     const stored = Number(window.localStorage.getItem('kalanso.student'));
@@ -315,6 +317,49 @@ export function DataProvider({ children }) {
     loadThreads();
   }, [loadMeta, loadNotifications, loadThreads]);
 
+  /* Abonnements à l'état de connexion réseau (diffusé par api.js). */
+  useEffect(() => {
+    const onStatus = (event) => setApiOnline(Boolean(event.detail?.online));
+    window.addEventListener('kalanso:api-status', onStatus);
+    return () => window.removeEventListener('kalanso:api-status', onStatus);
+  }, []);
+
+  /* Tentative manuelle (bouton « Réessayer » du bandeau hors-ligne). */
+  const retryConnection = useCallback(async () => {
+    if (retrying) return false;
+    setRetrying(true);
+    try {
+      const ok = await pingApi(4000);
+      if (ok) {
+        setApiOnline(true);
+        refresh();
+        notify('Connexion au serveur rétablie.');
+      }
+      return ok;
+    } finally {
+      setRetrying(false);
+    }
+  }, [retrying, refresh, notify]);
+
+  /* Reconnexion automatique : tant que le serveur est injoignable, une
+     sonde légère est lancée toutes les 10 secondes. */
+  useEffect(() => {
+    if (apiOnline) return undefined;
+    let cancelled = false;
+    const timer = window.setInterval(async () => {
+      const ok = await pingApi(3500);
+      if (ok && !cancelled) {
+        setApiOnline(true);
+        refresh();
+        notify('Connexion au serveur rétablie.');
+      }
+    }, 10000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [apiOnline, refresh, notify]);
+
   const markNotification = useCallback(async (notification) => {
     if (!notification || notification.read_at) return;
     try {
@@ -450,6 +495,9 @@ export function DataProvider({ children }) {
     toasts,
     notify,
     dismissToast,
+    apiOnline,
+    retrying,
+    retryConnection,
     user,
     setUser,
     signIn,
@@ -470,7 +518,8 @@ export function DataProvider({ children }) {
     meta, booting, bootError, checkingSetup, setupStatus, completeSetup, bootstrap, checkSetup,
     version, refresh, notifications, unread,
     unreadThreads, loadThreads, markNotification, markAllNotifications, deleteNotification, loadNotifications,
-    toasts, notify, dismissToast, user, signIn, signInWithToken, signOut, updateUser, can, canAccessPage,
+    toasts, notify, dismissToast, apiOnline, retrying, retryConnection,
+    user, signIn, signInWithToken, signOut, updateUser, can, canAccessPage,
     studentId, setStudentId, classId, setClassId, staffId, setStaffId, admissionId, setAdmissionId,
   ]);
 

@@ -46,9 +46,16 @@ class UserController extends Controller
         if (array_key_exists('password', $data) && blank($data['password'])) {
             unset($data['password']);
         }
+        $passwordChanged = array_key_exists('password', $data);
 
         $previousRole = $user->role;
         $user->update($data);
+
+        // Un changement de mot de passe invalide toutes les sessions
+        // existantes du compte (les jetons Sanctum sont supprimés).
+        if ($passwordChanged) {
+            $user->tokens()->delete();
+        }
         $properties = [];
         if ($previousRole !== $user->role) {
             $properties['role'] = ['avant' => $previousRole, 'après' => $user->role];
@@ -96,7 +103,7 @@ class UserController extends Controller
                 'max:190',
                 Rule::unique('users', 'email')->ignore($user?->id),
             ],
-            'password' => [$user ? 'nullable' : 'required', 'string', 'min:8'],
+            'password' => [$user ? 'nullable' : 'required', 'string', 'min:10'],
             'role' => [
                 $user ? 'sometimes' : 'required',
                 Rule::in(User::ROLES),
