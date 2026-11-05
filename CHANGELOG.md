@@ -19,6 +19,17 @@ une fois par version dans la fenêtre **Nouveautés**.
 - Intégration continue GitHub Actions : tests API (SQLite en mémoire),
   build React et construction du paquet Linux (sans publication) à chaque
   push et pull request.
+- Sécurité : connexions (réussies et échouées) et connexions Google
+  journalisées dans le journal d'audit ; un changement de mot de passe
+  révoque immédiatement toutes les sessions du compte.
+- Mots de passe : longueur minimale portée à 10 caractères pour les nouveaux
+  comptes et les changements de mot de passe.
+- Dépendances serveur mises à jour : les 8 alertes de sécurité Symfony
+  connues (http-foundation, http-kernel, mime, routing, yaml) sont corrigées.
+- En-têtes de sécurité HTTP ajoutés (HSTS, nosniff, anti-cadrage,
+  Referrer-Policy) — sans effet si le serveur ne les supporte pas.
+- Nouvelle section « Sauvegardes et restauration » dans le guide de
+  déploiement LWS (base, photos/documents, .env + test de restauration).
 
 ## 1.3.1 — 3 novembre 2026
 

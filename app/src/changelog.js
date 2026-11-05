@@ -16,6 +16,8 @@ export const CHANGELOG = [
       'Écran « Serveur injoignable » épuré, avec bouton Réessayer.',
       'Paquets plus légers : les dépendances de développement ne sont plus embarquées (~30 Mo de moins).',
       'Les photos et documents présents sur le poste de build ne peuvent plus être embarqués dans l’installateur.',
+      'Connexions (réussies et échouées) journalisées ; un changement de mot de passe révoque immédiatement toutes les sessions du compte.',
+      'Mots de passe : 10 caractères minimum pour les nouveaux comptes.',
     ],
   },
   {

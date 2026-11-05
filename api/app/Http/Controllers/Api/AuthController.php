@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,10 +22,20 @@ class AuthController extends Controller
 
         $user = User::where('email', $data['email'])->first();
         if (! $user || ! Hash::check($data['password'], $user->password)) {
+            // Tentative infructueuse journalisée (anti force brute, audit) —
+            // jamais le mot de passe tenté.
+            AuditLog::record(
+                'auth.login_failed',
+                $user,
+                "Échec de connexion : {$data['email']}",
+                ['email' => $data['email']],
+                $user,
+            );
             throw ValidationException::withMessages(['email' => ['Identifiants invalides.']]);
         }
 
         $token = $user->createToken($data['device_name'] ?? 'desktop')->plainTextToken;
+        AuditLog::record('auth.login', $user, "Connexion : {$user->name}", [], $user);
 
         return response()->json(['token' => $token, 'user' => $user->load('photos:id,user_id,filename')]);
     }

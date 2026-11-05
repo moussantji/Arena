@@ -50,7 +50,7 @@ class SetupController extends Controller
             'year_ends_on' => ['required', 'date', 'after:year_starts_on'],
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:190', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'min:10', 'confirmed'],
         ], [
             'school_name.required' => 'Le nom court de l’établissement est obligatoire.',
             'school_full_name.required' => 'Le nom complet de l’établissement est obligatoire.',
