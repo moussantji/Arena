@@ -8,6 +8,17 @@ export const APP_VERSION = '1.3.1';
 
 export const CHANGELOG = [
   {
+    version: '1.3.2',
+    date: 'À paraître',
+    title: 'Robustesse et finition',
+    items: [
+      'Bandeau « hors-ligne » : quand le serveur ne répond plus, un bandeau le signale et la reconnexion est tentée automatiquement.',
+      'Écran « Serveur injoignable » épuré, avec bouton Réessayer.',
+      'Paquets plus légers : les dépendances de développement ne sont plus embarquées (~30 Mo de moins).',
+      'Les photos et documents présents sur le poste de build ne peuvent plus être embarqués dans l’installateur.',
+    ],
+  },
+  {
     version: '1.3.1',
     date: '3 novembre 2026',
     title: 'Mises à jour via GitHub',

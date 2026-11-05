@@ -1,5 +1,7 @@
 # Kalanso — gestion d'école
 
+![CI](https://github.com/moussantji/Arena/actions/workflows/ci.yml/badge.svg)
+
 Application desktop de gestion d'école : interface React, API Laravel, coquille
 Electron et connexion Google. Palette **Indigo Minuit** (`#070B1F` · `#5B7CFA` ·
 `#E0A86F`).
@@ -114,7 +116,8 @@ curl -X POST http://127.0.0.1:8001/api/login \
 
 ```bash
 # tests API (SQLite en mémoire, la base réelle n'est pas modifiée)
-cd api && php artisan test
+# utilisez le PHP qui dispose de pdo_sqlite (php8.4 sur ce poste)
+cd api && php8.4 artisan test
 ```
 
 Les tests nécessitent l'extension PHP `pdo_sqlite`. Le build front se vérifie avec :
@@ -123,10 +126,29 @@ Les tests nécessitent l'extension PHP `pdo_sqlite`. Le build front se vérifie 
 cd app && npm run build
 ```
 
+## Intégration continue
+
+Le workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) vérifie à
+chaque push et pull request, sans rien mettre en ligne :
+
+1. **API** — installation des dépendances et `php artisan test` (SQLite en
+   mémoire, PHP 8.4) ;
+2. **Interface** — `npm ci` puis `npm run build` ;
+3. **Desktop** — vérification de syntaxe du processus principal et
+   construction du paquet Linux **sans publication**
+   (`electron-builder --linux dir --publish never`), avec cache des
+   binaires Electron.
+
+Les déploiements (serveur LWS, GitHub Releases) restent des actions
+manuelles et ne font pas partie de la CI.
+
 ## Application desktop Ubuntu
 
 L'application Electron intègre le build React et démarre automatiquement l'API
-Laravel locale : aucun terminal n'est nécessaire après installation.
+Laravel locale : aucun terminal n'est nécessaire après installation. Le paquet
+(`electron-builder.js`) n'embarque que les dépendances **de production** de
+l'API — les paquets de dev sont exclus automatiquement — et jamais les dossiers
+`storage/` du poste de build (photos, documents), recréés à l'installation.
 
 ```bash
 # paquets générés dans release/

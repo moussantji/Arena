@@ -42,6 +42,44 @@ const API_ORIGIN = (() => {
 
 const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost', '::1', '[::1]']);
 
+/* ---------- état de connexion à l'API ----------
+   Chaque réponse HTTP (même une erreur métier) prouve que le serveur est
+   joignable ; seules les erreurs réseau font basculer l'application en
+   mode hors-ligne. L'état est diffusé aux abonnés via un événement
+   « kalanso:api-status » et exposé par getApiOnline(). */
+let apiOnline = true;
+
+function notifyApiStatus(next) {
+  const normalized = Boolean(next);
+  if (normalized === apiOnline) return;
+  apiOnline = normalized;
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('kalanso:api-status', { detail: { online: apiOnline } }));
+  }
+}
+
+export function getApiOnline() {
+  return apiOnline;
+}
+
+/**
+ * Sonde légère `${API_URL}/health` (sans authentification). Sert au bouton
+ * « Réessayer » du bandeau hors-ligne et à la reconnexion automatique.
+ */
+export async function pingApi(timeoutMs = 4000) {
+  try {
+    const response = await fetch(`${API_URL}/health`, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    notifyApiStatus(response.ok);
+    return response.ok;
+  } catch {
+    notifyApiStatus(false);
+    return false;
+  }
+}
+
 /**
  * L'API construit les URLs des fichiers avec APP_URL (127.0.0.1). Quand
  * l'interface est ouverte depuis le réseau, ces URLs pointeraient vers la
@@ -187,12 +225,20 @@ async function send(path, options = {}) {
   }
   if (auth && token) requestHeaders.Authorization = `Bearer ${token}`;
 
-  const response = await fetch(buildUrl(path, query), {
-    method,
-    headers: requestHeaders,
-    body: body === undefined || body === null ? undefined : (isForm ? body : JSON.stringify(body)),
-    signal,
-  });
+  let response;
+  try {
+    response = await fetch(buildUrl(path, query), {
+      method,
+      headers: requestHeaders,
+      body: body === undefined || body === null ? undefined : (isForm ? body : JSON.stringify(body)),
+      signal,
+    });
+  } catch (error) {
+    // Une annulation demandée par l'interface n'est pas une perte de connexion.
+    if (error?.name !== 'AbortError') notifyApiStatus(false);
+    throw error;
+  }
+  notifyApiStatus(true);
 
   if (response.status === 401 && auth) {
     clearSession();
