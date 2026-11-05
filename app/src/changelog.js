@@ -21,6 +21,7 @@ export const CHANGELOG = [
       'Restriction PC : enseignants et (bientôt) parents ne peuvent plus se connecter à l’application de bureau — réservée à la direction, au secrétariat et à la comptabilité.',
       'Le serveur de données est réservé au créateur de l’établissement.',
       'Nouveauté : comptes parents — créés par la direction sur le PC, connectés depuis l’application mobile (notes, absences, finances de leurs enfants uniquement).',
+      'Nouveauté : application mobile Kalanso (Android) — écran par rôle (parent, enseignant, direction) ; la messagerie y est cloisonnée par fil pour les parents.',
     ],
   },
   {

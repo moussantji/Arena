@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Kalanso",
+    "slug": "kalanso",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0b1030",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0b1030"
+    },
+    "android": {
+      "package": "com.kalanso.mobile",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0b1030"
+      }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ],
+    "extra": {
+      "apiUrl": "https://kalanso.mandenbaoubab.com/api"
+    }
+  }
+}

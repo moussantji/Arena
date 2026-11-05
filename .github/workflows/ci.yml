@@ -1,7 +1,8 @@
 # CI — Kalanso
 # Vérifie à chaque push/PR : les tests de l'API Laravel, le build de
-# l'interface React et la construction (sans publication) du paquet
-# desktop Linux. Aucune mise en ligne : rien n'est déployé ni publié.
+# l'interface React, les types de l'application mobile et la construction
+# (sans publication) du paquet desktop Linux. Aucune mise en ligne :
+# rien n'est déployé ni publié.
 name: CI
 
 on:
@@ -67,6 +68,28 @@ jobs:
 
       - name: Build de production
         run: npm run build
+
+  mobile:
+    name: Mobile — vérification TypeScript
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Types TypeScript
+        run: npm run typecheck
 
   desktop:
     name: Desktop — paquet Linux (sans publication)
