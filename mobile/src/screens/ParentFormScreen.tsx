@@ -11,6 +11,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { api, ApiError } from '../api';
 import { theme } from '../theme';
@@ -118,7 +119,10 @@ export default function ParentFormScreen() {
     return (
       <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
         <Card style={styles.successCard}>
-          <Text style={styles.successTitle}>✓ Compte parent créé</Text>
+          <View style={styles.successIconCircle}>
+            <Ionicons name="checkmark" size={30} color={theme.ok} />
+          </View>
+          <Text style={styles.successTitle}>Compte parent créé</Text>
           <Text style={styles.successSub}>
             Transmettez ces identifiants au parent. Il pourra changer son mot de passe
             depuis l’application (Compte → Changer le mot de passe).
@@ -198,7 +202,8 @@ export default function ParentFormScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={`Retirer ${fullName(child)}`}
               >
-                <Text style={styles.selectedChipText}>{fullName(child)} ✕</Text>
+                <Text style={styles.selectedChipText}>{fullName(child)}</Text>
+                <Ionicons name="close" size={13} color="#b9c8ff" />
               </Pressable>
             ))}
           </View>
@@ -236,7 +241,7 @@ export default function ParentFormScreen() {
                     </Text>
                   </View>
                   <View style={[styles.checkbox, checked && styles.checkboxChecked]}>
-                    {checked ? <Text style={styles.checkmark}>✓</Text> : null}
+                    {checked ? <Ionicons name="checkmark" size={15} color="#ffffff" /> : null}
                   </View>
                 </Pressable>
               );
@@ -314,9 +319,12 @@ const styles = StyleSheet.create({
   generateLinkText: { color: theme.accent, fontSize: 11.5, fontWeight: '600' },
   selectedRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   selectedChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: theme.accentSoft,
     borderWidth: 1,
-    borderColor: theme.accentStrong,
+    borderColor: 'rgba(109, 139, 255, 0.45)',
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 7,
@@ -358,11 +366,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxChecked: { backgroundColor: theme.accentStrong, borderColor: theme.accentStrong },
-  checkmark: { color: '#fff', fontSize: 13, fontWeight: '800' },
   noResult: { color: theme.faint, fontSize: 11.5, textAlign: 'center', paddingVertical: 10 },
   submitButton: { marginTop: 16 },
   successCard: { gap: 12, marginTop: 10 },
-  successTitle: { color: theme.ok, fontSize: 19, fontWeight: '800' },
+  successIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(111, 227, 176, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(111, 227, 176, 0.4)',
+    marginBottom: 2,
+  },
+  successTitle: { color: theme.ok, fontSize: 19, fontWeight: '800', textAlign: 'center' },
   successSub: { color: theme.faint, fontSize: 12, lineHeight: 17 },
   credBox: {
     backgroundColor: theme.surfaceAlt,

@@ -17,6 +17,8 @@ export const theme = {
   copper: '#d9b06f',
   danger: '#f08a8a',
   ok: '#6fe3b0',
+  surfaceHigh: '#1e2448',
+  tabBar: 'rgba(17, 22, 52, 0.96)',
   radius: 14,
   radiusSm: 10,
 } as const;

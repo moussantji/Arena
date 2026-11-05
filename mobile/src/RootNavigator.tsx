@@ -7,6 +7,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { theme } from './theme';
 import { useAuth } from './auth';
 import { Avatar } from './ui';
+import PremiumTabBar from './PremiumTabBar';
 import type { Role } from './types';
 
 import LoginScreen from './screens/LoginScreen';
@@ -93,20 +94,14 @@ function HeaderAvatar() {
 const headerOptions = {
   headerStyle: { backgroundColor: theme.bg },
   headerTintColor: theme.ink,
-  headerTitleStyle: { fontWeight: '700' as const, fontSize: 16 },
+  headerTitleStyle: { fontWeight: '800' as const, fontSize: 16 },
   headerShadowVisible: false,
   headerRight: () => <HeaderAvatar />,
 };
 
 const tabScreenOptions = {
   ...headerOptions,
-  tabBarStyle: {
-    backgroundColor: '#080d28',
-    borderTopColor: theme.line,
-  },
-  tabBarActiveTintColor: '#a8bcff',
-  tabBarInactiveTintColor: theme.faint,
-  tabBarLabelStyle: { fontSize: 10, fontWeight: '600' as const, marginBottom: 2 },
+  tabBar: (props: React.ComponentProps<typeof PremiumTabBar>) => <PremiumTabBar {...props} />,
   tabBarHideOnKeyboard: true,
 };
 
@@ -210,7 +205,7 @@ export default function RootNavigator() {
           headerStyle: { backgroundColor: theme.bg },
           headerTintColor: theme.ink,
           headerShadowVisible: false,
-          headerTitleStyle: { fontWeight: '700' },
+          headerTitleStyle: { fontWeight: '800' },
           contentStyle: { backgroundColor: theme.bg },
         }}
       >
@@ -235,7 +230,7 @@ export default function RootNavigator() {
 const styles = StyleSheet.create({
   splash: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.bg, gap: 12 },
   splashLogo: { width: 120, height: 120, borderRadius: 26 },
-  splashName: { color: theme.ink, fontSize: 26, fontWeight: '800', letterSpacing: 0.5 },
+  splashName: { color: theme.ink, fontSize: 26, fontWeight: '800', letterSpacing: 2.2 },
   splashSpinner: { marginTop: 4 },
   avatarButton: { marginRight: 4, borderRadius: 16 },
 });

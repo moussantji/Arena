@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../theme';
 import { Avatar, Empty, ErrorState, Loading, Pill } from '../ui';
@@ -45,8 +46,9 @@ export default function MessagesScreen() {
         <ErrorState message={error} onRetry={reload} />
       ) : threads.length === 0 ? (
         <Empty
+          icon="chatbubbles-outline"
           title="Aucune conversation"
-          sub="Démarrez une conversation avec l’école via le bouton ＋."
+          sub="Démarrez une conversation avec l’école via le bouton +."
         />
       ) : (
         <FlatList
@@ -62,7 +64,7 @@ export default function MessagesScreen() {
             return (
               <Pressable
                 onPress={() => navigation.navigate('Discussion', { threadId: item.id, subject: item.subject })}
-                style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+                style={({ pressed }) => [styles.row, unread > 0 && styles.rowUnread, pressed && styles.rowPressed]}
                 accessibilityRole="button"
               >
                 <Avatar name={author} size={44} />
@@ -97,7 +99,7 @@ export default function MessagesScreen() {
         accessibilityRole="button"
         accessibilityLabel="Nouvelle conversation"
       >
-        <Text style={styles.fabText}>＋</Text>
+        <Ionicons name="add" size={30} color="#ffffff" />
       </Pressable>
     </View>
   );
@@ -105,7 +107,7 @@ export default function MessagesScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
-  listContent: { padding: 12, paddingBottom: 110, gap: 8 },
+  listContent: { padding: 12, paddingBottom: 118, gap: 8 },
   row: {
     flexDirection: 'row',
     gap: 12,
@@ -115,8 +117,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.surface,
     borderWidth: 1,
     borderColor: theme.line,
+    shadowColor: '#000000',
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
   },
   rowPressed: { backgroundColor: theme.surfaceAlt },
+  rowUnread: { borderColor: 'rgba(109, 139, 255, 0.45)', backgroundColor: '#141a3e' },
   rowInfo: { flex: 1, gap: 3 },
   rowTop: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
   subject: { flex: 1, color: theme.ink, fontSize: 13.5, fontWeight: '700' },
@@ -137,8 +145,8 @@ const styles = StyleSheet.create({
   unreadText: { color: '#fff', fontSize: 10, fontWeight: '800' },
   fab: {
     position: 'absolute',
-    right: 18,
-    bottom: 24,
+    right: 16,
+    bottom: 100,
     width: 58,
     height: 58,
     borderRadius: 29,
@@ -152,5 +160,4 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
   },
   fabPressed: { opacity: 0.85 },
-  fabText: { color: '#fff', fontSize: 26, lineHeight: 30, fontWeight: '500' },
 });

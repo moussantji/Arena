@@ -104,7 +104,7 @@ export default function StudentDetailScreen() {
 
       <SectionHeader title="Dernières notes" />
       {recentGrades.length === 0 ? (
-        <Empty title="Aucune note" sub="Aucune note enregistrée pour cet élève." />
+        <Empty icon="document-text-outline" title="Aucune note" sub="Aucune note enregistrée pour cet élève." />
       ) : (
         <Card>
           {recentGrades.map((grade, index) => (
@@ -121,7 +121,7 @@ export default function StudentDetailScreen() {
 
       <SectionHeader title="Absences récentes" />
       {recentAbsences.length === 0 ? (
-        <Empty title="Aucune absence" sub="Cet élève n'a aucune absence enregistrée." />
+        <Empty icon="calendar-clear-outline" title="Aucune absence" sub="Cet élève n'a aucune absence enregistrée." />
       ) : (
         <Card>
           {recentAbsences.map((absence, index) => (

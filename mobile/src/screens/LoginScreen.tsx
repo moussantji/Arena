@@ -39,6 +39,7 @@ export default function LoginScreen() {
         >
           <View style={styles.hero}>
             <View style={styles.glow} />
+            <View style={styles.glowOuter} />
             <Image
               source={require('../../assets/icon.png')}
               style={styles.logo}
@@ -118,14 +119,32 @@ const styles = StyleSheet.create({
   glow: {
     position: 'absolute',
     top: -60,
-    width: 260,
-    height: 260,
-    borderRadius: 130,
-    backgroundColor: 'rgba(91, 124, 250, 0.14)',
+    width: 240,
+    height: 240,
+    borderRadius: 120,
+    backgroundColor: 'rgba(91, 124, 250, 0.18)',
   },
-  logo: { width: 96, height: 96, borderRadius: 22 },
-  name: { color: theme.ink, fontSize: 30, fontWeight: '800', letterSpacing: 0.4, marginTop: 14 },
-  tagline: { color: theme.faint, fontSize: 12.5, marginTop: 2 },
+  glowOuter: {
+    position: 'absolute',
+    top: -95,
+    width: 330,
+    height: 330,
+    borderRadius: 165,
+    backgroundColor: 'rgba(91, 124, 250, 0.06)',
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(167, 182, 255, 0.35)',
+    shadowColor: '#5b7cfa',
+    shadowOpacity: 0.5,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  name: { color: theme.ink, fontSize: 32, fontWeight: '800', letterSpacing: 2.4, marginTop: 16 },
+  tagline: { color: theme.copper, fontSize: 11, letterSpacing: 1.6, textTransform: 'uppercase', marginTop: 5, fontWeight: '700' },
   form: { width: '100%' },
   errorBox: {
     backgroundColor: 'rgba(240, 138, 138, 0.12)',

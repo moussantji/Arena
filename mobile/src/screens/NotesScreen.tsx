@@ -15,6 +15,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { api, ApiError } from '../api';
 import { theme } from '../theme';
 import {
@@ -271,6 +272,7 @@ export default function NotesScreen() {
 
       {classId == null || subjectId == null || termId == null ? (
         <Empty
+          icon="options-outline"
           title="Sélectionnez le contexte"
           sub="Choisissez la classe, la matière, la période et l'évaluation à saisir."
         />
@@ -279,7 +281,7 @@ export default function NotesScreen() {
       ) : studentsQuery.error ? (
         <ErrorState message={studentsQuery.error} onRetry={studentsQuery.reload} />
       ) : students.length === 0 ? (
-        <Empty title="Aucun élève" sub="Cette classe ne compte aucun élève actif." />
+        <Empty icon="people-outline" title="Aucun élève" sub="Cette classe ne compte aucun élève actif." />
       ) : (
         <>
           <SectionHeader
@@ -332,7 +334,10 @@ export default function NotesScreen() {
             style={styles.saveButton}
           />
           {savedCount != null && savedCount > 0 ? (
-            <Text style={styles.savedNote}>{savedCount} note(s) enregistrée(s) ✓</Text>
+            <View style={styles.savedRow}>
+              <Ionicons name="checkmark-circle" size={15} color={theme.ok} />
+              <Text style={styles.savedNote}>{savedCount} note(s) enregistrée(s)</Text>
+            </View>
           ) : null}
         </>
       )}
@@ -368,7 +373,7 @@ function EmptyInline({ label }: { label: string }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
   fill: { flex: 1, backgroundColor: theme.bg },
-  content: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 48 },
+  content: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 112 },
   chipRow: { gap: 8, paddingVertical: 4, paddingRight: 16 },
   chip: {
     paddingHorizontal: 13, paddingVertical: 9, borderRadius: 999,
@@ -416,5 +421,6 @@ const styles = StyleSheet.create({
   scoreInputDirty: { borderColor: theme.accentStrong, backgroundColor: theme.accentSoft },
   dirtyBadge: { color: theme.accent, fontSize: 11, fontWeight: '700' },
   saveButton: { marginTop: 14 },
-  savedNote: { color: theme.ok, textAlign: 'center', marginTop: 8, fontSize: 12, fontWeight: '600' },
+  savedRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 10 },
+  savedNote: { color: theme.ok, fontSize: 12, fontWeight: '600' },
 });

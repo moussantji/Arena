@@ -13,6 +13,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRoute, type RouteProp } from '@react-navigation/native';
 import type { ScrollViewInstance } from 'react-native';
 import { api, ApiError } from '../api';
@@ -90,7 +91,7 @@ export default function ThreadScreen() {
         onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
       >
         {messages.length === 0 ? (
-          <Empty title="Aucun message" sub="Soyez le premier à écrire dans ce fil." />
+          <Empty icon="chatbubbles-outline" title="Aucun message" sub="Soyez le premier à écrire dans ce fil." />
         ) : (
           messages.map((message) => (
             <MessageBubble key={message.id} message={message} mine={message.sender_id === user?.id} />
@@ -124,7 +125,7 @@ export default function ThreadScreen() {
           {sending ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text style={styles.sendIcon}>➤</Text>
+            <Ionicons name="send" size={18} color="#ffffff" />
           )}
         </Pressable>
       </View>
@@ -209,5 +210,4 @@ const styles = StyleSheet.create({
   },
   sendDisabled: { opacity: 0.35 },
   sendPressed: { opacity: 0.8 },
-  sendIcon: { color: '#fff', fontSize: 17 },
 });

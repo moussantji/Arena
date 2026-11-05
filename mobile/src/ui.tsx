@@ -2,6 +2,7 @@
 import React from 'react';
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -12,6 +13,8 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from './theme';
 import { initials } from './format';
 
@@ -72,7 +75,10 @@ export function CardTitle({ title, sub, right }: {
 export function SectionHeader({ title, right }: { title: string; right?: React.ReactNode }) {
   return (
     <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{title.toUpperCase()}</Text>
+      <View style={styles.sectionHeaderLeft}>
+        <View style={styles.sectionBar} />
+        <Text style={styles.sectionTitle}>{title.toUpperCase()}</Text>
+      </View>
       {right}
     </View>
   );
@@ -170,19 +176,28 @@ export function Pill({ label, tone = 'muted' }: { label: string; tone?: PillTone
 export function Loading({ label = 'Chargement…' }: { label?: string }) {
   return (
     <View style={styles.centered}>
-      <ActivityIndicator size="large" color={theme.accent} />
+      <Image
+        source={require('../assets/icon.png')}
+        style={styles.loadingLogo}
+        accessibilityLabel="Kalanso"
+      />
+      <ActivityIndicator size="small" color={theme.accent} style={styles.loadingSpinner} />
       <Text style={styles.loadingLabel}>{label}</Text>
     </View>
   );
 }
 
-export function Empty({ title, sub, action }: {
+export function Empty({ title, sub, action, icon = 'sparkles-outline' }: {
   title: string;
   sub?: string;
   action?: React.ReactNode;
+  icon?: keyof typeof Ionicons.glyphMap;
 }) {
   return (
     <View style={styles.emptyBox}>
+      <View style={styles.emptyIconCircle}>
+        <Ionicons name={icon} size={26} color={theme.accent} />
+      </View>
       <Text style={styles.emptyTitle}>{title}</Text>
       {sub ? <Text style={styles.emptySub}>{sub}</Text> : null}
       {action ? <View style={styles.emptyAction}>{action}</View> : null}
@@ -193,6 +208,9 @@ export function Empty({ title, sub, action }: {
 export function ErrorState({ message, onRetry }: { message?: string; onRetry?: () => void }) {
   return (
     <View style={styles.emptyBox}>
+      <View style={[styles.emptyIconCircle, styles.errorIconCircle]}>
+        <Ionicons name="cloud-offline-outline" size={26} color={theme.danger} />
+      </View>
       <Text style={styles.emptyTitle}>Une erreur est survenue</Text>
       <Text style={styles.emptySub}>{message ?? 'Réessayez dans un instant.'}</Text>
       {onRetry ? (
@@ -208,10 +226,38 @@ export function Divider() {
   return <View style={styles.divider} />;
 }
 
-export function StatCard({ label, value, tone = 'accent' }: {
+export function HomeHero({ overline, title, icon = 'school-outline' }: {
+  overline: string;
+  title: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+}) {
+  return (
+    <LinearGradient
+      colors={['#1d2454', '#141a3e']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.hero}
+    >
+      <View style={styles.heroGlowTop} pointerEvents="none" />
+      <View style={styles.heroGlowBottom} pointerEvents="none" />
+      <View style={styles.heroRow}>
+        <View style={styles.heroTextBlock}>
+          <Text style={styles.heroOverline} numberOfLines={1}>{overline.toUpperCase()}</Text>
+          <Text style={styles.heroTitle} numberOfLines={2}>{title}</Text>
+        </View>
+        <View style={styles.heroMark}>
+          <Ionicons name={icon} size={30} color="#93a8ff" />
+        </View>
+      </View>
+    </LinearGradient>
+  );
+}
+
+export function StatCard({ label, value, tone = 'accent', icon }: {
   label: string;
   value: string;
   tone?: 'accent' | 'ok' | 'copper' | 'muted';
+  icon?: keyof typeof Ionicons.glyphMap;
 }) {
   const accent = tone === 'accent' ? theme.accent
     : tone === 'ok' ? theme.ok
@@ -219,12 +265,24 @@ export function StatCard({ label, value, tone = 'accent' }: {
     : theme.faint;
 
   return (
-    <View style={styles.statCard}>
-      <Text style={styles.statLabel}>{label.toUpperCase()}</Text>
+    <LinearGradient
+      colors={['#171e44', '#121737']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.statCard}
+    >
+      <View style={styles.statTopRow}>
+        <Text style={styles.statLabel}>{label.toUpperCase()}</Text>
+        {icon ? (
+          <View style={styles.statIconChip}>
+            <Ionicons name={icon} size={15} color={accent} />
+          </View>
+        ) : null}
+      </View>
       <Text style={[styles.statValue, { color: accent }]} numberOfLines={1} adjustsFontSizeToFit>
         {value}
       </Text>
-    </View>
+    </LinearGradient>
   );
 }
 
@@ -238,6 +296,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.line,
     padding: 16,
+    shadowColor: '#000000',
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
   },
   cardPressed: { backgroundColor: theme.surfaceAlt },
   cardTitleRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 },
@@ -248,14 +311,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 18,
-    marginBottom: 8,
+    marginTop: 20,
+    marginBottom: 9,
+  },
+  sectionHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  sectionBar: {
+    width: 4,
+    height: 12,
+    borderRadius: 2,
+    backgroundColor: theme.accentStrong,
   },
   sectionTitle: {
-    color: theme.faint,
-    fontSize: 10,
-    letterSpacing: 1.4,
-    fontWeight: '700',
+    color: '#b6c2f4',
+    fontSize: 9.5,
+    letterSpacing: 1.6,
+    fontWeight: '800',
   },
   button: {
     minHeight: 48,
@@ -264,7 +334,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 18,
   },
-  buttonSolid: { backgroundColor: theme.accentStrong },
+  buttonSolid: {
+    backgroundColor: theme.accentStrong,
+    shadowColor: '#5b7cfa',
+    shadowOpacity: 0.45,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 5,
+  },
   buttonOutline: { borderWidth: 1, borderColor: theme.lineStrong, backgroundColor: 'transparent' },
   buttonDanger: { borderWidth: 1, borderColor: 'rgba(240, 138, 138, 0.45)', backgroundColor: 'rgba(240, 138, 138, 0.12)' },
   buttonGhost: { backgroundColor: 'transparent' },
@@ -293,11 +370,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   avatar: {
-    backgroundColor: theme.accentSoft,
+    backgroundColor: theme.surfaceHigh,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(109, 139, 255, 0.35)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(109, 139, 255, 0.5)',
   },
   avatarText: { color: '#c9d4ff', fontWeight: '700' },
   pill: {
@@ -305,26 +382,111 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(238, 240, 255, 0.09)',
   },
   pillText: { fontSize: 10.5, fontWeight: '700', letterSpacing: 0.2 },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  loadingLabel: { color: theme.faint, marginTop: 12, fontSize: 13 },
-  emptyBox: { alignItems: 'center', padding: 26, gap: 6 },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 4 },
+  loadingLogo: { width: 64, height: 64, borderRadius: 15, opacity: 0.95 },
+  loadingSpinner: { marginTop: 14 },
+  loadingLabel: { color: theme.faint, marginTop: 8, fontSize: 12, letterSpacing: 0.3 },
+  emptyBox: { alignItems: 'center', padding: 26, gap: 8 },
+  emptyIconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.surfaceHigh,
+    borderWidth: 1,
+    borderColor: theme.lineStrong,
+    marginBottom: 2,
+  },
+  errorIconCircle: { borderColor: 'rgba(240, 138, 138, 0.4)' },
   emptyTitle: { color: theme.ink, fontSize: 14.5, fontWeight: '700', textAlign: 'center' },
   emptySub: { color: theme.faint, fontSize: 12, textAlign: 'center', lineHeight: 17 },
   emptyAction: { marginTop: 10 },
   divider: { height: 1, backgroundColor: theme.line, marginVertical: 14 },
+  hero: {
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(167, 182, 255, 0.18)',
+    padding: 18,
+    overflow: 'hidden',
+    marginBottom: 16,
+    shadowColor: '#050a24',
+    shadowOpacity: 0.55,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 6,
+  },
+  heroGlowTop: {
+    position: 'absolute',
+    top: -70,
+    right: -50,
+    width: 190,
+    height: 190,
+    borderRadius: 95,
+    backgroundColor: 'rgba(109, 139, 255, 0.16)',
+  },
+  heroGlowBottom: {
+    position: 'absolute',
+    bottom: -80,
+    left: -60,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: 'rgba(217, 176, 111, 0.07)',
+  },
+  heroRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 14 },
+  heroTextBlock: { flex: 1, gap: 6 },
+  heroOverline: {
+    color: theme.copper,
+    fontSize: 9,
+    letterSpacing: 1.8,
+    fontWeight: '800',
+  },
+  heroTitle: {
+    color: theme.ink,
+    fontSize: 24,
+    lineHeight: 30,
+    fontWeight: '800',
+    letterSpacing: 0.1,
+  },
+  heroMark: {
+    width: 64,
+    height: 64,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(109, 139, 255, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(109, 139, 255, 0.35)',
+  },
   statCard: {
     flexBasis: '47%',
     flexGrow: 1,
-    backgroundColor: theme.surface,
-    borderWidth: 1,
-    borderColor: theme.line,
     borderRadius: theme.radius,
-    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(167, 182, 255, 0.16)',
+    paddingVertical: 13,
     paddingHorizontal: 14,
-    gap: 4,
+    gap: 6,
+    shadowColor: '#000000',
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
   },
-  statLabel: { color: theme.faint, fontSize: 9.5, letterSpacing: 1.2, fontWeight: '700' },
-  statValue: { fontSize: 19, fontWeight: '800' },
+  statTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  statIconChip: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(109, 139, 255, 0.12)',
+  },
+  statLabel: { color: theme.faint, fontSize: 9, letterSpacing: 1.3, fontWeight: '800', flexShrink: 1 },
+  statValue: { fontSize: 20, fontWeight: '800', letterSpacing: 0.2 },
 });

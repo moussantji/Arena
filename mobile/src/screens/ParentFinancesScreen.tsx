@@ -75,7 +75,7 @@ export default function ParentFinancesScreen() {
           </Card>
 
           {data.invoices.length === 0 ? (
-            <Empty title="Aucune facture" sub="Aucune facture n'a encore été émise pour cet enfant." />
+            <Empty icon="receipt-outline" title="Aucune facture" sub="Aucune facture n'a encore été émise pour cet enfant." />
           ) : (
             <>
               <SectionHeader title="Factures" />
@@ -177,7 +177,7 @@ function InvoiceRow({ invoice, expanded, onToggle }: {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
   fill: { flex: 1, backgroundColor: theme.bg },
-  content: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 40 },
+  content: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 112 },
   childName: { color: theme.ink, fontSize: 19, fontWeight: '800', marginTop: 6 },
   childMeta: { color: theme.faint, fontSize: 11.5, marginTop: 2, marginBottom: 10 },
   summaryCard: { gap: 6, marginBottom: 4 },

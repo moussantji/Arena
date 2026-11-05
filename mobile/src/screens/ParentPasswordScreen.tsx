@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { api, ApiError } from '../api';
 import { theme } from '../theme';
@@ -60,7 +61,10 @@ export default function ParentPasswordScreen() {
     return (
       <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
         <Card style={styles.successCard}>
-          <Text style={styles.successTitle}>✓ Mot de passe réinitialisé</Text>
+          <View style={styles.successIconCircle}>
+            <Ionicons name="checkmark" size={30} color={theme.ok} />
+          </View>
+          <Text style={styles.successTitle}>Mot de passe réinitialisé</Text>
           <Text style={styles.successSub}>
             {name} devra utiliser ce mot de passe à sa prochaine connexion.
             Toutes ses sessions précédentes ont été fermées.
@@ -142,7 +146,18 @@ const styles = StyleSheet.create({
   },
   generateHint: { color: theme.faint, fontSize: 10, marginTop: 6 },
   successCard: { gap: 12, marginTop: 10 },
-  successTitle: { color: theme.ok, fontSize: 18, fontWeight: '800' },
+  successIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(111, 227, 176, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(111, 227, 176, 0.4)',
+  },
+  successTitle: { color: theme.ok, fontSize: 18, fontWeight: '800', textAlign: 'center' },
   successSub: { color: theme.faint, fontSize: 12, lineHeight: 17 },
   credBox: {
     backgroundColor: theme.surfaceAlt,

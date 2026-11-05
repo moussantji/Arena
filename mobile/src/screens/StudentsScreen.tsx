@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { api, ApiError } from '../api';
@@ -82,6 +83,7 @@ export default function StudentsScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.searchBar}>
+        <Ionicons name="search-outline" size={18} color={theme.faint} />
         <TextInput
           style={styles.searchInput}
           value={query}
@@ -94,7 +96,7 @@ export default function StudentsScreen() {
         />
         {query.length > 0 && (
           <Pressable onPress={() => setQuery('')} hitSlop={10} accessibilityLabel="Effacer la recherche">
-            <Text style={styles.clearButton}>✕</Text>
+            <Ionicons name="close-circle" size={20} color={theme.faint} />
           </Pressable>
         )}
       </View>
@@ -105,6 +107,7 @@ export default function StudentsScreen() {
         <ErrorState message={error} onRetry={() => setDebounced((value) => value)} />
       ) : items.length === 0 ? (
         <Empty
+          icon="search-outline"
           title={debounced ? 'Aucun résultat' : 'Aucun élève'}
           sub={debounced ? `Aucun élève ne correspond à « ${debounced} ».` : 'Aucun élève actif dans l’établissement.'}
         />
@@ -170,8 +173,7 @@ const styles = StyleSheet.create({
     borderColor: theme.line,
   },
   searchInput: { flex: 1, color: theme.ink, fontSize: 14 },
-  clearButton: { color: theme.faint, fontSize: 15, paddingHorizontal: 4 },
-  listContent: { paddingHorizontal: 12, paddingBottom: 30, gap: 8 },
+  listContent: { paddingHorizontal: 12, paddingBottom: 112, gap: 8 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

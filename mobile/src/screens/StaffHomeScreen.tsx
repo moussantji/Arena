@@ -2,6 +2,7 @@
 import React from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { useApiQuery } from '../useApiQuery';
 import { api } from '../api';
 import { theme } from '../theme';
@@ -9,6 +10,7 @@ import {
   Avatar,
   Card,
   ErrorState,
+  HomeHero,
   Loading,
   SectionHeader,
   StatCard,
@@ -39,19 +41,22 @@ export default function StaffHomeScreen({ role }: { role: 'direction' | 'secreta
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={false} onRefresh={reload} tintColor={theme.accent} />}
     >
-      <Text style={styles.greeting}>Bonjour, {firstName} 👋</Text>
-      <Text style={styles.dateLine}>{formatDate(new Date().toISOString())}</Text>
+      <HomeHero
+        overline={formatDate(new Date().toISOString())}
+        title={`Bonjour, ${firstName}`}
+        icon="school-outline"
+      />
 
       <View style={styles.statsRow}>
-        <StatCard label="Élèves actifs" value={String(data.kpis.students)} tone="accent" />
-        <StatCard label="Classes" value={String(data.kpis.classes)} tone="muted" />
+        <StatCard label="Élèves actifs" value={String(data.kpis.students)} tone="accent" icon="people-outline" />
+        <StatCard label="Classes" value={String(data.kpis.classes)} tone="muted" icon="library-outline" />
       </View>
       <View style={styles.statsRow}>
-        <StatCard label="Assiduité (mois)" value={`${data.kpis.attendance} %`} tone={data.kpis.attendance >= 90 ? 'ok' : 'copper'} />
+        <StatCard label="Assiduité (mois)" value={`${data.kpis.attendance} %`} tone={data.kpis.attendance >= 90 ? 'ok' : 'copper'} icon="checkmark-circle-outline" />
         {canSeeFinance && data.kpis.recovery != null ? (
-          <StatCard label="Recettes (année)" value={money(data.kpis.recovery)} tone="copper" />
+          <StatCard label="Recettes (année)" value={money(data.kpis.recovery)} tone="copper" icon="cash-outline" />
         ) : (
-          <StatCard label="Bulletins" value="Trimestre courant" tone="muted" />
+          <StatCard label="Bulletins" value="Trimestre courant" tone="muted" icon="document-text-outline" />
         )}
       </View>
 
@@ -59,8 +64,8 @@ export default function StaffHomeScreen({ role }: { role: 'direction' | 'secreta
         <>
           <SectionHeader title="Actions rapides" />
           <View style={styles.quickRow}>
-            <QuickAction label="Saisir mes notes" hint="Devoirs & compositions" onPress={() => navigation.navigate('Notes')} />
-            <QuickAction label="Faire l'appel" hint="Absences du jour" onPress={() => navigation.navigate('Appel')} />
+            <QuickAction label="Saisir mes notes" hint="Devoirs & compositions" icon="create-outline" onPress={() => navigation.navigate('Notes')} />
+            <QuickAction label="Faire l'appel" hint="Absences du jour" icon="megaphone-outline" onPress={() => navigation.navigate('Appel')} />
           </View>
         </>
       )}
@@ -129,9 +134,12 @@ export default function StaffHomeScreen({ role }: { role: 'direction' | 'secreta
   );
 }
 
-function QuickAction({ label, hint, onPress }: { label: string; hint: string; onPress: () => void }) {
+function QuickAction({ label, hint, icon, onPress }: { label: string; hint: string; icon: keyof typeof Ionicons.glyphMap; onPress: () => void }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.quickCard, pressed && styles.quickPressed]}>
+      <View style={styles.quickIconChip}>
+        <Ionicons name={icon} size={18} color="#a8baff" />
+      </View>
       <Text style={styles.quickLabel}>{label}</Text>
       <Text style={styles.quickHint}>{hint}</Text>
     </Pressable>
@@ -141,19 +149,28 @@ function QuickAction({ label, hint, onPress }: { label: string; hint: string; on
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
   fill: { flex: 1, backgroundColor: theme.bg },
-  content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 40 },
-  greeting: { color: theme.ink, fontSize: 21, fontWeight: '800' },
-  dateLine: { color: theme.faint, fontSize: 12, marginTop: 2, marginBottom: 12 },
+  content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 112 },
   statsRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
   quickRow: { flexDirection: 'row', gap: 10 },
   quickCard: {
     flex: 1,
-    backgroundColor: theme.accentSoft,
-    borderColor: 'rgba(109, 139, 255, 0.35)',
+    backgroundColor: 'rgba(109, 139, 255, 0.1)',
+    borderColor: 'rgba(109, 139, 255, 0.3)',
     borderWidth: 1,
     borderRadius: theme.radius,
     padding: 14,
-    gap: 3,
+    gap: 5,
+  },
+  quickIconChip: {
+    width: 36,
+    height: 36,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(109, 139, 255, 0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(109, 139, 255, 0.35)',
+    marginBottom: 2,
   },
   quickPressed: { opacity: 0.8 },
   quickLabel: { color: '#dfe6ff', fontSize: 13.5, fontWeight: '700' },

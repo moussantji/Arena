@@ -135,7 +135,7 @@ function Kpi({ label, value, tone }: { label: string; value: string; tone: 'plai
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
   fill: { flex: 1, backgroundColor: theme.bg },
-  content: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 44 },
+  content: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 112 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   kpi: {
     flexBasis: '47%',

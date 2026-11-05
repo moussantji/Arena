@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../auth';
 import { useChildren } from '../children';
 import { api } from '../api';
@@ -11,6 +13,7 @@ import {
   Card,
   Empty,
   ErrorState,
+  HomeHero,
   Loading,
   SectionHeader,
 } from '../ui';
@@ -66,13 +69,17 @@ export default function ParentHomeScreen() {
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={false} onRefresh={reload} tintColor={theme.accent} />}
     >
-      <Text style={styles.greeting}>Bonjour, {firstName} 👋</Text>
-      <Text style={styles.dateLine}>{schoolName ?? 'Espace parent'}</Text>
+      <HomeHero
+        overline={schoolName ?? 'Espace parent'}
+        title={`Bonjour, ${firstName}`}
+        icon="school-outline"
+      />
 
       {error && children.length === 0 ? (
         <ErrorState message={error} onRetry={reload} />
       ) : children.length === 0 ? (
         <Empty
+          icon="people-outline"
           title="Aucun enfant lié"
           sub="La direction de l’établissement doit lier votre compte à vos enfants. Contactez le secrétariat."
         />
@@ -109,6 +116,7 @@ export default function ParentHomeScreen() {
                 <View style={styles.childActions}>
                   <ActionButton
                     label="Bulletin"
+                    icon="document-text-outline"
                     onPress={() => {
                       select(child.id);
                       navigation.navigate('Bulletin');
@@ -116,6 +124,7 @@ export default function ParentHomeScreen() {
                   />
                   <ActionButton
                     label="Absences"
+                    icon="calendar-clear-outline"
                     onPress={() => {
                       select(child.id);
                       navigation.navigate('Absences');
@@ -123,6 +132,7 @@ export default function ParentHomeScreen() {
                   />
                   <ActionButton
                     label="Finances"
+                    icon="wallet-outline"
                     onPress={() => {
                       select(child.id);
                       navigation.navigate('Finances');
@@ -137,9 +147,16 @@ export default function ParentHomeScreen() {
 
       <SectionHeader title="Messagerie" />
       <Card onPress={() => navigation.navigate('Messages')} style={styles.messageCard}>
-        <Text style={styles.messageTitle}>Écrire à l’école</Text>
-        <Text style={styles.messageSub}>Questions sur la scolarité, les absences ou la facturation : adressez-vous à la direction.</Text>
-        <Text style={styles.messageLink}>Ouvrir la messagerie →</Text>
+        <View style={styles.messageRow}>
+          <View style={styles.messageIconChip}>
+            <Ionicons name="chatbubbles-outline" size={20} color="#a8baff" />
+          </View>
+          <View style={styles.messageTextBlock}>
+            <Text style={styles.messageTitle}>Écrire à l’école</Text>
+            <Text style={styles.messageSub}>Questions sur la scolarité, les absences ou la facturation : adressez-vous à la direction.</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={theme.faint} />
+        </View>
       </Card>
 
       <View style={styles.footerSpace} />
@@ -149,18 +166,24 @@ export default function ParentHomeScreen() {
 
 function Snapshot({ label, value, tone }: { label: string; value: string; tone: string }) {
   return (
-    <View style={styles.snapshot}>
+    <LinearGradient
+      colors={['#171e44', '#131a3c']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.snapshot}
+    >
       <Text style={styles.snapshotLabel}>{label.toUpperCase()}</Text>
       <Text style={[styles.snapshotValue, { color: tone }]} numberOfLines={1} adjustsFontSizeToFit>
         {value}
       </Text>
-    </View>
+    </LinearGradient>
   );
 }
 
-function ActionButton({ label, onPress }: { label: string; onPress: () => void }) {
+function ActionButton({ label, icon, onPress }: { label: string; icon: keyof typeof Ionicons.glyphMap; onPress: () => void }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.actionButton, pressed && styles.actionPressed]}>
+      <Ionicons name={icon} size={15} color="#a8baff" />
       <Text style={styles.actionLabel}>{label}</Text>
     </Pressable>
   );
@@ -168,9 +191,7 @@ function ActionButton({ label, onPress }: { label: string; onPress: () => void }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
-  content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 40 },
-  greeting: { color: theme.ink, fontSize: 21, fontWeight: '800' },
-  dateLine: { color: theme.faint, fontSize: 12, marginTop: 2, marginBottom: 10 },
+  content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 112 },
   childCard: { marginBottom: 12, gap: 14 },
   childTop: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   childInfo: { flex: 1 },
@@ -179,29 +200,43 @@ const styles = StyleSheet.create({
   snapshotRow: { flexDirection: 'row', gap: 10 },
   snapshot: {
     flex: 1,
-    backgroundColor: theme.surfaceSoft,
     borderRadius: theme.radiusSm,
     borderWidth: 1,
-    borderColor: theme.line,
-    padding: 10,
-    gap: 3,
+    borderColor: 'rgba(167, 182, 255, 0.16)',
+    padding: 11,
+    gap: 4,
   },
   snapshotLabel: { color: theme.faint, fontSize: 8, letterSpacing: 0.9, fontWeight: '700' },
   snapshotValue: { fontSize: 15, fontWeight: '800' },
   childActions: { flexDirection: 'row', gap: 8 },
   actionButton: {
     flex: 1,
+    flexDirection: 'row',
+    gap: 6,
     borderWidth: 1,
     borderColor: theme.lineStrong,
     borderRadius: theme.radiusSm,
     paddingVertical: 10,
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(167, 182, 255, 0.04)',
   },
   actionPressed: { backgroundColor: theme.surfaceAlt },
   actionLabel: { color: theme.ink, fontSize: 12, fontWeight: '700' },
   messageCard: { gap: 4 },
+  messageRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  messageIconChip: {
+    width: 46,
+    height: 46,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(109, 139, 255, 0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(109, 139, 255, 0.35)',
+  },
+  messageTextBlock: { flex: 1, gap: 3 },
   messageTitle: { color: theme.ink, fontSize: 14.5, fontWeight: '800' },
   messageSub: { color: theme.faint, fontSize: 11.5, lineHeight: 16 },
-  messageLink: { color: theme.accent, fontSize: 12, fontWeight: '700', marginTop: 6 },
   footerSpace: { height: 24 },
 });
