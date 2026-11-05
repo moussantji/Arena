@@ -5,6 +5,12 @@
    ============================================================ */
 
 function defaultApiUrl() {
+  // Dans l'application desktop, l'adresse effective (API distante de
+  // l'établissement ou API locale du poste) est fournie par le process
+  // principal.
+  if (typeof window !== 'undefined' && window.desktopAPI?.apiUrl) {
+    return window.desktopAPI.apiUrl;
+  }
   // En Electron (file://), l'API tourne toujours sur la machine locale.
   if (typeof window === 'undefined' || !window.location?.hostname) {
     return 'http://127.0.0.1:8001/api';

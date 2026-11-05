@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Btn, Card, CardHead, Pill, Progress, Table, Tr,
+  Btn, Card, CardHead, Icon, Pill, Progress, Table, Tr,
 } from '../ui.jsx';
 import {
   useApi, useData, useDebounced, number, date, fullName, EVALUATIONS,
@@ -53,6 +53,8 @@ export function Notes() {
   const currentClass = classes.find((item) => String(item.id) === String(classId));
   const currentSubject = subjects.find((item) => String(item.id) === String(subjectId));
   const currentTerm = terms.find((item) => String(item.id) === String(termId));
+  const selectedTerm = termId ? currentTerm : meta?.term;
+  const lockedTerm = selectedTerm?.locked_at ? selectedTerm : null;
 
   const distribution = useMemo(() => {
     const buckets = [0, 0, 0, 0, 0];
@@ -99,9 +101,21 @@ export function Notes() {
       <PageHead
         id="notes"
         sub={`${number(total)} notes · ${currentClass?.name || 'toutes les classes'} · ${currentSubject?.name || 'toutes les matières'} · ${currentTerm?.name || 'année en cours'}`}
-        onPrimary={() => actions.grade(null, { school_class_id: classId || undefined, subject_id: subjectId || undefined, term_id: termId || undefined })}
+        primary={lockedTerm ? null : undefined}
+        onPrimary={lockedTerm ? undefined : () => actions.grade(null, { school_class_id: classId || undefined, subject_id: subjectId || undefined, term_id: termId || undefined })}
         onSecondary={exportRows}
       />
+
+      {lockedTerm && (
+        <div className="form-alert rise" role="alert" style={{ marginBottom: 14 }}>
+          <Icon name="clock" size={14} />
+          <span>
+            <b>Période délibérée et verrouillée.</b>{' '}
+            Aucune note de « {lockedTerm.name} » ne peut être créée, modifiée ou supprimée.
+            {can('settings.manage') && ' La Direction peut la rouvrir depuis Paramètres → Calendrier.'}
+          </span>
+        </div>
+      )}
 
       <div className="stats-row rise">
         <div className="stat"><b>{number(total)}</b><span>Notes enregistrées</span></div>
@@ -141,7 +155,15 @@ export function Notes() {
         <div className="toolbar-right">
           {(q || classId || subjectId || termId || evaluation) && <Btn icon="close" onClick={reset}>Effacer</Btn>}
           {can('grades.manage') && (
-            <Btn icon="plus" solid onClick={() => actions.grade(null, { school_class_id: classId || undefined, subject_id: subjectId || undefined, term_id: termId || undefined })}>Saisir une note</Btn>
+            <Btn
+              icon="plus"
+              solid
+              disabled={Boolean(lockedTerm)}
+              title={lockedTerm ? 'Période délibérée et verrouillée' : undefined}
+              onClick={() => actions.grade(null, { school_class_id: classId || undefined, subject_id: subjectId || undefined, term_id: termId || undefined })}
+            >
+              Saisir une note
+            </Btn>
           )}
         </div>
       </div>
@@ -185,7 +207,7 @@ export function Notes() {
                   <span className="cell mono">{Number(grade.coefficient || 0)}</span>
                   <span className="cell mono">{date(grade.evaluated_on)}</span>
                   <span className="cell right cell-actions">
-                    <ActionMenu actions={[
+                    <ActionMenu actions={lockedTerm ? [] : [
                       { label: 'Modifier la note', icon: 'edit', permission: 'grades.manage', onClick: () => actions.grade(grade) },
                       { label: 'Supprimer', icon: 'trash', tone: 'danger', permission: 'grades.manage', onClick: () => actions.deleteGrade(grade) },
                     ]} />

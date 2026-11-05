@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AbsenceController;
 use App\Http\Controllers\Api\AdmissionController;
+use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DocumentController;
@@ -204,9 +205,12 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     /*
-    | Établissement et comptes utilisateurs : direction uniquement.
+    | Établissement, comptes utilisateurs et journal : direction uniquement.
     */
     Route::middleware('role:direction')->group(function () {
+        Route::get('/audit-logs', [AuditLogController::class, 'index']);
+        Route::patch('/references/terms/{term}/lock', [ReferenceController::class, 'toggleLock']);
+
         Route::put('/school', [SchoolController::class, 'update']);
         Route::patch('/school', [SchoolController::class, 'update']);
         Route::post('/school/photo', [PhotoController::class, 'storeSchoolPhoto']);

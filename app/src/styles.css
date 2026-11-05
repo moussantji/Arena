@@ -435,6 +435,10 @@ button { font: inherit; cursor: pointer; }
   position: relative; transition: 0.18s;
 }
 .icon-btn:hover { color: #fff; border-color: var(--line-strong); background: var(--panel2); transform: translateY(-1px); }
+.icon-btn.is-locked {
+  color: #e3c878; border-color: rgba(184, 134, 59, 0.45);
+  background: rgba(184, 134, 59, 0.12);
+}
 .dot-badge {
   position: absolute; top: 7px; right: 8px; width: 6px; height: 6px; border-radius: 50%;
   background: var(--copper); box-shadow: 0 0 8px var(--copper);

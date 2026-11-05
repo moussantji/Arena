@@ -8,6 +8,7 @@ import {
 } from '../data.jsx';
 import { useActions } from '../actions.jsx';
 import { errorMessage } from '../api.js';
+import { printReceiptPdf } from '../documents/recu.js';
 import {
   exportFinanceInvoicesWorkbook, exportFinancePaymentsWorkbook, exportFinanceSummaryWorkbook,
   fetchAllInvoices, fetchAllPayments,
@@ -66,6 +67,12 @@ export function Finances() {
   const paymentSearch = useDebounced(paymentQ);
   const currency = meta?.school?.currency || 'FCFA';
   const classes = meta?.classes || [];
+
+  const printReceipt = async (payment) => {
+    const result = await printReceiptPdf({ payment, meta, currency });
+    if (result.ok) notify('Reçu PDF enregistré.', { tone: 'success' });
+    else if (!result.canceled) notify(result.message || 'Génération du PDF impossible.', { tone: 'danger' });
+  };
 
   useEffect(() => {
     try {
@@ -514,6 +521,7 @@ export function Finances() {
                       <span className="cell"><PaymentPill status={payment.status} /></span>
                       <span className="cell right cell-actions">
                         <ActionMenu actions={[
+                          { label: 'Reçu PDF', icon: 'download', onClick: () => printReceipt(payment) },
                           { label: 'Modifier', icon: 'edit', onClick: () => actions.payment(payment) },
                           { label: 'Supprimer', icon: 'trash', tone: 'danger', onClick: () => actions.deletePayment(payment) },
                         ]} />

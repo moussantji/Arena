@@ -7,15 +7,16 @@ pourra s'y connecter depuis n'importe quel poste.
 
 **Ce qui a déjà été préparé dans le dépôt :**
 
-- `api/public/install.php` — installateur web protégé par un secret (crée les
-  tables, la clé d'application et le lien de stockage, sans ligne de commande) ;
+- `api/database/schema/kalanso-mysql-schema.sql` — schéma complet de la base
+  (31 tables, **sans aucune donnée**) à importer via phpMyAdmin ;
 - `.htaccess` à la racine — si le sous-domaine pointe vers le dossier du dépôt,
   toutes les requêtes sont servies par `api/public` et les fichiers sensibles
   (`.env`, `composer.*`…) ne sont jamais exposés ;
 - `api/.env.production.example` — modèle de configuration prêt pour le
   sous-domaine ;
 - branche `deploy/lws` — le code + les dépendances (`api/vendor`) incluses,
-  car l'hébergeur ne lance pas Composer ;
+  car l'hébergeur ne lance pas Composer ; branche **append-only** : ne la
+  forcez (push) jamais, l'hébergeur cale sur l'historique ;
 - confiance aux proxys activée (HTTPS détecté correctement derrière l'hébergeur).
 
 ---
@@ -54,51 +55,97 @@ pourra s'y connecter depuis n'importe quel poste.
 Via **Gestionnaire de fichiers** de LWS :
 
 1. Copiez `api/.env.production.example` vers `api/.env`.
-2. Renseignez :
-   - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (étape 1) ;
-   - `KALANSO_SETUP_TOKEN=un-long-secret-aleatoire` (servira à l'installation).
-3. Enregistrez.
+2. Renseignez `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (étape 1).
+3. Connexion Google : recopiez les deux lignes `GOOGLE_CLIENT_ID` et
+   `GOOGLE_CLIENT_SECRET` depuis le `.env` de votre PC (`api/.env`).
+   Sans le secret, le bouton « Se connecter avec Google » reste masqué.
+   Aucun réglage à changer dans Google Cloud Console : l'application
+   utilise toujours l'adresse de retour locale (127.0.0.1), seul l'échange
+   du code se fait désormais sur le serveur.
+4. Enregistrez.
 
-## 5. Installer l'API (une fois)
+## 5. Créer les tables (une fois)
 
-Ouvrez dans le navigateur :
+**Via phpMyAdmin (LWS Panel → Bases de données → phpMyAdmin) :**
 
-```text
-https://kalanso.mandenbaoubab.com/install.php?token=UN-LONG-SECRET-ALEATOIRE
+1. Sélectionnez la base `…kalanso` à gauche.
+2. Onglet **Importer** → choisissez le fichier
+   `api/database/schema/kalanso-mysql-schema.sql` (téléchargez-le depuis
+   GitHub : branche `deploy/lws`) → **Exécuter**.
+3. « L'import s'est terminé avec succès » : les 31 tables sont créées,
+   la base reste vide (aucune donnée de démonstration).
+
+**Ou, si vous avez un accès SSH/Terminal :**
+
+```bash
+cd api && php artisan migrate --force
 ```
 
-Chaque étape doit afficher ✔ (clé d'application, MySQL, migrations, stockage).
-En cas d'erreur, le message indique exactement quoi corriger dans le `.env`.
+## 6. Clé d'application
 
-Vérifiez ensuite : <https://kalanso.mandenbaoubab.com/api/health> doit
-répondre `{"status":"ok",…}`.
+Le `.env` doit contenir une `APP_KEY`. Deux options :
 
-## 6. Désactiver l'installateur
+- **SSH** : `cd api && php artisan key:generate --force` ;
+- **Sans SSH** : générez-en une (par exemple avec
+  [Laravel Key Generator](https://laravel-key-generator.com) ou toute autre
+  source fiable — 32 octets en base64, préfixe `base64:`) et collez-la dans
+  `APP_KEY=` du `.env`.
 
-Dans le `.env`, **videz** la ligne `KALANSO_SETUP_TOKEN=`. La page
-`install.php` refuse alors toute exécution. (Pour une mise à jour, remettez
-temporairement un secret.)
+## 7. Vérifier
 
-## 7. Mises à jour de l'API
+<https://kalanso.mandenbaoubab.com/api/health> doit répondre
+`{"status":"ok",…}`.
+
+## 8. Mises à jour de l'API
 
 Sur votre PC :
 
 ```bash
 # une fois les changements commités sur votre branche
 bash scripts/api-deploy-branch.sh
-git push origin deploy/lws --force
+git push origin deploy/lws
 ```
 
-Puis dans **LWS Panel → Git → Déployer** à nouveau. Enfin, rouvrez
-`install.php?token=…` pour appliquer d'éventuelles nouvelles migrations
-(les données sont conservées), puis re-videz `KALANSO_SETUP_TOKEN`.
+> `deploy/lws` n'est **jamais forcée** : la branche ne fait qu'avancer
+> (append-only). Un `git push --force` cassait la mise à jour côté
+> hébergeur (il cale sur l'historique). L'historique a été réconcilié le
+> 5 novembre 2026 pour aligner l'état ; tout est un fast-forward depuis.
 
-## 8. Brancher l'application Kalanso
+Puis dans **LWS Panel → Git → Déployer** à nouveau. Pour appliquer
+d'éventuelles nouvelles migrations : réimportez le schéma mis à jour
+**uniquement si de nouvelles tables manquent** (sinon, préférez `php artisan
+migrate --force` en SSH — les données sont conservées) ou demandez le SQL des
+migrations manquantes.
 
-L'application desktop saura utiliser cette API via son adresse
-`https://kalanso.mandenbaoubab.com` (option « API distante » à activer dans
-l'application). Les données de tous les postes seront alors centralisées
-dans la base MySQL de l'hébergeur.
+**Mise à jour du 5 novembre 2026 (journal d'audit + verrouillage des périodes)** :
+déployez d'abord la branche `deploy/lws`, puis dans phpMyAdmin
+(onglet SQL) exécutez le contenu de
+`api/database/schema/kalanso-migrations-2026-11-05.sql`. Ce script est sans
+danger pour les données : il crée la table `audit_logs` et ajoute la colonne
+`terms.locked_at`.
+
+## 9. Brancher l'application Kalanso (multi-postes)
+
+Sur chaque poste, après connexion avec un compte **Direction**, ouvrez
+**Paramètres → Préférences → Serveur de données → Modifier**, renseignez :
+
+```text
+https://kalanso.mandenbaoubab.com
+```
+
+puis **« Enregistrer et redémarrer »**. À l'écran de connexion suivant,
+connectez-vous avec le compte de l'établissement : les données de tous les
+postes sont centralisées dans la base MySQL de l'hébergeur.
+
+L'écran de connexion n'affiche jamais l'adresse du serveur — le réglage est
+réservé aux comptes Direction, dans les Paramètres. Sur un poste tout neuf
+(base locale vide), la première installation crée un compte local qui sert
+uniquement à atteindre les Paramètres ; il devient inutile après le
+basculement vers le serveur.
+
+Pour revenir au mode local (données stockées uniquement sur le poste), videz
+l'adresse dans le même écran. Cette fonctionnalité est incluse à partir de la
+version **1.3.2** de l'application.
 
 **Sécurité** : le `.env` en ligne contient les accès MySQL et le secret
 Google — il n'est jamais servi par le serveur web et n'est pas dans Git.

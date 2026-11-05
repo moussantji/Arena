@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
+use App\Models\AuditLog;
 use App\Models\School;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -102,6 +103,12 @@ class SetupController extends Controller
                 'token' => $user->createToken('premier-compte')->plainTextToken,
             ];
         });
+
+        AuditLog::record(
+            'setup.completed',
+            $result['school'],
+            "Installation de Kalanso : {$result['school']->name} — compte Direction {$result['user']->email}",
+        );
 
         return response()->json([
             'message' => 'Kalanso est prêt. Bienvenue dans votre espace de gestion.',
