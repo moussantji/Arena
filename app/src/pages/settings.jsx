@@ -27,6 +27,7 @@ const ROLE_TONES = {
   secretariat: 'glass',
   comptable: 'copper',
   enseignant: 'muted',
+  parent: 'glass',
 };
 const DEFAULT_PREFS = { reduceMotion: false, compact: false };
 
@@ -74,6 +75,8 @@ export function Parametres() {
   const departmentRows = departments.data?.departments || [];
   const feeRows = feeTypes.data?.fee_types || [];
   const userRows = users.data?.users || [];
+  const staffRows = userRows.filter((account) => account.role !== 'parent');
+  const parentRows = userRows.filter((account) => account.role === 'parent');
 
   useEffect(() => {
     if (!school) return;
@@ -536,7 +539,7 @@ export function Parametres() {
                 <ListState
                   loading={users.loading && !users.data}
                   error={users.error}
-                  empty={!users.loading && !users.error && !userRows.length}
+                  empty={!users.loading && !users.error && !staffRows.length}
                   emptyTitle="Aucun compte"
                   emptySub="Créez un premier compte pour permettre la connexion."
                   onRetry={users.reload}
@@ -544,9 +547,9 @@ export function Parametres() {
                   <Table
                     columns={['Utilisateur', 'Adresse e-mail', 'Rôle', 'Créé le', '']}
                     template="1.4fr 1.7fr .8fr .8fr 34px"
-                    foot={<><span className="tf-l">{userRows.length} comptes</span><span className="tf-r">Accès protégés par token</span></>}
+                    foot={<><span className="tf-l">{staffRows.length} comptes du personnel</span><span className="tf-r">Accès protégés par token</span></>}
                   >
-                    {userRows.map((account) => (
+                    {staffRows.map((account) => (
                       <Tr
                         key={account.id}
                         template="1.4fr 1.7fr .8fr .8fr 34px"
@@ -580,6 +583,68 @@ export function Parametres() {
                     ))}
                   </Table>
                 </ListState>
+              </Card>
+
+              <Card>
+                <CardHead
+                  title="Comptes parents"
+                  sub="Un parent ne voit que les enfants qui lui sont liés (notes, absences, finances). La connexion se fait depuis l’application mobile."
+                  right={<Btn icon="userPlus" solid onClick={() => actions.parent()}>Nouveau compte parent</Btn>}
+                />
+                {parentRows.length === 0 ? (
+                  <div className="state-box">
+                    <b>Aucun compte parent</b>
+                    <em>Créez un compte parent et liez-le à un ou plusieurs élèves ; il se connectera depuis l’application mobile.</em>
+                    <Btn icon="userPlus" solid onClick={() => actions.parent()}>Créer le premier compte parent</Btn>
+                  </div>
+                ) : (
+                  <Table
+                    columns={['Parent', 'Adresse e-mail', 'Enfants liés', 'Créé le', '']}
+                    template="1.3fr 1.5fr 1.6fr .8fr 34px"
+                    foot={<><span className="tf-l">{parentRows.length} compte{parentRows.length > 1 ? 's' : ''} parent{parentRows.length > 1 ? 's' : ''}</span><span className="tf-r">Application mobile</span></>}
+                  >
+                    {parentRows.map((account) => {
+                      const children = account.children || [];
+                      const names = children.map((child) => child.name).filter(Boolean);
+                      const shown = names.slice(0, 2).join(', ');
+                      const extra = names.length > 2 ? ` +${names.length - 2}` : '';
+                      return (
+                        <Tr
+                          key={account.id}
+                          template="1.3fr 1.5fr 1.6fr .8fr 34px"
+                          onClick={() => actions.parent(account)}
+                          title="Modifier le compte parent"
+                        >
+                          <span className="cell subject-cell">
+                            <Avatar initials={initials(account.name)} size={26} />
+                            <span>
+                              <b>{account.name}</b>
+                              <em>Compte parent</em>
+                            </span>
+                          </span>
+                          <span className="cell mono">{account.email}</span>
+                          <span className="cell" title={names.join(', ')}>
+                            {names.length
+                              ? <Pill tone="glass">{shown}{extra}</Pill>
+                              : <Pill tone="copper">Aucun enfant lié</Pill>}
+                          </span>
+                          <span className="cell mono">{date(account.created_at)}</span>
+                          <span className="cell right cell-actions">
+                            <ActionMenu actions={[
+                              { label: 'Modifier le compte', icon: 'edit', onClick: () => actions.parent(account) },
+                              {
+                                label: 'Supprimer',
+                                icon: 'trash',
+                                tone: 'danger',
+                                onClick: () => actions.deleteUser(account),
+                              },
+                            ]} />
+                          </span>
+                        </Tr>
+                      );
+                    })}
+                  </Table>
+                )}
               </Card>
 
               <Card>

@@ -35,6 +35,11 @@ une fois par version dans la fenêtre **Nouveautés**.
 - Le « Serveur de données » (Paramètres) est désormais réservé au
   **créateur** de l'établissement (le premier compte créé), plus aux
   autres comptes de direction.
+- Nouveauté : les **comptes parents**. La direction les crée sur le PC
+  (Paramètres → Utilisateurs → Comptes parents) en liant un ou plusieurs
+  élèves. Le parent se connecte depuis l'application mobile et ne voit
+  que ses enfants (notes, absences, finances). Application mobile en
+  préparation (Play Store).
 - Nouvelle section « Sauvegardes et restauration » dans le guide de
   déploiement LWS (base, photos/documents, .env + test de restauration).
 

@@ -18,6 +18,7 @@ const normalizeOptions = (options = []) => options.map((option) => {
   return {
     value: option.value ?? option.id ?? '',
     label: option.label ?? option.name ?? String(option.value ?? ''),
+    hint: option.hint,
     disabled: option.disabled,
   };
 });
@@ -25,6 +26,7 @@ const normalizeOptions = (options = []) => options.map((option) => {
 const blankValue = (field) => {
   if (field.type === 'checkbox') return Boolean(field.default);
   if (field.type === 'file') return field.multiple ? [] : null;
+  if (field.type === 'multiselect') return Array.isArray(field.default) ? field.default : [];
   if (field.default !== undefined) return field.default;
   return '';
 };
@@ -192,6 +194,56 @@ function ResourceForm({
   );
 }
 
+function MultiSelectField({ id, value, disabled, onChange, options }) {
+  const [query, setQuery] = React.useState('');
+  const selected = Array.isArray(value) ? value : [];
+  const q = query.trim().toLowerCase();
+  const filtered = options.filter((option) => !q
+    || String(option.label).toLowerCase().includes(q)
+    || String(option.hint || '').toLowerCase().includes(q));
+
+  const toggle = (optionValue) => {
+    const key = String(optionValue);
+    const next = selected.includes(key)
+      ? selected.filter((item) => item !== key)
+      : [...selected, key];
+    onChange(next);
+  };
+
+  return (
+    <div className="multiselect">
+      <input
+        type="text"
+        className="input"
+        placeholder="Rechercher un élève…"
+        value={query}
+        disabled={disabled}
+        onChange={(event) => setQuery(event.target.value)}
+        autoComplete="off"
+        spellCheck="false"
+      />
+      <div className="multiselect-list" role="group" aria-label="Élèves liés au compte">
+        {filtered.map((option) => {
+          const checked = selected.includes(String(option.value));
+          return (
+            <label key={String(option.value)} className={`multiselect-item ${checked ? 'checked' : ''}`}>
+              <input type="checkbox" checked={checked} disabled={disabled} onChange={() => toggle(option.value)} />
+              <span>
+                <b>{option.label}</b>
+                {option.hint && <em>{option.hint}</em>}
+              </span>
+            </label>
+          );
+        })}
+        {!filtered.length && <div className="multiselect-empty">Aucun élève ne correspond.</div>}
+      </div>
+      <div className="multiselect-foot">
+        {selected.length} enfant{selected.length > 1 ? 's' : ''} lié{selected.length > 1 ? 's' : ''} au compte
+      </div>
+    </div>
+  );
+}
+
 function FormField({
   field, value, error, disabled, onChange,
 }) {
@@ -239,6 +291,17 @@ function FormField({
           rows={field.rows || 3}
           value={value ?? ''}
           onChange={(event) => onChange(event.target.value)}
+        />
+      );
+      break;
+    case 'multiselect':
+      control = (
+        <MultiSelectField
+          id={id}
+          value={value}
+          disabled={common.disabled}
+          onChange={onChange}
+          options={options}
         />
       );
       break;

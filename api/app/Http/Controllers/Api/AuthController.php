@@ -45,6 +45,39 @@ class AuthController extends Controller
         return response()->json(['token' => $token, 'user' => $user->load('photos:id,user_id,filename')]);
     }
 
+    /**
+     * Changement du mot de passe par l'utilisateur lui-même.
+     * Vérifie d'abord le mot de passe actuel, puis révoque les autres
+     * sessions du compte (le jeton utilisé pour la requête est conservé).
+     */
+    public function updatePassword(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:10', 'confirmed'],
+        ]);
+
+        /** @var User $user */
+        $user = $request->user();
+
+        if (! Hash::check($data['current_password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['Le mot de passe actuel est incorrect.'],
+            ]);
+        }
+
+        $user->update(['password' => $data['password']]);
+
+        $currentTokenId = $request->user()?->currentAccessToken()?->id;
+        $user->tokens()
+            ->when($currentTokenId, fn ($query) => $query->where('id', '!=', $currentTokenId))
+            ->delete();
+
+        AuditLog::record('auth.password_changed', $user, "Mot de passe modifié : {$user->name}", [], $user);
+
+        return response()->json(['message' => 'Mot de passe mis à jour.']);
+    }
+
     public function me(Request $request): JsonResponse
     {
         return response()->json(['user' => $request->user()->load('photos:id,user_id,filename')]);

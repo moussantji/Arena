@@ -9,17 +9,17 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  * Règles d'accès à l'application PC (poste de l'établissement).
  *
  * L'application desktop est réservée aux rôles d'administration. Les
- * comptes enseignants utiliseront l'application mobile Kalanso
- * (prochainement) ; les comptes parents feront de même.
+ * comptes enseignants et parents utiliseront l'application mobile
+ * Kalanso (enseignants prochainement, parents inclus dès le MVP).
  * Le canal de l'appareil est déduit du "device_name" transmis par le
  * client : « …desktop… » = application PC, tout le reste = mobile/API.
  */
 final class DesktopAccess
 {
-    /** Rôles interdits sur le poste PC (le mobile restera ouvert). */
+    /** Rôles interdits sur le poste PC (le mobile leur sera ouvert). */
     public const DESKTOP_FORBIDDEN_ROLES = [
         User::ROLE_ENSEIGNANT,
-        // 'parent' — à ajouter lors de l'arrivée des comptes parents (mobile).
+        User::ROLE_PARENT,
     ];
 
     /** PC si le device_name mentionne « desktop », mobile sinon. */
