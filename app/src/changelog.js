@@ -18,6 +18,8 @@ export const CHANGELOG = [
       'Les photos et documents présents sur le poste de build ne peuvent plus être embarqués dans l’installateur.',
       'Connexions (réussies et échouées) journalisées ; un changement de mot de passe révoque immédiatement toutes les sessions du compte.',
       'Mots de passe : 10 caractères minimum pour les nouveaux comptes.',
+      'Restriction PC : enseignants et (bientôt) parents ne peuvent plus se connecter à l’application de bureau — réservée à la direction, au secrétariat et à la comptabilité.',
+      'Le serveur de données est réservé au créateur de l’établissement.',
     ],
   },
   {

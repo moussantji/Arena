@@ -124,6 +124,16 @@ déployez d'abord la branche `deploy/lws`, puis dans phpMyAdmin
 danger pour les données : il crée la table `audit_logs` et ajoute la colonne
 `terms.locked_at`.
 
+**Mise à jour du 5 novembre 2026 (restriction PC + créateur)** :
+redéployez `deploy/lws` — la restriction PC est alors appliquée (connexions
+des comptes enseignants refusées sur le poste, code PHP). Puis, dans
+phpMyAdmin (onglet SQL), exécutez le contenu de
+`api/database/schema/kalanso-migrations-2026-11-05-is-creator.sql` : il ajoute
+la colonne `users.is_creator` et désigne le tout premier compte comme créateur
+de l'établissement (le seul à voir et modifier l'adresse du serveur de données
+dans les Paramètres). Sans ce script, tout fonctionne mais le réglage serveur
+reste visible par toute la Direction.
+
 ## 8 bis. Sauvegardes et restauration
 
 Trois choses sont à sauvegarder régulièrement (avant chaque mise à jour du
@@ -175,7 +185,8 @@ compte concerné.
 
 ## 9. Brancher l'application Kalanso (multi-postes)
 
-Sur chaque poste, après connexion avec un compte **Direction**, ouvrez
+Sur chaque poste, connectez-vous avec le compte **créateur** de
+l'établissement (le premier compte créé), puis ouvrez
 **Paramètres → Préférences → Serveur de données → Modifier**, renseignez :
 
 ```text
@@ -186,8 +197,10 @@ puis **« Enregistrer et redémarrer »**. À l'écran de connexion suivant,
 connectez-vous avec le compte de l'établissement : les données de tous les
 postes sont centralisées dans la base MySQL de l'hébergeur.
 
-L'écran de connexion n'affiche jamais l'adresse du serveur — le réglage est
-réservé aux comptes Direction, dans les Paramètres. Sur un poste tout neuf
+L'écran de connexion n'affiche jamais l'adresse du serveur — et le réglage
+est réservé au **créateur** de l'établissement (le premier compte créé,
+marqué `is_creator` en base), pas même aux autres comptes de direction.
+Sur un poste tout neuf
 (base locale vide), la première installation crée un compte local qui sert
 uniquement à atteindre les Paramètres ; il devient inutile après le
 basculement vers le serveur.
@@ -199,3 +212,11 @@ version **1.3.2** de l'application.
 **Sécurité** : le `.env` en ligne contient les accès MySQL et le secret
 Google — il n'est jamais servi par le serveur web et n'est pas dans Git.
 Gardez aussi `APP_DEBUG=false` en production (valeur du modèle).
+
+**Restriction PC** : depuis la mise à jour du 5 novembre 2026, l'application
+de bureau refuse la connexion des comptes **enseignants** (et, plus tard,
+**parents**) — sur le poste de l'établissement, seuls la direction, le
+secrétariat et la comptabilité se connectent. Les enseignants verront le
+message « Ce compte est réservé à l'application mobile Kalanso ». Le
+changement s'applique dès le déploiement de `deploy/lws` ; l'application
+mobile (enseignants + parents) suivra dans une prochaine étape.

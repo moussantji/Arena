@@ -7,6 +7,7 @@ use App\Models\AcademicYear;
 use App\Models\AuditLog;
 use App\Models\School;
 use App\Models\User;
+use App\Support\DesktopAccess;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -194,6 +195,15 @@ class GoogleAuthController extends Controller
 
             $firstAccount = true;
         }
+
+        if ($firstAccount) {
+            // Le premier compte (via Google) est le créateur de l'établissement.
+            $user->forceFill(['is_creator' => true])->save();
+        }
+
+        // Restriction PC : les comptes enseignants utilisent (à venir)
+        // l'application mobile, pas le poste de l'établissement.
+        DesktopAccess::assertAllowed($user, 'google-desktop');
 
         $token = $user->createToken('google-desktop')->plainTextToken;
         AuditLog::record(
