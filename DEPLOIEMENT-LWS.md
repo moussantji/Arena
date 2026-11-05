@@ -131,6 +131,12 @@ contenu de `api/database/schema/kalanso-migrations-2026-11-05-parent-student.sql
 échoue. Rappel : exécutez aussi `kalanso-migrations-2026-11-05-is-creator.sql`
 si ce n'est pas déjà fait.
 
+**Déploiement du 5 novembre 2026 (application mobile)** :
+le dernier `deploy/lws` embarque aussi une page publique
+`https://kalanso.mandenbaoubab.com/confidentialite` (politique de
+confidentialité exigée par le Play Store). Rien à configurer : elle est en
+ligne dès le clic sur Déployer. Aucune donnée n'y est collectée.
+
 **Mise à jour du 5 novembre 2026 (restriction PC + créateur)** :
 redéployez `deploy/lws` — la restriction PC est alors appliquée (connexions
 des comptes enseignants refusées sur le poste, code PHP). Puis, dans
