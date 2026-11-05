@@ -8,6 +8,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -27,11 +28,14 @@ class User extends Authenticatable
 
     public const ROLE_ENSEIGNANT = 'enseignant';
 
+    public const ROLE_PARENT = 'parent';
+
     public const ROLES = [
         self::ROLE_DIRECTION,
         self::ROLE_SECRETARIAT,
         self::ROLE_COMPTABLE,
         self::ROLE_ENSEIGNANT,
+        self::ROLE_PARENT,
     ];
 
     protected $appends = ['photo_url'];
@@ -44,6 +48,15 @@ class User extends Authenticatable
     public function isDirection(): bool
     {
         return $this->hasAnyRole(self::ROLE_DIRECTION);
+    }
+
+    /**
+     * Enfants liés au compte parent (vide pour les autres rôles).
+     */
+    public function children(): BelongsToMany
+    {
+        return $this->belongsToMany(Student::class, 'parent_student', 'user_id', 'student_id')
+            ->withTimestamps();
     }
 
     /**

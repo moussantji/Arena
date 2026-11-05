@@ -7,12 +7,14 @@ export const ROLE_DIRECTION = 'direction';
 export const ROLE_SECRETARIAT = 'secretariat';
 export const ROLE_COMPTABLE = 'comptable';
 export const ROLE_ENSEIGNANT = 'enseignant';
+export const ROLE_PARENT = 'parent';
 
 export const ROLES = [
   ROLE_DIRECTION,
   ROLE_SECRETARIAT,
   ROLE_COMPTABLE,
   ROLE_ENSEIGNANT,
+  ROLE_PARENT,
 ];
 
 export const ROLE_LABELS = {
@@ -20,6 +22,7 @@ export const ROLE_LABELS = {
   [ROLE_SECRETARIAT]: 'Secrétariat',
   [ROLE_COMPTABLE]: 'Comptabilité',
   [ROLE_ENSEIGNANT]: 'Enseignant',
+  [ROLE_PARENT]: 'Parent',
 };
 
 export const ROLE_DESCRIPTIONS = {
@@ -27,6 +30,7 @@ export const ROLE_DESCRIPTIONS = {
   [ROLE_SECRETARIAT]: 'Accès aux élèves, classes, matières, personnel et admissions',
   [ROLE_COMPTABLE]: 'Accès aux finances et consultations',
   [ROLE_ENSEIGNANT]: 'Accès aux notes, absences et consultations pédagogiques',
+  [ROLE_PARENT]: 'Application mobile uniquement : notes, absences et finances de ses enfants',
 };
 
 export const ROLE_PERMISSIONS = {
@@ -106,6 +110,7 @@ export const ROLE_PERMISSIONS = {
     'messages.view',
     'messages.manage',
   ],
+  [ROLE_PARENT]: [],
 };
 
 export const ROLE_PAGES = {
@@ -163,6 +168,7 @@ export const ROLE_PAGES = {
     'absences',
     'messagerie',
   ],
+  [ROLE_PARENT]: [],
 };
 
 /**

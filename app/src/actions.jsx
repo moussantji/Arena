@@ -8,7 +8,7 @@ import {
 } from './data.jsx';
 import { openResourceForm, openConfirm } from './forms.jsx';
 import { useCan } from './common.jsx';
-import { ROLES, ROLE_LABELS, ROLE_DESCRIPTIONS } from './auth.js';
+import { ROLES, ROLE_LABELS, ROLE_DESCRIPTIONS, ROLE_PARENT } from './auth.js';
 import { exportInvoiceReport } from './reports.js';
 import { Avatar, Btn, Icon, Pill } from './ui.jsx';
 
@@ -39,6 +39,7 @@ const ROLE_TONES = {
   secretariat: 'glass',
   comptable: 'copper',
   enseignant: 'muted',
+  parent: 'glass',
 };
 
 const focusInvoices = () => {
@@ -1587,8 +1588,72 @@ export function useActions() {
     });
   }
 
+  function parentForm(account) {
+    if (!can('users.manage')) return;
+
+    const editing = Boolean(account?.id);
+    const classById = new Map((meta?.classes || []).map((entry) => [entry.id, entry]));
+    const studentOptions = (meta?.students || []).map((student) => ({
+      value: String(student.id),
+      label: fullName(student),
+      hint: `${student.matricule || '—'} · ${classById.get(student.school_class_id)?.name || 'Sans classe'}`,
+    }));
+
+    openResourceForm(modal, {
+      title: editing ? 'Modifier le compte parent' : 'Nouveau compte parent',
+      sub: editing ? account.email : 'Le parent ne voit que les enfants qui lui sont liés.',
+      eyebrow: 'Comptes parents',
+      icon: 'profile',
+      variant: 'center',
+      size: 620,
+      fields: [
+        { name: 'name', label: 'Nom du parent', required: true, placeholder: 'Fatou Traoré' },
+        { name: 'email', label: 'Adresse e-mail', type: 'email', required: true, placeholder: 'parent@exemple.com' },
+        {
+          name: 'password',
+          label: editing ? 'Nouveau mot de passe (facultatif)' : 'Mot de passe',
+          type: 'password',
+          required: !editing,
+          placeholder: '10 caractères minimum',
+          help: editing
+            ? 'Laisser vide pour conserver le mot de passe actuel.'
+            : 'À transmettre au parent après la création.',
+        },
+        {
+          name: 'student_ids',
+          label: 'Enfants liés au compte',
+          type: 'multiselect',
+          required: true,
+          wide: true,
+          options: studentOptions,
+          help: 'Le parent verra uniquement ces élèves (notes, absences, finances).',
+        },
+      ],
+      initial: {
+        name: account?.name || '',
+        email: account?.email || '',
+        password: '',
+        student_ids: (account?.children || []).map((child) => String(child.id)),
+      },
+      submit: (payload) => {
+        const body = {
+          ...payload,
+          role: ROLE_PARENT,
+          student_ids: (payload.student_ids || []).map(Number),
+        };
+        if (!body.password) delete body.password;
+        return editing
+          ? api.patch(`/users/${account.id}`, body)
+          : api.post('/users', body);
+      },
+      success: editing ? 'Compte parent enregistré.' : 'Compte parent créé.',
+      submitLabel: editing ? 'Enregistrer' : 'Créer le compte parent',
+    });
+  }
+
   function userForm(account) {
     if (!can('users.manage')) return;
+    if (account?.role === ROLE_PARENT) return parentForm(account);
 
     const editing = Boolean(account?.id);
 
@@ -1607,7 +1672,7 @@ export function useActions() {
           label: 'Rôle',
           type: 'select',
           required: true,
-          options: ROLES.map((role) => ({ value: role, label: ROLE_LABELS[role] })),
+          options: ROLES.filter((role) => role !== ROLE_PARENT).map((role) => ({ value: role, label: ROLE_LABELS[role] })),
           help: 'Le rôle détermine les pages et les actions autorisées.',
         },
         {
@@ -1615,7 +1680,7 @@ export function useActions() {
           label: editing ? 'Nouveau mot de passe (facultatif)' : 'Mot de passe',
           type: 'password',
           required: !editing,
-          placeholder: '8 caractères minimum',
+          placeholder: '10 caractères minimum',
           help: editing ? 'Laisser vide pour conserver le mot de passe actuel.' : undefined,
         },
       ],
@@ -1686,6 +1751,7 @@ export function useActions() {
     feeType: feeTypeForm,
     deleteFeeType,
     user: userForm,
+    parent: parentForm,
     profile,
     deleteUser,
     nextMatricule,

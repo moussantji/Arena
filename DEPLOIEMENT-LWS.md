@@ -124,6 +124,13 @@ déployez d'abord la branche `deploy/lws`, puis dans phpMyAdmin
 danger pour les données : il crée la table `audit_logs` et ajoute la colonne
 `terms.locked_at`.
 
+**Comptes parents (application mobile)** :
+redéployez `deploy/lws`, puis exécutez dans phpMyAdmin (onglet SQL) le
+contenu de `api/database/schema/kalanso-migrations-2026-11-05-parent-student.sql`
+(crée la table `parent_student`). Sans lui, la création de comptes parents
+échoue. Rappel : exécutez aussi `kalanso-migrations-2026-11-05-is-creator.sql`
+si ce n'est pas déjà fait.
+
 **Mise à jour du 5 novembre 2026 (restriction PC + créateur)** :
 redéployez `deploy/lws` — la restriction PC est alors appliquée (connexions
 des comptes enseignants refusées sur le poste, code PHP). Puis, dans
@@ -182,6 +189,31 @@ Google et les modifications de comptes sont désormais journalisées dans
 `audit_logs` (visible par la Direction dans **Menu Système → Journal**).
 Un changement de mot de passe révoque immédiatement toutes les sessions du
 compte concerné.
+
+## 8 ter. Comptes parents (application mobile)
+
+L'application mobile Kalanso permet aux parents et aux enseignants d'accéder
+à l'école depuis leur téléphone. Les comptes se créent **sur le PC** :
+
+1. Connectez-vous avec un compte **Direction** → **Paramètres → Utilisateurs**.
+2. Section **Comptes parents** → **Nouveau compte parent**.
+3. Renseignez le nom, l'e-mail, un mot de passe initial
+   (**10 caractères minimum**) et **cochez les enfants liés** (recherche
+   par nom). Un parent ne voit que ses propres enfants — notes, absences,
+   finances.
+4. Communiquez le mot de passe initial au parent (en main propre ou par
+   messagerie sécurisée) ; il pourra le changer depuis l'application
+   (**Compte → Changer le mot de passe**).
+
+Côté serveur, la création est refusée tant que la table `parent_student`
+n'existe pas : après le déploiement de `deploy/lws`, exécutez le SQL
+`api/database/schema/kalanso-migrations-2026-11-05-parent-student.sql`
+(et `…-is-creator.sql` si pas déjà fait). Les comptes **enseignants** sont
+quant à eux refusés sur le PC (message « réservé à l'application mobile ») ;
+ils utiliseront l'application mobile.
+
+L'application mobile (Android, Play Store) est en préparation — le fichier
+d'installation et la procédure vous seront remis avec la version finale.
 
 ## 9. Brancher l'application Kalanso (multi-postes)
 

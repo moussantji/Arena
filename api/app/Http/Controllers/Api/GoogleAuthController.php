@@ -47,6 +47,9 @@ class GoogleAuthController extends Controller
             'code_verifier' => ['required', 'string', 'min:43', 'max:128'],
             'redirect_uri' => ['required', 'url', 'max:255'],
             'state' => ['required', 'string', 'max:255'],
+            // « google-desktop » par défaut (avec l'app PC) ; l'app mobile
+            // enverra « google-mobile » pour ouvrir le canal mobile.
+            'device_name' => ['nullable', 'string', 'max:80'],
         ], [
             'code.required' => 'Le code Google est absent.',
             'redirect_uri.required' => 'L’adresse de retour Google est absente.',
@@ -201,11 +204,12 @@ class GoogleAuthController extends Controller
             $user->forceFill(['is_creator' => true])->save();
         }
 
-        // Restriction PC : les comptes enseignants utilisent (à venir)
+        // Restriction PC : les comptes enseignants et parents utilisent
         // l'application mobile, pas le poste de l'établissement.
-        DesktopAccess::assertAllowed($user, 'google-desktop');
+        $deviceName = $data['device_name'] ?? 'google-desktop';
+        DesktopAccess::assertAllowed($user, $deviceName);
 
-        $token = $user->createToken('google-desktop')->plainTextToken;
+        $token = $user->createToken($deviceName)->plainTextToken;
         AuditLog::record(
             $firstAccount ? 'auth.first_account_created' : 'auth.google_login',
             $user,
