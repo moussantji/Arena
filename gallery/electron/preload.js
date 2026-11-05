@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('desktopAPI', {
   },
   googleSignIn: () => ipcRenderer.invoke('google:signIn'),
   googleCancel: () => ipcRenderer.invoke('google:cancel'),
+  savePdf: (payload) => ipcRenderer.invoke('pdf:save', payload),
   updates: {
     version: () => ipcRenderer.invoke('update:version'),
     check: () => ipcRenderer.invoke('update:check'),

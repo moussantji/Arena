@@ -9,6 +9,7 @@ import {
 import { useActions } from '../actions.jsx';
 import { errorMessage } from '../api.js';
 import { exportStudentReportWorkbook } from '../exports.js';
+import { printBulletinPdf } from '../documents/bulletin.js';
 import {
   ActionMenu, ListState, SelectFilter,
 } from '../forms.jsx';
@@ -42,6 +43,7 @@ export function Fiche() {
   const actions = useActions();
   const [tab, setTab] = useState(0);
   const [exportingReport, setExportingReport] = useState(false);
+  const [printingPdf, setPrintingPdf] = useState(false);
   const students = meta?.students || [];
   const currency = meta?.school?.currency || 'FCFA';
   const showFinance = can('finances.view');
@@ -105,6 +107,27 @@ export function Fiche() {
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, 5);
   }, [paymentRows, invoiceRows]);
+
+  const printBulletin = async () => {
+    if (!student || printingPdf) return;
+    setPrintingPdf(true);
+    try {
+      const stats = absences.data?.stats || {};
+      const result = await printBulletinPdf({
+        student,
+        report: reportData,
+        meta,
+        absences: {
+          total: Number(stats.total ?? absenceRows.length),
+          unjustified: Number(stats.unjustified ?? pendingAbsences.length),
+        },
+      });
+      if (result.ok) notify('Bulletin PDF enregistré.', { tone: 'success' });
+      else if (!result.canceled) notify(result.message || 'Génération du PDF impossible.', { tone: 'danger' });
+    } finally {
+      setPrintingPdf(false);
+    }
+  };
 
   const exportReport = async () => {
     if (!student || exportingReport) return;
@@ -203,7 +226,10 @@ export function Fiche() {
                 </div>
               </div>
               <div className="ph-actions">
-                <Btn icon="download" onClick={exportReport}>Bulletin</Btn>
+                <Btn icon="download" onClick={exportReport}>Excel</Btn>
+                <Btn icon="download" solid onClick={printBulletin} disabled={printingPdf}>
+                  {printingPdf ? 'PDF…' : 'Bulletin PDF'}
+                </Btn>
                 {can('students.manage') && <Btn icon="upload" onClick={() => actions.photo(student)}>Photo</Btn>}
                 {showDocuments && <Btn icon="upload" onClick={() => actions.document(student)}>Document</Btn>}
                 <ActionMenu actions={[

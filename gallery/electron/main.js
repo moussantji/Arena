@@ -1014,6 +1014,71 @@ ipcMain.handle('api:setUrl', (_event, value) => {
   return { ok: true };
 });
 
+/* ------------------------------------------------------------------ */
+/*  Impression de documents PDF (bulletins, reçus)                     */
+/* ------------------------------------------------------------------ */
+
+// Fenêtre cachée persistante : la détruire puis la recréer dans le même
+// process peut faire échouer le chargement suivant (ERR_FAILED).
+let printWindow = null;
+let pdfBusy = false;
+
+function getPrintWindow() {
+  if (printWindow && !printWindow.isDestroyed()) return printWindow;
+  printWindow = new BrowserWindow({
+    show: false,
+    webPreferences: { sandbox: true, contextIsolation: true, nodeIntegration: false },
+  });
+  printWindow.on('closed', () => { printWindow = null; });
+  return printWindow;
+}
+
+// Le renderer construit le HTML (mise en page A4), ici on imprime et on
+// propose l'emplacement d'enregistrement.
+ipcMain.handle('pdf:save', async (_event, payload) => {
+  if (pdfBusy) return { ok: false, message: 'Une génération est déjà en cours.' };
+
+  const sentFilename = path.basename(String(payload?.filename || 'document.pdf'))
+    .replace(/[^\w.\- ]+/g, '_');
+  const filename = /\.pdf$/i.test(sentFilename) ? sentFilename : `${sentFilename}.pdf`;
+  const html = String(payload?.html || '');
+  if (!html.trim()) return { ok: false, message: 'Document vide.' };
+
+  pdfBusy = true;
+  const tmp = path.join(app.getPath('userData'), `document-${process.pid}-${Date.now()}.html`);
+  try {
+    await fs.promises.writeFile(tmp, html, 'utf8');
+    const hidden = getPrintWindow();
+    await Promise.race([
+      hidden.loadFile(tmp),
+      new Promise((_, reject) => setTimeout(
+        () => reject(new Error('Le chargement du document a dépassé le délai.')),
+        20000,
+      )),
+    ]);
+    const pdf = await hidden.webContents.printToPDF({
+      pageSize: 'A4',
+      printBackground: true,
+      margins: { marginType: 'none' },
+    });
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      title: 'Enregistrer le document',
+      defaultPath: path.join(app.getPath('documents'), filename),
+      filters: [{ name: 'Document PDF', extensions: ['pdf'] }],
+    });
+    if (canceled || !filePath) return { ok: false, canceled: true };
+    await fs.promises.writeFile(filePath, pdf);
+    logMain(`PDF enregistré : ${filePath}`);
+    return { ok: true, path: filePath };
+  } catch (error) {
+    logMain(`génération PDF impossible : ${error.stack || error.message}`);
+    return { ok: false, message: error.message || 'Génération du PDF impossible.' };
+  } finally {
+    pdfBusy = false;
+    fs.promises.unlink(tmp).catch(() => {});
+  }
+});
+
 ipcMain.handle('update:version', () => app.getVersion());
 
 ipcMain.handle('update:check', async () => {
