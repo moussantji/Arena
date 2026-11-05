@@ -14,6 +14,7 @@ import { Admissions } from './pages/admissions.jsx';
 import { FicheAdmission } from './pages/admission-profile.jsx';
 import { Messagerie } from './pages/messages.jsx';
 import { Parametres } from './pages/settings.jsx';
+import { Journal } from './pages/journal.jsx';
 import { Modales } from './modals-page.jsx';
 
 export { META } from './pages/meta.js';
@@ -35,6 +36,7 @@ export {
   FicheAdmission,
   Messagerie,
   Parametres,
+  Journal,
   Modales,
 };
 
@@ -55,5 +57,6 @@ export const PAGES = {
   'fiche-admission': FicheAdmission,
   messagerie: Messagerie,
   parametres: Parametres,
+  journal: Journal,
   modales: Modales,
 };

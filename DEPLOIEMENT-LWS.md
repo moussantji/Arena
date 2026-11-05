@@ -111,6 +111,13 @@ d'éventuelles nouvelles migrations : réimportez le schéma mis à jour
 migrate --force` en SSH — les données sont conservées) ou demandez le SQL des
 migrations manquantes.
 
+**Mise à jour du 5 novembre 2026 (journal d'audit + verrouillage des périodes)** :
+déployez d'abord la branche `deploy/lws` reconstruite, puis dans phpMyAdmin
+(onglet SQL) exécutez le contenu de
+`api/database/schema/kalanso-migrations-2026-11-05.sql`. Ce script est sans
+danger pour les données : il crée la table `audit_logs` et ajoute la colonne
+`terms.locked_at`.
+
 ## 9. Brancher l'application Kalanso (multi-postes)
 
 Sur chaque poste, après connexion avec un compte **Direction**, ouvrez

@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Term extends Model
 {
-    protected $fillable = ['academic_year_id', 'name', 'starts_on', 'ends_on', 'is_current'];
+    protected $fillable = ['academic_year_id', 'name', 'starts_on', 'ends_on', 'is_current', 'locked_at'];
 
-    protected $casts = ['starts_on' => 'date', 'ends_on' => 'date', 'is_current' => 'boolean'];
+    protected $casts = ['starts_on' => 'date', 'ends_on' => 'date', 'is_current' => 'boolean', 'locked_at' => 'datetime'];
 
     public function academicYear(): BelongsTo
     {
@@ -35,5 +35,13 @@ class Term extends Model
     public function scopeCurrent($query)
     {
         return $query->where('is_current', true);
+    }
+
+    /**
+     * Période délibérée : verrouillée pour toute modification de notes.
+     */
+    public function isLocked(): bool
+    {
+        return $this->locked_at !== null;
     }
 }

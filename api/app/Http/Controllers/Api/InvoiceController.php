@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Invoice;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -50,8 +51,13 @@ class InvoiceController extends Controller
         $data = $request->validate($this->rules());
         $data['reference'] ??= 'FAC-'.now()->format('Y').'-'.Str::upper(Str::random(6));
         $invoice = Invoice::create($data);
+        $invoice->loadMissing('student:id,first_name,last_name,matricule', 'feeType:id,name');
+        AuditLog::record('invoice.created', $invoice, $this->describe($invoice, 'émise'), [
+            'amount' => $invoice->amount,
+            'reference' => $invoice->reference,
+        ]);
 
-        return response()->json(['invoice' => $invoice->load('student:id,first_name,last_name,matricule', 'feeType:id,name')], 201);
+        return response()->json(['invoice' => $invoice], 201);
     }
 
     public function show(Invoice $invoice): JsonResponse
@@ -73,16 +79,34 @@ class InvoiceController extends Controller
 
     public function update(Request $request, Invoice $invoice): JsonResponse
     {
+        $previousAmount = $invoice->amount;
         $invoice->update($request->validate($this->rules($invoice)));
+        $invoice->loadMissing('student:id,first_name,last_name,matricule', 'feeType:id,name');
+        AuditLog::record('invoice.updated', $invoice, $this->describe($invoice, 'modifiée'), [
+            'amount' => ['avant' => $previousAmount, 'après' => $invoice->amount],
+        ]);
 
         return response()->json(['invoice' => $invoice->fresh()->load('student:id,first_name,last_name,matricule', 'feeType:id,name')]);
     }
 
     public function destroy(Invoice $invoice): JsonResponse
     {
+        $invoice->loadMissing('student:id,first_name,last_name,matricule', 'feeType:id,name');
+        $description = $this->describe($invoice, 'supprimée');
+        $amount = $invoice->amount;
         $invoice->delete();
+        AuditLog::record('invoice.deleted', $invoice, $description, ['amount' => $amount]);
 
         return response()->json(status: 204);
+    }
+
+    private function describe(Invoice $invoice, string $verb): string
+    {
+        $student = $invoice->student
+            ? trim($invoice->student->first_name.' '.$invoice->student->last_name)
+            : 'Élève #'.$invoice->student_id;
+
+        return sprintf('Facture %s : %s · %s · %s', $verb, $invoice->reference, $student, number_format((float) $invoice->amount, 0, ',', ' '));
     }
 
     private function rules(?Invoice $invoice = null): array

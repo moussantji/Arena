@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Term;
@@ -79,7 +80,20 @@ class GradeController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate($this->rules());
+        $term = Term::query()->find($data['term_id']);
+        if ($term?->isLocked()) {
+            return $this->lockedResponse();
+        }
+
         $data['school_class_id'] ??= Student::find($data['student_id'])?->school_class_id;
+        $existing = Grade::query()
+            ->where('student_id', $data['student_id'])
+            ->where('subject_id', $data['subject_id'])
+            ->where('term_id', $data['term_id'])
+            ->where('evaluation', $data['evaluation'])
+            ->first();
+        $previousScore = $existing?->score;
+
         $grade = Grade::updateOrCreate(
             [
                 'student_id' => $data['student_id'],
@@ -89,8 +103,17 @@ class GradeController extends Controller
             ],
             $data
         );
+        $grade->loadMissing('student:id,first_name,last_name,matricule', 'subject:id,name,code');
 
-        return response()->json(['grade' => $grade->load('student:id,first_name,last_name,matricule', 'subject:id,name,code')], $grade->wasRecentlyCreated ? 201 : 200);
+        if ($existing) {
+            AuditLog::record('grade.updated', $grade, $this->describeGrade($grade, 'modifiée'), [
+                'score' => ['avant' => $previousScore, 'après' => $grade->score],
+            ]);
+        } else {
+            AuditLog::record('grade.created', $grade, $this->describeGrade($grade, 'saisie'));
+        }
+
+        return response()->json(['grade' => $grade], $grade->wasRecentlyCreated ? 201 : 200);
     }
 
     public function show(Grade $grade): JsonResponse
@@ -100,14 +123,32 @@ class GradeController extends Controller
 
     public function update(Request $request, Grade $grade): JsonResponse
     {
+        $grade->loadMissing('term:id,name,locked_at');
+        if ($grade->term?->isLocked()) {
+            return $this->lockedResponse();
+        }
+
+        $previousScore = $grade->score;
         $grade->update($request->validate($this->rules($grade)));
+        $grade->loadMissing('student:id,first_name,last_name,matricule', 'subject:id,name,code');
+        AuditLog::record('grade.updated', $grade, $this->describeGrade($grade, 'modifiée'), [
+            'score' => ['avant' => $previousScore, 'après' => $grade->score],
+        ]);
 
         return response()->json(['grade' => $grade->fresh()->load('student:id,first_name,last_name,matricule', 'subject:id,name,code')]);
     }
 
     public function destroy(Grade $grade): JsonResponse
     {
+        $grade->loadMissing('term:id,name,locked_at', 'student:id,first_name,last_name,matricule', 'subject:id,name,code');
+        if ($grade->term?->isLocked()) {
+            return $this->lockedResponse();
+        }
+
+        $description = $this->describeGrade($grade, 'supprimée');
+        $score = $grade->score;
         $grade->delete();
+        AuditLog::record('grade.deleted', $grade, $description, ['score' => $score]);
 
         return response()->json(status: 204);
     }
@@ -174,6 +215,44 @@ class GradeController extends Controller
                 default => 'Insuffisant',
             },
         ]);
+    }
+
+    /**
+     * Verrou de délibération : une période verrouillée n'accepte plus aucune
+     * écriture sur les notes.
+     */
+    private function lockedResponse(): JsonResponse
+    {
+        return response()->json([
+            'message' => 'Cette période est délibérée et verrouillée : les notes ne peuvent plus être modifiées.',
+        ], 403);
+    }
+
+    private function describeGrade(Grade $grade, string $verb): string
+    {
+        $student = $grade->student
+            ? trim($grade->student->first_name.' '.$grade->student->last_name)
+            : 'Élève #'.$grade->student_id;
+        $subject = $grade->subject?->name ?? 'Matière #'.$grade->subject_id;
+
+        return sprintf(
+            'Note %s : %s · %s · %s = %s/20',
+            $verb,
+            $student,
+            $subject,
+            $this->evaluationLabel((string) $grade->evaluation),
+            $grade->score,
+        );
+    }
+
+    private function evaluationLabel(string $evaluation): string
+    {
+        return match ($evaluation) {
+            'devoir_1' => 'Devoir 1',
+            'devoir_2' => 'Devoir 2',
+            'composition' => 'Composition',
+            default => $evaluation,
+        };
     }
 
     private function rules(?Grade $grade = null): array

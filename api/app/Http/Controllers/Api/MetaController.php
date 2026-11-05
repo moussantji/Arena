@@ -74,7 +74,7 @@ class MetaController extends Controller
                 ->orderBy('last_name')
                 ->orderBy('first_name')
                 ->get(['id', 'first_name', 'last_name', 'role', 'department_id']),
-            'terms' => Term::orderBy('starts_on')->get(['id', 'academic_year_id', 'name', 'starts_on', 'ends_on', 'is_current']),
+            'terms' => Term::orderBy('starts_on')->get(['id', 'academic_year_id', 'name', 'starts_on', 'ends_on', 'is_current', 'locked_at']),
             'fee_types' => $canSeeFinance
                 ? FeeType::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code', 'default_amount'])
                 : [],

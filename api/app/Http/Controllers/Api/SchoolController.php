@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
+use App\Models\AuditLog;
 use App\Models\School;
 use App\Models\Term;
 use Illuminate\Http\JsonResponse;
@@ -39,7 +40,13 @@ class SchoolController extends Controller
             'email' => ['nullable', 'email', 'max:180'],
             'logo_path' => ['nullable', 'string', 'max:255'],
         ]);
+        $previous = $school->exists ? $school->only(['name', 'currency']) : null;
         $school->update($data);
+        AuditLog::record('school.updated', $school, "Établissement modifié : {$school->name}", array_filter([
+            'name' => ($previous && $previous['name'] !== $school->name)
+                ? ['avant' => $previous['name'], 'après' => $school->name]
+                : null,
+        ]));
 
         return response()->json(['school' => $school->fresh()->load('photos:id,school_id,filename')]);
     }

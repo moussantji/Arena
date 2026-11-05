@@ -125,6 +125,20 @@ export function Parametres() {
     }
   };
 
+  const toggleTermLock = async (term) => {
+    const locked = !term.locked_at;
+    try {
+      await api.patch(`/references/terms/${term.id}/lock`, { locked });
+      notify(locked
+        ? `« ${term.name} » délibéré et verrouillé — les notes sont intouchables.`
+        : `« ${term.name} » rouverte — la saisie redevient possible.`);
+      years.reload();
+      refresh();
+    } catch (error) {
+      notify(error?.firstError || error?.message || 'Opération impossible.', { tone: 'danger' });
+    }
+  };
+
   const testConnection = async () => {
     setTesting(true);
     try {
@@ -360,9 +374,20 @@ export function Parametres() {
                                 <Icon name="clock" size={13} />
                                 <b>{term.name}</b>
                                 {term.is_current && <Pill tone="accent">En cours</Pill>}
+                                {term.locked_at && <Pill tone="copper" dot>Délibéré</Pill>}
                               </span>
                               <span className="term-range mono">{date(term.starts_on)} → {date(term.ends_on)}</span>
                               <span className="term-actions">
+                                <button
+                                  type="button"
+                                  className={`icon-btn${term.locked_at ? ' is-locked' : ''}`}
+                                  title={term.locked_at
+                                    ? 'Rouvrir la période (la saisie redevient possible)'
+                                    : 'Délibérer et verrouiller (les notes deviennent intouchables)'}
+                                  onClick={() => toggleTermLock(term)}
+                                >
+                                  <Icon name={term.locked_at ? 'lock' : 'unlock'} size={13} />
+                                </button>
                                 <button type="button" className="icon-btn" title="Modifier" onClick={() => actions.term(term)}><Icon name="edit" size={13} /></button>
                                 <button type="button" className="icon-btn" title="Supprimer" onClick={() => actions.deleteTerm(term)}><Icon name="close" size={12} /></button>
                               </span>

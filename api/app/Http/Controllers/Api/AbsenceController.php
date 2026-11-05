@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Absence;
+use App\Models\AuditLog;
 use App\Models\Student;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class AbsenceController extends Controller
 {
@@ -59,8 +61,10 @@ class AbsenceController extends Controller
         $data = $request->validate($this->rules());
         $data['school_class_id'] ??= Student::find($data['student_id'])?->school_class_id;
         $absence = Absence::create($data);
+        $absence->loadMissing('student:id,first_name,last_name,matricule');
+        AuditLog::record('absence.created', $absence, $this->describe($absence, 'enregistrée'));
 
-        return response()->json(['absence' => $absence->load('student:id,first_name,last_name,matricule')], 201);
+        return response()->json(['absence' => $absence], 201);
     }
 
     public function show(Absence $absence): JsonResponse
@@ -71,6 +75,8 @@ class AbsenceController extends Controller
     public function update(Request $request, Absence $absence): JsonResponse
     {
         $absence->update($request->validate($this->rules($absence)));
+        $absence->loadMissing('student:id,first_name,last_name,matricule');
+        AuditLog::record('absence.updated', $absence, $this->describe($absence, 'modifiée'));
 
         return response()->json(['absence' => $absence->fresh()->load('student:id,first_name,last_name,matricule')]);
     }
@@ -86,15 +92,32 @@ class AbsenceController extends Controller
             'justification' => $data['justification'],
             'reason' => $data['reason'] ?? $absence->reason,
         ]);
+        $absence->loadMissing('student:id,first_name,last_name,matricule');
+        AuditLog::record('absence.justified', $absence, $this->describe($absence, 'justifiée'));
 
         return response()->json(['absence' => $absence->fresh()->load('student:id,first_name,last_name,matricule')]);
     }
 
     public function destroy(Absence $absence): JsonResponse
     {
+        $absence->loadMissing('student:id,first_name,last_name,matricule');
+        $description = $this->describe($absence, 'supprimée');
         $absence->delete();
+        AuditLog::record('absence.deleted', $absence, $description);
 
         return response()->json(status: 204);
+    }
+
+    private function describe(Absence $absence, string $verb): string
+    {
+        $student = $absence->student
+            ? trim($absence->student->first_name.' '.$absence->student->last_name)
+            : 'Élève #'.$absence->student_id;
+        $date = $absence->date instanceof Carbon
+            ? $absence->date->format('d/m/Y')
+            : (string) $absence->date;
+
+        return "Absence {$verb} : {$student} · {$date}";
     }
 
     private function rules(?Absence $absence = null): array

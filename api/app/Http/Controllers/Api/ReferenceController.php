@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
+use App\Models\AuditLog;
 use App\Models\Department;
 use App\Models\FeeType;
 use App\Models\Term;
@@ -27,7 +28,10 @@ class ReferenceController extends Controller
             'code' => ['nullable', 'string', 'max:20', 'unique:departments,code'],
         ]);
 
-        return response()->json(['department' => Department::create($data)], 201);
+        $department = Department::create($data);
+        AuditLog::record('department.created', $department, "Département créé : {$department->name}");
+
+        return response()->json(['department' => $department], 201);
     }
 
     public function updateDepartment(Request $request, Department $department): JsonResponse
@@ -37,13 +41,16 @@ class ReferenceController extends Controller
             'code' => ['nullable', 'string', 'max:20', Rule::unique('departments', 'code')->ignore($department->id)],
         ]);
         $department->update($data);
+        AuditLog::record('department.updated', $department, "Département modifié : {$department->name}");
 
         return response()->json(['department' => $department->fresh()]);
     }
 
     public function destroyDepartment(Department $department): JsonResponse
     {
+        $name = $department->name;
         $department->delete();
+        AuditLog::record('department.deleted', $department, "Département supprimé : {$name}");
 
         return response()->json(status: 204);
     }
@@ -59,19 +66,25 @@ class ReferenceController extends Controller
     {
         $data = $request->validate($this->feeTypeRules());
 
-        return response()->json(['fee_type' => FeeType::create($data)], 201);
+        $feeType = FeeType::create($data);
+        AuditLog::record('fee_type.created', $feeType, "Type de frais créé : {$feeType->name}");
+
+        return response()->json(['fee_type' => $feeType], 201);
     }
 
     public function updateFeeType(Request $request, FeeType $feeType): JsonResponse
     {
         $feeType->update($request->validate($this->feeTypeRules($feeType)));
+        AuditLog::record('fee_type.updated', $feeType, "Type de frais modifié : {$feeType->name}");
 
         return response()->json(['fee_type' => $feeType->fresh()]);
     }
 
     public function destroyFeeType(FeeType $feeType): JsonResponse
     {
+        $name = $feeType->name;
         $feeType->delete();
+        AuditLog::record('fee_type.deleted', $feeType, "Type de frais supprimé : {$name}");
 
         return response()->json(status: 204);
     }
@@ -97,7 +110,10 @@ class ReferenceController extends Controller
             AcademicYear::query()->update(['is_current' => false]);
         }
 
-        return response()->json(['academic_year' => AcademicYear::create($data)], 201);
+        $academicYear = AcademicYear::create($data);
+        AuditLog::record('year.created', $academicYear, "Année scolaire créée : {$academicYear->label}");
+
+        return response()->json(['academic_year' => $academicYear], 201);
     }
 
     public function updateAcademicYear(Request $request, AcademicYear $academicYear): JsonResponse
@@ -114,13 +130,16 @@ class ReferenceController extends Controller
         }
 
         $academicYear->update($data);
+        AuditLog::record('year.updated', $academicYear, "Année scolaire modifiée : {$academicYear->label}");
 
         return response()->json(['academic_year' => $academicYear->fresh()]);
     }
 
     public function destroyAcademicYear(AcademicYear $academicYear): JsonResponse
     {
+        $label = $academicYear->label;
         $academicYear->delete();
+        AuditLog::record('year.deleted', $academicYear, "Année scolaire supprimée : {$label}");
 
         return response()->json(status: 204);
     }
@@ -150,7 +169,11 @@ class ReferenceController extends Controller
             Term::query()->update(['is_current' => false]);
         }
 
-        return response()->json(['term' => Term::create($data)->load('academicYear:id,label')], 201);
+        $term = Term::create($data);
+        $term->load('academicYear:id,label');
+        AuditLog::record('term.created', $term, "Période créée : {$term->name}");
+
+        return response()->json(['term' => $term], 201);
     }
 
     public function updateTerm(Request $request, Term $term): JsonResponse
@@ -168,15 +191,44 @@ class ReferenceController extends Controller
         }
 
         $term->update($data);
+        AuditLog::record('term.updated', $term, "Période modifiée : {$term->name}");
 
         return response()->json(['term' => $term->fresh()->load('academicYear:id,label')]);
     }
 
     public function destroyTerm(Term $term): JsonResponse
     {
+        $name = $term->name;
         $term->delete();
+        AuditLog::record('term.deleted', $term, "Période supprimée : {$name}");
 
         return response()->json(status: 204);
+    }
+
+    /**
+     * Délibération : verrouille (ou rouvre) une période de notation.
+     * Tant qu'elle est verrouillée, aucune note ne peut être créée,
+     * modifiée ou supprimée. Chaque bascule est journalisée.
+     */
+    public function toggleLock(Request $request, Term $term): JsonResponse
+    {
+        $data = $request->validate(['locked' => ['required', 'boolean']]);
+        $locked = $data['locked'];
+
+        if ($term->isLocked() === $locked) {
+            return response()->json(['term' => $term->fresh()->load('academicYear:id,label')]);
+        }
+
+        $term->update(['locked_at' => $locked ? now() : null]);
+        AuditLog::record(
+            $locked ? 'term.locked' : 'term.unlocked',
+            $term,
+            $locked
+                ? "Période « {$term->name} » délibérée et verrouillée"
+                : "Période « {$term->name} » rouverte",
+        );
+
+        return response()->json(['term' => $term->fresh()->load('academicYear:id,label')]);
     }
 
     private function feeTypeRules(?FeeType $feeType = null): array
