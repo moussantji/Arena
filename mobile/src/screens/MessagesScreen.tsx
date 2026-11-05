@@ -107,7 +107,7 @@ export default function MessagesScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
-  listContent: { padding: 12, paddingBottom: 118, gap: 8 },
+  listContent: { padding: 12, paddingBottom: 40, gap: 8 },
   row: {
     flexDirection: 'row',
     gap: 12,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 16,
-    bottom: 100,
+    bottom: 20,
     width: 58,
     height: 58,
     borderRadius: 29,

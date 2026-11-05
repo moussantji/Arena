@@ -83,6 +83,15 @@ La politique de confidentialité publique exigée par la fiche Play est en ligne
 - Changement de mot de passe : révoque les autres sessions du compte.
 - Comptes parents/enseignants refusés sur le PC (réservé direction/secrétariat/comptabilité).
 
+## Design « Indigo Minuit réhaussée »
+
+L'interface reprend l'identité de la version PC, version luxe : fond aurore,
+cartes de verre dépoli, dégradé signature indigo → champagne, or champagne en
+touche (actions fortes, chiffres clés). Jetons dans `src/theme.ts`, composants
+dans `src/ui.tsx` (écran, cartes, boutons dégradés, chips, tuiles KPI, barres
+de progression, onglets segmentés). Les maquettes de référence sont dans
+`gallery/mobile-premium/`.
+
 ## Structure
 
 ```
@@ -93,7 +102,8 @@ mobile/
     auth.tsx               — session (/me au démarrage)
     children.tsx           — enfants du parent (contexte partagé + sélecteur)
     RootNavigator.tsx      — pile racine + onglets par rôle + en-tête avatar
-    theme.ts / ui.tsx      — design « Indigo Minuit » et composants
+    theme.ts / ui.tsx      — design « Indigo Minuit réhaussée » et composants
     format.ts / types.ts   — formatage FR et types API
-    screens/               — écrans (connexion, accueil, notes, appel, finances…)
+    screens/               — écrans (connexion, accueil, élèves, fiche élève,
+                             finances, notes, emploi du temps, appel…)
 ```

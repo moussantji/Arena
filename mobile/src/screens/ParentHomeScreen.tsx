@@ -191,7 +191,7 @@ function ActionButton({ label, icon, onPress }: { label: string; icon: keyof typ
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
-  content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 112 },
+  content: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 40 },
   childCard: { marginBottom: 12, gap: 14 },
   childTop: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   childInfo: { flex: 1 },

@@ -1,10 +1,25 @@
-/** Fiche élève (personnel) : identité, moyennes, absences récentes. */
-import React from 'react';
+/**
+ * Fiche élève premium : héros identité, tuiles de statistiques,
+ * onglets segmentés (Aperçu / Notes / Absences / Finances).
+ */
+import React, { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRoute, type RouteProp } from '@react-navigation/native';
 import { api } from '../api';
 import { theme } from '../theme';
-import { Avatar, Card, Empty, ErrorState, Loading, SectionHeader, Pill } from '../ui';
+import {
+  Avatar,
+  Card,
+  Empty,
+  ErrorState,
+  Loading,
+  Pill,
+  ProgressBar,
+  ScreenHeader,
+  SectionHeader,
+  SegmentedTabs,
+  StatTile,
+} from '../ui';
 import { evaluationLabel, formatDate, fullName, money } from '../format';
 import { useApiQuery } from '../useApiQuery';
 import type { RootStackParamList } from '../RootNavigator';
@@ -39,13 +54,33 @@ interface StudentDetail {
   };
 }
 
+const TABS = ['Aperçu', 'Notes', 'Absences', 'Finances'] as const;
+type Tab = (typeof TABS)[number];
+
 export default function StudentDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'Eleve'>>();
   const { studentId } = route.params;
+  const [tab, setTab] = useState<Tab>('Aperçu');
   const detail = useApiQuery<StudentDetail>(
     () => api.get<StudentDetail>(`/students/${studentId}`),
     [studentId],
   );
+
+  const subjectAverages = useMemo(() => {
+    const grades = detail.data?.student.grades ?? [];
+    const bySubject = new Map<string, { total: number; count: number }>();
+    for (const grade of grades) {
+      const name = grade.subject?.name ?? 'Matière';
+      const entry = bySubject.get(name) ?? { total: 0, count: 0 };
+      entry.total += Number(grade.score) || 0;
+      entry.count += 1;
+      bySubject.set(name, entry);
+    }
+
+    return [...bySubject.entries()]
+      .map(([name, { total, count }]) => ({ name, average: count ? total / count : 0 }))
+      .sort((a, b) => b.average - a.average);
+  }, [detail.data]);
 
   if (detail.loading && !detail.data) return <Loading />;
   if (!detail.data) {
@@ -58,111 +93,179 @@ export default function StudentDetailScreen() {
 
   const { student, summary } = detail.data;
   const name = fullName(student);
-  const recentGrades = (student.grades ?? []).slice(-6).reverse();
-  const recentAbsences = student.absences ?? [];
+  const recentGrades = (student.grades ?? []).slice().reverse();
+  const absences = student.absences ?? [];
+  const invoices = student.invoices ?? [];
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Card style={styles.identityCard}>
-        <Avatar name={name} size={64} />
-        <View style={styles.identityBody}>
-          <Text style={styles.identityName}>{name}</Text>
-          <Text style={styles.identityMeta}>
-            {student.matricule ?? 'Sans matricule'} · {student.school_class?.name ?? 'Sans classe'}
+    <View style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ScreenHeader title="Fiche élève" sub={student.school_class?.name ?? undefined} />
+
+        <View style={styles.hero}>
+          <Avatar name={name} size={86} ring />
+          <Text style={styles.heroName}>{name}</Text>
+          <Text style={styles.heroMeta}>
+            {student.school_class?.name ?? 'Sans classe'}
+            {student.matricule ? ` · N° ${student.matricule}` : ''}
           </Text>
-          <View style={styles.identityPills}>
+          <View style={styles.heroPills}>
             {student.status ? <Pill label={student.status} tone="accent" /> : null}
             {student.gender ? <Pill label={student.gender === 'F' ? 'Féminin' : 'Masculin'} tone="muted" /> : null}
-            {student.enrolled_on ? <Pill label={`Inscrit le ${formatDate(student.enrolled_on)}`} tone="muted" /> : null}
           </View>
         </View>
-      </Card>
 
-      <SectionHeader title="Assiduité & résultats" />
-      <View style={styles.statsRow}>
-        <Card style={styles.statCard}>
-          <Text style={styles.statValue}>{summary.average != null ? summary.average.toFixed(2) : '—'}</Text>
-          <Text style={styles.statLabel}>MOYENNE / 20</Text>
-        </Card>
-        <Card style={styles.statCard}>
-          <Text style={styles.statValue}>{summary.absences}</Text>
-          <Text style={styles.statLabel}>ABSENCES</Text>
-        </Card>
-        <Card style={styles.statCard}>
-          <Text style={[styles.statValue, summary.unjustified_absences > 0 && styles.statDanger]}>
-            {summary.unjustified_absences}
-          </Text>
-          <Text style={styles.statLabel}>NON JUSTIFIÉES</Text>
-        </Card>
-      </View>
-      {summary.outstanding != null && summary.outstanding > 0 ? (
-        <Card style={styles.outstandingCard}>
-          <Text style={styles.outstandingLabel}>SOLDE EN ATTENTE</Text>
-          <Text style={styles.outstandingValue}>{money(summary.outstanding)}</Text>
-        </Card>
-      ) : null}
+        <View style={styles.statsRow}>
+          <StatTile
+            value={summary.average != null ? summary.average.toFixed(1) : '—'}
+            label="Moyenne / 20"
+            trend={summary.average != null && summary.average >= 10 ? '↑' : undefined}
+          />
+          <StatTile value={String(summary.absences)} label="Absences" tone="muted" />
+          {summary.outstanding != null && summary.outstanding > 0 ? (
+            <StatTile value={money(summary.outstanding)} label="Solde dû" tone="danger" />
+          ) : (
+            <StatTile value="0 F" label="Solde" tone="ok" />
+          )}
+        </View>
 
-      <SectionHeader title="Dernières notes" />
-      {recentGrades.length === 0 ? (
-        <Empty icon="document-text-outline" title="Aucune note" sub="Aucune note enregistrée pour cet élève." />
-      ) : (
-        <Card>
-          {recentGrades.map((grade, index) => (
-            <View key={grade.id} style={[styles.lineRow, index > 0 && styles.lineBorder]}>
-              <View style={styles.lineBody}>
-                <Text style={styles.lineTitle}>{grade.subject?.name ?? 'Matière'} · {evaluationLabel(grade.evaluation)}</Text>
-                <Text style={styles.lineMeta}>{grade.term?.name ?? ''}</Text>
-              </View>
-              <Text style={styles.lineScore}>{grade.score} / {grade.max_score}</Text>
-            </View>
-          ))}
-        </Card>
-      )}
+        <View style={styles.tabsWrap}>
+          <SegmentedTabs
+            tabs={[...TABS]}
+            active={tab}
+            onChange={(next) => setTab(next as Tab)}
+          />
+        </View>
 
-      <SectionHeader title="Absences récentes" />
-      {recentAbsences.length === 0 ? (
-        <Empty icon="calendar-clear-outline" title="Aucune absence" sub="Cet élève n'a aucune absence enregistrée." />
-      ) : (
-        <Card>
-          {recentAbsences.map((absence, index) => (
-            <View key={absence.id} style={[styles.lineRow, index > 0 && styles.lineBorder]}>
-              <View style={styles.lineBody}>
-                <Text style={styles.lineTitle}>{absence.reason?.trim() || 'Absence'}</Text>
-                <Text style={styles.lineMeta}>{formatDate(absence.date)}</Text>
-              </View>
-              <Pill label={absence.is_justified ? 'Justifiée' : 'Non justifiée'} tone={absence.is_justified ? 'ok' : 'copper'} />
-            </View>
-          ))}
-        </Card>
-      )}
+        {tab === 'Aperçu' ? (
+          <>
+            <SectionHeader title="Matières" />
+            <Card>
+              {subjectAverages.length === 0 ? (
+                <Empty title="Aucune note" sub="Aucune note enregistrée pour cet élève." />
+              ) : (
+                subjectAverages.map((row, index) => (
+                  <View key={row.name} style={[styles.subjectRow, index > 0 && styles.lineBorder]}>
+                    <View style={styles.subjectHead}>
+                      <Text style={styles.subjectName} numberOfLines={1}>{row.name}</Text>
+                      <Text style={styles.subjectScore}>{row.average.toFixed(1)}</Text>
+                    </View>
+                    <ProgressBar value={row.average} max={20} />
+                  </View>
+                ))
+              )}
+            </Card>
+            {student.enrolled_on ? (
+              <Text style={styles.footNote}>Inscrit le {formatDate(student.enrolled_on)}</Text>
+            ) : null}
+          </>
+        ) : null}
 
-      <View style={styles.footerSpace} />
-    </ScrollView>
+        {tab === 'Notes' ? (
+          <>
+            <SectionHeader title={`Notes (${recentGrades.length})`} />
+            {recentGrades.length === 0 ? (
+              <Empty title="Aucune note" sub="Aucune note enregistrée pour cet élève." />
+            ) : (
+              <Card>
+                {recentGrades.map((grade, index) => (
+                  <View key={grade.id} style={[styles.lineRow, index > 0 && styles.lineBorder]}>
+                    <View style={styles.lineBody}>
+                      <Text style={styles.lineTitle}>{grade.subject?.name ?? 'Matière'} · {evaluationLabel(grade.evaluation)}</Text>
+                      <Text style={styles.lineMeta}>{grade.term?.name ?? ''}</Text>
+                    </View>
+                    <View style={styles.scoreBadge}>
+                      <Text style={styles.scoreText}>{grade.score}</Text>
+                      <Text style={styles.scoreMax}>/ {grade.max_score}</Text>
+                    </View>
+                  </View>
+                ))}
+              </Card>
+            )}
+          </>
+        ) : null}
+
+        {tab === 'Absences' ? (
+          <>
+            <SectionHeader title={`Absences (${absences.length})`} />
+            {absences.length === 0 ? (
+              <Empty title="Aucune absence" sub="Cet élève n'a aucune absence enregistrée." />
+            ) : (
+              <Card>
+                {absences.map((absence, index) => (
+                  <View key={absence.id} style={[styles.lineRow, index > 0 && styles.lineBorder]}>
+                    <View style={styles.lineBody}>
+                      <Text style={styles.lineTitle}>{absence.reason?.trim() || 'Absence'}</Text>
+                      <Text style={styles.lineMeta}>{formatDate(absence.date)}</Text>
+                    </View>
+                    <Pill
+                      label={absence.is_justified ? 'Justifiée' : 'Non justifiée'}
+                      tone={absence.is_justified ? 'ok' : 'copper'}
+                    />
+                  </View>
+                ))}
+              </Card>
+            )}
+          </>
+        ) : null}
+
+        {tab === 'Finances' ? (
+          <>
+            <SectionHeader title={`Factures (${invoices.length})`} />
+            {invoices.length === 0 ? (
+              <Empty title="Aucune facture" sub="Aucune facture émise pour cet élève." />
+            ) : (
+              <Card>
+                {invoices.map((invoice, index) => {
+                  const amount = Number(invoice.amount) || 0;
+                  const paid = Number(invoice.paid_amount ?? 0) || 0;
+
+                  return (
+                    <View key={`${invoice.status}-${index}`} style={[styles.lineRow, index > 0 && styles.lineBorder]}>
+                      <View style={styles.lineBody}>
+                        <Text style={styles.lineTitle}>{money(amount)}</Text>
+                        <Text style={styles.lineMeta}>Réglé : {money(paid)}</Text>
+                      </View>
+                      <Pill
+                        label={invoice.status === 'paid' ? 'Payée' : invoice.status === 'overdue' ? 'En retard' : 'En attente'}
+                        tone={invoice.status === 'paid' ? 'ok' : invoice.status === 'overdue' ? 'danger' : 'copper'}
+                      />
+                    </View>
+                  );
+                })}
+              </Card>
+            )}
+          </>
+        ) : null}
+
+        <View style={styles.footerSpace} />
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
   fill: { flex: 1, backgroundColor: theme.bg },
-  content: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 44 },
-  identityCard: { flexDirection: 'row', gap: 16, alignItems: 'center' },
-  identityBody: { flex: 1, gap: 5 },
-  identityName: { color: theme.ink, fontSize: 18, fontWeight: '800' },
-  identityMeta: { color: theme.faint, fontSize: 11 },
-  identityPills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 },
-  statsRow: { flexDirection: 'row', gap: 8 },
-  statCard: { flex: 1, alignItems: 'center', paddingVertical: 12 },
-  statValue: { color: theme.ink, fontSize: 19, fontWeight: '800', fontVariant: ['tabular-nums'] },
-  statDanger: { color: theme.danger },
-  statLabel: { color: theme.faint, fontSize: 7.5, letterSpacing: 0.8, fontWeight: '700', marginTop: 3 },
-  outstandingCard: { marginTop: 10, borderColor: 'rgba(217, 176, 111, 0.45)' },
-  outstandingLabel: { color: theme.faint, fontSize: 8.5, letterSpacing: 1.2, fontWeight: '700' },
-  outstandingValue: { color: theme.copper, fontSize: 22, fontWeight: '800', marginTop: 2 },
-  lineRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 9 },
+  content: { paddingHorizontal: 16, paddingBottom: 44 },
+  hero: { alignItems: 'center', marginTop: 10, marginBottom: 6 },
+  heroName: { color: theme.ink, fontSize: 23, fontWeight: '800', letterSpacing: -0.3, marginTop: 12 },
+  heroMeta: { color: theme.faint, fontSize: 12.5, marginTop: 4 },
+  heroPills: { flexDirection: 'row', gap: 8, marginTop: 10 },
+  statsRow: { flexDirection: 'row', gap: 9, marginTop: 14 },
+  tabsWrap: { marginTop: 20, marginHorizontal: -4 },
+  subjectRow: { paddingVertical: 10, gap: 8 },
+  subjectHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
+  subjectName: { color: theme.inkSoft, fontSize: 13, fontWeight: '600', flex: 1 },
+  subjectScore: { color: theme.ink, fontSize: 14.5, fontWeight: '800', fontVariant: ['tabular-nums'] },
+  footNote: { color: theme.ghost, fontSize: 10.5, textAlign: 'center', marginTop: 12 },
+  lineRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
   lineBorder: { borderTopWidth: 1, borderTopColor: theme.line },
   lineBody: { flex: 1 },
   lineTitle: { color: theme.ink, fontSize: 12.5, fontWeight: '600' },
   lineMeta: { color: theme.faint, fontSize: 10, marginTop: 2 },
-  lineScore: { color: theme.ink, fontWeight: '800', fontVariant: ['tabular-nums'], fontSize: 14 },
+  scoreBadge: { flexDirection: 'row', alignItems: 'baseline', gap: 3 },
+  scoreText: { color: theme.ink, fontWeight: '800', fontVariant: ['tabular-nums'], fontSize: 15 },
+  scoreMax: { color: theme.ghost, fontSize: 10, fontWeight: '600' },
   footerSpace: { height: 24 },
 });

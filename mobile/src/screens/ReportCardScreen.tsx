@@ -130,7 +130,7 @@ function Fact({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
   fill: { flex: 1, backgroundColor: theme.bg },
-  content: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 112 },
+  content: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 40 },
   childName: { color: theme.ink, fontSize: 19, fontWeight: '800', marginTop: 6 },
   childMeta: { color: theme.faint, fontSize: 11.5, marginTop: 2, marginBottom: 6 },
   termRow: { gap: 8, paddingVertical: 8 },

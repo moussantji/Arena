@@ -306,7 +306,7 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
   fill: { flex: 1, backgroundColor: theme.bg },
-  content: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 112 },
+  content: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 40 },
   chipRow: { gap: 8, paddingVertical: 4, paddingRight: 16 },
   chip: {
     paddingHorizontal: 13, paddingVertical: 9, borderRadius: 999,

@@ -22,6 +22,7 @@ export const CHANGELOG = [
       'Le serveur de données est réservé au créateur de l’établissement.',
       'Nouveauté : comptes parents — créés par la direction sur le PC, connectés depuis l’application mobile (notes, absences, finances de leurs enfants uniquement).',
       'Nouveauté : application mobile Kalanso (Android) — écran par rôle (parent, enseignant, direction) ; la messagerie y est cloisonnée par fil pour les parents.',
+      'Application mobile : refonte « Indigo Minuit réhaussée » (fond aurore, verre dépoli, indigo → champagne) — et nouvel écran Emploi du temps.',
     ],
   },
   {

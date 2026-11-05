@@ -43,6 +43,11 @@ une fois par version dans la fenêtre **Nouveautés**.
   Expo / React Native ; écran par rôle (parent, enseignant, direction) :
   voir `mobile/README.md`. La messagerie est cloisonnée par enfant pour
   les comptes parents (ils ne voient que leurs fils).
+- Application mobile : refonte visuelle « **Indigo Minuit réhaussée** »
+  (fond aurore, verre dépoli, dégradé indigo → champagne, or cuivré) —
+  connexion, accueil, élèves, fiche élève, notes, finances et nouvel
+  écran **Emploi du temps** (menu « Emploi » de l'accueil personnel).
+  Maquettes de référence dans `gallery/mobile-premium/`.
 - Nouvelle section « Sauvegardes et restauration » dans le guide de
   déploiement LWS (base, photos/documents, .env + test de restauration).
 

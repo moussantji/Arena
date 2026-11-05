@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   addButtonInner: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   addPressed: { opacity: 0.85 },
   addButtonText: { color: '#fff', fontSize: 12.5, fontWeight: '700' },
-  listContent: { paddingHorizontal: 12, paddingBottom: 112, gap: 8 },
+  listContent: { paddingHorizontal: 12, paddingBottom: 40, gap: 8 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
