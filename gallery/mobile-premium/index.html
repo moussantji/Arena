@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalanso Mobile — Maquettes premium « Indigo Minuit »</title>
+<style>
+  :root {
+    --bg: #070b1f;
+    --bg2: #0b1030;
+    --panel: rgba(27, 42, 107, 0.28);
+    --glass: rgba(167, 182, 255, 0.1);
+    --ink: #f0f2ff;
+    --dim: #a7b6ff;
+    --faint: #6b78a8;
+    --line: rgba(167, 182, 255, 0.14);
+    --accent: #5b7cfa;
+    --accent2: #7e9bff;
+    --copper: #e0a86f;
+    --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background:
+      radial-gradient(1100px 520px at 12% -8%, rgba(91, 124, 250, 0.22), transparent 60%),
+      radial-gradient(900px 480px at 92% 4%, rgba(224, 168, 111, 0.14), transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 56px 28px 90px; }
+
+  /* ---------- en-tête ---------- */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11.5px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--copper); border: 1px solid rgba(224, 168, 111, 0.35);
+    padding: 7px 14px; border-radius: 99px; background: rgba(224, 168, 111, 0.08);
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--copper); box-shadow: 0 0 10px var(--copper); }
+  h1 {
+    font-size: clamp(30px, 5vw, 52px); line-height: 1.06; margin: 22px 0 14px;
+    letter-spacing: -0.02em; font-weight: 750;
+  }
+  h1 .grad {
+    background: linear-gradient(100deg, var(--accent2), var(--copper));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .lede { color: var(--dim); font-size: 17px; line-height: 1.65; max-width: 720px; margin: 0 0 34px; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- jetons ---------- */
+  .tokens { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 54px; }
+  .token {
+    display: flex; align-items: center; gap: 11px;
+    background: var(--panel); border: 1px solid var(--line);
+    padding: 10px 16px 10px 10px; border-radius: 14px;
+  }
+  .swatch { width: 34px; height: 34px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.14); }
+  .token b { display: block; font-size: 12.5px; letter-spacing: 0.04em; }
+  .token span { display: block; font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; }
+
+  /* ---------- grille d'écrans ---------- */
+  h2 {
+    font-size: 13px; letter-spacing: 0.26em; text-transform: uppercase;
+    color: var(--copper); margin: 0 0 26px; font-weight: 600;
+    display: flex; align-items: center; gap: 14px;
+  }
+  h2::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(224, 168, 111, 0.4), transparent); }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 30px; margin-bottom: 64px;
+  }
+  .shot {
+    position: relative; border-radius: 22px; overflow: hidden;
+    border: 1px solid var(--line); background: var(--panel);
+    transition: transform 0.35s cubic-bezier(0.22, 0.8, 0.22, 1), box-shadow 0.35s;
+    cursor: zoom-in;
+  }
+  .shot:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 60px rgba(3, 6, 20, 0.55), 0 0 0 1px rgba(126, 155, 255, 0.25), 0 0 42px rgba(91, 124, 250, 0.18);
+  }
+  .shot img { display: block; width: 100%; height: auto; }
+  .shot .num {
+    position: absolute; top: 14px; left: 14px; z-index: 2;
+    font-size: 11px; letter-spacing: 0.18em; color: var(--ink);
+    background: rgba(7, 11, 31, 0.72); border: 1px solid var(--line);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    padding: 6px 11px; border-radius: 99px;
+  }
+  .caption { padding: 18px 20px 20px; }
+  .caption h3 { margin: 0 0 6px; font-size: 16.5px; letter-spacing: -0.01em; }
+  .caption p { margin: 0; color: var(--dim); font-size: 13.5px; line-height: 1.6; }
+
+  /* ---------- principes ---------- */
+  .principles {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 18px; margin-bottom: 20px;
+  }
+  .principle {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 18px; padding: 24px 22px;
+  }
+  .principle .icon {
+    width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    background: var(--glass); border: 1px solid var(--line);
+    font-size: 19px; margin-bottom: 14px;
+  }
+  .principle h3 { margin: 0 0 8px; font-size: 15.5px; }
+  .principle p { margin: 0; color: var(--dim); font-size: 13.5px; line-height: 1.65; }
+
+  footer {
+    margin-top: 70px; padding-top: 26px; border-top: 1px solid var(--line);
+    color: var(--faint); font-size: 12.5px; letter-spacing: 0.05em;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+
+  /* ---------- lightbox ---------- */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 50; display: none;
+    align-items: center; justify-content: center;
+    background: rgba(4, 7, 20, 0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    padding: 30px; cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: min(430px, 92vw); max-height: 90vh; border-radius: 26px;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(167, 182, 255, 0.2);
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>Direction artistique · Kalanso Mobile</span>
+    <h1>L'app de gestion d'école,<br><span class="grad">version mobile ultra premium</span></h1>
+    <p class="lede">
+      Sept maquettes haute fidélité qui transposent l'univers <strong>Indigo Minuit</strong> de la
+      version PC dans une expérience mobile luxe : verre dépoli, aurores profondes, accents champagne
+      et micro-détails soignés. Objectif : valider le design avant le développement.
+    </p>
+
+    <div class="tokens">
+      <div class="token"><div class="swatch" style="background:#070B1F"></div><div><b>Fond profond</b><span>#070B1F</span></div></div>
+      <div class="token"><div class="swatch" style="background:#0B1030"></div><div><b>Surface</b><span>#0B1030</span></div></div>
+      <div class="token"><div class="swatch" style="background:#5B7CFA"></div><div><b>Indigo</b><span>#5B7CFA</span></div></div>
+      <div class="token"><div class="swatch" style="background:#E0A86F"></div><div><b>Champagne</b><span>#E0A86F</span></div></div>
+      <div class="token"><div class="swatch" style="background:#F0F2FF"></div><div><b>Encre</b><span>#F0F2FF</span></div></div>
+      <div class="token"><div class="swatch" style="background:#A7B6FF"></div><div><b>Atone</b><span>#A7B6FF</span></div></div>
+    </div>
+
+    <h2>Les écrans</h2>
+    <div class="grid" id="grid"></div>
+
+    <h2>Principes du langage visuel</h2>
+    <div class="principles">
+      <div class="principle">
+        <div class="icon">◍</div>
+        <h3>Verre &amp; profondeur</h3>
+        <p>Cartes givrées translucides, filets lumineux de 1 px et ombres portées douces : la hiérarchie se lit par la lumière, pas par les bordures.</p>
+      </div>
+      <div class="principle">
+        <div class="icon">✦</div>
+        <h3>Or champagne en touche</h3>
+        <p>L'accent cuivre de Kalanso devient un signal luxe : boutons d'action forts, chiffres clés, soulignés et emblème de marque. Jamais plus de deux surfaces dorées par écran.</p>
+      </div>
+      <div class="principle">
+        <div class="icon">◐</div>
+        <h3>Aurores &amp; matière</h3>
+        <p>Halos dégradés indigo et champagne sur fond marine, particules lumineuses discrètes : chaque écran respire comme une scène, sans jamais gêner la lecture.</p>
+      </div>
+      <div class="principle">
+        <div class="icon">▤</div>
+        <h3>Typographie souveraine</h3>
+        <p>Titres larges et affirmés, lignes secondaires atones, chiffres tabulaires pour les montants. Le français reste parfaitement lisible à chaque densité.</p>
+      </div>
+    </div>
+
+    <footer>
+      <span>KALANSO · MAQUETTES MOBILE PREMIUM · INDIGO MINUIT RÉHAUSSÉE</span>
+      <span>gallery/mobile-premium/ · 7 écrans</span>
+    </footer>
+  </div>
+
+  <div class="lightbox" id="lightbox" title="Fermer"><img id="lightbox-img" alt="Agrandissement de la maquette"></div>
+
+<script>
+  const shots = [
+    { n: '01', img: '01-connexion.png', t: 'Connexion', d: "Ciel aurore, emblème champagne et carte de verre : une entrée en matière qui pose tout de suite le registre premium." },
+    { n: '02', img: '02-accueil.png', t: 'Accueil · Direction', d: "Tableau de bord : salutation, trois KPI vitreux (élèves, présence, encaissé), agenda du jour et actions rapides." },
+    { n: '03', img: '03-eleves.png', t: 'Élèves', d: "Annuaire : recherche vitreuse, filtres de niveau en pastilles, liste avec portraits cerclés d'or et statuts de présence." },
+    { n: '04', img: '04-fiche-eleve.png', t: 'Fiche élève', d: "Profil élève : portrait héros, tuiles de statistiques, onglets segmentés et barres de progression matière indigo → champagne." },
+    { n: '05', img: '05-finances.png', t: 'Finances', d: "Carte héros en dégradé avec mini-graphe d'encaissement, pastilles d'état et factures récentes par élève." },
+    { n: '06', img: '06-notes.png', t: 'Saisie des notes', d: "Sélecteurs classe / matière, liste de saisie avec champ focalisé, moyenne de classe et bouton Enregistrer champagne." },
+    { n: '07', img: '07-emploi-du-temps.png', t: 'Emploi du temps', d: "Semaine en pastilles jour, frise horaire et cartes de cours à liseré coloré, avec pause déjeuner marquée." },
+  ];
+  const grid = document.getElementById('grid');
+  grid.innerHTML = shots.map(s => `
+    <figure class="shot" data-img="${s.img}" style="margin:0">
+      <span class="num">ÉCRAN ${s.n}</span>
+      <img src="${s.img}" alt="${s.t} — maquette mobile Kalanso" loading="lazy">
+      <figcaption class="caption"><h3>${s.t}</h3><p>${s.d}</p></figcaption>
+    </figure>`).join('');
+
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  grid.addEventListener('click', e => {
+    const fig = e.target.closest('.shot');
+    if (!fig) return;
+    lightboxImg.src = fig.dataset.img;
+    lightbox.classList.add('open');
+  });
+  lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.classList.remove('open'); });
+</script>
+</body>
+</html>
