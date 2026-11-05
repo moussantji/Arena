@@ -38,8 +38,11 @@ une fois par version dans la fenêtre **Nouveautés**.
 - Nouveauté : les **comptes parents**. La direction les crée sur le PC
   (Paramètres → Utilisateurs → Comptes parents) en liant un ou plusieurs
   élèves. Le parent se connecte depuis l'application mobile et ne voit
-  que ses enfants (notes, absences, finances). Application mobile en
-  préparation (Play Store).
+  que ses enfants (notes, absences, finances).
+- Nouveauté : **application mobile Kalanso** (Android, Play Store) —
+  Expo / React Native ; écran par rôle (parent, enseignant, direction) :
+  voir `mobile/README.md`. La messagerie est cloisonnée par enfant pour
+  les comptes parents (ils ne voient que leurs fils).
 - Nouvelle section « Sauvegardes et restauration » dans le guide de
   déploiement LWS (base, photos/documents, .env + test de restauration).
 
