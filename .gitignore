@@ -18,3 +18,5 @@ api/opencode.json
 
 # Archives de secours
 kalanso-lws.zip
+*.keystore
+*.jks
