@@ -1,9 +1,23 @@
-/** Cockpit financier (direction et comptabilité) : encaissé, en attente, encaissements mensuels. */
+/**
+ * Cockpit financier premium (direction et comptabilité) : carte héros
+ * encaissement, états des factures, répartitions mensuelles et modes de paiement.
+ */
 import React from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { api } from '../api';
-import { theme } from '../theme';
-import { Card, Empty, ErrorState, Loading, SectionHeader, Pill } from '../ui';
+import { gradients, theme } from '../theme';
+import {
+  Aurora,
+  Card,
+  Empty,
+  ErrorState,
+  HeroCard,
+  Loading,
+  Pill,
+  ScreenHeader,
+  SectionHeader,
+} from '../ui';
 import { money, paymentMethodLabel } from '../format';
 import type { FinanceSummary } from '../types';
 import { useApiQuery } from '../useApiQuery';
@@ -14,6 +28,14 @@ const STATUS_LABEL: Record<string, string> = {
   pending: 'En attente',
   overdue: 'En retard',
   cancelled: 'Annulées',
+};
+
+const STATUS_TONE: Record<string, 'ok' | 'accent' | 'copper' | 'danger' | 'muted'> = {
+  paid: 'ok',
+  partial: 'accent',
+  pending: 'copper',
+  overdue: 'danger',
+  cancelled: 'muted',
 };
 
 export default function FinancesScreen() {
@@ -35,99 +57,130 @@ export default function FinancesScreen() {
   const data = summary.data;
   const maxMonth = Math.max(1, ...data.monthly.map((month) => month.total));
   const maxMethod = Math.max(1, ...data.byMethod.map((method) => method.total));
+  const currentMonth = data.monthly[data.monthly.length - 1];
+  const previousMonth = data.monthly[data.monthly.length - 2];
+  const trend = currentMonth && previousMonth && previousMonth.total > 0
+    ? Math.round(((currentMonth.total - previousMonth.total) / previousMonth.total) * 100)
+    : null;
 
   return (
-    <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={false} onRefresh={summary.reload} tintColor={theme.accent} />}
-    >
-      <SectionHeader title={`Exercice ${year}`} />
+    <View style={styles.screen}>
+      <Aurora />
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={false} onRefresh={summary.reload} tintColor={theme.accent} />}
+      >
+        <ScreenHeader title="Finances" sub={`Année scolaire ${year}`} />
 
-      <View style={styles.grid}>
-        <Kpi label="Facturé" value={money(data.invoiced)} tone="plain" />
-        <Kpi label="Encaissé" value={money(data.collected)} tone="ok" />
-        <Kpi label="En attente" value={money(data.outstanding)} tone="copper" />
-        <Kpi label="En retard" value={money(data.overdue)} tone="danger" />
-      </View>
-
-      <SectionHeader title="Encaissements par mois" />
-      <Card>
-        {data.monthly.length === 0 ? (
-          <Text style={styles.muted}>Aucun encaissement enregistré cette année.</Text>
-        ) : (
-          <View style={styles.chart}>
-            {data.monthly.map((month) => (
-              <View key={month.month} style={styles.barColumn}>
-                <Text style={styles.barAmount} numberOfLines={1}>
-                  {month.total >= 1000 ? `${Math.round(month.total / 1000)} k` : String(Math.round(month.total))}
-                </Text>
-                <View style={styles.barTrack}>
-                  <View style={[styles.barFill, { height: `${Math.max(6, Math.round((month.total / maxMonth) * 100))}%` }]} />
+        <HeroCard style={styles.hero}>
+          <View style={styles.heroTop}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.heroLabel}>ENCAISSÉ · ANNÉE</Text>
+              <Text style={styles.heroValue} numberOfLines={1} adjustsFontSizeToFit>{money(data.collected)}</Text>
+              {trend != null ? (
+                <View style={styles.heroTrend}>
+                  <Text style={styles.heroTrendText}>
+                    {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)} % ce mois
+                  </Text>
                 </View>
-                <Text style={styles.barLabel}>{month.label}</Text>
-              </View>
-            ))}
+              ) : null}
+            </View>
+            <View style={styles.heroChart}>
+              {data.monthly.slice(-6).map((month) => (
+                <View key={month.month} style={styles.heroBarColumn}>
+                  <View
+                    style={[
+                      styles.heroBar,
+                      { height: `${Math.max(10, Math.round((month.total / maxMonth) * 100))}%` },
+                    ]}
+                  />
+                </View>
+              ))}
+            </View>
           </View>
-        )}
-      </Card>
+          <View style={styles.heroFooter}>
+            <Text style={styles.heroFootText}>Facturé {money(data.invoiced)}</Text>
+            <Text style={styles.heroFootText}>Encaissé {money(data.collected)}</Text>
+          </View>
+        </HeroCard>
 
-      <SectionHeader title="Par mode de paiement" />
-      <Card>
-        {data.byMethod.length === 0 ? (
-          <Text style={styles.muted}>Aucun paiement encaissé.</Text>
-        ) : (
-          data.byMethod.map((method) => (
-            <View key={method.method} style={styles.methodRow}>
-              <Text style={styles.methodName} numberOfLines={1}>{paymentMethodLabel(method.method)}</Text>
-              <View style={styles.methodTrack}>
-                <View style={[styles.methodFill, { width: `${Math.round((method.total / maxMethod) * 100)}%` }]} />
-              </View>
-              <Text style={styles.methodValue} numberOfLines={1}>{money(method.total)}</Text>
-            </View>
-          ))
-        )}
-      </Card>
-
-      <SectionHeader title="Par type de frais" />
-      <Card>
-        {data.byFeeType.length === 0 ? (
-          <Text style={styles.muted}>Aucune facture émise.</Text>
-        ) : (
-          data.byFeeType.map((row) => (
-            <View key={row.code ?? row.fee} style={styles.feeRow}>
-              <Text style={styles.feeName} numberOfLines={1}>{row.fee}</Text>
-              <Text style={styles.feeValue} numberOfLines={1}>{money(row.invoiced)}</Text>
-            </View>
-          ))
-        )}
-      </Card>
-
-      <SectionHeader title="État des factures" />
-      <Card>
-        <View style={styles.breakdownRow}>
+        <View style={styles.statusRow}>
           {data.statusBreakdown.map((row) => (
-            <View key={row.status} style={styles.breakdownItem}>
-              <Text style={styles.breakdownCount}>{row.count}</Text>
-              <Text style={styles.breakdownLabel}>{STATUS_LABEL[row.status] ?? row.status}</Text>
-              <Text style={styles.breakdownTotal}>{money(Number(row.total))}</Text>
+            <View key={row.status} style={styles.statusChip}>
+              <Pill
+                label={`${STATUS_LABEL[row.status] ?? row.status} · ${row.count}`}
+                tone={STATUS_TONE[row.status] ?? 'muted'}
+              />
+              <Text style={styles.statusAmount}>{money(Number(row.total))}</Text>
             </View>
           ))}
         </View>
-      </Card>
 
-      <View style={styles.footerSpace} />
-    </ScrollView>
-  );
-}
+        <SectionHeader title="Encaissements par mois" />
+        <Card>
+          {data.monthly.length === 0 ? (
+            <Text style={styles.muted}>Aucun encaissement enregistré cette année.</Text>
+          ) : (
+            <View style={styles.chart}>
+              {data.monthly.map((month) => (
+                <View key={month.month} style={styles.barColumn}>
+                  <Text style={styles.barAmount} numberOfLines={1}>
+                    {month.total >= 1000 ? `${Math.round(month.total / 1000)} k` : String(Math.round(month.total))}
+                  </Text>
+                  <View style={styles.barTrack}>
+                    <LinearGradient
+                      colors={gradients.progress}
+                      start={{ x: 0, y: 1 }}
+                      end={{ x: 0, y: 0 }}
+                      style={[styles.barFill, { height: `${Math.max(6, Math.round((month.total / maxMonth) * 100))}%` }]}
+                    />
+                  </View>
+                  <Text style={styles.barLabel}>{month.label}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </Card>
 
-function Kpi({ label, value, tone }: { label: string; value: string; tone: 'plain' | 'ok' | 'copper' | 'danger' }) {
-  const color = tone === 'ok' ? theme.ok : tone === 'copper' ? theme.copper : tone === 'danger' ? theme.danger : theme.ink;
+        <SectionHeader title="Par mode de paiement" />
+        <Card>
+          {data.byMethod.length === 0 ? (
+            <Text style={styles.muted}>Aucun paiement encaissé.</Text>
+          ) : (
+            data.byMethod.map((method) => (
+              <View key={method.method} style={styles.methodRow}>
+                <Text style={styles.methodName} numberOfLines={1}>{paymentMethodLabel(method.method)}</Text>
+                <View style={styles.methodTrack}>
+                  <LinearGradient
+                    colors={gradients.progress}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[styles.methodFill, { width: `${Math.round((method.total / maxMethod) * 100)}%` }]}
+                  />
+                </View>
+                <Text style={styles.methodValue} numberOfLines={1}>{money(method.total)}</Text>
+              </View>
+            ))
+          )}
+        </Card>
 
-  return (
-    <View style={styles.kpi}>
-      <Text style={styles.kpiLabel}>{label.toUpperCase()}</Text>
-      <Text style={[styles.kpiValue, { color }]} numberOfLines={1} adjustsFontSizeToFit>{value}</Text>
+        <SectionHeader title="Par type de frais" />
+        <Card>
+          {data.byFeeType.length === 0 ? (
+            <Text style={styles.muted}>Aucune facture émise.</Text>
+          ) : (
+            data.byFeeType.map((row) => (
+              <View key={row.code ?? row.fee} style={styles.feeRow}>
+                <Text style={styles.feeName} numberOfLines={1}>{row.fee}</Text>
+                <Text style={styles.feeValue} numberOfLines={1}>{money(row.invoiced)}</Text>
+              </View>
+            ))
+          )}
+        </Card>
+
+        <View style={styles.footerSpace} />
+      </ScrollView>
     </View>
   );
 }
@@ -135,20 +188,47 @@ function Kpi({ label, value, tone }: { label: string; value: string; tone: 'plai
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
   fill: { flex: 1, backgroundColor: theme.bg },
-  content: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 44 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  kpi: {
-    flexBasis: '47%',
-    flexGrow: 1,
-    backgroundColor: theme.surface,
+  content: { paddingHorizontal: 16, paddingBottom: 44 },
+  hero: { marginTop: 12 },
+  heroTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 14 },
+  heroLabel: { color: 'rgba(240, 242, 255, 0.75)', fontSize: 9.5, letterSpacing: 1.6, fontWeight: '700' },
+  heroValue: { color: '#FFFFFF', fontSize: 27, fontWeight: '800', fontVariant: ['tabular-nums'], marginTop: 5 },
+  heroTrend: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(7, 11, 31, 0.28)',
+    borderRadius: 999,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    marginTop: 8,
     borderWidth: 1,
-    borderColor: theme.line,
-    borderRadius: theme.radius,
-    padding: 14,
-    gap: 6,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
   },
-  kpiLabel: { color: theme.faint, fontSize: 8.5, letterSpacing: 1.2, fontWeight: '700' },
-  kpiValue: { fontSize: 20, fontWeight: '800', fontVariant: ['tabular-nums'] },
+  heroTrendText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
+  heroChart: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 5,
+    height: 62,
+    marginTop: 6,
+  },
+  heroBarColumn: { flex: 1, height: '100%', justifyContent: 'flex-end' },
+  heroBar: {
+    width: '100%',
+    borderRadius: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+  },
+  heroFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.18)',
+  },
+  heroFootText: { color: 'rgba(240, 242, 255, 0.85)', fontSize: 11, fontWeight: '600', fontVariant: ['tabular-nums'] },
+  statusRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 14 },
+  statusChip: { alignItems: 'center', gap: 5 },
+  statusAmount: { color: theme.faint, fontSize: 10, fontVariant: ['tabular-nums'] },
   muted: { color: theme.faint, fontSize: 12 },
   chart: {
     flexDirection: 'row',
@@ -163,44 +243,28 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     justifyContent: 'flex-end',
-    backgroundColor: theme.surfaceAlt,
+    backgroundColor: 'rgba(7, 11, 31, 0.55)',
     borderRadius: 6,
     overflow: 'hidden',
   },
-  barFill: { backgroundColor: theme.accentStrong, width: '100%', borderRadius: 6 },
+  barFill: { width: '100%', borderRadius: 6 },
   barLabel: { color: theme.faint, fontSize: 8.5, fontWeight: '600' },
-  methodRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
-  methodName: { width: 110, color: theme.ink, fontSize: 11.5, fontWeight: '600' },
+  methodRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 7 },
+  methodName: { width: 110, color: theme.inkSoft, fontSize: 11.5, fontWeight: '600' },
   methodTrack: {
-    flex: 1, height: 8, borderRadius: 4, backgroundColor: theme.surfaceAlt, overflow: 'hidden',
+    flex: 1, height: 8, borderRadius: 4, backgroundColor: 'rgba(7, 11, 31, 0.55)', overflow: 'hidden',
   },
-  methodFill: { height: 8, borderRadius: 4, backgroundColor: theme.copper },
+  methodFill: { height: 8, borderRadius: 4 },
   methodValue: { width: 96, textAlign: 'right', color: theme.ink, fontSize: 10.5, fontVariant: ['tabular-nums'] },
   feeRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 12,
-    paddingVertical: 8,
+    paddingVertical: 9,
     borderBottomWidth: 1,
     borderBottomColor: theme.line,
   },
-  feeName: { flex: 1, color: theme.ink, fontSize: 12.5 },
+  feeName: { flex: 1, color: theme.inkSoft, fontSize: 12.5 },
   feeValue: { color: theme.ink, fontSize: 12, fontWeight: '700', fontVariant: ['tabular-nums'] },
-  breakdownRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  breakdownItem: {
-    flexBasis: '30%',
-    flexGrow: 1,
-    backgroundColor: theme.surfaceSoft,
-    borderRadius: theme.radiusSm,
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-    gap: 2,
-    borderWidth: 1,
-    borderColor: theme.line,
-  },
-  breakdownCount: { color: theme.ink, fontSize: 18, fontWeight: '800' },
-  breakdownLabel: { color: theme.faint, fontSize: 8, letterSpacing: 0.6, fontWeight: '700', textTransform: 'uppercase' },
-  breakdownTotal: { color: theme.faint, fontSize: 9, fontVariant: ['tabular-nums'] },
   footerSpace: { height: 24 },
 });

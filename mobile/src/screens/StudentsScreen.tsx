@@ -1,33 +1,64 @@
-/** Liste des élèves (personnel) : recherche, pagination, accès à la fiche. */
-import React, { useEffect, useState } from 'react';
+/**
+ * Liste des élèves premium : recherche, filtres de classe, pagination,
+ * portraits cerclés d'or et accès à la fiche.
+ */
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 import { api, ApiError } from '../api';
 import { theme } from '../theme';
-import { Avatar, Empty, ErrorState, Loading, Pill } from '../ui';
+import {
+  Aurora,
+  Avatar,
+  Chip,
+  ChipRow,
+  Empty,
+  ErrorState,
+  Loading,
+  Pill,
+  ScreenHeader,
+  SearchBar,
+  type PillTone,
+} from '../ui';
 import { fullName } from '../format';
-import type { StudentListPage, StudentRow } from '../types';
+import { useApiQuery } from '../useApiQuery';
+import type { SchoolClassSummary, StudentListPage, StudentRow } from '../types';
 import type { RootStackParamList } from '../RootNavigator';
+
+function statusTone(status?: string | null): PillTone {
+  const value = (status ?? '').toLowerCase();
+  if (value.includes('actif')) return 'ok';
+  if (value.includes('inact') || value.includes('sort')) return 'muted';
+  if (value.includes('attent')) return 'copper';
+  return 'accent';
+}
 
 export default function StudentsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [query, setQuery] = useState('');
   const [debounced, setDebounced] = useState('');
+  const [classId, setClassId] = useState<number | null>(null);
   const [items, setItems] = useState<StudentRow[]>([]);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const classesQuery = useApiQuery<{ classes: SchoolClassSummary[] }>(
+    () => api.get<{ classes: SchoolClassSummary[] }>('/classes'),
+    [],
+  );
+  const classes = useMemo(() => classesQuery.data?.classes ?? [], [classesQuery.data]);
 
   useEffect(() => {
     const handle = setTimeout(() => setDebounced(query.trim()), 350);
@@ -42,6 +73,7 @@ export default function StudentsScreen() {
 
     const params = new URLSearchParams({ per_page: '25', page: '1' });
     if (debounced) params.set('q', debounced);
+    if (classId != null) params.set('class_id', String(classId));
 
     api.get<StudentListPage>(`/students?${params.toString()}`)
       .then((result) => {
@@ -60,7 +92,7 @@ export default function StudentsScreen() {
     return () => {
       cancelled = true;
     };
-  }, [debounced]);
+  }, [debounced, classId]);
 
   const loadMore = () => {
     if (loadingMore || page >= lastPage) return;
@@ -68,6 +100,7 @@ export default function StudentsScreen() {
     const nextPage = page + 1;
     const params = new URLSearchParams({ per_page: '25', page: String(nextPage) });
     if (debounced) params.set('q', debounced);
+    if (classId != null) params.set('class_id', String(classId));
 
     api.get<StudentListPage>(`/students?${params.toString()}`)
       .then((result) => {
@@ -81,22 +114,29 @@ export default function StudentsScreen() {
 
   return (
     <View style={styles.screen}>
-      <View style={styles.searchBar}>
-        <TextInput
-          style={styles.searchInput}
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Rechercher un élève (nom, matricule)…"
-          placeholderTextColor={theme.faint}
-          autoCorrect={false}
-          autoCapitalize="none"
-          accessibilityLabel="Recherche d'élève"
-        />
-        {query.length > 0 && (
-          <Pressable onPress={() => setQuery('')} hitSlop={10} accessibilityLabel="Effacer la recherche">
-            <Text style={styles.clearButton}>✕</Text>
-          </Pressable>
-        )}
+      <Aurora />
+      <View style={styles.head}>
+        <ScreenHeader title="Élèves" sub={`${items.length ? `${items.length} affichés · ` : ''}annuaire de l’établissement`} />
+        <View style={styles.searchWrap}>
+          <SearchBar
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Rechercher un élève (nom, matricule)…"
+            accessibilityLabel="Recherche d'élève"
+          />
+        </View>
+        <ChipRow style={styles.chips}>
+          <Chip label="Tous" active={classId == null} onPress={() => setClassId(null)} small />
+          {classes.map((entry) => (
+            <Chip
+              key={entry.id}
+              label={entry.name}
+              active={entry.id === classId}
+              onPress={() => setClassId(entry.id === classId ? null : entry.id)}
+              small
+            />
+          ))}
+        </ChipRow>
       </View>
 
       {loading ? (
@@ -114,6 +154,7 @@ export default function StudentsScreen() {
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={styles.listContent}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
           onEndReachedThreshold={0.4}
           onEndReached={loadMore}
           ListFooterComponent={(
@@ -132,20 +173,20 @@ export default function StudentsScreen() {
               style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
               accessibilityRole="button"
             >
-              <Avatar name={fullName(item)} size={44} />
+              <Avatar name={fullName(item)} size={46} ring />
               <View style={styles.rowInfo}>
                 <Text style={styles.rowName} numberOfLines={1}>{fullName(item)}</Text>
                 <Text style={styles.rowMeta} numberOfLines={1}>
-                  {item.matricule ?? 'Sans matricule'} · {item.school_class?.name ?? 'Sans classe'}
+                  {item.school_class?.name ?? 'Sans classe'} · {item.matricule ?? 'Sans matricule'}
                 </Text>
-                <View style={styles.rowFooter}>
-                  {item.status ? <Pill label={item.status} tone="muted" /> : null}
-                  {item.average != null ? (
-                    <Text style={styles.average}>Moy. {Number(item.average).toFixed(2)}</Text>
-                  ) : null}
-                </View>
               </View>
-              <Text style={styles.chevron}>›</Text>
+              <View style={styles.rowRight}>
+                {item.status ? <Pill label={item.status} tone={statusTone(item.status)} /> : null}
+                {item.average != null ? (
+                  <Text style={styles.average}>Moy. {Number(item.average).toFixed(1)}</Text>
+                ) : null}
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={theme.ghost} />
             </Pressable>
           )}
         />
@@ -156,22 +197,10 @@ export default function StudentsScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    margin: 12,
-    marginBottom: 4,
-    paddingHorizontal: 14,
-    height: 46,
-    backgroundColor: theme.surfaceAlt,
-    borderRadius: theme.radiusSm,
-    borderWidth: 1,
-    borderColor: theme.line,
-  },
-  searchInput: { flex: 1, color: theme.ink, fontSize: 14 },
-  clearButton: { color: theme.faint, fontSize: 15, paddingHorizontal: 4 },
-  listContent: { paddingHorizontal: 12, paddingBottom: 30, gap: 8 },
+  head: { paddingHorizontal: 16 },
+  searchWrap: { marginTop: 6 },
+  chips: { marginTop: 12, marginHorizontal: -16 },
+  listContent: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 30, gap: 9 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -183,12 +212,11 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   rowPressed: { backgroundColor: theme.surfaceAlt },
-  rowInfo: { flex: 1, gap: 2 },
-  rowName: { color: theme.ink, fontSize: 13.5, fontWeight: '700' },
-  rowMeta: { color: theme.faint, fontSize: 10.5 },
-  rowFooter: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 3 },
-  average: { color: theme.accent, fontSize: 10.5, fontWeight: '700', fontVariant: ['tabular-nums'] },
-  chevron: { color: theme.faint, fontSize: 22 },
+  rowInfo: { flex: 1, gap: 3 },
+  rowName: { color: theme.ink, fontSize: 14, fontWeight: '700' },
+  rowMeta: { color: theme.faint, fontSize: 11 },
+  rowRight: { alignItems: 'flex-end', gap: 5 },
+  average: { color: theme.copper, fontSize: 10.5, fontWeight: '700', fontVariant: ['tabular-nums'] },
   footer: { alignItems: 'center', paddingVertical: 14, gap: 8 },
   loadMoreButton: {
     borderWidth: 1,

@@ -234,3 +234,21 @@ export interface Thread {
   unread_count?: number;
   messages?: Message[];
 }
+
+export interface TimetableSlot {
+  id: number;
+  day_of_week: number;
+  starts_at: string;
+  ends_at: string;
+  room: string | null;
+  is_live?: boolean;
+  subject?: { id: number; name: string; code: string | null } | null;
+  staff?: { id: number; first_name: string; last_name: string } | null;
+  schoolClass?: { id: number; name: string; level: string | null; room: string | null } | null;
+  term?: { id: number; name: string } | null;
+}
+
+export interface TimetableResponse {
+  slots: TimetableSlot[];
+  days: { day: number; label: string; slots: TimetableSlot[] }[];
+}

@@ -1,20 +1,21 @@
-/** Écran de connexion — épuré : logo, établissement, e-mail, mot de passe. */
+/**
+ * Connexion premium : ciel aurore, emblème champagne, carte de verre.
+ */
 import React, { useState } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../auth';
-import { theme, spacing } from '../theme';
-import { Button, Field } from '../ui';
+import { gradients, theme } from '../theme';
+import { Aurora, Button, Field } from '../ui';
 
 export default function LoginScreen() {
   const { signIn, signingIn, error, clearError } = useAuth();
@@ -28,6 +29,7 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.screen}>
+      <Aurora dense />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -38,17 +40,25 @@ export default function LoginScreen() {
           bounces={false}
         >
           <View style={styles.hero}>
-            <View style={styles.glow} />
-            <Image
-              source={require('../../assets/icon.png')}
-              style={styles.logo}
-              accessibilityLabel="Logo Kalanso"
-            />
-            <Text style={styles.name}>Kalanso</Text>
-            <Text style={styles.tagline}>L’école dans votre poche</Text>
+            <LinearGradient
+              colors={gradients.gold}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.emblemRing}
+            >
+              <View style={styles.emblemCore}>
+                <Image
+                  source={require('../../assets/icon.png')}
+                  style={styles.logo}
+                  accessibilityLabel="Logo Kalanso"
+                />
+              </View>
+            </LinearGradient>
+            <Text style={styles.name}>KALANSO</Text>
+            <Text style={styles.tagline}>Gestion d’école</Text>
           </View>
 
-          <View style={styles.form}>
+          <View style={styles.formCard}>
             <Field
               label="Adresse e-mail"
               autoCapitalize="none"
@@ -97,13 +107,19 @@ export default function LoginScreen() {
               style={styles.submit}
             />
 
+            <View style={styles.helpRow}>
+              <View style={styles.helpLine} />
+              <Text style={styles.helpMark}>KALANSO · SÉCURISÉ</Text>
+              <View style={styles.helpLine} />
+            </View>
+
             <Text style={styles.help}>
               Les comptes sont créés par l’établissement. En cas d’oubli du mot de passe,
               adressez-vous à la direction.
             </Text>
           </View>
 
-          <Text style={styles.footer}>Kalanso · Application de l’établissement</Text>
+          <Text style={styles.footer}>Application de l’établissement</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -113,22 +129,46 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
   flex: { flex: 1 },
-  scroll: { flexGrow: 1, paddingHorizontal: spacing.xl, paddingTop: 48, paddingBottom: 28 },
-  hero: { alignItems: 'center', marginBottom: 34 },
-  glow: {
-    position: 'absolute',
-    top: -60,
-    width: 260,
-    height: 260,
-    borderRadius: 130,
-    backgroundColor: 'rgba(91, 124, 250, 0.14)',
+  scroll: { flexGrow: 1, paddingHorizontal: 22, paddingTop: 36, paddingBottom: 28 },
+  hero: { alignItems: 'center', marginBottom: 30 },
+  emblemRing: {
+    width: 104,
+    height: 104,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: theme.copper,
+    shadowOpacity: 0.5,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 8,
   },
-  logo: { width: 96, height: 96, borderRadius: 22 },
-  name: { color: theme.ink, fontSize: 30, fontWeight: '800', letterSpacing: 0.4, marginTop: 14 },
-  tagline: { color: theme.faint, fontSize: 12.5, marginTop: 2 },
-  form: { width: '100%' },
+  emblemCore: {
+    width: 98,
+    height: 98,
+    borderRadius: 27,
+    backgroundColor: theme.bg2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: { width: 78, height: 78, borderRadius: 20 },
+  name: {
+    color: theme.ink,
+    fontSize: 28,
+    fontWeight: '800',
+    letterSpacing: 7,
+    marginTop: 18,
+  },
+  tagline: { color: theme.faint, fontSize: 13, letterSpacing: 2.4, marginTop: 6, textTransform: 'uppercase' },
+  formCard: {
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.lineStrong,
+    borderRadius: theme.radiusLg,
+    padding: 20,
+  },
   errorBox: {
-    backgroundColor: 'rgba(240, 138, 138, 0.12)',
+    backgroundColor: theme.dangerSoft,
     borderWidth: 1,
     borderColor: 'rgba(240, 138, 138, 0.4)',
     borderRadius: theme.radiusSm,
@@ -137,12 +177,16 @@ const styles = StyleSheet.create({
   },
   errorText: { color: theme.danger, fontSize: 12.5, lineHeight: 18 },
   submit: { marginTop: 4 },
-  help: { color: theme.faint, fontSize: 11, lineHeight: 16, marginTop: 16, textAlign: 'center' },
+  helpRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 18, marginBottom: 10 },
+  helpLine: { flex: 1, height: 1, backgroundColor: theme.line },
+  helpMark: { color: theme.ghost, fontSize: 8.5, letterSpacing: 1.6, fontWeight: '700' },
+  help: { color: theme.faint, fontSize: 11, lineHeight: 16, textAlign: 'center' },
   footer: {
     color: 'rgba(167, 182, 255, 0.35)',
     fontSize: 10.5,
-    letterSpacing: 0.6,
+    letterSpacing: 1.2,
     textAlign: 'center',
-    marginTop: 36,
+    marginTop: 28,
+    textTransform: 'uppercase',
   },
 });
