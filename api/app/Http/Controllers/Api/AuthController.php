@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Support\DesktopAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -33,6 +34,10 @@ class AuthController extends Controller
             );
             throw ValidationException::withMessages(['email' => ['Identifiants invalides.']]);
         }
+
+        // Restriction PC : les comptes enseignants utilisent (à venir)
+        // l'application mobile, pas le poste de l'établissement.
+        DesktopAccess::assertAllowed($user, $data['device_name'] ?? 'kalanso-desktop');
 
         $token = $user->createToken($data['device_name'] ?? 'desktop')->plainTextToken;
         AuditLog::record('auth.login', $user, "Connexion : {$user->name}", [], $user);

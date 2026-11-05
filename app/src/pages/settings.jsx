@@ -615,7 +615,19 @@ export function Parametres() {
                 </div>
               </Card>
 
-              {window.desktopAPI && (
+              {window.desktopAPI && !user?.is_creator && user?.role === 'direction' && (
+                <Card>
+                  <CardHead
+                    title="Serveur de données"
+                    sub="Emplacement des données de l’établissement."
+                    right={<Pill tone="muted">Réservé</Pill>}
+                  />
+                  <p className="form-hint" style={{ padding: '4px 2px' }}>
+                    Le serveur de données est géré par le créateur de l’établissement.
+                  </p>
+                </Card>
+              )}
+              {window.desktopAPI && user?.is_creator && (
                 <Card>
                   <CardHead
                     title="Serveur de données"

@@ -28,6 +28,13 @@ une fois par version dans la fenêtre **Nouveautés**.
   connues (http-foundation, http-kernel, mime, routing, yaml) sont corrigées.
 - En-têtes de sécurité HTTP ajoutés (HSTS, nosniff, anti-cadrage,
   Referrer-Policy) — sans effet si le serveur ne les supporte pas.
+- Restriction PC : l'application de bureau refuse désormais la connexion
+  des comptes enseignants (et, plus tard, parents) — réservée à la
+  direction, au secrétariat et à la comptabilité. Les enseignants
+  utiliseront l'application mobile Kalanso.
+- Le « Serveur de données » (Paramètres) est désormais réservé au
+  **créateur** de l'établissement (le premier compte créé), plus aux
+  autres comptes de direction.
 - Nouvelle section « Sauvegardes et restauration » dans le guide de
   déploiement LWS (base, photos/documents, .env + test de restauration).
 

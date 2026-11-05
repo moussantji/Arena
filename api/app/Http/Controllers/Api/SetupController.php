@@ -95,6 +95,8 @@ class SetupController extends Controller
                 'role' => User::ROLE_DIRECTION,
                 'email_verified_at' => now(),
             ]);
+            // Le premier compte créé est le créateur de l'établissement.
+            $user->forceFill(['is_creator' => true])->save();
 
             return [
                 'school' => $school->fresh(),
