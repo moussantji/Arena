@@ -269,6 +269,44 @@ class ParentAccessTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_parent_only_sees_own_threads_and_never_internal_staff_threads(): void
+    {
+        $direction = $this->createUser('direction@exemple.test', User::ROLE_DIRECTION);
+        $parent = $this->createUser('parent@exemple.test', User::ROLE_PARENT);
+
+        // Fil interne créé par la direction.
+        $directionToken = $direction->createToken('kalanso-mobile')->plainTextToken;
+        $staffThreadId = (int) $this->withToken($directionToken)->postJson('/api/threads', [
+            'subject' => 'Conseil de classe',
+            'type' => 'internal',
+            'body' => 'Point interne au personnel.',
+        ])->assertCreated()->json('thread.id');
+
+        // Le parent ne voit pas le fil interne, même en direct.
+        auth()->forgetGuards();
+        $parentToken = $parent->createToken('kalanso-mobile')->plainTextToken;
+        $this->withToken($parentToken)->getJson('/api/threads')
+            ->assertOk()
+            ->assertJsonCount(0, 'threads');
+        $this->withToken($parentToken)->getJson("/api/threads/{$staffThreadId}")->assertNotFound();
+        $this->withToken($parentToken)->postJson("/api/threads/{$staffThreadId}/messages", [
+            'body' => 'Je sors du rang.',
+        ])->assertNotFound();
+
+        // Le parent ouvre son propre fil ; le type est forcé à « parent ».
+        auth()->forgetGuards();
+        $ownThreadId = (int) $this->withToken($parentToken)->postJson('/api/threads', [
+            'subject' => 'Sortie scolaire',
+            'body' => 'Bonjour, une question.',
+            'type' => 'internal',
+        ])->assertCreated()->assertJsonPath('thread.type', 'parent')->json('thread.id');
+        $this->withToken($parentToken)->getJson("/api/threads/{$ownThreadId}")->assertOk();
+
+        // Le personnel, lui, voit tous les fils.
+        auth()->forgetGuards();
+        $this->withToken($directionToken)->getJson("/api/threads/{$ownThreadId}")->assertOk();
+    }
+
     private function createUser(string $email, string $role): User
     {
         return User::create([
