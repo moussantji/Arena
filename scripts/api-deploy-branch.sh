@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
-# Reconstruit la branche deploy/lws : code courant + dépendances de l'API (vendor).
+# Met à jour la branche deploy/lws : code courant + dépendances de l'API (vendor).
 #
 # Cette branche est celle que le déploiement Git de l'hébergeur récupère.
 # Elle embarque api/vendor pour fonctionner sans Composer sur le serveur.
 #
+# La branche est APPEND-ONLY : chaque déploiement ajoute un commit au-dessus
+# du précédent. Ne jamais la supprimer, la recréer ni la forcer — l'hébergeur
+# (clone local) ne peut récupérer les mises à jour que par fast-forward.
+#
 # Utilisation (depuis n'importe où dans le dépôt, sur une branche de travail
 # avec un arbre propre) :
 #   bash scripts/api-deploy-branch.sh
-#   git push origin deploy/lws --force
+#   git push origin deploy/lws
 
 set -euo pipefail
 
@@ -26,20 +30,27 @@ if ! git diff-index --quiet HEAD --; then
   exit 1
 fi
 
-git branch -D "$BRANCH" 2>/dev/null || true
-git checkout -b "$BRANCH"
+# Construit le nouvel arbre SANS toucher au répertoire de travail :
+# index temporaire = branche de travail + api/vendor (ajouté en force).
+TMP_INDEX="$(git rev-parse --git-dir)/index-kalanso-deploy"
+rm -f "$TMP_INDEX"
+trap 'rm -f "$TMP_INDEX"' EXIT
 
-# Les dépendances sont ajoutées en force : elles restent ignorées dans les
-# branches de développement (voir api/.gitignore).
-git add -f api/vendor
-git commit -m "Déploiement : dépendances de l'API incluses (vendor)"
+GIT_INDEX_FILE="$TMP_INDEX" git read-tree "$PREVIOUS"
+GIT_INDEX_FILE="$TMP_INDEX" git add -f api/vendor
+NEW_TREE="$(GIT_INDEX_FILE="$TMP_INDEX" git write-tree)"
+rm -f "$TMP_INDEX"
+trap - EXIT
 
-git checkout "$PREVIOUS"
+CURRENT_TREE="$(git rev-parse "$BRANCH^{tree}")"
+if [[ "$NEW_TREE" == "$CURRENT_TREE" ]]; then
+  echo "deploy/lws est déjà à jour (arbre identique). Rien à commiter."
+  exit 0
+fi
 
-# Le checkout retire api/vendor (non suivi sur la branche de travail) :
-# on le restaure depuis la branche de déploiement pour le développement.
-git restore --source="$BRANCH" --worktree -- api/vendor
+git update-ref "refs/heads/$BRANCH" \
+  "$(git commit-tree "$NEW_TREE" -p "$(git rev-parse "$BRANCH")" \
+      -m "Déploiement : code et dépendances de l'API ($(date +%Y-%m-%d), depuis $(git rev-parse --short "$PREVIOUS"))")"
 
-echo ""
-echo "Branche '$BRANCH' prête à partir du code de '$PREVIOUS'."
-echo "Pour la publier : git push origin $BRANCH --force"
+echo "deploy/lws mis à jour (append-only, pas de force push)."
+echo "Pour la publier : git push origin $BRANCH"

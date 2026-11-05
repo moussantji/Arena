@@ -15,7 +15,8 @@ pourra s'y connecter depuis n'importe quel poste.
 - `api/.env.production.example` — modèle de configuration prêt pour le
   sous-domaine ;
 - branche `deploy/lws` — le code + les dépendances (`api/vendor`) incluses,
-  car l'hébergeur ne lance pas Composer ;
+  car l'hébergeur ne lance pas Composer ; branche **append-only** : ne la
+  forcez (push) jamais, l'hébergeur cale sur l'historique ;
 - confiance aux proxys activée (HTTPS détecté correctement derrière l'hébergeur).
 
 ---
@@ -102,8 +103,13 @@ Sur votre PC :
 ```bash
 # une fois les changements commités sur votre branche
 bash scripts/api-deploy-branch.sh
-git push origin deploy/lws --force
+git push origin deploy/lws
 ```
+
+> `deploy/lws` n'est **jamais forcée** : la branche ne fait qu'avancer
+> (append-only). Un `git push --force` cassait la mise à jour côté
+> hébergeur (il cale sur l'historique). L'historique a été réconcilié le
+> 5 novembre 2026 pour aligner l'état ; tout est un fast-forward depuis.
 
 Puis dans **LWS Panel → Git → Déployer** à nouveau. Pour appliquer
 d'éventuelles nouvelles migrations : réimportez le schéma mis à jour
@@ -112,7 +118,7 @@ migrate --force` en SSH — les données sont conservées) ou demandez le SQL de
 migrations manquantes.
 
 **Mise à jour du 5 novembre 2026 (journal d'audit + verrouillage des périodes)** :
-déployez d'abord la branche `deploy/lws` reconstruite, puis dans phpMyAdmin
+déployez d'abord la branche `deploy/lws`, puis dans phpMyAdmin
 (onglet SQL) exécutez le contenu de
 `api/database/schema/kalanso-migrations-2026-11-05.sql`. Ce script est sans
 danger pour les données : il crée la table `audit_logs` et ajoute la colonne
