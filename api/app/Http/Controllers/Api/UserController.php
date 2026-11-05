@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,6 +27,7 @@ class UserController extends Controller
         $data = $request->validate($this->rules());
 
         $user = User::create($data);
+        AuditLog::record('user.created', $user, "Compte créé : {$user->name} ({$user->role})");
 
         return response()->json(['user' => $user], 201);
     }
@@ -45,7 +47,16 @@ class UserController extends Controller
             unset($data['password']);
         }
 
+        $previousRole = $user->role;
         $user->update($data);
+        $properties = [];
+        if ($previousRole !== $user->role) {
+            $properties['role'] = ['avant' => $previousRole, 'après' => $user->role];
+        }
+        if (array_key_exists('password', $data)) {
+            $properties['password_changed'] = true;
+        }
+        AuditLog::record('user.updated', $user, "Compte modifié : {$user->name}", $properties);
 
         return response()->json(['user' => $user->fresh()]);
     }
@@ -64,7 +75,10 @@ class UserController extends Controller
             ], 422);
         }
 
+        $name = $user->name;
+        $role = $user->role;
         $user->delete();
+        AuditLog::record('user.deleted', $user, "Compte supprimé : {$name} ({$role})");
 
         return response()->json(status: 204);
     }

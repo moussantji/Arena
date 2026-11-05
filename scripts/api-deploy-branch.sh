@@ -36,6 +36,10 @@ git commit -m "Déploiement : dépendances de l'API incluses (vendor)"
 
 git checkout "$PREVIOUS"
 
+# Le checkout retire api/vendor (non suivi sur la branche de travail) :
+# on le restaure depuis la branche de déploiement pour le développement.
+git restore --source="$BRANCH" --worktree -- api/vendor
+
 echo ""
 echo "Branche '$BRANCH' prête à partir du code de '$PREVIOUS'."
 echo "Pour la publier : git push origin $BRANCH --force"

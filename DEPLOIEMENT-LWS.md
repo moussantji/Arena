@@ -55,7 +55,13 @@ Via **Gestionnaire de fichiers** de LWS :
 
 1. Copiez `api/.env.production.example` vers `api/.env`.
 2. Renseignez `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (étape 1).
-3. Enregistrez.
+3. Connexion Google : recopiez les deux lignes `GOOGLE_CLIENT_ID` et
+   `GOOGLE_CLIENT_SECRET` depuis le `.env` de votre PC (`api/.env`).
+   Sans le secret, le bouton « Se connecter avec Google » reste masqué.
+   Aucun réglage à changer dans Google Cloud Console : l'application
+   utilise toujours l'adresse de retour locale (127.0.0.1), seul l'échange
+   du code se fait désormais sur le serveur.
+4. Enregistrez.
 
 ## 5. Créer les tables (une fois)
 
@@ -105,12 +111,35 @@ d'éventuelles nouvelles migrations : réimportez le schéma mis à jour
 migrate --force` en SSH — les données sont conservées) ou demandez le SQL des
 migrations manquantes.
 
-## 9. Brancher l'application Kalanso
+**Mise à jour du 5 novembre 2026 (journal d'audit + verrouillage des périodes)** :
+déployez d'abord la branche `deploy/lws` reconstruite, puis dans phpMyAdmin
+(onglet SQL) exécutez le contenu de
+`api/database/schema/kalanso-migrations-2026-11-05.sql`. Ce script est sans
+danger pour les données : il crée la table `audit_logs` et ajoute la colonne
+`terms.locked_at`.
 
-L'application desktop saura utiliser cette API via son adresse
-`https://kalanso.mandenbaoubab.com` (option « API distante » à activer dans
-l'application). Les données de tous les postes seront alors centralisées
-dans la base MySQL de l'hébergeur.
+## 9. Brancher l'application Kalanso (multi-postes)
+
+Sur chaque poste, après connexion avec un compte **Direction**, ouvrez
+**Paramètres → Préférences → Serveur de données → Modifier**, renseignez :
+
+```text
+https://kalanso.mandenbaoubab.com
+```
+
+puis **« Enregistrer et redémarrer »**. À l'écran de connexion suivant,
+connectez-vous avec le compte de l'établissement : les données de tous les
+postes sont centralisées dans la base MySQL de l'hébergeur.
+
+L'écran de connexion n'affiche jamais l'adresse du serveur — le réglage est
+réservé aux comptes Direction, dans les Paramètres. Sur un poste tout neuf
+(base locale vide), la première installation crée un compte local qui sert
+uniquement à atteindre les Paramètres ; il devient inutile après le
+basculement vers le serveur.
+
+Pour revenir au mode local (données stockées uniquement sur le poste), videz
+l'adresse dans le même écran. Cette fonctionnalité est incluse à partir de la
+version **1.3.2** de l'application.
 
 **Sécurité** : le `.env` en ligne contient les accès MySQL et le secret
 Google — il n'est jamais servi par le serveur web et n'est pas dans Git.

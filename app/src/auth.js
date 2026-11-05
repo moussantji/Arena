@@ -126,6 +126,7 @@ export const ROLE_PAGES = {
     'admissions',
     'fiche-admission',
     'parametres',
+    'journal',
   ],
   [ROLE_SECRETARIAT]: [
     'dashboard',

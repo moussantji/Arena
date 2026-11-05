@@ -80,6 +80,10 @@ export const META = {
     label: 'Modales', group: 'Système', crumb: ['Système', 'Modales'],
     title: 'Modales', sub: 'Formulaires et confirmations en situation réelle',
   },
+  journal: {
+    label: 'Journal', group: 'Système', crumb: ['Système', 'Journal d’audit'],
+    title: 'Journal d’audit', sub: 'Qui a fait quoi, quand — notes, paiements, comptes',
+  },
   parametres: {
     label: 'Paramètres', group: 'Système', crumb: ['Système', 'Paramètres'],
     title: 'Paramètres', sub: 'Établissement, calendrier et préférences',

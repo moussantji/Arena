@@ -55,6 +55,11 @@ export function Parametres() {
   const [prefs, setPrefs] = useState(readPrefs);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarInput = useRef(null);
+  const [serverInfo, setServerInfo] = useState(null);
+  const [serverEditing, setServerEditing] = useState(false);
+  const [serverDraft, setServerDraft] = useState('');
+  const [serverBusy, setServerBusy] = useState(false);
+  const [serverError, setServerError] = useState('');
 
   const years = useApi('/references/academic-years');
   const departments = useApi('/references/departments');
@@ -88,6 +93,11 @@ export function Parametres() {
     document.documentElement.classList.toggle('compact-ui', Boolean(prefs.compact));
   }, [prefs]);
 
+  useEffect(() => {
+    // Adresse effective de l'API (distante ou locale), fournie par Electron.
+    window.desktopAPI?.apiInfo?.().then(setServerInfo).catch(() => {});
+  }, []);
+
   const setField = (name, value) => {
     setForm((current) => ({ ...current, [name]: value }));
     setSaved(false);
@@ -112,6 +122,20 @@ export function Parametres() {
       setFormError(error.firstError || error.message || 'Impossible d’enregistrer.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const toggleTermLock = async (term) => {
+    const locked = !term.locked_at;
+    try {
+      await api.patch(`/references/terms/${term.id}/lock`, { locked });
+      notify(locked
+        ? `« ${term.name} » délibéré et verrouillé — les notes sont intouchables.`
+        : `« ${term.name} » rouverte — la saisie redevient possible.`);
+      years.reload();
+      refresh();
+    } catch (error) {
+      notify(error?.firstError || error?.message || 'Opération impossible.', { tone: 'danger' });
     }
   };
 
@@ -166,6 +190,30 @@ export function Parametres() {
 
   const openUpdate = () => {
     modal.open(updateModal(modal));
+  };
+
+  const openServerEdit = () => {
+    setServerDraft(serverInfo?.remote ? serverInfo.origin : '');
+    setServerError('');
+    setServerEditing(true);
+  };
+
+  const saveServer = async () => {
+    if (serverBusy) return;
+    setServerBusy(true);
+    setServerError('');
+    try {
+      const result = await window.desktopAPI?.setApiUrl?.(serverDraft.trim());
+      if (result && !result.ok) {
+        setServerError(result.message || 'Enregistrement impossible.');
+        setServerBusy(false);
+      }
+      // Sinon : le process principal redémarre l'application pour appliquer
+      // le changement — la promesse peut ne jamais se résoudre.
+    } catch (error) {
+      setServerError(error?.message || 'Enregistrement impossible.');
+      setServerBusy(false);
+    }
   };
 
   const feesTotal = useMemo(
@@ -326,9 +374,20 @@ export function Parametres() {
                                 <Icon name="clock" size={13} />
                                 <b>{term.name}</b>
                                 {term.is_current && <Pill tone="accent">En cours</Pill>}
+                                {term.locked_at && <Pill tone="copper" dot>Délibéré</Pill>}
                               </span>
                               <span className="term-range mono">{date(term.starts_on)} → {date(term.ends_on)}</span>
                               <span className="term-actions">
+                                <button
+                                  type="button"
+                                  className={`icon-btn${term.locked_at ? ' is-locked' : ''}`}
+                                  title={term.locked_at
+                                    ? 'Rouvrir la période (la saisie redevient possible)'
+                                    : 'Délibérer et verrouiller (les notes deviennent intouchables)'}
+                                  onClick={() => toggleTermLock(term)}
+                                >
+                                  <Icon name={term.locked_at ? 'lock' : 'unlock'} size={13} />
+                                </button>
                                 <button type="button" className="icon-btn" title="Modifier" onClick={() => actions.term(term)}><Icon name="edit" size={13} /></button>
                                 <button type="button" className="icon-btn" title="Supprimer" onClick={() => actions.deleteTerm(term)}><Icon name="close" size={12} /></button>
                               </span>
@@ -555,6 +614,62 @@ export function Parametres() {
                   <Btn icon="refresh" solid onClick={openUpdate}>Vérifier les mises à jour</Btn>
                 </div>
               </Card>
+
+              {window.desktopAPI && (
+                <Card>
+                  <CardHead
+                    title="Serveur de données"
+                    sub="Où sont enregistrées les données de l’établissement."
+                    right={serverInfo?.remote
+                      ? <Pill tone="accent" dot>Serveur distant</Pill>
+                      : <Pill tone="muted">Sur cet ordinateur</Pill>}
+                  />
+                  {serverEditing ? (
+                    <div className="stack">
+                      <label className="field">
+                        <span className="field-label">Adresse de l’API</span>
+                        <input
+                          className="input mono"
+                          type="url"
+                          value={serverDraft}
+                          onChange={(event) => setServerDraft(event.target.value)}
+                          placeholder="https://kalanso.mandenbaoubab.com"
+                          disabled={serverBusy}
+                        />
+                      </label>
+                      {serverError && (
+                        <div className="form-alert" role="alert">
+                          <Icon name="close" size={14} />
+                          <span>{serverError}</span>
+                        </div>
+                      )}
+                      <p className="form-hint">
+                        Laissez vide pour enregistrer les données uniquement sur cet
+                        ordinateur. L’application redémarre pour appliquer le changement.
+                      </p>
+                      <div className="form-actions">
+                        <Btn onClick={() => setServerEditing(false)} disabled={serverBusy}>Annuler</Btn>
+                        <Btn icon="check" solid onClick={saveServer} disabled={serverBusy}>
+                          {serverBusy ? 'Enregistrement…' : 'Enregistrer et redémarrer'}
+                        </Btn>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="update-brief">
+                      <span className="update-brief-ic"><Icon name="settings" size={16} /></span>
+                      <div>
+                        <b className="mono">{serverInfo?.remote ? serverInfo.origin : 'Cet ordinateur'}</b>
+                        <span>
+                          {serverInfo?.remote
+                            ? 'Les données de tous les postes sont centralisées sur ce serveur.'
+                            : 'Les données sont enregistrées uniquement sur cet appareil.'}
+                        </span>
+                      </div>
+                      <Btn icon="edit" onClick={openServerEdit}>Modifier</Btn>
+                    </div>
+                  )}
+                </Card>
+              )}
 
               <Card>
                 <CardHead title="Confort d’affichage" sub="Préférences enregistrées sur cet appareil" />
