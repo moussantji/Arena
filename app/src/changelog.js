@@ -4,12 +4,12 @@
    entrée en tête de CHANGELOG, puis reconstruire les paquets.
    ============================================================ */
 
-export const APP_VERSION = '1.3.1';
+export const APP_VERSION = '1.3.2';
 
 export const CHANGELOG = [
   {
     version: '1.3.2',
-    date: 'À paraître',
+    date: '6 novembre 2026',
     title: 'Robustesse et finition',
     items: [
       'Bandeau « hors-ligne » : quand le serveur ne répond plus, un bandeau le signale et la reconnexion est tentée automatiquement.',

@@ -4,7 +4,7 @@ Ce fichier documente les nouveautés visibles pour les utilisateurs. La même
 liste est embarquée dans l'application (`app/src/changelog.js`) et affichée
 une fois par version dans la fenêtre **Nouveautés**.
 
-## 1.3.2 — à paraître
+## 1.3.2 — 6 novembre 2026
 
 - Nouveau bandeau « hors-ligne » : quand le serveur ne répond plus, un
   bandeau le signale et la reconnexion est tentée automatiquement toutes
