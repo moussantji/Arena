@@ -4,6 +4,16 @@ Ce fichier documente les nouveautés visibles pour les utilisateurs. La même
 liste est embarquée dans l'application (`app/src/changelog.js`) et affichée
 une fois par version dans la fenêtre **Nouveautés**.
 
+## 1.3.3 — 6 novembre 2026
+
+- Une installation neuve pointe désormais sur le serveur de l’établissement
+  (https://kalanso.mandenbaoubab.com), comme l’application mobile —
+  plus besoin de XAMPP sur les postes.
+- Les installations existantes ne sont pas migrées silencieusement :
+  basculez dans Paramètres → Serveur de données (réservé au créateur).
+- Écran « API Kalanso » adapté au mode distant (plus de référence au
+  serveur local).
+
 ## 1.3.2 — 6 novembre 2026
 
 - Nouveau bandeau « hors-ligne » : quand le serveur ne répond plus, un

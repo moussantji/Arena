@@ -4,9 +4,19 @@
    entrée en tête de CHANGELOG, puis reconstruire les paquets.
    ============================================================ */
 
-export const APP_VERSION = '1.3.2';
+export const APP_VERSION = '1.3.3';
 
 export const CHANGELOG = [
+  {
+    version: '1.3.3',
+    date: '6 novembre 2026',
+    title: 'Connexion au serveur par défaut',
+    items: [
+      'Une installation neuve pointe désormais sur le serveur de l’établissement (https://kalanso.mandenbaoubab.com), comme l’application mobile — plus besoin de XAMPP sur les postes.',
+      'Les installations existantes ne sont pas migrées silencieusement : basculez dans Paramètres → Serveur de données (réservé au créateur).',
+      'Écran « API Kalanso » adapté au mode distant (plus de référence au serveur local).',
+    ],
+  },
   {
     version: '1.3.2',
     date: '6 novembre 2026',
