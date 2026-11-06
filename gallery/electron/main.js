@@ -203,6 +203,8 @@ function ensureWritableBackend(target) {
 
   // Le lien storage:link généré par Laravel est absolu. On le recrée en
   // relatif pour que le dossier copié fonctionne hors du dépôt.
+  // Sous Windows, une jonction (junction) ne requiert pas de droits admin
+  // ni le mode développeur ; en échec, l'application continue sans le lien.
   const link = path.join(target, 'public', 'storage');
   try {
     const stat = fs.lstatSync(link);
@@ -211,7 +213,16 @@ function ensureWritableBackend(target) {
   } catch {
     /* lien absent */
   }
-  fs.symlinkSync(path.join('..', 'storage', 'app', 'public'), link, 'dir');
+
+  const relativeTarget = path.join('..', 'storage', 'app', 'public');
+  const linkTarget = process.platform === 'win32'
+    ? path.resolve(path.dirname(link), relativeTarget)
+    : relativeTarget;
+  try {
+    fs.symlinkSync(linkTarget, link, process.platform === 'win32' ? 'junction' : 'dir');
+  } catch (error) {
+    logMain(`lien storage non recréé (${error.message}) — démarrage poursuivi sans.`);
+  }
 
   ensureEnvFile(target);
 }
@@ -874,13 +885,16 @@ async function boot() {
       type: 'error',
       title: 'Service local indisponible',
       message: "L'API locale n'a pas pu démarrer.",
-      detail: process.platform === 'win32'
+      detail: (process.platform === 'win32'
         ? `${error.message}\n\nSur Windows, installez PHP 8.2+ et MySQL/MariaDB `
           + '(par exemple avec XAMPP), puis démarrez MySQL.\n\n'
           + `Configuration et accès à la base : ${path.join(apiCacheDir(), '.env')}`
         : `${error.message}\n\nVérifiez que PHP et MariaDB sont installés et démarrés :\n`
           + 'sudo apt install php-cli mariadb-server\nsudo systemctl start mariadb\n\n'
-          + `Configuration et accès à la base : ${path.join(apiCacheDir(), '.env')}`,
+          + `Configuration et accès à la base : ${path.join(apiCacheDir(), '.env')}`)
+        + "\n\nAstuce : pour utiliser le serveur de l'établissement sans PHP local, "
+          + 'ouvrez Paramètres → Serveur de données (réservé au créateur) et saisissez '
+          + 'https://kalanso.mandenbaoubab.com.',
       buttons: ['Continuer', 'Quitter'],
       defaultId: 0,
       cancelId: 1,

@@ -4,9 +4,19 @@
    entrée en tête de CHANGELOG, puis reconstruire les paquets.
    ============================================================ */
 
-export const APP_VERSION = '1.3.3';
+export const APP_VERSION = '1.3.4';
 
 export const CHANGELOG = [
+  {
+    version: '1.3.4',
+    date: '6 novembre 2026',
+    title: 'Démarrage Windows sans erreur',
+    items: [
+      'Correctif Windows : le lien public/storage est recréé en jonction (junction) — aucun droit admin ni mode développeur requis.',
+      'En cas d’échec du lien, l’application démarre quand même (au lieu d’afficher « L’API locale n’a pas pu démarrer »).',
+      'Message « Service local indisponible » : ajout d’une astuce pour basculer sur le serveur de l’établissement (Paramètres → Serveur de données), sans serveur PHP local.',
+    ],
+  },
   {
     version: '1.3.3',
     date: '6 novembre 2026',
