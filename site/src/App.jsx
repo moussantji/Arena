@@ -15,10 +15,26 @@ import Espace from './pages/Espace.jsx';
 import { formations, articles, school } from './data/content.js';
 import { MessageCircleIcon as MessageCircle } from 'lucide-react';
 
+const TITLES = {
+  '/': 'Institut Bernard Kouchner — IPFS-BK | École de santé à Bamako',
+  '/formations': 'Formations sanitaires — IPFS-BK Bamako',
+  '/blog': 'Actualités & blog — Institut Bernard Kouchner',
+  '/application': 'Application mobile — IPFS-BK',
+  '/a-propos': 'À propos — Institut Bernard Kouchner, Hippodrome 1',
+  '/admission': 'Admission en ligne — IPFS-BK',
+  '/contact': 'Contact — Institut Bernard Kouchner, Bamako',
+  '/personnel': 'Espace personnel — Version PC | IPFS-BK',
+  '/espace': 'Mon espace — IPFS-BK',
+  '/espace/connexion': 'Connexion — IPFS-BK',
+};
+
 function ScrollRestore() {
   const { pathname } = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
+    const base = '/' + (pathname.split('/')[1] || '');
+    const title = TITLES[pathname] || TITLES[base];
+    if (title) document.title = title;
   }, [pathname]);
   return null;
 }

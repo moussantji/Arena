@@ -257,6 +257,28 @@ class Canvas:
         self.text(self.w - 72, self.h - 24, "BNDA 490001201401 · Arrêté n°2026-0401/MESRS-SG", size=9,
                   color=(0.5, 0.56, 0.53), anchor="right")
 
+    def soft(self, x, y, w, h, color=WHITE, opacity=0.2, feather=22):
+        """Voile translucide à bords fondus (dégradé alpha) — pas de bandes visibles."""
+        import numpy as np
+
+        size = 64
+        rgb = [int(v * 255) for v in color]
+        alpha = np.full((size, size), int(opacity * 255), dtype=np.uint8)
+        edge = np.linspace(0, int(opacity * 255), feather).astype(np.uint8)
+        alpha[:feather, :] = np.minimum(alpha[:feather, :], edge[:, None])
+        alpha[-feather:, :] = np.minimum(alpha[-feather:, :], edge[::-1][:, None])
+        alpha[:, :feather] = np.minimum(alpha[:, :feather], edge[None, :])
+        alpha[:, -feather:] = np.minimum(alpha[:, -feather:], edge[::-1][None, :])
+
+        base = pymupdf.Pixmap(pymupdf.csRGB, pymupdf.IRect(0, 0, size, size), False)
+        base.set_rect(base.irect, tuple(rgb))
+        mask = pymupdf.Pixmap(pymupdf.csGRAY, pymupdf.IRect(0, 0, size, size), False)
+        mask.set_rect(mask.irect, (255,))
+        for row in range(size):
+            for col in range(size):
+                mask.set_pixel(row, col, (int(alpha[row, col]),))
+        self.page.insert_image(pymupdf.Rect(x, y, x + w, y + h), pixmap=pymupdf.Pixmap(base, mask))
+
     def save(self, name):
         pix = self.page.get_pixmap(dpi=110)
         target = OUT / f"{name}.png"
@@ -269,18 +291,16 @@ class Canvas:
 def page_home():
     c = Canvas()
     c.img("hero.jpg", 0, 0, W, 620)
-    for i in range(16):
-        y0 = i * 40
-        c.rect(0, y0, W, 42, fill=INK, opacity=0.16 + 0.42 * (i / 15) ** 1.6)
-    for i in range(4):
-        c.rect(0, i * 30, W, 32, fill=INK, opacity=0.16)
+    c.rect(0, 0, W, 620, fill=INK, opacity=0.34)
+    c.soft(0, 210, W, 300, opacity=0.30, feather=30)
+    c.soft(-40, 300, W + 80, 250, opacity=0.22, feather=30)
     c.circle(1260, -140, 420, fill=(15 / 255, 111 / 255, 82 / 255), opacity=0.22)
     c.header()
 
     for cxp, cxl in ((72, "Hippodrome 1 · Bamako"), (262, "Arrêté n°2026-0401/MESRS-SG"),
                      (520, "4,6/5 · 39 avis Google")):
-        c.chip(cxp, 126, cxl, fg=WHITE, bg=(1, 1, 1), size=9.5, h=26, padx=12,
-               stroke=(0.7, 0.75, 0.73), opacity=0.16)
+        c.chip(cxp, 126, cxl, fg=WHITE, bg=WHITE, size=9.5, h=26, padx=12,
+               stroke=(0.92, 0.96, 0.94), opacity=0.16)
 
     c.text(72, 250, "La santé commence par", size=64, color=WHITE, serif=True)
     c.text(72, 318, "une", size=64, color=WHITE, serif=True)
@@ -291,9 +311,9 @@ def page_home():
               "Intégrez un institut qui place la qualité, la rigueur et l'engagement au cœur de son action.",
               15, 660, color=(0.82, 0.86, 0.84), lh=24)
     c.btn(72, 452, "S'inscrire en ligne  →", h=52, bg=GOLD, fg=INK, size=14)
-    c.btn(320, 452, "Explorer les 14 formations", h=52, bg=(1, 1, 1), fg=WHITE, size=14,
-          stroke=(0.72, 0.78, 0.76), opacity=0.14)
-    c.rect(624, 456, 196, 44, fill=(1, 1, 1), r=22, stroke=(0.6, 0.66, 0.64), opacity=0.12)
+    c.btn(320, 452, "Explorer les 14 formations", h=52, bg=WHITE, fg=WHITE, size=14,
+          stroke=(0.95, 0.98, 0.97), opacity=0.12)
+    c.rect(624, 456, 196, 44, fill=WHITE, r=22, stroke=(0.95, 0.98, 0.97), opacity=0.12)
     c.text(722, 483, "+223 83 01 02 02", size=13, color=WHITE, anchor="center")
 
     c.rect(72, 528, 1296, 84, fill=(4 / 255, 19 / 255, 15 / 255), r=20, stroke=(0.42, 0.47, 0.45), opacity=0.72)
