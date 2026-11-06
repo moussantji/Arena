@@ -418,7 +418,7 @@ def page_formations():
         c.text(x + 250, y + 103, price, size=8.5, color=WHITE, anchor="center")
         c.text(x + 20, y + 146, meta.split("·")[0].strip().upper(), size=8.5, color=EMERALD, spacing=1.3)
         c.wrap_px(x + 20, y + 168, title, 15, 264, serif=True, lh=18)
-        c.wrap_px(x + 20, y + 206, desc, 10, 264, color=MUTED, lh=14)
+        c.wrap_px(x + 20, y + 204, desc, 10, 250, color=MUTED, lh=14, max_lines=2)
         c.line(x + 20, y + 228, x + 286, y + 228, color=(0.93, 0.91, 0.87))
         c.text(x + 20, y + 240, "Découvrir  ↗", size=10, color=EMERALD)
     return c
