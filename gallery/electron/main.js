@@ -245,9 +245,8 @@ function ensureEnvFile(target) {
       '# Canal de mise à jour (laisser vide pour GitHub Releases)',
       'KALANSO_UPDATE_URL=',
       '',
-      "# API distante (laisser vide pour utiliser l'API de cet ordinateur)",
-      '# Exemple : https://kalanso.mandenbaoubab.com',
-      'KALANSO_REMOTE_API_URL=',
+      "# API de l'établissement (défaut en production ; laisser vide pour l'API locale)",
+      'KALANSO_REMOTE_API_URL=https://kalanso.mandenbaoubab.com',
       '',
     ].join('\n'));
   }
@@ -260,8 +259,12 @@ function ensureEnvFile(target) {
   if (!/^KALANSO_UPDATE_URL=/m.test(content)) {
     content = `${content.replace(/\s*$/, '')}\n\n# Canal de mise à jour (laisser vide pour GitHub Releases)\nKALANSO_UPDATE_URL=\n`;
   }
-  if (!/^KALANSO_REMOTE_API_URL=/m.test(content)) {
-    content = `${content.replace(/\s*$/, '')}\n\n# API distante (laisser vide pour utiliser l'API de cet ordinateur)\nKALANSO_REMOTE_API_URL=\n`;
+  if (/^KALANSO_REMOTE_API_URL=\s*$/m.test(content)) {
+    // Installation neuve : défaut = serveur de l'établissement (comme l'app mobile).
+    // Ce bloc ne s'exécute pas pour un .env existant (mode local conservé).
+    content = content.replace(/^KALANSO_REMOTE_API_URL=\s*$/m, 'KALANSO_REMOTE_API_URL=https://kalanso.mandenbaoubab.com');
+  } else if (!/^KALANSO_REMOTE_API_URL=/m.test(content)) {
+    content = `${content.replace(/\s*$/, '')}\n\n# API de l'établissement (défaut ; laisser vide pour l'API locale)\nKALANSO_REMOTE_API_URL=https://kalanso.mandenbaoubab.com\n`;
   }
   fs.writeFileSync(envPath, content);
   logMain(`fichier .env créé pour le backend installé : ${envPath}`);

@@ -825,12 +825,16 @@ export function Parametres() {
                     <div><dt>URL</dt><dd className="mono">{API_URL}</dd></div>
                     <div><dt>Version</dt><dd className="mono">{APP_VERSION}</dd></div>
                     <div><dt>État</dt><dd>{health.loading ? 'Vérification…' : health.error ? 'Indisponible' : 'Opérationnelle'}</dd></div>
-                    <div><dt>Démarrage</dt><dd>{booting ? 'En cours' : 'Terminé'}</dd></div>
+                    {serverInfo?.remote
+                      ? <div><dt>Serveur</dt><dd className="mono">Distant · {serverInfo.origin}</dd></div>
+                      : <div><dt>Démarrage</dt><dd>{booting ? 'En cours' : 'Terminé'}</dd></div>}
                     <div><dt>Écritures</dt><dd>Protégées par token</dd></div>
                   </dl>
                   <div className="api-hint">
                     <Icon name="external" size={13} />
-                    <span>Lancez <code>php artisan serve --host=127.0.0.1 --port=8001</code> dans le dossier <code>api</code>.</span>
+                    {serverInfo?.remote
+                      ? <span>Les données sont servies par le serveur de l’établissement. Aucune configuration locale requise.</span>
+                      : <span>Lancez <code>php artisan serve --host=127.0.0.1 --port=8001</code> dans le dossier <code>api</code>.</span>}
                   </div>
                 </Card>
               </div>
