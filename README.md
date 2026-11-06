@@ -81,9 +81,9 @@ contre un token Sanctum. Le secret reste côté API. La connexion est réservée
 aux comptes Kalanso existants : le compte est lié automatiquement lorsque
 l'adresse e-mail Google vérifiée correspond à un utilisateur.
 
-> Application déjà installée : l'API copiée se trouve dans
-> `~/.config/kalanso-desktop/backend/.env`. Renseignez-y les mêmes variables si
-> vous n'avez pas modifié `api/.env` avant le premier lancement.
+> Les identifiants Google (`GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`) sont
+> définis **côté serveur** (celui de l'établissement — sur LWS en production),
+> pas sur chaque poste.
 
 ## API
 
@@ -142,45 +142,45 @@ chaque push et pull request, sans rien mettre en ligne :
 Les déploiements (serveur LWS, GitHub Releases) restent des actions
 manuelles et ne font pas partie de la CI.
 
-## Application desktop Ubuntu
+## Application desktop (Windows / Linux)
 
-L'application Electron intègre le build React et démarre automatiquement l'API
-Laravel locale : aucun terminal n'est nécessaire après installation. Le paquet
-(`electron-builder.js`) n'embarque que les dépendances **de production** de
-l'API — les paquets de dev sont exclus automatiquement — et jamais les dossiers
-`storage/` du poste de build (photos, documents), recréés à l'installation.
+L'application Electron est un **client** du serveur de l'établissement : elle
+se connecte à `https://kalanso.mandenbaoubab.com` par défaut — le même serveur
+que l'application mobile. Aucun serveur Laravel/PHP/MySQL n'est embarqué ni
+démarré sur le poste ; rien à installer, aucun identifiant dans le paquet.
+Les données sont celles du serveur, en temps réel.
 
 ```bash
 # paquets générés dans release/
 cd gallery/electron && npm run dist:linux
 
 # installation du .deb (menu Applications → Kalanso)
-sudo apt install ./release/Kalanso-1.1.0-amd64.deb
+sudo apt install ./release/Kalanso-<version>-amd64.deb
 
 # ou exécution directe de l'AppImage
-chmod +x release/Kalanso-1.1.0-x86_64.AppImage
-./release/Kalanso-1.1.0-x86_64.AppImage
+chmod +x release/Kalanso-<version>-x86_64.AppImage
+./release/Kalanso-<version>-x86_64.AppImage
 ```
 
-Prérequis sur la machine : **PHP 8.2+ CLI** et **MariaDB/MySQL** actifs, avec la
-base et les identifiants renseignés dans `api/.env`. Au premier lancement,
-Electron copie l'API dans `~/.config/kalanso-desktop/backend`, applique les
-migrations puis démarre le service sur `127.0.0.1:8001`. Les journaux sont dans
-`~/.config/kalanso-desktop/logs/` (`main.log` pour le démarrage de la fenêtre,
-`backend.log` pour l'API).
+**Configuration par poste** : aucune au premier lancement. Le créateur peut
+modifier le serveur (Paramètres → Serveur de données) ; le réglage est écrit
+dans `~/.config/kalanso-desktop/config/.env` (les anciennes installations
+utilisent encore `~/.config/kalanso-desktop/backend/.env`, conservé tel quel).
+Les journaux sont dans `~/.config/kalanso-desktop/logs/` (`main.log`).
 
 Sur Linux, le rendu GPU est désactivé par défaut pour éviter les fenêtres
 noires sur certaines cartes graphiques. `KALANSO_GPU=1 kalanso` réactive
 l'accélération matérielle.
 
 Pour développer avec HMR : `cd gallery/electron && npm run dev`. La commande
-démarre Vite si nécessaire, puis ouvre Electron sur `http://127.0.0.1:5179` en
-réutilisant l'API locale du port 8001. Les modifications React/CSS sont
-appliquées à chaud ; `main.js` et `preload.js` nécessitent un redémarrage. Le
-mode développement utilise le profil `~/.config/kalanso-desktop-dev` et peut donc
-tourner en même temps que l'application installée. Pour ouvrir les DevTools :
-`KALANSO_DEVTOOLS=1 npm run dev`. Pour lancer la version desktop locale sans
-paquet : `npm start` dans `gallery/electron`.
+démarre Vite si nécessaire, puis ouvre Electron sur `http://127.0.0.1:5179`.
+Le mode développement utilise le profil `~/.config/kalanso-desktop-dev`. Pour
+indiquer le serveur à l'app en développement : `KALANSO_REMOTE_API_URL`
+(défaut : le serveur de l'établissement ; `local` = `http://127.0.0.1:8001`
+avec un serveur démarré à la main). Les modifications React/CSS sont
+appliquées à chaud ; `main.js` et `preload.js` nécessitent un redémarrage.
+Pour ouvrir les DevTools : `KALANSO_DEVTOOLS=1 npm run dev`. Pour lancer la
+version desktop locale sans paquet : `npm start` dans `gallery/electron`.
 
 L'icône Kalanso par défaut est générée dans
 `gallery/electron/build/icon.png` (source vectorielle `icon.svg`) et reprise
@@ -238,7 +238,7 @@ en charge automatiquement dès qu'un certificat est fourni.
 
 Un canal privé ou local reste possible : renseignez `KALANSO_UPDATE_URL`
 (dossier ou serveur contenant `latest-linux.yml`) dans
-`~/.config/kalanso-desktop/backend/.env`. Pour un essai :
+`~/.config/kalanso-desktop/config/.env`. Pour un essai :
 `cd release && python3 -m http.server 8099` puis lancer avec
 `KALANSO_UPDATE_URL=http://127.0.0.1:8099`.
 
@@ -246,17 +246,11 @@ Un canal privé ou local reste possible : renseignez `KALANSO_UPDATE_URL`
 s'affiche une fois par version ; elle reste consultable dans
 **Paramètres → Préférences → Nouveautés**.
 
-**Configuration de chaque poste** : les paquets ne contiennent aucun
-identifiant. Au premier lancement, Kalanso crée
-`~/.config/kalanso-desktop/backend/.env` avec une clé d'application générée ;
-renseignez les accès MySQL (et les identifiants Google si besoin), puis
-relancez. Lors des mises à jour, ce fichier est conservé, tout comme les
-données (base MySQL, photos, documents).
-
-**Sous Windows** : comme sous Linux, la machine doit disposer de **PHP 8.2+**
-et **MySQL/MariaDB** démarrés (par exemple via [XAMPP](https://www.apachefriends.org)),
-et de la variable `KALANSO_PHP_BIN` pointant vers `php.exe` si PHP n'est pas
-dans le `PATH`. Les données sont les mêmes que sous Linux (base `arena`).
+**Configuration de chaque poste** : aucune — les paquets ne contiennent
+aucun identifiant et aucune donnée. La configuration éventuelle
+(`~/.config/kalanso-desktop/config/.env`, créée au premier lancement) ne
+contient que le serveur de données et, optionnellement, le canal de mise à
+jour ; elle est conservée lors des mises à jour.
 
 ## Figma
 

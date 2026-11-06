@@ -41,7 +41,7 @@ const readPrefs = () => {
 
 export function Parametres() {
   const {
-    meta, refresh, notify, user, booting, setUser,
+    meta, refresh, notify, user, setUser,
   } = useData();
   const actions = useActions();
   const modal = useModal();
@@ -828,7 +828,7 @@ export function Parametres() {
                     <div><dt>État</dt><dd>{health.loading ? 'Vérification…' : health.error ? 'Indisponible' : 'Opérationnelle'}</dd></div>
                     {serverInfo?.remote
                       ? <div><dt>Serveur</dt><dd className="mono">Distant · {serverInfo.origin}</dd></div>
-                      : <div><dt>Démarrage</dt><dd>{booting ? 'En cours' : 'Terminé'}</dd></div>}
+                      : <div><dt>Serveur</dt><dd className="mono">Local · {serverInfo?.origin ?? '127.0.0.1:8001'} (développement)</dd></div>}
                     <div><dt>Écritures</dt><dd>Protégées par token</dd></div>
                   </dl>
                   <div className="api-hint">

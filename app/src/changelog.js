@@ -10,12 +10,13 @@ export const CHANGELOG = [
   {
     version: '1.3.4',
     date: '6 novembre 2026',
-    title: 'Démarrage Windows sans erreur',
+    title: 'Application connectée au serveur',
     items: [
-      'Correctif Windows : le lien public/storage est recréé en jonction (junction) — aucun droit admin ni mode développeur requis.',
-      'En cas d’échec du lien, l’application démarre quand même (au lieu d’afficher « L’API locale n’a pas pu démarrer »).',
-      'Message « Service local indisponible » : ajout d’une astuce pour basculer sur le serveur de l’établissement (Paramètres → Serveur de données), sans serveur PHP local.',
-      'Le logiciel ne démarre plus de serveur local par défaut : sans configuration explicite, il se connecte au serveur de l’établissement — y compris pour les installations existantes. Tapez « local » (Paramètres → Serveur de données) ou KALANSO_REMOTE_API_URL=local pour forcer l’API locale de développement.',
+      'Le logiciel PC n’embarque plus aucun serveur : il se connecte exclusivement au serveur de l’établissement — rien à installer, aucun XAMPP/MySQL sur les postes.',
+      'Installateurs allégés (l’API embarquée a été retirée du paquet).',
+      'Écran d’erreur « L’API locale n’a pas pu démarrer » supprimé : l’application s’ouvre toujours — en cas de serveur injoignable, l’interface affiche son bandeau « hors-ligne » et « Serveur injoignable » avec Réessayer.',
+      'Configuration par poste conservée (serveur modifiable par le créateur) ; les réglages des anciennes installations sont repris tels quels.',
+      'Tapez « local » dans Paramètres → Serveur de données pour forcer http://127.0.0.1:8001 (développement uniquement).',
     ],
   },
   {
