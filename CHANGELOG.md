@@ -4,6 +4,16 @@ Ce fichier documente les nouveautés visibles pour les utilisateurs. La même
 liste est embarquée dans l'application (`app/src/changelog.js`) et affichée
 une fois par version dans la fenêtre **Nouveautés**.
 
+## 1.3.4 — 6 novembre 2026
+
+- Correctif Windows : le lien `public/storage` est recréé en jonction
+  (junction) — aucun droit admin ni mode développeur requis.
+- En cas d'échec du lien, l'application démarre quand même (plus de
+  blocage au lancement).
+- Message « Service local indisponible » : ajout d'une astuce pour
+  basculer sur le serveur de l'établissement (Paramètres →
+  Serveur de données), sans serveur PHP local.
+
 ## 1.3.3 — 6 novembre 2026
 
 - Une installation neuve pointe désormais sur le serveur de l’établissement
