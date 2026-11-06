@@ -1,11 +1,11 @@
 // Kalanso — Electron main process
-// Fenêtre sans cadre, contexte isolé et service Laravel local démarré
-// automatiquement pour que l'application fonctionne comme une vraie app PC.
+// Fenêtre sans cadre, contexte isolé. L'application se connecte
+// exclusivement au serveur de l'établissement : aucun serveur Laravel
+// n'est embarqué ni démarré sur le poste.
 const {
   app, BrowserWindow, Menu, dialog, ipcMain, shell,
 } = require('electron');
 const { autoUpdater } = require('electron-updater');
-const { execFileSync, spawn } = require('node:child_process');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const http = require('node:http');
@@ -28,9 +28,12 @@ const API_PORT = Number(process.env.KALANSO_API_PORT || 8001);
 const LOCAL_API_ORIGIN = `http://127.0.0.1:${API_PORT}`;
 
 /**
- * API de l'établissement : vide/absent = https://kalanso.mandenbaoubab.com ;
- * « local » explicite = API locale du poste (développement uniquement) ;
+ * API de l'établissement (seul serveur supporté) :
+ * vide/absent = https://kalanso.mandenbaoubab.com ;
+ * « local »    = http://127.0.0.1:8001 (développement, PHP démarré à la main) ;
  * toute autre adresse http(s) remplace le serveur.
+ *
+ * Aucune API n'est embarquée ni démarrée par l'application.
  */
 const DEFAULT_REMOTE_API = 'https://kalanso.mandenbaoubab.com';
 const LOCAL_SENTINEL = 'local';
@@ -48,7 +51,7 @@ function remoteApiUrl() {
   if (fromEnv) return isLocalSentinel(fromEnv) ? null : fromEnv;
 
   try {
-    const envPath = path.join(app.isPackaged ? apiCacheDir() : apiSourceDir(), '.env');
+    const envPath = configEnvPath();
     const content = fs.readFileSync(envPath, 'utf8');
     const match = content.match(/^\s*KALANSO_REMOTE_API_URL\s*=\s*"?([^"\n\r]*?)"?\s*$/m);
     if (match) {
@@ -65,7 +68,7 @@ function remoteApiUrl() {
 
 const REMOTE_API_URL = remoteApiUrl();
 const API_ORIGIN = REMOTE_API_URL || LOCAL_API_ORIGIN;
-const REMOTE_MODE = Boolean(REMOTE_API_URL);
+const REMOTE_MODE = Boolean(REMOTE_API_URL);   // false uniquement avec « local »
 const SOURCE_APP_INDEX = path.join(__dirname, '..', '..', 'app', 'dist', 'index.html');
 const PACKAGED_APP_INDEX = path.join(process.resourcesPath, 'app', 'index.html');
 const GALLERY_INDEX = path.join(__dirname, '..', 'index.html');
@@ -74,8 +77,6 @@ const ICON = path.join(__dirname, 'build', 'icon.png');
 const LOG_DIR = path.join(app.getPath('userData'), 'logs');
 
 let win = null;
-let backend = null;
-let backendLog = null;
 let quitting = false;
 
 /* ------------------------------------------------------------------ */
@@ -106,7 +107,7 @@ logMain(
   + `display=${process.env.DISPLAY || '?'} · session=${process.env.XDG_SESSION_TYPE || '?'}`
   + `${isDev ? ` · mode=dev · profil=${app.getPath('userData')}` : ''} ---`,
 );
-if (REMOTE_MODE) logMain(`API distante : ${REMOTE_API_URL}`);
+logMain(`serveur : ${API_ORIGIN}`);
 
 process.on('uncaughtException', (error) => {
   logMain(`uncaughtException: ${error.stack || error.message}`);
@@ -119,8 +120,8 @@ process.on('unhandledRejection', (reason) => {
   logMain(`unhandledRejection: ${reason?.stack || reason}`);
 });
 
-// Arrêt demandé par le système ou par le lanceur de développement : passer
-// par app.quit() pour que before-quit arrête aussi l'API Laravel.
+// Arrêt demandé par le système ou par le lanceur de développement :
+// passer par app.quit() pour déclencher before-quit proprement.
 function requestQuit(signal) {
   logMain(`signal ${signal} reçu — arrêt.`);
   if (app.isReady()) app.quit();
@@ -131,34 +132,39 @@ process.on('SIGINT', () => requestQuit('SIGINT'));
 
 
 /* ------------------------------------------------------------------ */
-/*  Service Laravel local                                             */
+/*  Serveur de l'établissement (aucune API embarquée)                 */
 /* ------------------------------------------------------------------ */
 
-const delay = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
+// Configuration du serveur lue par poste (KALANSO_REMOTE_API_URL).
+// Le fichier userData/backend/.env des installations existantes est
+// conservé tel quel (il peut contenir les identifiants Google) ; les
+// nouvelles installations utilisent userData/config/.env.
+const LEGACY_CONFIG_DIR = path.join(app.getPath('userData'), 'backend');
+const CONFIG_DIR = path.join(app.getPath('userData'), 'config');
 
-function apiSourceDir() {
-  return app.isPackaged
-    ? path.join(process.resourcesPath, 'api')
-    : path.join(__dirname, '..', '..', 'api');
+function configEnvPath() {
+  const legacy = path.join(LEGACY_CONFIG_DIR, '.env');
+  if (fs.existsSync(legacy)) return legacy;
+
+  return path.join(CONFIG_DIR, '.env');
 }
 
-function apiCacheDir() {
-  return path.join(app.getPath('userData'), 'backend');
+function ensureConfigFile() {
+  if (fs.existsSync(path.join(CONFIG_DIR, '.env'))) return;
+  if (fs.existsSync(path.join(LEGACY_CONFIG_DIR, '.env'))) return;
+
+  fs.mkdirSync(CONFIG_DIR, { recursive: true });
+  fs.writeFileSync(
+    path.join(CONFIG_DIR, '.env'),
+    ['# Kalanso — serveur de données',
+     '# Vide = serveur de l\'établissement ; « local » = http://127.0.0.1:8001',
+     'KALANSO_REMOTE_API_URL=',
+     ''].join('\n'),
+  );
 }
 
-function logDir() {
-  return LOG_DIR;
-}
-
-function openBackendLog() {
-  if (backendLog && !backendLog.writableEnded) return path.join(LOG_DIR, 'backend.log');
-  fs.mkdirSync(LOG_DIR, { recursive: true });
-  const logPath = path.join(LOG_DIR, 'backend.log');
-  backendLog = fs.createWriteStream(logPath, { flags: 'a' });
-  backendLog.write(`\n[${new Date().toISOString()}] --- lancement Kalanso ---\n`);
-  return logPath;
-}
-
+// Vérification de joignabilité du serveur (non bloquante) :
+// l'interface gère l'état hors-ligne toute seule (bandeau + Réessayer).
 function probeApi(timeout = 1200) {
   return new Promise((resolve) => {
     const client = API_ORIGIN.startsWith('https:') ? https : http;
@@ -174,335 +180,11 @@ function probeApi(timeout = 1200) {
   });
 }
 
-function findPhp() {
-  const exe = process.platform === 'win32' ? 'php.exe' : 'php';
-  const candidates = [
-    process.env.KALANSO_PHP_BIN,
-    '/usr/bin/php',
-    '/usr/local/bin/php',
-    ...String(process.env.PATH || '')
-      .split(process.platform === 'win32' ? ';' : ':')
-      .filter(Boolean)
-      .map((dir) => path.join(dir, exe)),
-    'C:\\php\\php.exe',
-    'C:\\xampp\\php\\php.exe',
-  ].filter(Boolean);
-  for (const candidate of candidates) {
-    try {
-      if (!fs.existsSync(candidate)) continue;
-      execFileSync(candidate, ['-r', 'echo PHP_VERSION;'], { stdio: 'ignore', timeout: 4000 });
-      return candidate;
-    } catch {
-      /* candidat suivant */
-    }
-  }
-  return null;
-}
-
-function ensureWritableBackend(target) {
-  const folders = [
-    'storage/app/public',
-    'storage/framework/cache/data',
-    'storage/framework/sessions',
-    'storage/framework/views',
-    'storage/logs',
-    'bootstrap/cache',
-  ];
-  folders.forEach((folder) => fs.mkdirSync(path.join(target, folder), { recursive: true }));
-
-  // Le lien storage:link généré par Laravel est absolu. On le recrée en
-  // relatif pour que le dossier copié fonctionne hors du dépôt.
-  // Sous Windows, une jonction (junction) ne requiert pas de droits admin
-  // ni le mode développeur ; en échec, l'application continue sans le lien.
-  const link = path.join(target, 'public', 'storage');
-  try {
-    const stat = fs.lstatSync(link);
-    if (stat.isDirectory() && !stat.isSymbolicLink()) fs.rmSync(link, { recursive: true, force: true });
-    else fs.unlinkSync(link);
-  } catch {
-    /* lien absent */
-  }
-
-  const relativeTarget = path.join('..', 'storage', 'app', 'public');
-  const linkTarget = process.platform === 'win32'
-    ? path.resolve(path.dirname(link), relativeTarget)
-    : relativeTarget;
-  try {
-    fs.symlinkSync(linkTarget, link, process.platform === 'win32' ? 'junction' : 'dir');
-  } catch (error) {
-    logMain(`lien storage non recréé (${error.message}) — démarrage poursuivi sans.`);
-  }
-
-  ensureEnvFile(target);
-}
-
-/**
- * Crée le .env du backend installé s'il est absent (les paquets ne
- * contiennent volontairement aucun identifiant). Une clé d'application
- * est générée automatiquement ; les accès à la base restent à compléter.
- */
-function ensureEnvFile(target) {
-  const envPath = path.join(target, '.env');
-  if (fs.existsSync(envPath)) return;
-
-  const examplePath = path.join(target, '.env.example');
-  if (fs.existsSync(examplePath)) {
-    fs.copyFileSync(examplePath, envPath);
-  } else {
-    fs.writeFileSync(envPath, [
-      'APP_NAME="Kalanso"',
-      'APP_ENV=local',
-      'APP_KEY=',
-      'APP_DEBUG=false',
-      'APP_URL=http://127.0.0.1:8001',
-      'DB_CONNECTION=mysql',
-      'DB_HOST=127.0.0.1',
-      'DB_PORT=3306',
-      'DB_DATABASE=arena',
-      'DB_USERNAME=arena',
-      'DB_PASSWORD=',
-      '',
-      '# Canal de mise à jour (laisser vide pour GitHub Releases)',
-      'KALANSO_UPDATE_URL=',
-      '',
-      "# Vide ou absent = serveur de l'établissement ; « local » = API locale de développement",
-      'KALANSO_REMOTE_API_URL=https://kalanso.mandenbaoubab.com',
-      '',
-    ].join('\n'));
-  }
-
-  let content = fs.readFileSync(envPath, 'utf8');
-  if (/^APP_KEY=\s*$/m.test(content)) {
-    const key = `base64:${crypto.randomBytes(32).toString('base64')}`;
-    content = content.replace(/^APP_KEY=.*$/m, `APP_KEY=${key}`);
-  }
-  if (!/^KALANSO_UPDATE_URL=/m.test(content)) {
-    content = `${content.replace(/\s*$/, '')}\n\n# Canal de mise à jour (laisser vide pour GitHub Releases)\nKALANSO_UPDATE_URL=\n`;
-  }
-  if (!/^KALANSO_REMOTE_API_URL=/m.test(content)) {
-    // Vide/absent = serveur de l'établissement (voir remoteApiUrl).
-    content = `${content.replace(/\s*$/, '')}\n\n# Vide = serveur de l'établissement ; « local » = API locale de développement\nKALANSO_REMOTE_API_URL=https://kalanso.mandenbaoubab.com\n`;
-  }
-  fs.writeFileSync(envPath, content);
-  logMain(`fichier .env créé pour le backend installé : ${envPath}`);
-}
-
-function copyBackendTree(source, target) {
-  if (process.platform === 'win32') {
-    return fs.promises.cp(source, target, { recursive: true, force: true, dereference: false });
-  }
-  return new Promise((resolve, reject) => {
-    const child = spawn('/bin/cp', ['-a', `${source}/.`, `${target}/`], {
-      stdio: ['ignore', 'ignore', 'pipe'],
-    });
-    let stderr = '';
-    child.stderr.on('data', (chunk) => { stderr += chunk; });
-    child.on('error', reject);
-    child.on('exit', (code) => {
-      if (code === 0) resolve();
-      else reject(new Error(`Copie du service local impossible (code ${code}). ${stderr.slice(0, 400)}`));
-    });
-  });
-}
-
-async function prepareBackend() {
-  if (!app.isPackaged) {
-    ensureWritableBackend(apiSourceDir());
-    return { dir: apiSourceDir(), refreshed: false };
-  }
-
-  const source = apiSourceDir();
-  const target = apiCacheDir();
-  const version = `${app.getVersion()}-${Math.round(fs.statSync(source).mtimeMs)}`;
-  const marker = path.join(target, '.bundle-version');
-  let refreshed = true;
-
-  try {
-    refreshed = fs.readFileSync(marker, 'utf8').trim() !== version;
-  } catch {
-    /* première installation */
-  }
-
-  if (refreshed) {
-    // Les photos et documents envoyés par les utilisateurs vivent dans
-    // storage/app du backend installé. Une mise à jour du paquet ne doit pas
-    // les effacer : on les met de côté puis on les fusionne avec le nouveau
-    // bundle (les fichiers du bundle restent prioritaires).
-    const targetStorage = path.join(target, 'storage', 'app');
-    const backupStorage = path.join(app.getPath('userData'), 'backend-storage-backup');
-    let hasBackup = false;
-
-    try {
-      await fs.promises.rename(targetStorage, backupStorage);
-      hasBackup = true;
-    } catch {
-      /* première installation ou storage absent */
-    }
-
-    // La configuration installée (.env : base de données, identifiants
-    // Google…) est propre au poste : une mise à jour du paquet ne doit pas
-    // la remplacer par celle, vierge, embarquée dans le bundle.
-    const targetEnv = path.join(target, '.env');
-    const backupEnv = path.join(app.getPath('userData'), 'backend-env-backup');
-    let hasEnvBackup = false;
-
-    try {
-      await fs.promises.copyFile(targetEnv, backupEnv);
-      hasEnvBackup = true;
-    } catch {
-      /* première installation : le .env du bundle sera utilisé */
-    }
-
-    await fs.promises.rm(target, { recursive: true, force: true });
-    await fs.promises.mkdir(target, { recursive: true });
-    await copyBackendTree(source, target);
-
-    if (hasBackup) {
-      await fs.promises.mkdir(path.dirname(targetStorage), { recursive: true });
-      await fs.promises.cp(backupStorage, targetStorage, {
-        recursive: true,
-        force: false,
-        errorOnExist: false,
-      });
-      await fs.promises.rm(backupStorage, { recursive: true, force: true });
-    }
-
-    if (hasEnvBackup) {
-      await fs.promises.copyFile(backupEnv, targetEnv);
-      await fs.promises.rm(backupEnv, { force: true });
-    }
-
-    await fs.promises.writeFile(marker, version);
-  }
-
-  ensureWritableBackend(target);
-  return { dir: target, refreshed };
-}
-
-async function runMigrations(dir) {
-  const php = findPhp();
-  if (!php || !backendLog) return;
-  backendLog.write(`[${new Date().toISOString()}] migration de la base…\n`);
-  await new Promise((resolve) => {
-    const child = spawn(php, ['artisan', 'migrate', '--force', '--no-interaction'], {
-      cwd: dir,
-      env: { ...process.env, APP_NO_INTERACTION: '1' },
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-    const timer = setTimeout(() => {
-      child.kill('SIGKILL');
-      resolve();
-    }, 30000);
-    child.stdout.pipe(backendLog, { end: false });
-    child.stderr.pipe(backendLog, { end: false });
-    child.on('error', () => { clearTimeout(timer); resolve(); });
-    child.on('exit', (code) => {
-      clearTimeout(timer);
-      backendLog?.write(`[${new Date().toISOString()}] migration terminée (code ${code}).\n`);
-      resolve();
-    });
-  });
-}
-
-async function startBackend() {
-  if (REMOTE_MODE) {
-    // API distante : aucun serveur local à démarrer. On vérifie simplement
-    // que le serveur de l'établissement répond, sans bloquer l'ouverture de
-    // l'application si le réseau est lent — les erreurs s'afficheront dans
-    // l'interface au moment de la connexion.
-    const reachable = await probeApi(6000);
-    logMain(reachable
-      ? `API distante joignable : ${API_ORIGIN}`
-      : `API distante injoignable pour l'instant : ${API_ORIGIN}`);
-    return { reused: true, remote: true };
-  }
-
-  if (await probeApi()) {
-    logMain('API locale déjà active — réutilisation.');
-    return { reused: true };
-  }
-
-  openBackendLog();
-  const { dir, refreshed } = await prepareBackend();
-  backendLog.write(`[${new Date().toISOString()}] API locale : ${dir}\n`);
-  logMain(`API locale : ${dir} (rafraîchie=${refreshed})`);
-
-  if (refreshed && app.isPackaged) await runMigrations(dir);
-
-  const php = findPhp();
-  if (!php) {
-    throw new Error('PHP est introuvable. Installez php-cli (sudo apt install php-cli).');
-  }
-
-  const router = path.join(
-    dir, 'vendor', 'laravel', 'framework', 'src', 'Illuminate',
-    'Foundation', 'resources', 'server.php',
-  );
-  if (!fs.existsSync(router)) {
-    throw new Error('Les dépendances Laravel (vendor) sont absentes du paquet.');
-  }
-
-  const childEnv = {
-    ...process.env,
-    PHP_CLI_SERVER_WORKERS: process.env.PHP_CLI_SERVER_WORKERS || '4',
-  };
-  if (app.isPackaged) {
-    childEnv.APP_ENV = process.env.APP_ENV || 'production';
-    childEnv.APP_DEBUG = process.env.APP_DEBUG || 'false';
-  }
-
-  backend = spawn(
-    php,
-    ['-S', `127.0.0.1:${API_PORT}`, router],
-    {
-      cwd: path.join(dir, 'public'),
-      env: childEnv,
-      stdio: ['ignore', 'pipe', 'pipe'],
-      detached: process.platform !== 'win32',
-    },
-  );
-
-  backend.stdout.pipe(backendLog, { end: false });
-  backend.stderr.pipe(backendLog, { end: false });
-  backend.on('error', (error) => {
-    if (backendLog && !backendLog.writableEnded) {
-      backendLog.write(`[${new Date().toISOString()}] erreur process : ${error.message}\n`);
-    }
-  });
-  backend.on('exit', (code, signal) => {
-    if (backendLog && !backendLog.writableEnded) {
-      backendLog.write(`[${new Date().toISOString()}] API arrêtée (code ${code}, signal ${signal}).\n`);
-    }
-    backend = null;
-  });
-
-  const deadline = Date.now() + 30000;
-  while (Date.now() < deadline) {
-    if (await probeApi(800)) return { reused: false };
-    if (!backend) break;
-    await delay(300);
-  }
-
-  throw new Error(`L'API locale n'a pas démarré. Consultez ${path.join(logDir(), 'backend.log')}.`);
-}
-
-function stopBackend() {
-  if (!backend) return;
-  const child = backend;
-  backend = null;
-  try {
-    if (process.platform === 'win32') child.kill();
-    else process.kill(-child.pid, 'SIGTERM');
-  } catch {
-    try { child.kill(); } catch { /* déjà arrêtée */ }
-  }
-  const timer = setTimeout(() => {
-    try {
-      if (process.platform === 'win32') child.kill('SIGKILL');
-      else process.kill(-child.pid, 'SIGKILL');
-    } catch { /* déjà arrêtée */ }
-  }, 1500);
-  timer.unref();
+async function probeServer() {
+  const reachable = await probeApi(6000);
+  logMain(reachable
+    ? `serveur joignable : ${API_ORIGIN}`
+    : `serveur injoignable pour l'instant : ${API_ORIGIN}`);
 }
 
 /* ------------------------------------------------------------------ */
@@ -695,14 +377,14 @@ async function googleSignInFlow() {
 /* ------------------------------------------------------------------ */
 
 // Canal de mise à jour : variable d'environnement KALANSO_UPDATE_URL ou,
-// sinon, la même clé lue dans le .env du backend installé. Il doit pointer
-// vers un dossier ou un serveur contenant latest-linux.yml et les paquets.
+// sinon, la même clé lue dans le fichier de configuration du poste. Il doit
+// pointer vers un dossier ou un serveur contenant latest-linux.yml et les paquets.
 function updateFeedUrl() {
   const fromEnv = String(process.env.KALANSO_UPDATE_URL || '').trim();
   if (fromEnv) return fromEnv;
 
   try {
-    const envPath = path.join(app.isPackaged ? apiCacheDir() : apiSourceDir(), '.env');
+    const envPath = configEnvPath();
     const content = fs.readFileSync(envPath, 'utf8');
     const match = content.match(/^\s*KALANSO_UPDATE_URL\s*=\s*"?([^"\n\r]+?)"?\s*$/m);
     if (match && match[1].trim()) return match[1].trim();
@@ -880,39 +562,11 @@ async function boot() {
   createWindow();
 
   try {
-    const { reused } = await startBackend();
-    backendLog?.write(`[${new Date().toISOString()}] service ${reused ? 'déjà actif' : 'prêt'}.\n`);
-    logMain(`service ${reused ? 'déjà actif' : 'prêt'}.`);
+    await probeServer();
   } catch (error) {
-    backendLog?.write(`[${new Date().toISOString()}] ÉCHEC : ${error.stack || error.message}\n`);
-    logMain(`ÉCHEC du service local : ${error.stack || error.message}`);
-    if (quitting) return;
-    const message = {
-      type: 'error',
-      title: 'Service local indisponible',
-      message: "L'API locale n'a pas pu démarrer.",
-      detail: (process.platform === 'win32'
-        ? `${error.message}\n\nSur Windows, installez PHP 8.2+ et MySQL/MariaDB `
-          + '(par exemple avec XAMPP), puis démarrez MySQL.\n\n'
-          + `Configuration et accès à la base : ${path.join(apiCacheDir(), '.env')}`
-        : `${error.message}\n\nVérifiez que PHP et MariaDB sont installés et démarrés :\n`
-          + 'sudo apt install php-cli mariadb-server\nsudo systemctl start mariadb\n\n'
-          + `Configuration et accès à la base : ${path.join(apiCacheDir(), '.env')}`)
-        + "\n\nAstuce : pour utiliser le serveur de l'établissement sans PHP local, "
-          + 'ouvrez Paramètres → Serveur de données (réservé au créateur) et saisissez '
-          + 'https://kalanso.mandenbaoubab.com.',
-      buttons: ['Continuer', 'Quitter'],
-      defaultId: 0,
-      cancelId: 1,
-      noLink: true,
-    };
-    const { response } = win && !win.isDestroyed()
-      ? await dialog.showMessageBox(win, message)
-      : await dialog.showMessageBox(message);
-    if (response === 1) {
-      app.quit();
-      return;
-    }
+    // La sonde ne bloque jamais l'ouverture : l'interface affiche son
+    // bandeau « hors-ligne » si le serveur ne répond pas.
+    logMain(`sonde serveur impossible : ${error.stack || error.message}`);
   }
 
   if (quitting) return;
@@ -947,14 +601,10 @@ if (!hasLock) {
   });
 
   app.on('before-quit', () => {
-    quitting = true;
-    stopBackend();
-    backendLog?.end();
     logMain('arrêt demandé.');
   });
 
   app.on('window-all-closed', () => {
-    stopBackend();
     if (process.platform !== 'darwin') app.quit();
   });
 }
@@ -1013,11 +663,9 @@ ipcMain.handle('api:setUrl', (_event, value) => {
     return { ok: false, message: "L'adresse doit commencer par http:// ou https:// (ou « local » pour l'API de développement)" };
   }
 
-  const dir = app.isPackaged ? apiCacheDir() : apiSourceDir();
   try {
-    fs.mkdirSync(dir, { recursive: true });
-    ensureEnvFile(dir);
-    const envPath = path.join(dir, '.env');
+    ensureConfigFile();
+    const envPath = configEnvPath();
     let content = fs.readFileSync(envPath, 'utf8');
     const line = `KALANSO_REMOTE_API_URL=${normalized}`;
     if (/^KALANSO_REMOTE_API_URL=.*$/m.test(content)) {
@@ -1031,7 +679,7 @@ ipcMain.handle('api:setUrl', (_event, value) => {
     return { ok: false, message: "Impossible d'enregistrer la configuration." };
   }
 
-  logMain(`serveur de données : ${normalized || 'API locale'} — redémarrage.`);
+  logMain(`serveur de données : ${normalized === 'local' ? 'API locale (développement)' : normalized || DEFAULT_REMOTE_API} — redémarrage.`);
   app.relaunch();
   quitting = true;
   app.quit();
