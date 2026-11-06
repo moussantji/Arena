@@ -15,11 +15,11 @@ export default function About() {
             <div style={{ display: 'grid', gap: 16 }}>
               <span className="eyebrow">Notre histoire</span>
               <h1 className="display-lg">
-                Une initiative malienne <span className="italic-accent">au service de la santé</span>
+                Une initiative malienne <span className="italic-accent">au chevet de la santé</span>
               </h1>
               <p className="lead">
                 L’Institut Privé de Formation Sanitaire Bernard Kouchner est né de la volonté de professionnels
-                maliens de la santé de réunir leurs expériences et de renforcer durablement les compétences locales.
+                maliens de la santé : unir leurs expériences et renforcer durablement les compétences locales.
               </p>
             </div>
             <Reveal className="media-frame" style={{ borderRadius: 'var(--r-lg)' }}>
@@ -34,12 +34,12 @@ export default function About() {
           <div className="grid-2" style={{ gap: 40, alignItems: 'start' }}>
             <Reveal style={{ display: 'grid', gap: 16 }}>
               <p style={{ fontSize: '1.02rem', lineHeight: 1.8, color: 'rgba(4,19,15,0.76)' }}>
-                Les enseignements tirés des crises sanitaires récentes ont confirmé l’importance de former des
-                professionnels rigoureux, solidaires et capables d’agir au plus près des réalités du terrain.
+                Les crises sanitaires récentes l’ont confirmé : il faut former des professionnels rigoureux,
+                solidaires et capables d’agir au plus près des réalités du terrain.
               </p>
               <p style={{ fontSize: '1.02rem', lineHeight: 1.8, color: 'rgba(4,19,15,0.76)' }}>
-                Notre ambition est de contribuer à la souveraineté sanitaire du Mali et du Sahel par la formation
-                initiale et continue, l’innovation pédagogique et l’accompagnement des futurs acteurs de la santé.
+                Notre ambition : contribuer à la souveraineté sanitaire du Mali et du Sahel grâce à la formation
+                initiale et continue, à l’innovation pédagogique et à l’accompagnement des futurs acteurs de la santé.
               </p>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 8 }}>
                 <Link to="/formations" className="btn btn-primary">Voir les formations <ArrowRight className="arrow" /></Link>
@@ -68,7 +68,7 @@ export default function About() {
               <span className="eyebrow">Reconnaissance officielle</span>
               <h2 className="display-md">Autorisation ministérielle et paiement sécurisé</h2>
               <p className="lead">
-                Pour rassurer les parents, les candidats et les partenaires, l’Institut affiche clairement ses
+                Pour rassurer les parents, les candidats et les partenaires, l’Institut rend visibles ses
                 références officielles et ses modalités de paiement.
               </p>
             </div>
@@ -77,7 +77,7 @@ export default function About() {
             {[
               { icon: ShieldCheck, t: 'Références officielles du MESRS', d: `Création : ${school.agrement.creation}. Ouverture : ${school.agrement.ouverture}. Localisation : Hippodrome-Bamako.` },
               { icon: Landmark, t: 'Versement ou virement bancaire', d: `Paiement sur le compte BNDA de l’Institut Bernard Kouchner : ${school.bank.compte}.` },
-              { icon: Users, t: 'Accompagnement administratif', d: 'L’équipe accompagne les candidats dans le choix de la formation, la constitution du dossier et le suivi de l’inscription.' },
+              { icon: Users, t: 'Accompagnement administratif', d: 'L’équipe aide les candidats à choisir leur formation, à constituer le dossier et à suivre l’inscription.' },
             ].map((x, i) => (
               <Reveal key={x.t} delay={i * 90} className="card value-card">
                 <div className="value-icon"><x.icon /></div>
@@ -95,7 +95,7 @@ export default function About() {
           <div className="section-head">
             <Reveal className="titles">
               <span className="eyebrow">Pourquoi nous choisir</span>
-              <h2 className="display-md" style={{ color: '#fff' }}>Des valeurs fortes au service de l’apprentissage</h2>
+              <h2 className="display-md" style={{ color: '#fff' }}>Des valeurs solides au service de l’apprentissage</h2>
             </Reveal>
           </div>
           <div className="grid-4">
@@ -142,9 +142,9 @@ export default function About() {
           <div className="section-head">
             <div className="titles">
               <span className="eyebrow">Notre équipe</span>
-              <h2 className="display-md">L’administration qui accompagne l’institut</h2>
+              <h2 className="display-md">L’administration qui fait vivre l’institut</h2>
               <p className="lead">
-                Des membres de l’administration engagés dans l’organisation, l’encadrement et le bon fonctionnement
+                Une administration engagée dans l’organisation, l’encadrement et le bon fonctionnement
                 de l’établissement.
               </p>
             </div>
@@ -193,7 +193,7 @@ export default function About() {
                 <span className="eyebrow">Expérience terrain</span>
                 <h3 className="display-sm">Nos terrains de stage</h3>
                 <p style={{ fontSize: '0.88rem', color: 'rgba(4,19,15,0.6)' }}>
-                  Les stages commencent dès la fin du premier semestre, selon la filière et la programmation
+                  Les stages démarrent dès la fin du premier semestre, selon la filière et la programmation
                   pédagogique.
                 </p>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 6 }}>

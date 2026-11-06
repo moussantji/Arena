@@ -41,10 +41,10 @@ export default function Home() {
           </div>
 
           <h1 className="display-xl">
-            La santé commence par une <em>formation sérieuse</em>.
+            La santé passe d’abord par une <em>formation exigeante</em>.
           </h1>
 
-          <p className="hero-sub">{school.claim} Intégrez un institut qui place la qualité, la rigueur et l’engagement au cœur de son action.</p>
+          <p className="hero-sub">{school.claim} Rejoignez un institut où la qualité, la rigueur et l’engagement guident chaque décision.</p>
 
           <div className="hero-cta">
             <Link to="/admission" className="btn btn-gold btn-lg">
@@ -87,11 +87,11 @@ export default function Home() {
             <Reveal className="titles">
               <span className="eyebrow">Notre engagement</span>
               <h2 className="display-lg">
-                Une école de santé ancrée dans les <span className="italic-accent">réalités du Mali</span>
+                Une école de santé enracinée dans les <span className="italic-accent">réalités du Mali</span>
               </h2>
               <p className="lead">
-                Des parcours conçus pour développer des compétences utiles, une pratique responsable et une
-                meilleure capacité d’action au service des patients et des communautés.
+                Des parcours qui développent des compétences concrètes, une pratique responsable et une
+                réelle capacité d’action auprès des patients et des communautés.
               </p>
             </Reveal>
             <Reveal delay={120}>
@@ -134,10 +134,10 @@ export default function Home() {
 
             <Reveal delay={120} style={{ display: 'grid', gap: 22 }}>
               <span className="eyebrow">Confiance & inscription</span>
-              <h2 className="display-md">Un institut officiellement autorisé, avec des modalités de paiement claires</h2>
+              <h2 className="display-md">Un institut officiellement autorisé, des modalités de paiement transparentes</h2>
               <p className="lead">
-                L’Institut Privé de Formation Sanitaire Bernard Kouchner (IPFS-BK) accompagne les candidats avec
-                une procédure d’inscription simple, transparente et adaptée aux réalités du Mali.
+                L’Institut Privé de Formation Sanitaire Bernard Kouchner (IPFS-BK) guide chaque candidat
+                dans une inscription simple, transparente et adaptée aux réalités du Mali.
               </p>
               <ul className="check-list">
                 <li>
@@ -157,7 +157,7 @@ export default function Home() {
                 <li>
                   <span className="tick"><Check /></span>
                   <span>
-                    <strong>Accompagnement candidat.</strong> Notre équipe vous guide du choix de la formation à la
+                    <strong>Accompagnement candidat.</strong> Notre équipe vous accompagne du choix de la formation jusqu’à la
                     validation du dossier.
                   </span>
                 </li>
@@ -177,8 +177,8 @@ export default function Home() {
           <div className="section-head">
             <Reveal className="titles">
               <span className="eyebrow">Parcours d’admission</span>
-              <h2 className="display-md">Comment rejoindre l’Institut en 3 étapes</h2>
-              <p className="lead">Un processus clair, simple et rassurant pour finaliser votre inscription sans confusion.</p>
+              <h2 className="display-md">Rejoindre l’Institut en 3 étapes</h2>
+              <p className="lead">Un parcours clair et rassurant pour finaliser votre inscription sereinement.</p>
             </Reveal>
           </div>
           <div className="grid-3">
@@ -207,11 +207,11 @@ export default function Home() {
             <Reveal className="titles">
               <span className="eyebrow">Nos programmes</span>
               <h2 className="display-lg">
-                Des formations pensées pour construire un <span className="italic-accent">vrai avenir professionnel</span>
+                Des formations conçues pour bâtir un <span className="italic-accent">véritable avenir professionnel</span>
               </h2>
               <p className="lead">
-                Des parcours adaptés aux réalités du terrain, avec des contenus professionnalisants et des niveaux
-                d’accès variés selon votre profil.
+                Des parcours proches du terrain, des contenus professionnalisants et des niveaux
+                d’accès adaptés à chaque profil.
               </p>
             </Reveal>
             <Reveal delay={100}>
@@ -254,11 +254,11 @@ export default function Home() {
             <Reveal>
               <span className="eyebrow">Pourquoi nous choisir</span>
               <h2 className="display-lg" style={{ margin: '16px 0 18px', color: '#fff' }}>
-                Une école de santé tournée vers l’excellence et <span style={{ fontStyle: 'italic', color: 'var(--gold-2)' }}>l’avenir</span>
+                Une école de santé orientée vers l’excellence et <span style={{ fontStyle: 'italic', color: 'var(--gold-2)' }}>l’avenir</span>
               </h2>
               <p className="lead" style={{ maxWidth: '48ch' }}>
-                Nous combinons expertise pédagogique, formations professionnalisantes, accompagnement humain et
-                vision santé 4.0 pour préparer chaque étudiant à réussir durablement.
+                Nous réunissons expertise pédagogique, formations professionnalisantes, accompagnement humain
+                et vision santé 4.0 pour préparer chaque étudiant à réussir dans la durée.
               </p>
               <div style={{ display: 'flex', gap: 12, marginTop: 26, flexWrap: 'wrap' }}>
                 <Link to="/a-propos" className="btn btn-gold">Notre histoire <ArrowRight className="arrow" /></Link>
@@ -330,9 +330,9 @@ export default function Home() {
             <div style={{ display: 'flex', gap: 20, justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center' }}>
               <div>
                 <span className="eyebrow">Expérience terrain</span>
-                <h2 className="display-sm" style={{ marginTop: 12 }}>La pratique au cœur de l’apprentissage</h2>
+                <h2 className="display-sm" style={{ marginTop: 12 }}>L’apprentissage par la pratique</h2>
                 <p style={{ fontSize: '0.9rem', color: 'rgba(4,19,15,0.6)', marginTop: 8, maxWidth: '58ch' }}>
-                  Les stages commencent dès la fin du premier semestre de la première année, selon la filière et la
+                  Les stages débutent dès la fin du premier semestre de première année, selon la filière et la
                   programmation pédagogique.
                 </p>
               </div>
@@ -368,7 +368,7 @@ export default function Home() {
             <Reveal className="titles">
               <span className="eyebrow">Avis authentiques</span>
               <h2 className="display-md">Ce que disent nos étudiants</h2>
-              <p className="lead">Les témoignages ci-dessous ont été envoyés par des étudiants puis vérifiés par l’Institut.</p>
+              <p className="lead">Les témoignages ci-dessous ont été transmis par des étudiants, puis vérifiés par l’Institut.</p>
             </Reveal>
             <Reveal delay={100}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderRadius: 999, border: '1px solid var(--line-strong)', background: '#fff' }}>
@@ -408,7 +408,7 @@ export default function Home() {
             <Reveal className="titles">
               <span className="eyebrow">À la une</span>
               <h2 className="display-lg">Actualités de l’Institut</h2>
-              <p className="lead">Rentrées, résultats, vie étudiante et communiqués : suivez la vie de l’IPFS-BK.</p>
+              <p className="lead">Rentrées, résultats, vie étudiante et communiqués : suivez l’actualité de l’IPFS-BK.</p>
             </Reveal>
             <Reveal delay={100}>
               <Link to="/blog" className="btn btn-ghost">Tous les articles <ArrowRight className="arrow" /></Link>
@@ -490,10 +490,10 @@ export default function Home() {
         <div className="container">
           <Reveal className="cta-panel">
             <span className="eyebrow on-dark">Passez à l’action</span>
-            <h2 className="display-lg">Construisez votre avenir avec nous</h2>
+            <h2 className="display-lg">Bâtissez votre avenir avec nous</h2>
             <p>
-              Explorez nos programmes, découvrez nos opportunités et prenez contact avec notre équipe. Notre
-              accompagnement candidat vous suit de la première question jusqu’à la validation de votre inscription.
+              Parcourez nos programmes, saisissez les opportunités et échangez avec notre équipe. Notre
+              accompagnement candidat vous suit de la première question jusqu’à la validation de votre dossier.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', position: 'relative', zIndex: 2 }}>
               <Link to="/admission" className="btn btn-gold btn-lg">S’inscrire maintenant <ArrowRight className="arrow" /></Link>

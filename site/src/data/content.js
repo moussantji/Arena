@@ -4,9 +4,9 @@
 export const school = {
   shortName: 'IPFS-BK',
   name: 'Institut Privé de Formation Sanitaire Bernard Kouchner',
-  tagline: 'La santé commence par une formation sérieuse.',
+  tagline: 'Une formation sérieuse, au service de la santé.',
   claim:
-    'Nous formons des apprenants compétents, responsables et prêts à relever les défis du terrain.',
+    'Nous préparons des apprenants compétents et responsables, capables de répondre aux réalités du terrain.',
   city: 'Bamako',
   quartier: 'Hippodrome 1',
   address: 'Hippodrome 1, 1 derrière le siège d’Orange Mali, RN27, Bamako — Mali',
@@ -41,7 +41,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: '450 000 FCFA',
     resume:
-      'Étudiez la prévention, la rééducation fonctionnelle et l’accompagnement de la mobilité des patients.',
+      'Apprenez la prévention, la rééducation fonctionnelle et l’accompagnement du mouvement chez le patient.',
     image: '/img/formations/kine.jpg',
     populaire: true,
     programme:
@@ -57,7 +57,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: '290 000 FCFA',
     resume:
-      'Formez-vous aux soins, à la prévention et aux actions de santé menées au bénéfice des communautés.',
+      'Formez-vous aux soins, à la prévention et aux actions de santé utiles aux communautés.',
     image: '/img/formations/infirmier.jpg',
     programme:
       'Un parcours orienté soins de proximité, prévention, éducation à la santé et travail en équipe au sein des CSCom et structures communautaires.',
@@ -73,7 +73,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: '290 000 FCFA',
     resume:
-      'Développez les compétences nécessaires à l’accompagnement de la mère, du nouveau-né et de l’enfant.',
+      'Acquérez les compétences pour accompagner la mère, le nouveau-né et l’enfant.',
     image: '/img/care.jpg',
     populaire: true,
     programme:
@@ -90,7 +90,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: '290 000 FCFA',
     resume:
-      'Préparez-vous aux activités techniques de laboratoire, de pharmacie et de contrôle sanitaire.',
+      'Préparez-vous aux gestes techniques du laboratoire, de la pharmacie et du contrôle sanitaire.',
     image: '/img/lab.jpg',
     populaire: true,
     programme:
@@ -106,7 +106,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: '100 000 FCFA',
     resume:
-      'Acquérez les compétences essentielles pour accompagner les patients et assister l’équipe soignante.',
+      'Acquérez les gestes essentiels pour accompagner les patients et seconder l’équipe soignante.',
     image: '/img/hero.jpg',
     populaire: true,
     programme:
@@ -122,7 +122,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: '410 000 FCFA',
     resume:
-      'Formez-vous au métier d’Infirmier d’État et assurez des soins de qualité aux patients, aux familles et aux communautés.',
+      'Devenez Infirmier d’État et offrez des soins de qualité aux patients, aux familles et aux communautés.',
     image: '/img/formations/infirmier.jpg',
     programme:
       'Soins infirmiers médicaux et chirurgicaux, urgences, santé publique, encadrement et démarche qualité.',
@@ -137,7 +137,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: '410 000 FCFA',
     resume:
-      'Participez à la santé de la mère, du nouveau-né et de la famille à travers une formation complète et orientée vers la pratique.',
+      'Contribuez à la santé de la mère, du nouveau-né et de la famille grâce à une formation complète, tournée vers la pratique.',
     image: '/img/care.jpg',
     programme:
       'Obstétrique, suivi de grossesse à risque, réanimation néonatale, planification familiale et pratique hospitalière.',
@@ -152,7 +152,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: '410 000 FCFA',
     resume:
-      'Préparez-vous aux techniques d’analyses biologiques indispensables au diagnostic et au suivi médical.',
+      'Maîtrisez les analyses biologiques indispensables au diagnostic et au suivi médical.',
     image: '/img/lab.jpg',
     programme:
       'Hématologie, biochimie, microbiologie, immunologie et assurance qualité au laboratoire d’analyses.',
@@ -167,7 +167,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: '450 000 FCFA',
     resume:
-      'Licence professionnelle pour la prise en charge nutritionnelle et la prévention des maladies liées à l’alimentation.',
+      'Une licence professionnelle pour la prise en charge nutritionnelle et la prévention des maladies liées à l’alimentation.',
     image: '/img/campus.jpg',
     populaire: true,
     programme:
@@ -184,7 +184,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: '450 000 FCFA',
     resume:
-      'Une formation complète alliant compétences scientifiques, techniques de vente et expérience terrain pour intégrer le secteur pharmaceutique.',
+      'Une formation complète — sciences, techniques de vente et expérience terrain — pour entrer dans le secteur pharmaceutique.',
     image: '/img/team-3.jpg',
     populaire: true,
     programme:
@@ -200,7 +200,7 @@ export const formations = [
     mode: 'Hybride',
     tarif: '250 000 FCFA',
     resume:
-      'Passez du terrain au pilotage d’équipe et apprenez à accompagner la performance des délégués médicaux.',
+      'Passez du terrain au pilotage d’équipe et apprenez à accompagner la performance des délégués.',
     image: '/img/graduation.jpg',
     programme:
       'Management d’équipe de délégués, planification des tournées, indicateurs de performance et coaching terrain.',
@@ -216,7 +216,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: 'Sur demande',
     resume:
-      'Maîtrisez votre voix, votre posture et votre message pour prendre la parole avec confiance et convaincre votre public.',
+      'Travaillez votre voix, votre posture et votre message pour prendre la parole avec assurance.',
     image: '/img/graduation.jpg',
     populaire: true,
     programme:
@@ -232,7 +232,7 @@ export const formations = [
     mode: 'Hybride',
     tarif: 'Sur demande',
     resume:
-      'Progressez en anglais dans un cadre vivant, pratique et convivial, quel que soit votre niveau de départ.',
+      'Progressez en anglais dans un cadre vivant et pratique, quel que soit votre niveau de départ.',
     image: '/img/campus.jpg',
     programme:
       'Anglais médical, conversation, compréhension orale et écrite, préparation aux échanges et publications scientifiques.',
@@ -247,7 +247,7 @@ export const formations = [
     mode: 'En présentiel',
     tarif: '125 000 FCFA',
     resume:
-      'Une formation polyvalente pour accueillir, informer et assurer le suivi administratif dans une structure de santé.',
+      'Une formation polyvalente pour accueillir, informer et gérer le suivi administratif dans une structure de santé.',
     image: '/img/formations/infirmier.jpg',
     programme:
       'Accueil et orientation des patients, gestion du dossier médical, tenue de caisse, stock pharmaceutique et communication.',

@@ -35,8 +35,8 @@ export default function Blog() {
               Le journal de l’Institut <span className="italic-accent">Bernard Kouchner</span>
             </h1>
             <p className="lead">
-              Formations, vie académique, vie étudiante, communiqués et métiers de la santé : toute la vie de
-              l’IPFS-BK, mise à jour par la Direction des études.
+              Formations, vie académique, vie étudiante, communiqués et métiers de la santé : suivez le
+              quotidien de l’IPFS-BK, mis à jour par la Direction des études.
             </p>
           </div>
         </div>
@@ -184,9 +184,9 @@ export default function Blog() {
 
             <Reveal className="card" style={{ padding: 'clamp(22px,3vw,32px)', alignSelf: 'start', display: 'grid', gap: 14 }}>
               <span className="eyebrow">Newsletter</span>
-              <h3 className="display-sm">Recevez les actualités de l’Institut</h3>
+              <h3 className="display-sm">L’actualité de l’Institut, chaque mois</h3>
               <p style={{ fontSize: '0.88rem', color: 'rgba(4,19,15,0.6)' }}>
-                Rentrées, résultats, bourses et événements : un e-mail clair, une fois par mois.
+                Rentrées, résultats, bourses et événements : un e-mail clair, une fois par mois, sans superflu.
               </p>
               <form
                 onSubmit={(e) => { e.preventDefault(); show('Inscription enregistrée — merci !'); e.target.reset(); }}

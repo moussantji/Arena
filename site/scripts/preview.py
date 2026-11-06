@@ -219,7 +219,7 @@ class Canvas:
         self.rect(x, y, 42, 42, fill=EMERALD, r=12)
         self.circle(x + 33, y + 9, 13, fill=(26 / 255, 130 / 255, 100 / 255), opacity=0.9)
         self.text(x + 21, y + 27, "BK", size=14, color=GOLD2, serif=True, anchor="center")
-        self.text(x + 54, y + 19, "Bernard Kouchner", size=15, color=fg, serif=True)
+        self.text(x + 54, y + 19, "Bernard Kouchner", size=15, color=(WHITE if dark else EMERALD), serif=True)
         self.text(x + 54, y + 34, "IPFS-BK · HIPPODROME 1", size=7.5, color=sub, spacing=1.3)
 
     def header(self, active="Accueil"):
@@ -302,13 +302,14 @@ def page_home():
         c.chip(cxp, 126, cxl, fg=WHITE, bg=WHITE, size=9.5, h=26, padx=12,
                stroke=(0.92, 0.96, 0.94), opacity=0.16)
 
-    c.text(72, 250, "La santé commence par", size=64, color=WHITE, serif=True)
-    c.text(72, 318, "une", size=64, color=WHITE, serif=True)
-    c.text(190, 318, "formation sérieuse", size=64, color=GOLD2, serif=True)
-    c.text(716, 318, ".", size=64, color=GOLD2, serif=True)
+    c.text(72, 250, "La santé passe d’abord", size=64, color=WHITE, serif=True)
+    c.text(72, 318, "par une", size=64, color=WHITE, serif=True)
+    gx = 72 + c.measure("par une ", serif=True, size=64)
+    c.text(gx, 318, "formation exigeante", size=64, color=GOLD2, serif=True)
+    c.text(gx + c.measure("formation exigeante", serif=True, size=64) + 2, 318, ".", size=64, color=GOLD2, serif=True)
     c.wrap_px(72, 372,
-              "Nous formons des apprenants compétents, responsables et prêts à relever les défis du terrain. "
-              "Intégrez un institut qui place la qualité, la rigueur et l'engagement au cœur de son action.",
+              "Nous préparons des apprenants compétents et responsables, capables de répondre aux réalités du "
+              "terrain. Rejoignez un institut où la qualité, la rigueur et l’engagement guident chaque décision.",
               15, 660, color=(0.82, 0.86, 0.84), lh=24)
     c.btn(72, 452, "S'inscrire en ligne  →", h=52, bg=GOLD, fg=INK, size=14)
     c.btn(320, 452, "Explorer les 14 formations", h=52, bg=WHITE, fg=WHITE, size=14,
@@ -335,11 +336,11 @@ def page_home():
         c.text(x - 22, 648, "◆", size=6.5, color=GOLD)
 
     c.eyebrow(72, 726, "Notre engagement")
-    c.text(72, 776, "Une école de santé ancrée dans les réalités", size=36, color=INK, serif=True)
+    c.text(72, 776, "Une école de santé enracinée dans les réalités", size=36, color=INK, serif=True)
     c.text(72, 814, "du Mali", size=36, color=EMERALD, serif=True)
     c.wrap_px(792, 748,
-              "Des parcours conçus pour développer des compétences utiles, une pratique responsable et une "
-              "meilleure capacité d'action au service des patients et des communautés.",
+              "Des parcours qui développent des compétences concrètes, une pratique responsable et une réelle "
+              "capacité d’action auprès des patients et des communautés.",
               13.5, 470, color=MUTED, lh=21)
     c.text(1296, 812, "Découvrir l'institut ↗", size=12, color=EMERALD, anchor="right")
 
@@ -365,8 +366,8 @@ def page_formations():
     c.header("Formations")
     c.text(72, 128, "Accueil  /  Formations", size=11, color=(0.6, 0.66, 0.63))
     c.eyebrow(72, 168, "14 programmes · DEF · BAC · Formation continue", color=GOLD2)
-    c.text(72, 218, "Des formations pensées pour construire", size=40, color=WHITE, serif=True)
-    c.text(72, 264, "un vrai avenir professionnel", size=40, color=GOLD2, serif=True)
+    c.text(72, 218, "Des formations conçues pour bâtir", size=40, color=WHITE, serif=True)
+    c.text(72, 264, "un véritable avenir professionnel", size=40, color=GOLD2, serif=True)
 
     c.rect(72, 306, 1296, 96, fill=WHITE, r=18, stroke=LINE)
     c.rect(94, 324, 400, 36, fill=WHITE, r=18, stroke=(0.78, 0.76, 0.7))
@@ -748,7 +749,7 @@ def page_blog():
         c.text(x + 20, 900, "Lire l'article  ↗", size=11, color=EMERALD)
 
     c.rect(72, 928, 1296, 44, fill=CREAM2, r=14)
-    c.text(100, 956, "Recevez les actualités de l'Institut — newsletter mensuelle", size=11.5, color=MUTED)
+    c.text(100, 956, "L'actualité de l'Institut — newsletter mensuelle", size=11.5, color=MUTED)
     c.btn(1150, 936, "Je m'abonne  →", h=28, size=10)
     return c
 
@@ -762,7 +763,7 @@ def mobile_header(c, dark=False):
     c.line(0, 62, c.w, 62, color=(0.2, 0.26, 0.24) if dark else LINE)
     c.rect(16, 13, 36, 36, fill=EMERALD, r=11)
     c.text(34, 37, "BK", size=11.5, color=GOLD2, serif=True, anchor="center")
-    c.text(62, 32, "Bernard Kouchner", size=14, color=fg, serif=True)
+    c.text(62, 32, "Bernard Kouchner", size=14, color=(WHITE if dark else EMERALD), serif=True)
     c.text(62, 46, "IPFS-BK · HIPPODROME 1", size=6.5, color=sub, spacing=0.9)
     c.rect(340, 15, 34, 34, fill=(1, 1, 1), r=10, stroke=(0.82, 0.8, 0.74), opacity=0.9 if not dark else 0.12)
     for i in range(3):
@@ -783,13 +784,13 @@ def page_mobile():
     c.chip(176, 86, "Arrêté n°2026-0401", fg=WHITE, bg=WHITE, size=8, h=22, padx=9,
            stroke=(0.92, 0.96, 0.94), opacity=0.16)
 
-    c.text(16, 190, "La santé", size=38, color=WHITE, serif=True)
-    c.text(16, 232, "commence par", size=38, color=WHITE, serif=True)
-    c.text(16, 286, "une formation", size=38, color=GOLD2, serif=True)
-    c.text(16, 328, "sérieuse", size=38, color=GOLD2, serif=True)
-    c.text(16 + c.measure("sérieuse", serif=True, size=38) + 2, 328, ".", size=38, color=GOLD2, serif=True)
+    c.text(16, 190, "La santé passe", size=38, color=WHITE, serif=True)
+    c.text(16, 232, "d’abord par une", size=38, color=WHITE, serif=True)
+    c.text(16, 286, "formation", size=38, color=GOLD2, serif=True)
+    c.text(16, 328, "exigeante", size=38, color=GOLD2, serif=True)
+    c.text(16 + c.measure("exigeante", serif=True, size=38) + 2, 328, ".", size=38, color=GOLD2, serif=True)
     c.wrap_px(16, 366,
-              "Nous formons des apprenants compétents, responsables et prêts à relever les défis du terrain.",
+              "Nous préparons des apprenants compétents et responsables, capables de répondre aux réalités du terrain.",
               12.5, 330, color=(0.84, 0.88, 0.86), lh=19)
 
     c.btn(16, 424, "S'inscrire en ligne  ›", w=358, h=46, bg=GOLD, fg=INK, size=12.5)
@@ -815,11 +816,11 @@ def page_mobile():
     # contenu : engagement
     c.eyebrow(16, 790, "Notre engagement")
     c.text(16, 828, "Une école de santé", size=25, color=INK, serif=True)
-    c.text(16, 858, "ancrée dans les", size=25, color=INK, serif=True)
+    c.text(16, 858, "enracinée dans les", size=25, color=INK, serif=True)
     c.text(16, 888, "réalités du Mali", size=25, color=EMERALD, serif=True)
     c.wrap_px(16, 920,
-              "Des parcours conçus pour développer des compétences utiles et une pratique "
-              "responsable au service des patients et des communautés.",
+              "Des parcours qui développent des compétences concrètes et une pratique "
+              "responsable auprès des patients et des communautés.",
               11.5, 350, color=MUTED, lh=18)
 
     # cartes empilées
@@ -849,12 +850,14 @@ def page_tablet():
         c.rect(753, 30 + i * 6, 18, 1.6, fill=INK, r=1)
     c.chip(40, 116, "Hippodrome 1 · Bamako", fg=WHITE, bg=WHITE, size=9, h=24, padx=10,
            stroke=(0.92, 0.96, 0.94), opacity=0.16)
-    c.text(40, 210, "La santé commence par", size=44, color=WHITE, serif=True)
-    c.text(40, 262, "une formation sérieuse", size=44, color=GOLD2, serif=True)
-    c.text(40 + c.measure("une formation sérieuse", serif=True, size=44) + 2, 262, ".", size=44, color=GOLD2, serif=True)
+    c.text(40, 210, "La santé passe d’abord", size=44, color=WHITE, serif=True)
+    c.text(40, 262, "par une", size=44, color=WHITE, serif=True)
+    tx = 40 + c.measure("par une ", serif=True, size=44)
+    c.text(tx, 262, "formation exigeante", size=44, color=GOLD2, serif=True)
+    c.text(tx + c.measure("formation exigeante", serif=True, size=44) + 2, 262, ".", size=44, color=GOLD2, serif=True)
     c.wrap_px(40, 306,
-              "Nous formons des apprenants compétents, responsables et prêts à relever les défis du terrain. "
-              "Intégrez un institut qui place la qualité, la rigueur et l'engagement au cœur de son action.",
+              "Nous préparons des apprenants compétents et responsables, capables de répondre aux réalités du "
+              "terrain. Rejoignez un institut où la qualité, la rigueur et l’engagement guident chaque décision.",
               13.5, 520, color=(0.82, 0.86, 0.84), lh=21)
     c.btn(40, 388, "S'inscrire en ligne  ›", h=48, bg=GOLD, fg=INK, size=12.5)
     c.btn(268, 388, "Explorer les 14 formations", h=48, bg=WHITE, fg=WHITE, size=12.5,
@@ -866,8 +869,8 @@ def page_tablet():
         c.text(x, 504, l, size=10, color=(0.78, 0.83, 0.81))
     # grille 2 colonnes
     c.eyebrow(40, 590, "Nos programmes")
-    c.text(40, 632, "Des formations pensées pour construire", size=30, color=INK, serif=True)
-    c.text(40, 668, "un vrai avenir professionnel", size=30, color=EMERALD, serif=True)
+    c.text(40, 632, "Des formations conçues pour bâtir", size=30, color=INK, serif=True)
+    c.text(40, 668, "un véritable avenir professionnel", size=30, color=EMERALD, serif=True)
     for i in range(4):
         col, row = i % 2, i // 2
         x, y = 40 + col * 388, 710 + row * 274

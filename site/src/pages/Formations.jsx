@@ -43,11 +43,11 @@ export default function Formations() {
           <div style={{ maxWidth: 760, display: 'grid', gap: 18, paddingTop: 12 }}>
             <span className="eyebrow">14 programmes · DEF · BAC · Formation continue</span>
             <h1 className="display-lg" style={{ color: '#fff' }}>
-              Des formations pensées pour construire un <span style={{ fontStyle: 'italic', color: 'var(--gold-2)' }}>vrai avenir professionnel</span>
+              Des formations conçues pour bâtir un <span style={{ fontStyle: 'italic', color: 'var(--gold-2)' }}>véritable avenir professionnel</span>
             </h1>
             <p className="lead" style={{ color: 'rgba(255,255,255,0.7)' }}>
               Soins infirmiers, santé maternelle et infantile, kinésithérapie, biologie médicale, nutrition,
-              promotion médicale, langues et communication. Trouvez le parcours qui correspond à votre projet.
+              promotion médicale, langues et communication : identifiez le parcours qui rejoint votre projet.
             </p>
           </div>
         </div>
@@ -135,9 +135,9 @@ export default function Formations() {
 
           <Reveal className="card" style={{ marginTop: 40, padding: 'clamp(22px,3.4vw,36px)', display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 260 }}>
-              <h3 className="display-sm">Vous hésitez entre deux filières ?</h3>
+              <h3 className="display-sm">Une hésitation entre deux filières ?</h3>
               <p style={{ fontSize: '0.9rem', color: 'rgba(4,19,15,0.6)', marginTop: 6 }}>
-                Notre équipe vous accompagne dans le choix de la formation, la constitution du dossier et le suivi de
+                Notre équipe vous aide à choisir la formation, à constituer le dossier et à suivre
                 l’inscription.
               </p>
             </div>
@@ -217,7 +217,7 @@ export function FormationDetail({ f }) {
             <div style={{ display: 'grid', gap: 20 }}>
               <Reveal className="card" style={{ padding: 'clamp(22px,3vw,34px)' }}>
                 <span className="eyebrow">01 — Le programme</span>
-                <h2 className="display-sm" style={{ margin: '14px 0 12px' }}>Une formation conçue pour passer à l’action</h2>
+                <h2 className="display-sm" style={{ margin: '14px 0 12px' }}>Un parcours pensé pour la pratique</h2>
                 <p style={{ fontSize: '0.96rem', color: 'rgba(4,19,15,0.7)', lineHeight: 1.75 }}>{f.programme}</p>
               </Reveal>
 

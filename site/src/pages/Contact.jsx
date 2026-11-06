@@ -34,7 +34,7 @@ export default function Contact() {
             </h1>
             <p className="lead" style={{ color: 'rgba(255,255,255,0.7)' }}>
               Une question sur une formation, un dossier ou un partenariat ? L’équipe de l’Institut Bernard Kouchner
-              vous répond du lundi au vendredi, de 8 h à 18 h.
+              vous répond du lundi au vendredi, entre 8 h et 18 h.
             </p>
           </div>
         </div>
@@ -47,7 +47,7 @@ export default function Contact() {
               <span className="eyebrow">Formulaire</span>
               <h2 className="display-sm" style={{ margin: '12px 0 6px' }}>Envoyez-nous un message</h2>
               <p style={{ fontSize: '0.88rem', color: 'rgba(4,19,15,0.56)', marginBottom: 20 }}>
-                Remplissez ce formulaire et nous reviendrons vers vous dans les meilleurs délais.
+                Remplissez le formulaire : nous revenons vers vous dans les meilleurs délais.
               </p>
 
               {sent ? (
