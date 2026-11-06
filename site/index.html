@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#04130f" />
+    <title>Institut Bernard Kouchner — IPFS-BK | École de santé à Bamako</title>
+    <meta
+      name="description"
+      content="Institut Privé de Formation Sanitaire Bernard Kouchner (IPFS-BK), Hippodrome 1, Bamako. Formations DEF, BAC et continues en santé : infirmier, sage-femme, kinésithérapie, biologie médicale, nutrition, délégué médical. Tél. +223 76 74 74 07."
+    />
+    <meta property="og:title" content="Institut Bernard Kouchner — IPFS-BK" />
+    <meta
+      property="og:description"
+      content="Nous formons des apprenants compétents, responsables et prêts à relever les défis du terrain."
+    />
+    <meta property="og:image" content="/img/hero.jpg" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <style>
+      /* État de chargement : évite une page blanche si le JS est lent ou bloqué. */
+      #root:empty {
+        min-height: 100svh;
+        display: grid;
+        place-content: center;
+        justify-items: center;
+        gap: 18px;
+        background: radial-gradient(70% 60% at 50% 0%, #0c2a22, #04130f 70%);
+        color: #fbf8f2;
+        font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+        text-align: center;
+        padding: 24px;
+      }
+      #root:empty::before {
+        content: 'BK';
+        width: 64px;
+        height: 64px;
+        border-radius: 20px;
+        display: grid;
+        place-items: center;
+        font-family: Georgia, serif;
+        font-size: 22px;
+        color: #f0d9a7;
+        background: linear-gradient(150deg, #16926c, #04130f);
+        box-shadow: 0 20px 40px -18px rgba(0, 0, 0, 0.8);
+      }
+      #root:empty::after {
+        content: 'Institut Bernard Kouchner — chargement de la page…';
+        font-size: 14px;
+        letter-spacing: 0.02em;
+        color: rgba(251, 248, 242, 0.62);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

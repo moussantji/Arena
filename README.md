@@ -11,6 +11,21 @@ au premier lancement, un écran de configuration crée l'établissement, l'anné
 scolaire et le premier compte Direction. Les vraies données sont ensuite saisies
 directement dans Kalanso.
 
+## Site vitrine IPFS-BK
+
+Le dossier `site/` contient un site React autonome pour l'**Institut Privé de
+Formation Sanitaire Bernard Kouchner** (Hippodrome 1, Bamako) : accueil,
+14 formations, blog, présentation de l'application mobile, admission, contact et
+un **espace personnel en version PC** qui s'affiche dès qu'un membre du personnel
+se connecte.
+
+```bash
+cd site && npm install && npm run dev     # http://localhost:5180
+```
+
+Accès de démonstration personnel : `direction@ipfs-bk.ml` / `direction2026`.
+Aperçus des écrans : `site-previews/` (générés par `site/scripts/preview.py`).
+
 ## Contenu
 
 | Dossier | Contenu |

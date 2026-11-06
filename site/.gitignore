@@ -1,0 +1,5 @@
+node_modules/
+dist/
+shots/
+.fonts-cache/
+.rc-bundle.mjs
