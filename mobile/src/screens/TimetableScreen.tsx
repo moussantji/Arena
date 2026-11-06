@@ -17,7 +17,7 @@ import {
   ScreenHeader,
   SectionHeader,
 } from '../ui';
-import { formatHour, fullName } from '../format';
+import { formatHour, fullName, isoWeek } from '../format';
 import { useApiQuery } from '../useApiQuery';
 import type { TimetableResponse, TimetableSlot } from '../types';
 
@@ -84,7 +84,7 @@ export default function TimetableScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <ScreenHeader
           title="Emploi du temps"
-          sub="Planning hebdomadaire"
+          sub={`Semaine ${isoWeek(new Date())}`}
           right={<Ionicons name="calendar-outline" size={22} color={theme.copper} />}
         />
 

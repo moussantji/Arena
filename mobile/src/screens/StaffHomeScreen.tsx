@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useApiQuery } from '../useApiQuery';
-import { api } from '../api';
+import { api, fileUrl } from '../api';
 import { theme } from '../theme';
 import {
   Aurora,
@@ -159,7 +159,12 @@ export default function StaffHomeScreen({ role }: { role: 'direction' | 'secreta
                 onPress={() => navigation.navigate('Eleve', { studentId: student.id })}
                 style={[styles.recentRow, index > 0 && styles.slotRowBorder]}
               >
-                <Avatar name={fullName(student)} size={38} ring />
+                <Avatar
+                  name={fullName(student)}
+                  size={38}
+                  ring
+                  uri={fileUrl(student.photos?.[0]?.url ?? student.photos?.[0]?.filename)}
+                />
                 <View style={styles.slotBody}>
                   <Text style={styles.slotSubject} numberOfLines={1}>{fullName(student)}</Text>
                   <Text style={styles.slotMeta} numberOfLines={1}>

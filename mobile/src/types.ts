@@ -163,7 +163,7 @@ export interface StudentRow {
   status: string | null;
   average?: number | null;
   balance?: number | null;
-  photos?: { id: number; student_id: number; filename: string }[];
+  photos?: { id: number; student_id: number; filename: string; url?: string }[];
 }
 
 export interface DashboardResponse {
@@ -186,6 +186,7 @@ export interface DashboardResponse {
     matricule: string | null;
     status: string | null;
     school_class?: { name: string } | null;
+    photos?: { id: number; student_id: number; filename: string; url?: string }[];
   }[];
   notifications: { id: number; title?: string; body?: string; created_at: string | null }[];
 }

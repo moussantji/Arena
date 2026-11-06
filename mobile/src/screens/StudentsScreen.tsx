@@ -14,7 +14,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-import { api, ApiError } from '../api';
+import { api, ApiError, fileUrl } from '../api';
 import { theme } from '../theme';
 import {
   Aurora,
@@ -47,6 +47,8 @@ export default function StudentsScreen() {
   const [query, setQuery] = useState('');
   const [debounced, setDebounced] = useState('');
   const [classId, setClassId] = useState<number | null>(null);
+  const [level, setLevel] = useState<string | null>(null);
+  const [total, setTotal] = useState<number | null>(null);
   const [items, setItems] = useState<StudentRow[]>([]);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -59,6 +61,10 @@ export default function StudentsScreen() {
     [],
   );
   const classes = useMemo(() => classesQuery.data?.classes ?? [], [classesQuery.data]);
+  const levels = useMemo(
+    () => [...new Set(classes.map((entry) => entry.level).filter((v): v is string => Boolean(v)))].sort(),
+    [classes],
+  );
 
   useEffect(() => {
     const handle = setTimeout(() => setDebounced(query.trim()), 350);
@@ -74,6 +80,7 @@ export default function StudentsScreen() {
     const params = new URLSearchParams({ per_page: '25', page: '1' });
     if (debounced) params.set('q', debounced);
     if (classId != null) params.set('class_id', String(classId));
+    if (level) params.set('level', level);
 
     api.get<StudentListPage>(`/students?${params.toString()}`)
       .then((result) => {
@@ -81,6 +88,7 @@ export default function StudentsScreen() {
         setItems(result.data ?? []);
         setPage(result.current_page ?? 1);
         setLastPage(result.last_page ?? 1);
+        setTotal(typeof result.total === 'number' ? result.total : null);
         setLoading(false);
       })
       .catch((exception) => {
@@ -92,7 +100,7 @@ export default function StudentsScreen() {
     return () => {
       cancelled = true;
     };
-  }, [debounced, classId]);
+  }, [debounced, classId, level]);
 
   const loadMore = () => {
     if (loadingMore || page >= lastPage) return;
@@ -101,6 +109,7 @@ export default function StudentsScreen() {
     const params = new URLSearchParams({ per_page: '25', page: String(nextPage) });
     if (debounced) params.set('q', debounced);
     if (classId != null) params.set('class_id', String(classId));
+    if (level) params.set('level', level);
 
     api.get<StudentListPage>(`/students?${params.toString()}`)
       .then((result) => {
@@ -116,7 +125,10 @@ export default function StudentsScreen() {
     <View style={styles.screen}>
       <Aurora />
       <View style={styles.head}>
-        <ScreenHeader title="Élèves" sub={`${items.length ? `${items.length} affichés · ` : ''}annuaire de l’établissement`} />
+        <ScreenHeader
+          title="Élèves"
+          sub={total != null ? `${total} inscrit${total > 1 ? 's' : ''}` : 'Annuaire de l’établissement'}
+        />
         <View style={styles.searchWrap}>
           <SearchBar
             value={query}
@@ -125,8 +137,22 @@ export default function StudentsScreen() {
             accessibilityLabel="Recherche d'élève"
           />
         </View>
-        <ChipRow style={styles.chips}>
-          <Chip label="Tous" active={classId == null} onPress={() => setClassId(null)} small />
+        {levels.length > 0 ? (
+          <ChipRow style={styles.chips}>
+            <Chip label="Tous les niveaux" active={level == null} onPress={() => setLevel(null)} small />
+            {levels.map((entry) => (
+              <Chip
+                key={entry}
+                label={entry}
+                active={entry === level}
+                onPress={() => setLevel(entry === level ? null : entry)}
+                small
+              />
+            ))}
+          </ChipRow>
+        ) : null}
+        <ChipRow style={[styles.chips, styles.chipsTight]}>
+          <Chip label="Toutes les classes" active={classId == null} onPress={() => setClassId(null)} small />
           {classes.map((entry) => (
             <Chip
               key={entry.id}
@@ -173,7 +199,7 @@ export default function StudentsScreen() {
               style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
               accessibilityRole="button"
             >
-              <Avatar name={fullName(item)} size={46} ring />
+              <Avatar name={fullName(item)} size={46} ring uri={fileUrl(item.photos?.[0]?.url ?? item.photos?.[0]?.filename)} />
               <View style={styles.rowInfo}>
                 <Text style={styles.rowName} numberOfLines={1}>{fullName(item)}</Text>
                 <Text style={styles.rowMeta} numberOfLines={1}>
@@ -200,6 +226,7 @@ const styles = StyleSheet.create({
   head: { paddingHorizontal: 16 },
   searchWrap: { marginTop: 6 },
   chips: { marginTop: 12, marginHorizontal: -16 },
+  chipsTight: { marginTop: 6 },
   listContent: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 30, gap: 9 },
   row: {
     flexDirection: 'row',

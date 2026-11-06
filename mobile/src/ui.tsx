@@ -5,6 +5,7 @@
 import React from 'react';
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   StyleProp,
@@ -295,7 +296,26 @@ export function SearchBar({ value, onChangeText, placeholder = 'Rechercher…', 
 /* Jetons, pastilles, chips                                            */
 /* ------------------------------------------------------------------ */
 
-export function Avatar({ name, size = 44, ring = false }: { name?: string | null; size?: number; ring?: boolean }) {
+export function Avatar({ name, size = 44, ring = false, uri }: {
+  name?: string | null;
+  size?: number;
+  ring?: boolean;
+  uri?: string | null;
+}) {
+  if (uri) {
+    return (
+      <Image
+        source={{ uri }}
+        accessibilityLabel={name ? `Photo de ${name}` : 'Photo'}
+        style={[
+          styles.avatar,
+          { width: size, height: size, borderRadius: size / 2 },
+          ring && styles.avatarRing,
+        ]}
+      />
+    );
+  }
+
   return (
     <View
       style={[
