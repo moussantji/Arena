@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AbsenceController;
 use App\Http\Controllers\Api\AdmissionController;
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BlogPostController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\FinanceController;
@@ -40,6 +41,16 @@ Route::post('/setup', [SetupController::class, 'store'])->middleware('throttle:1
 
 Route::get('/auth/google/status', [GoogleAuthController::class, 'status'])->middleware('throttle:60,1');
 Route::post('/auth/google/exchange', [GoogleAuthController::class, 'exchange'])->middleware('throttle:10,1');
+
+/*
+| Blog public : lecture des articles publiés (le site vitrine et la page
+| Blog de l'institut). La gestion est réservée à la direction et au
+| secrétariat (voir plus bas, sous auth:sanctum + rôle).
+*/
+Route::get('/blog/posts', [BlogPostController::class, 'index'])->middleware('throttle:60,1');
+Route::get('/blog/posts/{slug}', [BlogPostController::class, 'show'])
+    ->where('slug', '[a-z0-9][a-z0-9-]{0,179}')
+    ->middleware('throttle:60,1');
 
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
@@ -149,6 +160,16 @@ Route::middleware('auth:sanctum')->group(function () {
         | Scolarité, personnel, planning et référentiels : direction et secrétariat.
         */
         Route::middleware('role:direction,secretariat')->group(function () {
+            /*
+            | Blog : rédaction et mise en ligne (le site vitrine lit les
+            | articles publiés via les routes publiques).
+            */
+            Route::get('/blog/admin/posts', [BlogPostController::class, 'adminIndex']);
+            Route::post('/blog/admin/posts', [BlogPostController::class, 'store']);
+            Route::match(['put', 'patch'], '/blog/admin/posts/{post}', [BlogPostController::class, 'update']);
+            Route::delete('/blog/admin/posts/{post}', [BlogPostController::class, 'destroy']);
+            Route::post('/blog/admin/posts/{post}/photo', [BlogPostController::class, 'photo']);
+
             Route::get('/staff', [StaffController::class, 'index']);
             Route::get('/staff/{staff}', [StaffController::class, 'show']);
 

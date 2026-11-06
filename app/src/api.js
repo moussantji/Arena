@@ -88,10 +88,13 @@ export async function pingApi(timeoutMs = 4000) {
  */
 function normalizeFileUrls(value) {
   if (typeof value === 'string') {
+    if (value.startsWith('/images/') || value.startsWith('/storage/')) {
+      return API_ORIGIN ? `${API_ORIGIN}${value}` : value;
+    }
     try {
       const url = new URL(value);
       const isLocalFile = LOCAL_HOSTS.has(url.hostname)
-        && (url.port === '8001' || url.pathname.startsWith('/storage/'));
+        && (url.port === '8001' || url.pathname.startsWith('/storage/') || url.pathname.startsWith('/images/'));
       if (isLocalFile && API_ORIGIN) {
         return `${API_ORIGIN}${url.pathname}${url.search}${url.hash}`;
       }
