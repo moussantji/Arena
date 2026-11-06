@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Photo extends Model
 {
-    protected $fillable = ['filename', 'user_id', 'student_id', 'staff_id', 'school_id'];
+    protected $fillable = ['filename', 'user_id', 'student_id', 'staff_id', 'school_id', 'blog_post_id'];
 
     protected $appends = ['url'];
 
@@ -67,5 +67,10 @@ class Photo extends Model
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class);
+    }
+
+    public function blogPost(): BelongsTo
+    {
+        return $this->belongsTo(BlogPost::class);
     }
 }
