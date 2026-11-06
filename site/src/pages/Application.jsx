@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarCheckIcon as CalendarCheck, ClipboardListIcon as ClipboardList, WalletIcon as Wallet, MessageSquareIcon as MessageSquare, BellRingIcon as BellRing, FingerprintIcon as Fingerprint, SmartphoneIcon as Smartphone, Apple, PlayIcon as Play, ArrowRightIcon as ArrowRight, CheckIcon as Check, QrCodeIcon as QrCode, ShieldCheckIcon as ShieldCheck, DownloadIcon as Download, MonitorSmartphoneIcon as MonitorSmartphone, SparklesIcon as Sparkles, WifiIcon as Wifi, BatteryFull, SignalIcon as Signal, BookOpenIcon as BookOpen, UserIcon as User, HomeIcon as Home } from 'lucide-react';
-import QRCode from 'qrcode';
+import qrcode from 'qrcode-generator';
 import Reveal, { Breadcrumb, useToast } from '../components/Reveal.jsx';
 import { mobileFeatures, mobileScreens, school } from '../data/content.js';
 
@@ -13,13 +13,24 @@ export default function Application() {
   const [screen, setScreen] = useState(0);
 
   useEffect(() => {
-    QRCode.toDataURL(`${window.location.origin}/application`, {
-      margin: 0,
-      width: 220,
-      color: { dark: '#04130f', light: '#ffffff' },
-    })
-      .then(setQr)
-      .catch(() => setQr(''));
+    try {
+      const target = `${window.location.origin}/application`;
+      const qrCode = qrcode(0, 'M');
+      qrCode.addData(target);
+      qrCode.make();
+      const cells = qrCode.getModuleCount();
+      let path = '';
+      for (let row = 0; row < cells; row += 1) {
+        for (let col = 0; col < cells; col += 1) {
+          if (qrCode.isDark(row, col)) path += `M${col} ${row}h1v1h-1z`;
+        }
+      }
+      setQr(
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${cells} ${cells}" shape-rendering="crispEdges"><path fill="#04130f" d="${path}"/></svg>`
+      );
+    } catch {
+      setQr('');
+    }
   }, []);
 
   return (
@@ -157,7 +168,16 @@ export default function Application() {
             </div>
             <div style={{ display: 'grid', gap: 10, justifyItems: 'center' }}>
               <div className="qr-wrap" style={{ display: 'grid', justifyItems: 'center', gap: 10, padding: 18 }}>
-                {qr ? <img src={qr} alt="QR code vers l’application IPFS-BK" /> : <QrCode size={78} />}
+                {qr ? (
+                  <span
+                    className="qr-svg"
+                    role="img"
+                    aria-label="QR code vers l’application IPFS-BK"
+                    dangerouslySetInnerHTML={{ __html: qr }}
+                  />
+                ) : (
+                  <QrCode size={78} />
+                )}
                 <div style={{ textAlign: 'center' }}>
                   <b>Scanner pour installer</b>
                   <small>Ouvrez l’app sur mobile</small>

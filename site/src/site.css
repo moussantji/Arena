@@ -424,7 +424,9 @@
 .app-store b { font-size: 0.9rem; color: #fff; }
 
 .qr-wrap { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 16px; background: rgba(255,255,255,0.94); }
-.qr-wrap canvas, .qr-wrap img { width: 78px; height: 78px; border-radius: 8px; }
+.qr-wrap canvas, .qr-wrap img, .qr-wrap .qr-svg { width: 78px; height: 78px; border-radius: 8px; }
+.qr-wrap .qr-svg { display: block; overflow: hidden; }
+.qr-wrap .qr-svg svg { width: 100%; height: 100%; display: block; }
 .qr-wrap b { font-size: 0.82rem; display: block; }
 .qr-wrap small { font-size: 0.7rem; color: rgba(4,19,15,0.55); }
 
