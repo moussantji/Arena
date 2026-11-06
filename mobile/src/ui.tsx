@@ -5,6 +5,7 @@
 import React from 'react';
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   StyleProp,
@@ -88,6 +89,34 @@ export function ScreenHeader({ title, sub, right }: {
       </View>
       {right ? <View style={styles.screenHeaderRight}>{right}</View> : null}
     </View>
+  );
+}
+
+/** Carte d'en-tête « aurore » pour les accueils (personnel et parents). */
+export function HomeHero({ overline, title, icon = 'school-outline' }: {
+  overline: string;
+  title: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+}) {
+  return (
+    <LinearGradient
+      colors={['#182050', '#0D1334']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.homeHero}
+    >
+      <View style={styles.homeHeroGlowIndigo} pointerEvents="none" />
+      <View style={styles.homeHeroGlowCopper} pointerEvents="none" />
+      <View style={styles.homeHeroRow}>
+        <View style={styles.homeHeroText}>
+          <Text style={styles.homeHeroOverline} numberOfLines={1}>{overline.toUpperCase()}</Text>
+          <Text style={styles.homeHeroTitle} numberOfLines={2}>{title}</Text>
+        </View>
+        <View style={styles.homeHeroMark}>
+          <Ionicons name={icon} size={28} color={theme.copper} />
+        </View>
+      </View>
+    </LinearGradient>
   );
 }
 
@@ -267,7 +296,26 @@ export function SearchBar({ value, onChangeText, placeholder = 'Rechercher…', 
 /* Jetons, pastilles, chips                                            */
 /* ------------------------------------------------------------------ */
 
-export function Avatar({ name, size = 44, ring = false }: { name?: string | null; size?: number; ring?: boolean }) {
+export function Avatar({ name, size = 44, ring = false, uri }: {
+  name?: string | null;
+  size?: number;
+  ring?: boolean;
+  uri?: string | null;
+}) {
+  if (uri) {
+    return (
+      <Image
+        source={{ uri }}
+        accessibilityLabel={name ? `Photo de ${name}` : 'Photo'}
+        style={[
+          styles.avatar,
+          { width: size, height: size, borderRadius: size / 2 },
+          ring && styles.avatarRing,
+        ]}
+      />
+    );
+  }
+
   return (
     <View
       style={[
@@ -444,15 +492,16 @@ export function Loading({ label = 'Chargement…' }: { label?: string }) {
   );
 }
 
-export function Empty({ title, sub, action }: {
+export function Empty({ title, sub, action, icon = 'sparkles-outline' }: {
   title: string;
   sub?: string;
   action?: React.ReactNode;
+  icon?: keyof typeof Ionicons.glyphMap;
 }) {
   return (
     <View style={styles.emptyBox}>
       <View style={styles.emptyGlyph}>
-        <Ionicons name="sparkles-outline" size={22} color={theme.copper} />
+        <Ionicons name={icon} size={22} color={theme.copper} />
       </View>
       <Text style={styles.emptyTitle}>{title}</Text>
       {sub ? <Text style={styles.emptySub}>{sub}</Text> : null}
@@ -494,6 +543,49 @@ const styles = StyleSheet.create({
   screenTitle: { color: theme.ink, fontSize: 27, fontWeight: '800', letterSpacing: -0.4 },
   screenSub: { color: theme.faint, fontSize: 13, marginTop: 3 },
   screenHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+
+  /* Carte d'en-tête « aurore » */
+  homeHero: {
+    borderRadius: theme.radiusLg,
+    borderWidth: 1,
+    borderColor: theme.lineStrong,
+    padding: 18,
+    overflow: 'hidden',
+    marginTop: 6,
+    marginBottom: 14,
+  },
+  homeHeroGlowIndigo: {
+    position: 'absolute',
+    top: -70,
+    right: -50,
+    width: 190,
+    height: 190,
+    borderRadius: 95,
+    backgroundColor: 'rgba(91, 124, 250, 0.22)',
+  },
+  homeHeroGlowCopper: {
+    position: 'absolute',
+    bottom: -80,
+    left: -60,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: 'rgba(224, 168, 111, 0.12)',
+  },
+  homeHeroRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 14 },
+  homeHeroText: { flex: 1, gap: 6 },
+  homeHeroOverline: { color: theme.copper, fontSize: 9.5, letterSpacing: 2, fontWeight: '800' },
+  homeHeroTitle: { color: theme.ink, fontSize: 24, lineHeight: 30, fontWeight: '800', letterSpacing: -0.3 },
+  homeHeroMark: {
+    width: 60,
+    height: 60,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.glass,
+    borderWidth: 1,
+    borderColor: 'rgba(224, 168, 111, 0.45)',
+  },
 
   /* Cartes */
   card: {

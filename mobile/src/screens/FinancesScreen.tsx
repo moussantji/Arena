@@ -10,7 +10,6 @@ import { gradients, theme } from '../theme';
 import {
   Aurora,
   Card,
-  Empty,
   ErrorState,
   HeroCard,
   Loading,

@@ -75,7 +75,7 @@ export default function ParentFinancesScreen() {
           </Card>
 
           {data.invoices.length === 0 ? (
-            <Empty title="Aucune facture" sub="Aucune facture n'a encore été émise pour cet enfant." />
+            <Empty icon="receipt-outline" title="Aucune facture" sub="Aucune facture n'a encore été émise pour cet enfant." />
           ) : (
             <>
               <SectionHeader title="Factures" />
@@ -114,7 +114,6 @@ function InvoiceRow({ invoice, expanded, onToggle }: {
   expanded: boolean;
   onToggle: () => void;
 }) {
-  const done = invoice.remaining <= 0.004 && invoice.status !== 'pending' && invoice.status !== 'partial';
   const statusTone = invoice.status === 'paid' ? 'ok'
     : invoice.status === 'cancelled' ? 'muted'
     : invoice.status === 'partial' ? 'copper' : 'danger';

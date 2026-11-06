@@ -9,6 +9,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { api, ApiError } from '../api';
 import { theme } from '../theme';
@@ -78,7 +79,10 @@ export default function ParentsScreen() {
           accessibilityRole="button"
           accessibilityLabel="Créer un compte parent"
         >
-          <Text style={styles.addButtonText}>＋ Nouveau</Text>
+          <View style={styles.addButtonInner}>
+            <Ionicons name="add" size={16} color="#ffffff" />
+            <Text style={styles.addButtonText}>Nouveau</Text>
+          </View>
         </Pressable>
       </View>
 
@@ -88,6 +92,7 @@ export default function ParentsScreen() {
         <ErrorState message={error} onRetry={reload} />
       ) : parents.length === 0 ? (
         <Empty
+          icon="people-circle-outline"
           title="Aucun compte parent"
           sub="Créez un compte pour que les parents consultent notes, absences et finances de leurs enfants."
           action={(
@@ -125,7 +130,7 @@ export default function ParentsScreen() {
                   <Text style={styles.created}>Créé le {formatDate(item.created_at)}</Text>
                 </View>
               </View>
-              <Text style={styles.chevron}>⋯</Text>
+              <Ionicons name="ellipsis-horizontal" size={18} color={theme.faint} />
             </Pressable>
           )}
         />
@@ -152,9 +157,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
+  addButtonInner: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   addPressed: { opacity: 0.85 },
   addButtonText: { color: '#fff', fontSize: 12.5, fontWeight: '700' },
-  listContent: { paddingHorizontal: 12, paddingBottom: 32, gap: 8 },
+  listContent: { paddingHorizontal: 12, paddingBottom: 40, gap: 8 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -172,7 +178,6 @@ const styles = StyleSheet.create({
   rowEmail: { color: theme.faint, fontSize: 10.5 },
   rowFooter: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4, flexWrap: 'wrap' },
   created: { color: 'rgba(167, 182, 255, 0.4)', fontSize: 9 },
-  chevron: { color: theme.faint, fontSize: 18, paddingHorizontal: 4 },
   emptyCta: {
     backgroundColor: theme.accentStrong,
     borderRadius: 999,

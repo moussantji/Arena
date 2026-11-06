@@ -363,11 +363,22 @@ export default function NotesScreen() {
 
       <View style={styles.saveBar}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.saveBarLabel}>MOYENNE CLASSE</Text>
-          <Text style={styles.saveBarValue}>
-            {classAverage != null ? classAverage.toFixed(1) : '—'}
-            <Text style={styles.saveBarMax}> / 20</Text>
-          </Text>
+          {savedCount != null && savedCount > 0 ? (
+            <>
+              <Text style={styles.savedLabel}>ENREGISTRÉ</Text>
+              <Text style={styles.savedValue} numberOfLines={1} adjustsFontSizeToFit>
+                {savedCount} note{savedCount > 1 ? 's' : ''} enregistrée{savedCount > 1 ? 's' : ''}
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.saveBarLabel}>MOYENNE CLASSE</Text>
+              <Text style={styles.saveBarValue}>
+                {classAverage != null ? classAverage.toFixed(1) : '—'}
+                <Text style={styles.saveBarMax}> / 20</Text>
+              </Text>
+            </>
+          )}
         </View>
         <Button
           label={saving ? 'Enregistrement…' : 'Enregistrer'}
@@ -491,5 +502,7 @@ const styles = StyleSheet.create({
   saveBarLabel: { color: theme.copper, fontSize: 8.5, letterSpacing: 1.5, fontWeight: '700' },
   saveBarValue: { color: theme.ink, fontSize: 21, fontWeight: '800', fontVariant: ['tabular-nums'], marginTop: 2 },
   saveBarMax: { color: theme.ghost, fontSize: 11, fontWeight: '600' },
+  savedLabel: { color: theme.ok, fontSize: 8.5, letterSpacing: 1.5, fontWeight: '700' },
+  savedValue: { color: theme.ok, fontSize: 13.5, fontWeight: '800', marginTop: 3 },
   saveButton: { minWidth: 168 },
 });

@@ -4,7 +4,7 @@ Ce fichier documente les nouveautés visibles pour les utilisateurs. La même
 liste est embarquée dans l'application (`app/src/changelog.js`) et affichée
 une fois par version dans la fenêtre **Nouveautés**.
 
-## 1.3.2 — à paraître
+## 1.3.2 — 6 novembre 2026
 
 - Nouveau bandeau « hors-ligne » : quand le serveur ne répond plus, un
   bandeau le signale et la reconnexion est tentée automatiquement toutes
@@ -43,6 +43,11 @@ une fois par version dans la fenêtre **Nouveautés**.
   Expo / React Native ; écran par rôle (parent, enseignant, direction) :
   voir `mobile/README.md`. La messagerie est cloisonnée par enfant pour
   les comptes parents (ils ne voient que leurs fils).
+- Application mobile : refonte visuelle « **Indigo Minuit réhaussée** »
+  (fond aurore, verre dépoli, dégradé indigo → champagne, or cuivré) —
+  connexion, accueil, élèves, fiche élève, notes, finances et nouvel
+  écran **Emploi du temps** (menu « Emploi » de l'accueil personnel).
+  Maquettes de référence dans `gallery/mobile-premium/`.
 - Nouvelle section « Sauvegardes et restauration » dans le guide de
   déploiement LWS (base, photos/documents, .env + test de restauration).
 

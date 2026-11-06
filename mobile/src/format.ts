@@ -98,6 +98,16 @@ export function paymentMethodLabel(method?: string | null): string {
   }
 }
 
+/** Numéro de semaine ISO-8601 d'une date (1-53). */
+export function isoWeek(date: Date): number {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+}
+
 /** Date ISO (YYYY-MM-DD) du jour local. */
 export function todayIso(): string {
   const now = new Date();

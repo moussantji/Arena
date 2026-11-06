@@ -48,6 +48,7 @@ Aucune adresse de serveur n'est affichée dans l'application.
 
 ```bash
 npm run typecheck                     # TypeScript strict
+npm run lint                          # ESLint (eslint-config-expo)
 npx expo export --platform android    # bundle Metro de production (sans appareil)
 ```
 

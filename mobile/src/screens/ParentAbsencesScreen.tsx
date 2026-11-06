@@ -48,7 +48,7 @@ export default function ParentAbsencesScreen() {
           </View>
 
           {data.absences.length === 0 ? (
-            <Empty title="Aucune absence" sub="Félicitations : aucune absence enregistrée pour cet enfant." />
+            <Empty icon="shield-checkmark-outline" title="Aucune absence" sub="Félicitations : aucune absence enregistrée pour cet enfant." />
           ) : (
             <>
               <SectionHeader title="Historique" />

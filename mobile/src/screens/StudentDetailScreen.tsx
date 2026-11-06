@@ -3,9 +3,10 @@
  * onglets segmentés (Aperçu / Notes / Absences / Finances).
  */
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRoute, type RouteProp } from '@react-navigation/native';
-import { api } from '../api';
+import { api, fileUrl } from '../api';
 import { theme } from '../theme';
 import {
   Avatar,
@@ -34,6 +35,9 @@ interface StudentDetail {
     status: string | null;
     birth_date: string | null;
     enrolled_on: string | null;
+    guardian_name?: string | null;
+    guardian_phone?: string | null;
+    photos?: { id: number; student_id: number; filename: string; url?: string }[];
     school_class?: { name: string; level: string | null; room: string | null } | null;
     grades?: {
       id: number;
@@ -103,7 +107,12 @@ export default function StudentDetailScreen() {
         <ScreenHeader title="Fiche élève" sub={student.school_class?.name ?? undefined} />
 
         <View style={styles.hero}>
-          <Avatar name={name} size={86} ring />
+          <Avatar
+            name={name}
+            size={96}
+            ring
+            uri={fileUrl(student.photos?.[0]?.url ?? student.photos?.[0]?.filename)}
+          />
           <Text style={styles.heroName}>{name}</Text>
           <Text style={styles.heroMeta}>
             {student.school_class?.name ?? 'Sans classe'}
@@ -113,6 +122,19 @@ export default function StudentDetailScreen() {
             {student.status ? <Pill label={student.status} tone="accent" /> : null}
             {student.gender ? <Pill label={student.gender === 'F' ? 'Féminin' : 'Masculin'} tone="muted" /> : null}
           </View>
+          {student.guardian_phone ? (
+            <Pressable
+              onPress={() => void Linking.openURL(`tel:${student.guardian_phone}`)}
+              accessibilityRole="button"
+              accessibilityLabel={`Appeler le parent${student.guardian_name ? ` (${student.guardian_name})` : ''}`}
+              style={({ pressed }) => [styles.callButton, pressed && styles.callButtonPressed]}
+            >
+              <Ionicons name="call-outline" size={16} color="#cdd8ff" />
+              <Text style={styles.callButtonText}>
+                Appeler le parent{student.guardian_name ? ` · ${student.guardian_name}` : ''}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
 
         <View style={styles.statsRow}>
@@ -252,6 +274,20 @@ const styles = StyleSheet.create({
   heroName: { color: theme.ink, fontSize: 23, fontWeight: '800', letterSpacing: -0.3, marginTop: 12 },
   heroMeta: { color: theme.faint, fontSize: 12.5, marginTop: 4 },
   heroPills: { flexDirection: 'row', gap: 8, marginTop: 10 },
+  callButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: theme.lineStrong,
+    backgroundColor: 'rgba(91, 124, 250, 0.12)',
+  },
+  callButtonPressed: { backgroundColor: 'rgba(91, 124, 250, 0.22)' },
+  callButtonText: { color: '#cdd8ff', fontSize: 12.5, fontWeight: '700' },
   statsRow: { flexDirection: 'row', gap: 9, marginTop: 14 },
   tabsWrap: { marginTop: 20, marginHorizontal: -4 },
   subjectRow: { paddingVertical: 10, gap: 8 },

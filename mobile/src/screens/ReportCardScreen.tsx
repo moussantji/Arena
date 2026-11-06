@@ -4,9 +4,9 @@ import { ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
 import { useChildren, ChildSelector } from '../children';
 import { api } from '../api';
 import { theme } from '../theme';
-import { Card, CardTitle, Empty, ErrorState, Loading, SectionHeader, Pill } from '../ui';
+import { Card, Empty, ErrorState, Loading, SectionHeader, Pill } from '../ui';
 import { evaluationLabel, fullName } from '../format';
-import type { Bulletin, ParentMeta, Term } from '../types';
+import type { Bulletin, ParentMeta } from '../types';
 import { useApiQuery } from '../useApiQuery';
 
 export default function ReportCardScreen() {
@@ -66,7 +66,7 @@ export default function ReportCardScreen() {
       ) : !data ? (
         <ErrorState message={bulletin.error ?? undefined} onRetry={bulletin.reload} />
       ) : data.subjects.length === 0 ? (
-        <Empty title="Aucune note" sub="Aucun relevé pour cette période. Les notes seront publiées après les évaluations." />
+        <Empty icon="document-text-outline" title="Aucune note" sub="Aucun relevé pour cette période. Les notes seront publiées après les évaluations." />
       ) : (
         <>
           <Card style={styles.summaryCard}>

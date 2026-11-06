@@ -4,12 +4,12 @@
    entrée en tête de CHANGELOG, puis reconstruire les paquets.
    ============================================================ */
 
-export const APP_VERSION = '1.3.1';
+export const APP_VERSION = '1.3.2';
 
 export const CHANGELOG = [
   {
     version: '1.3.2',
-    date: 'À paraître',
+    date: '6 novembre 2026',
     title: 'Robustesse et finition',
     items: [
       'Bandeau « hors-ligne » : quand le serveur ne répond plus, un bandeau le signale et la reconnexion est tentée automatiquement.',
@@ -22,6 +22,7 @@ export const CHANGELOG = [
       'Le serveur de données est réservé au créateur de l’établissement.',
       'Nouveauté : comptes parents — créés par la direction sur le PC, connectés depuis l’application mobile (notes, absences, finances de leurs enfants uniquement).',
       'Nouveauté : application mobile Kalanso (Android) — écran par rôle (parent, enseignant, direction) ; la messagerie y est cloisonnée par fil pour les parents.',
+      'Application mobile : refonte « Indigo Minuit réhaussée » (fond aurore, verre dépoli, indigo → champagne) — et nouvel écran Emploi du temps.',
     ],
   },
   {

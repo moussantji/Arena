@@ -12,6 +12,17 @@ import * as SecureStore from 'expo-secure-store';
 const BASE_URL = (process.env.EXPO_PUBLIC_KALANSO_API_URL
   ?? 'https://kalanso.mandenbaoubab.com/api').replace(/\/+$/, '');
 
+const ORIGIN = BASE_URL.replace(/\/api\/?$/, '');
+
+/** URL affichable d'un fichier renvoyé par l'API (photo, document…). */
+export function fileUrl(value?: string | null): string | null {
+  if (!value) return null;
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith('/')) return `${ORIGIN}${value}`;
+
+  return `${ORIGIN}/storage/${value.replace(/^\/+/, '')}`;
+}
+
 export const TOKEN_KEY = 'kalanso.mobile.token';
 
 const REQUEST_TIMEOUT_MS = 15000;
