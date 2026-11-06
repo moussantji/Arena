@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
+use League\Glide\Urls\UrlBuilderFactory;
 
 class Photo extends Model
 {
@@ -24,10 +25,14 @@ class Photo extends Model
     /**
      * URL publique de la photo.
      *
-     * Kalanso n'embarque ni GD/Imagick, ni Glide/Intervention : le
-     * redimensionnement n'est pas disponible. On renvoie donc toujours le
-     * fichier d'origine, comme le fait le projet e-commerce en l'absence de
-     * moteur d'image.
+     * Reprise de `getImageUrl()` du projet e-commerce :
+     * - filename déjà absolue (CDN/externe) → renvoyée telle quelle ;
+     * - sans dimension demandée → fichier d'origine (`/storage/...`) ;
+     * - avec largeur/hauteur → URL Glide signée `/images/...?w=&h=&fit=crop&s=`
+     *   (voir ImageController, route `glide.image`).
+     * Sans moteur GD/Imagick, Glide ne peut pas redimensionner :
+     * `ImageController` sert alors l'original (pas de 500), mais l'URL
+     * reste `/images/...` comme dans le e-commerce.
      */
     public function getImageUrl(?int $width = null, ?int $height = null): string
     {
@@ -41,7 +46,19 @@ class Photo extends Model
             return $filename;
         }
 
-        return Storage::disk('public')->url($filename);
+        if ($width === null && $height === null) {
+            return Storage::disk('public')->url($filename);
+        }
+
+        $params = array_filter([
+            'w' => $width,
+            'h' => $height,
+            'fit' => 'crop',
+        ]);
+
+        $urlBuilder = UrlBuilderFactory::create('/images/', (string) config('glide.key', '') ?: null);
+
+        return $urlBuilder->getUrl($filename, $params);
     }
 
     public function getUrlAttribute(): string

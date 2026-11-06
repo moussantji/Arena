@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AbsenceController;
 use App\Http\Controllers\Api\AdmissionController;
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BlogPostController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\FinanceController;

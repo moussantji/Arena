@@ -201,6 +201,14 @@ class BlogPostController extends Controller
     {
         $post->loadMissing('photos:id,blog_post_id,filename');
 
+        $photos = $post->photos->map(function ($photo) {
+            $array = $photo->toArray();
+            $glideUrl = $photo->getImageUrl(BlogPost::PHOTO_WIDTH, BlogPost::PHOTO_HEIGHT);
+            $array['url'] = ($glideUrl !== '') ? $glideUrl : null;
+
+            return $array;
+        })->values();
+
         return [
             'id' => $post->id,
             'slug' => $post->slug,
@@ -215,7 +223,7 @@ class BlogPostController extends Controller
             'date' => $post->published_at?->format('Y-m-d') ?? $post->created_at?->format('Y-m-d'),
             'status' => $post->published_at ? 'publie' : 'brouillon',
             'photo_url' => $post->photo_url,
-            'photos' => $post->photos,
+            'photos' => $photos,
         ];
     }
 }
