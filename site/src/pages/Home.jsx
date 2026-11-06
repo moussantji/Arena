@@ -542,7 +542,6 @@ function AppTeaser() {
 
           <Reveal delay={120} className="phones-stage">
             <PhoneMock />
-            <div style={{ width: 1 }} />
           </Reveal>
         </div>
       </div>

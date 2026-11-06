@@ -753,9 +753,140 @@ def page_blog():
     return c
 
 
+def mobile_header(c, dark=False):
+    """Barre de navigation mobile : logo compact + menu hamburger."""
+    bg = INK if dark else CREAM
+    fg = WHITE if dark else INK
+    sub = (0.55, 0.62, 0.59) if dark else FAINT
+    c.rect(0, 0, c.w, 62, fill=bg, opacity=0.97)
+    c.line(0, 62, c.w, 62, color=(0.2, 0.26, 0.24) if dark else LINE)
+    c.rect(16, 13, 36, 36, fill=EMERALD, r=11)
+    c.text(34, 37, "BK", size=11.5, color=GOLD2, serif=True, anchor="center")
+    c.text(62, 32, "Bernard Kouchner", size=14, color=fg, serif=True)
+    c.text(62, 46, "IPFS-BK · HIPPODROME 1", size=6.5, color=sub, spacing=0.9)
+    c.rect(340, 15, 34, 34, fill=(1, 1, 1), r=10, stroke=(0.82, 0.8, 0.74), opacity=0.9 if not dark else 0.12)
+    for i in range(3):
+        c.rect(350, 25 + i * 5, 15, 1.5, fill=fg, r=1)
+
+
+def page_mobile():
+    MW = 390
+    c = Canvas(width=MW, height=1180)
+    c.img("hero.jpg", 0, 0, MW, 700)
+    c.rect(0, 0, MW, 700, fill=INK, opacity=0.34)
+    c.soft(0, 150, MW, 320, opacity=0.3, feather=26)
+    c.rect(0, 430, MW, 270, fill=INK, opacity=0.42)
+    mobile_header(c)
+
+    c.chip(16, 86, "Hippodrome 1 · Bamako", fg=WHITE, bg=WHITE, size=8, h=22, padx=9,
+           stroke=(0.92, 0.96, 0.94), opacity=0.16)
+    c.chip(176, 86, "Arrêté n°2026-0401", fg=WHITE, bg=WHITE, size=8, h=22, padx=9,
+           stroke=(0.92, 0.96, 0.94), opacity=0.16)
+
+    c.text(16, 190, "La santé", size=38, color=WHITE, serif=True)
+    c.text(16, 232, "commence par", size=38, color=WHITE, serif=True)
+    c.text(16, 286, "une formation", size=38, color=GOLD2, serif=True)
+    c.text(16, 328, "sérieuse", size=38, color=GOLD2, serif=True)
+    c.text(16 + c.measure("sérieuse", serif=True, size=38) + 2, 328, ".", size=38, color=GOLD2, serif=True)
+    c.wrap_px(16, 366,
+              "Nous formons des apprenants compétents, responsables et prêts à relever les défis du terrain.",
+              12.5, 330, color=(0.84, 0.88, 0.86), lh=19)
+
+    c.btn(16, 424, "S'inscrire en ligne  ›", w=358, h=46, bg=GOLD, fg=INK, size=12.5)
+    c.rect(16, 486, 358, 44, fill=WHITE, r=22, stroke=(0.92, 0.96, 0.94), opacity=0.18)
+    c.text(195, 513, "Explorer les 14 formations", size=12, color=WHITE, anchor="center")
+
+    # panneau de chiffres (2 × 2 sur mobile)
+    stats = [("4e", "Promotion diplômée"), ("14", "Formations"),
+             ("95,65%", "Réussite BT-Santé"), ("4,6/5", "Note Google")]
+    c.rect(16, 552, 358, 128, fill=WHITE, r=16, opacity=0.1)
+    for i, (v, l) in enumerate(stats):
+        x = 36 + (i % 2) * 174
+        y = 590 + (i // 2) * 54
+        c.text(x, y, v, size=23, color=WHITE, serif=True)
+        c.text(x, y + 16, l, size=9, color=(0.8, 0.85, 0.83))
+    c.line(203, 570, 203, 662, color=(1, 1, 1), width=0.8)
+    c.line(36, 628, 354, 628, color=(1, 1, 1), width=0.8)
+
+    c.rect(0, 700, MW, 40, fill=INK2)
+    c.text(16, 725, "RENTRÉE 2026 — 2027 OUVERTE", size=8, color=(0.66, 0.72, 0.69), spacing=1.2)
+    c.circle(300, 722, 2.5, fill=GOLD)
+
+    # contenu : engagement
+    c.eyebrow(16, 790, "Notre engagement")
+    c.text(16, 828, "Une école de santé", size=25, color=INK, serif=True)
+    c.text(16, 858, "ancrée dans les", size=25, color=INK, serif=True)
+    c.text(16, 888, "réalités du Mali", size=25, color=EMERALD, serif=True)
+    c.wrap_px(16, 920,
+              "Des parcours conçus pour développer des compétences utiles et une pratique "
+              "responsable au service des patients et des communautés.",
+              11.5, 350, color=MUTED, lh=18)
+
+    # cartes empilées
+    cards = [("DEF", "Parcours accessibles", "Après le Diplôme d'études fondamentales."),
+             ("BAC", "Licences & supérieur", "Des formations orientées métiers de la santé.")]
+    for i, (tag, t, d) in enumerate(cards):
+        y = 980 + i * 96
+        c.rect(16, y, 358, 84, fill=WHITE, r=15, stroke=LINE)
+        c.rect(32, y + 16, 34, 34, fill=MINT, r=10)
+        c.text(49, y + 38, "+", size=13, color=EMERALD, anchor="center")
+        c.text(78, y + 32, t, size=12.5, color=INK, serif=True)
+        c.wrap_px(78, y + 50, d, 9.5, 270, color=MUTED, lh=13)
+        c.text(32, y + 74, tag, size=8, color=GOLD_DARK, spacing=1.2)
+    return c
+
+
+def page_tablet():
+    c = Canvas(width=834, height=1000)
+    c.img("hero.jpg", 0, 0, 834, 520)
+    c.rect(0, 0, 834, 520, fill=INK, opacity=0.34)
+    c.soft(0, 180, 834, 320, opacity=0.3, feather=28)
+    c.rect(0, 0, 834, 74, fill=CREAM, opacity=0.96)
+    c.line(0, 74, 834, 74, color=LINE)
+    c.logo(40, 16)
+    c.rect(742, 18, 40, 40, fill=WHITE, r=11, stroke=(0.82, 0.8, 0.74))
+    for i in range(3):
+        c.rect(753, 30 + i * 6, 18, 1.6, fill=INK, r=1)
+    c.chip(40, 116, "Hippodrome 1 · Bamako", fg=WHITE, bg=WHITE, size=9, h=24, padx=10,
+           stroke=(0.92, 0.96, 0.94), opacity=0.16)
+    c.text(40, 210, "La santé commence par", size=44, color=WHITE, serif=True)
+    c.text(40, 262, "une formation sérieuse", size=44, color=GOLD2, serif=True)
+    c.text(40 + c.measure("une formation sérieuse", serif=True, size=44) + 2, 262, ".", size=44, color=GOLD2, serif=True)
+    c.wrap_px(40, 306,
+              "Nous formons des apprenants compétents, responsables et prêts à relever les défis du terrain. "
+              "Intégrez un institut qui place la qualité, la rigueur et l'engagement au cœur de son action.",
+              13.5, 520, color=(0.82, 0.86, 0.84), lh=21)
+    c.btn(40, 388, "S'inscrire en ligne  ›", h=48, bg=GOLD, fg=INK, size=12.5)
+    c.btn(268, 388, "Explorer les 14 formations", h=48, bg=WHITE, fg=WHITE, size=12.5,
+          stroke=(0.95, 0.98, 0.97), opacity=0.12)
+    stats = [("4e", "Promotion diplômée"), ("14", "Formations"), ("95,65%", "BT-Santé 2026"), ("4,6/5", "Note Google")]
+    for i, (v, l) in enumerate(stats):
+        x = 46 + i * 196
+        c.text(x, 486, v, size=24, color=WHITE, serif=True)
+        c.text(x, 504, l, size=10, color=(0.78, 0.83, 0.81))
+    # grille 2 colonnes
+    c.eyebrow(40, 590, "Nos programmes")
+    c.text(40, 632, "Des formations pensées pour construire", size=30, color=INK, serif=True)
+    c.text(40, 668, "un vrai avenir professionnel", size=30, color=EMERALD, serif=True)
+    for i in range(4):
+        col, row = i % 2, i // 2
+        x, y = 40 + col * 388, 710 + row * 274
+        c.rect(x, y, 366, 254, fill=WHITE, r=18, stroke=LINE)
+        c.img(["formations/kine.jpg", "formations/infirmier.jpg", "care.jpg", "lab.jpg"][i], x + 1, y + 1, 364, 120)
+        c.text(x + 18, y + 152, "SANTÉ · BAC", size=8, color=EMERALD, spacing=1.2)
+        c.text(x + 18, y + 176, ["Kinésithérapie", "Infirmier en santé publique", "Santé maternelle", "Technicien de labo"][i],
+               size=14, color=INK, serif=True)
+        c.text(x + 18, y + 200, "Tarif sur la fiche formation", size=9.5, color=MUTED)
+        c.line(x + 18, y + 220, x + 348, y + 220, color=(0.94, 0.92, 0.88))
+        c.text(x + 18, y + 236, "Découvrir  ›", size=9.5, color=EMERALD)
+    return c
+
+
 def main():
     OUT.mkdir(exist_ok=True)
     for name, fn in [
+        ("07-mobile", page_mobile),
+        ("08-tablette", page_tablet),
         ("01-accueil", page_home),
         ("02-formations", page_formations),
         ("03-application-mobile", page_application),

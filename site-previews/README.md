@@ -12,5 +12,7 @@ que le site React).
 | `04-personnel-pc.jpg` | **Version PC** affichée quand un membre du personnel est connecté |
 | `05-connexion.jpg` | Connexion 3 profils (personnel / étudiant / parent) |
 | `06-blog.jpg` | Blog / actualités |
+| `07-mobile.jpg` | Accueil sur mobile (390 px) — menu hamburger, hero et chiffres en 2×2 |
+| `08-tablette.jpg` | Accueil sur tablette (834 px) — grilles en 2 colonnes |
 
 Pour régénérer : `cd site && pip install pymupdf fonttools brotli && python3 scripts/preview.py`

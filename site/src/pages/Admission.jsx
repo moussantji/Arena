@@ -237,7 +237,7 @@ export default function Admission() {
                           ['Pièces fournies', docs.length ? `${docs.length} / 4` : 'Aucune'],
                           ['Motivations', motivation ? 'Renseignées' : 'Non renseignées'],
                         ].map(([k, v]) => (
-                          <div key={k} style={{ background: '#fff', display: 'flex', justifyContent: 'space-between', gap: 16, padding: '12px 16px', fontSize: '0.86rem' }}>
+                          <div key={k} className="summary-row" style={{ background: '#fff', padding: '12px 16px', fontSize: '0.86rem' }}>
                             <span style={{ color: 'rgba(4,19,15,0.5)' }}>{k}</span>
                             <span style={{ fontWeight: 600, textAlign: 'right' }}>{v}</span>
                           </div>

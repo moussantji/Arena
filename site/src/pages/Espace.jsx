@@ -23,7 +23,7 @@ export default function Espace() {
     <div style={{ background: '#f1f4f3', minHeight: '100svh', paddingTop: 0 }}>
       {/* Barre app */}
       <div style={{ background: 'var(--ink)', color: '#fff', paddingTop: 22, paddingBottom: 26 }}>
-        <div className="container" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+        <div className="container espace-head">
           <Link to="/" className="link-arrow" style={{ color: 'var(--gold-2)', width: '100%', fontSize: '0.8rem', marginBottom: 2 }}>
             <ArrowLeft size={14} /> Retour au site
           </Link>
@@ -37,14 +37,14 @@ export default function Espace() {
               {isParent ? 'Suivi de Awa Traoré · Kinésithérapie L1' : 'Licence Kinésithérapie · L1 · 2026—2027'}
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <div className="espace-actions">
             <Link to="/application" className="btn btn-light btn-sm"><Smartphone size={14} /> Application mobile</Link>
             <button className="btn btn-light btn-sm" onClick={logout}><LogOut size={14} /> Déconnexion</button>
           </div>
         </div>
       </div>
 
-      <div className="container" style={{ padding: '24px 28px 70px', display: 'grid', gap: 18 }}>
+      <div className="container espace-wrap">
         <div className="kpis">
           {[
             { l: 'Moyenne S1', v: '15,4/20', d: 'Mention Très bien', i: GraduationCap },
@@ -72,11 +72,15 @@ export default function Espace() {
                   ['Jeudi', '07:30', 'Stage — CHU Gabriel Touré', 'Rééducation'],
                   ['Vendredi', '14:00', 'Anglais médical', 'Salle 108'],
                 ].map(([j, h, c, s]) => (
-                  <div key={j + c} style={{ display: 'grid', gridTemplateColumns: '70px 56px 1fr auto', gap: 10, alignItems: 'center', padding: '10px 12px', borderRadius: 11, background: 'var(--cream-2)' }}>
-                    <b style={{ fontSize: '0.8rem' }}>{j}</b>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--emerald)', fontWeight: 800 }}>{h}</span>
-                    <span style={{ fontSize: '0.82rem' }}>{c}</span>
-                    <small style={{ fontSize: '0.72rem', color: 'rgba(4,19,15,0.45)' }}>{s}</small>
+                  <div
+                    key={j + c}
+                    className="schedule-row"
+                    style={{ padding: '10px 12px', borderRadius: 11, background: 'var(--cream-2)' }}
+                  >
+                    <b className="sr-day">{j}</b>
+                    <span className="sr-hour">{h}</span>
+                    <span className="sr-course">{c}</span>
+                    <small className="sr-room">{s}</small>
                   </div>
                 ))}
               </div>

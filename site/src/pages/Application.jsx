@@ -62,7 +62,7 @@ export default function Application() {
               </div>
             </div>
             <div className="phones-stage">
-              <div style={{ transform: 'rotate(-4deg) translateX(26px)', opacity: 0.72, transformOrigin: 'bottom right' }}>
+              <div className="phone-secondary" style={{ transform: 'rotate(-4deg) translateX(26px)', opacity: 0.72, transformOrigin: 'bottom right' }}>
                 <PhoneMini />
               </div>
               <div className="phone-float" style={{ transform: 'translateX(-26px)', zIndex: 2 }}>
@@ -143,7 +143,7 @@ export default function Application() {
       {/* Personnel : version PC */}
       <section className="section">
         <div className="container">
-          <Reveal className="card" style={{ padding: 'clamp(24px,4vw,44px)', display: 'grid', gridTemplateColumns: '1fr auto', gap: 32, alignItems: 'center' }}>
+          <Reveal className="card staff-cta" style={{ padding: 'clamp(24px,4vw,44px)' }}>
             <div style={{ display: 'grid', gap: 14 }}>
               <span className="eyebrow">Espace personnel</span>
               <h2 className="display-md">
@@ -154,7 +154,7 @@ export default function Application() {
                 l’interface de bureau : tableau de bord, élèves, classes, notes, scolarité, admissions et messagerie
                 — une vraie application de gestion, optimisée pour grand écran.
               </p>
-              <ul className="check-list" style={{ gridTemplateColumns: '1fr 1fr', display: 'grid' }}>
+              <ul className="check-list check-list-2">
                 {['Tableau de bord temps réel', 'Gestion des élèves & classes', 'Notes, absences et bulletins', 'Scolarité & reçus BNDA'].map((x) => (
                   <li key={x}><span className="tick"><Check /></span>{x}</li>
                 ))}
@@ -166,7 +166,7 @@ export default function Application() {
                 <Link to="/espace" className="btn btn-ghost btn-lg">Espace étudiant / parent</Link>
               </div>
             </div>
-            <div style={{ display: 'grid', gap: 10, justifyItems: 'center' }}>
+            <div className="staff-cta-side">
               <div className="qr-wrap" style={{ display: 'grid', justifyItems: 'center', gap: 10, padding: 18 }}>
                 {qr ? (
                   <span
