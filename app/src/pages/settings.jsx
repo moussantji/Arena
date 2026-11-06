@@ -721,8 +721,9 @@ export function Parametres() {
                         </div>
                       )}
                       <p className="form-hint">
-                        Laissez vide pour enregistrer les données uniquement sur cet
-                        ordinateur. L’application redémarre pour appliquer le changement.
+                        Laissez vide pour utiliser le serveur de l’établissement (par défaut).
+                        Tapez « local » uniquement pour le développement.
+                        L’application redémarre pour appliquer le changement.
                       </p>
                       <div className="form-actions">
                         <Btn onClick={() => setServerEditing(false)} disabled={serverBusy}>Annuler</Btn>

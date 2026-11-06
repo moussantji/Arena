@@ -15,6 +15,7 @@ export const CHANGELOG = [
       'Correctif Windows : le lien public/storage est recréé en jonction (junction) — aucun droit admin ni mode développeur requis.',
       'En cas d’échec du lien, l’application démarre quand même (au lieu d’afficher « L’API locale n’a pas pu démarrer »).',
       'Message « Service local indisponible » : ajout d’une astuce pour basculer sur le serveur de l’établissement (Paramètres → Serveur de données), sans serveur PHP local.',
+      'Le logiciel ne démarre plus de serveur local par défaut : sans configuration explicite, il se connecte au serveur de l’établissement — y compris pour les installations existantes. Tapez « local » (Paramètres → Serveur de données) ou KALANSO_REMOTE_API_URL=local pour forcer l’API locale de développement.',
     ],
   },
   {

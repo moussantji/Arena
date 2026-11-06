@@ -28,30 +28,39 @@ const API_PORT = Number(process.env.KALANSO_API_PORT || 8001);
 const LOCAL_API_ORIGIN = `http://127.0.0.1:${API_PORT}`;
 
 /**
- * API distante : KALANSO_REMOTE_API_URL, définie en variable d'environnement
- * ou dans le .env du backend. Quand elle est renseignée — par exemple
- * https://kalanso.mandenbaoubab.com — l'application ne démarre aucun serveur
- * local et dialogue directement avec le serveur de l'établissement
- * (données centralisées, multi-postes).
+ * API de l'établissement : vide/absent = https://kalanso.mandenbaoubab.com ;
+ * « local » explicite = API locale du poste (développement uniquement) ;
+ * toute autre adresse http(s) remplace le serveur.
  */
+const DEFAULT_REMOTE_API = 'https://kalanso.mandenbaoubab.com';
+const LOCAL_SENTINEL = 'local';
+
+function isLocalSentinel(value) {
+  return String(value || '').trim().toLowerCase() === LOCAL_SENTINEL;
+}
+
 function normalizeRemoteUrl(value) {
   return String(value || '').trim().replace(/\/+$/, '').replace(/\/api$/i, '');
 }
 
 function remoteApiUrl() {
   const fromEnv = normalizeRemoteUrl(process.env.KALANSO_REMOTE_API_URL);
-  if (fromEnv) return fromEnv;
+  if (fromEnv) return isLocalSentinel(fromEnv) ? null : fromEnv;
 
   try {
     const envPath = path.join(app.isPackaged ? apiCacheDir() : apiSourceDir(), '.env');
     const content = fs.readFileSync(envPath, 'utf8');
-    const match = content.match(/^\s*KALANSO_REMOTE_API_URL\s*=\s*"?([^"\n\r]+?)"?\s*$/m);
-    if (match && match[1].trim()) return normalizeRemoteUrl(match[1]);
+    const match = content.match(/^\s*KALANSO_REMOTE_API_URL\s*=\s*"?([^"\n\r]*?)"?\s*$/m);
+    if (match) {
+      const raw = match[1].trim();
+      if (!raw || isLocalSentinel(raw)) return raw ? null : DEFAULT_REMOTE_API;
+      return normalizeRemoteUrl(raw);
+    }
   } catch {
     /* fichier .env absent */
   }
 
-  return null;
+  return DEFAULT_REMOTE_API;
 }
 
 const REMOTE_API_URL = remoteApiUrl();
@@ -256,7 +265,7 @@ function ensureEnvFile(target) {
       '# Canal de mise à jour (laisser vide pour GitHub Releases)',
       'KALANSO_UPDATE_URL=',
       '',
-      "# API de l'établissement (défaut en production ; laisser vide pour l'API locale)",
+      "# Vide ou absent = serveur de l'établissement ; « local » = API locale de développement",
       'KALANSO_REMOTE_API_URL=https://kalanso.mandenbaoubab.com',
       '',
     ].join('\n'));
@@ -270,12 +279,9 @@ function ensureEnvFile(target) {
   if (!/^KALANSO_UPDATE_URL=/m.test(content)) {
     content = `${content.replace(/\s*$/, '')}\n\n# Canal de mise à jour (laisser vide pour GitHub Releases)\nKALANSO_UPDATE_URL=\n`;
   }
-  if (/^KALANSO_REMOTE_API_URL=\s*$/m.test(content)) {
-    // Installation neuve : défaut = serveur de l'établissement (comme l'app mobile).
-    // Ce bloc ne s'exécute pas pour un .env existant (mode local conservé).
-    content = content.replace(/^KALANSO_REMOTE_API_URL=\s*$/m, 'KALANSO_REMOTE_API_URL=https://kalanso.mandenbaoubab.com');
-  } else if (!/^KALANSO_REMOTE_API_URL=/m.test(content)) {
-    content = `${content.replace(/\s*$/, '')}\n\n# API de l'établissement (défaut ; laisser vide pour l'API locale)\nKALANSO_REMOTE_API_URL=https://kalanso.mandenbaoubab.com\n`;
+  if (!/^KALANSO_REMOTE_API_URL=/m.test(content)) {
+    // Vide/absent = serveur de l'établissement (voir remoteApiUrl).
+    content = `${content.replace(/\s*$/, '')}\n\n# Vide = serveur de l'établissement ; « local » = API locale de développement\nKALANSO_REMOTE_API_URL=https://kalanso.mandenbaoubab.com\n`;
   }
   fs.writeFileSync(envPath, content);
   logMain(`fichier .env créé pour le backend installé : ${envPath}`);
@@ -999,11 +1005,12 @@ ipcMain.handle('api:info', () => ({
   apiUrl: `${API_ORIGIN}/api`,
 }));
 
-/* Change le serveur de données (API distante ou locale) puis redémarre. */
+/* Change le serveur de données (API distante, locale ou défaut production) puis redémarre. */
 ipcMain.handle('api:setUrl', (_event, value) => {
-  const normalized = normalizeRemoteUrl(value);
-  if (normalized && !/^https?:\/\//i.test(normalized)) {
-    return { ok: false, message: "L'adresse doit commencer par http:// ou https://" };
+  const raw = String(value || '').trim();
+  const normalized = isLocalSentinel(raw) ? 'local' : normalizeRemoteUrl(raw);
+  if (normalized && normalized !== 'local' && !/^https?:\/\//i.test(normalized)) {
+    return { ok: false, message: "L'adresse doit commencer par http:// ou https:// (ou « local » pour l'API de développement)" };
   }
 
   const dir = app.isPackaged ? apiCacheDir() : apiSourceDir();
@@ -1016,7 +1023,7 @@ ipcMain.handle('api:setUrl', (_event, value) => {
     if (/^KALANSO_REMOTE_API_URL=.*$/m.test(content)) {
       content = content.replace(/^KALANSO_REMOTE_API_URL=.*$/m, line);
     } else {
-      content = `${content.replace(/\s*$/, '')}\n\n# API distante (laisser vide pour utiliser l'API de cet ordinateur)\n${line}\n`;
+      content = `${content.replace(/\s*$/, '')}\n\n# Vide = serveur de l'établissement ; « local » = API locale de développement\n${line}\n`;
     }
     fs.writeFileSync(envPath, content);
   } catch (error) {

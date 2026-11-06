@@ -13,6 +13,11 @@ une fois par version dans la fenêtre **Nouveautés**.
 - Message « Service local indisponible » : ajout d'une astuce pour
   basculer sur le serveur de l'établissement (Paramètres →
   Serveur de données), sans serveur PHP local.
+- Le logiciel ne démarre plus de serveur local par défaut : sans
+  configuration explicite, il se connecte au serveur de l'établissement
+  — y compris pour les installations existantes. Tapez « local »
+  (Paramètres → Serveur de données) ou KALANSO_REMOTE_API_URL=local
+  pour forcer l'API locale de développement.
 
 ## 1.3.3 — 6 novembre 2026
 
