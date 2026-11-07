@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\BlogPostController;
 use App\Http\Controllers\Api\AbsenceController;
 use App\Http\Controllers\Api\AdmissionController;
 use App\Http\Controllers\Api\AuditLogController;
